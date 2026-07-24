@@ -1,10 +1,23 @@
 import { NextResponse } from "next/server";
-import { parseAndNormalizeLeaderboard } from "@/lib/normalize-leaderboard";
+import { parseAndNormalizeLeaderboard, maskUsername } from "@/lib/normalize-leaderboard";
 
 const TIMEOUT_MS = 10_000;
 
-export async function GET() {
+function isTooManyRequest(body: unknown): boolean {
+  if (typeof body !== "object" || body === null) return false;
+  const obj = body as Record<string, unknown>;
+  return obj.message === "TOO_MANY_REQUEST";
+}
+
+function isRefereesNotFound(body: unknown): boolean {
+  if (typeof body !== "object" || body === null) return false;
+  const obj = body as Record<string, unknown>;
+  return obj.message === "REFEREES_NOT_FOUND";
+}
+
+export async function GET(request: Request) {
   const apiUrl = process.env.LEADERBOARD_API_URL;
+  const apiKey = process.env.LEADERBOARD_API_KEY;
 
   if (!apiUrl) {
     return NextResponse.json(
@@ -13,14 +26,30 @@ export async function GET() {
     );
   }
 
+  const { searchParams } = new URL(request.url);
+  const startTime = searchParams.get("startTime");
+  const endTime = searchParams.get("endTime");
+
+  const url = new URL(apiUrl);
+  if (startTime) url.searchParams.set("startTime", startTime);
+  if (endTime) url.searchParams.set("endTime", endTime);
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    const response = await fetch(apiUrl, {
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (apiKey) {
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    }
+
+    const response = await fetch(url.toString(), {
       signal: controller.signal,
-      headers: { Accept: "application/json" },
-      next: { revalidate: 30 },
+      headers,
+      next: { revalidate: 60 },
     });
 
     clearTimeout(timeoutId);
@@ -36,6 +65,26 @@ export async function GET() {
       return NextResponse.json(
         { error: "rate_limited", message: "The leaderboard service is temporarily unavailable. Please try again." },
         { status: 429 }
+      );
+    }
+
+    if (response.status === 400) {
+      const errorBody: unknown = await response.json().catch(() => null);
+      if (isTooManyRequest(errorBody)) {
+        return NextResponse.json(
+          { error: "rate_limited", message: "The leaderboard service is temporarily unavailable. Please try again." },
+          { status: 429 }
+        );
+      }
+      if (isRefereesNotFound(errorBody)) {
+        return NextResponse.json(
+          { users: [], total: 0, highestScore: 0, averageScore: 0 },
+          { status: 200 }
+        );
+      }
+      return NextResponse.json(
+        { error: "api_error", message: "The leaderboard could not be loaded." },
+        { status: 502 }
       );
     }
 
@@ -58,12 +107,20 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(normalized, {
-      status: 200,
-      headers: {
-        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
-      },
-    });
+    const maskedUsers = normalized.users.map((user) => ({
+      ...user,
+      name: maskUsername(user.name),
+    }));
+
+    return NextResponse.json(
+      { ...normalized, users: maskedUsers },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+        },
+      }
+    );
   } catch (error: unknown) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === "AbortError") {

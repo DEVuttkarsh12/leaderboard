@@ -38,10 +38,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                 User
               </th>
               <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-[#6f6b7a]">
-                Score
-              </th>
-              <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-[#6f6b7a]">
-                Weighted Score
+                Wager Amount
               </th>
             </tr>
           </thead>
@@ -78,9 +75,6 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                 <td className="px-5 py-4 text-right font-medium text-[#17151f] tabular-nums">
                   {formatNumberCompact(user.score)}
                 </td>
-                <td className="px-5 py-4 text-right font-medium text-[#17151f] tabular-nums">
-                  {formatNumberCompact(user.weightedScore)}
-                </td>
               </tr>
             ))}
           </tbody>
@@ -113,13 +107,8 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                 {user.name}
               </div>
             </div>
-            <div className="text-right">
-              <div className="font-medium text-[#17151f] tabular-nums">
-                {formatNumberCompact(user.score)}
-              </div>
-              <div className="text-xs text-[#6f6b7a] tabular-nums">
-                w: {formatNumberCompact(user.weightedScore)}
-              </div>
+            <div className="text-right font-medium text-[#17151f] tabular-nums">
+              {formatNumberCompact(user.score)}
             </div>
           </div>
         ))}

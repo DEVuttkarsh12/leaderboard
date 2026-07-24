@@ -1,7 +1,7 @@
 export type RawLeaderboardUser = {
   username: string;
   wagerAmount: number;
-  weightedWagerAmount: number;
+  campaignCode?: string;
 };
 
 export type NormalizedLeaderboardUser = {
@@ -9,7 +9,6 @@ export type NormalizedLeaderboardUser = {
   name: string;
   rank: number;
   score: number;
-  weightedScore: number;
 };
 
 export type LeaderboardApiResponse = {

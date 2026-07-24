@@ -70,7 +70,7 @@ export default function LeaderboardSection() {
             Live Leaderboard
           </h2>
           <p className="mt-2 text-[#6f6b7a]">
-            Top participants ranked by their weighted activity score.
+            Top participants ranked by their total wager amount.
           </p>
         </div>
 

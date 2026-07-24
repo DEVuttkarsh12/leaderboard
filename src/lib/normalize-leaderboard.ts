@@ -21,6 +21,13 @@ function convertToId(username: string): string {
   return username.toLowerCase().replace(/[^a-z0-9]/g, "-");
 }
 
+export function maskUsername(username: string): string {
+  if (username.length <= 4) {
+    return username[0] + "***" + username[username.length - 1];
+  }
+  return username.slice(0, 3) + "***" + username.slice(-1);
+}
+
 export function normalizeLeaderboardUser(
   raw: RawLeaderboardUser,
   rank: number
@@ -30,7 +37,6 @@ export function normalizeLeaderboardUser(
     name: raw.username,
     rank,
     score: raw.wagerAmount,
-    weightedScore: raw.weightedWagerAmount,
   };
 }
 
@@ -43,16 +49,13 @@ export function parseAndNormalizeLeaderboard(
   for (const user of parsed) {
     if (
       typeof user.username === "string" &&
-      typeof user.wagerAmount === "number" &&
-      typeof user.weightedWagerAmount === "number"
+      typeof user.wagerAmount === "number"
     ) {
       validUsers.push(user);
     }
   }
 
-  validUsers.sort(
-    (a, b) => b.weightedWagerAmount - a.weightedWagerAmount
-  );
+  validUsers.sort((a, b) => b.wagerAmount - a.wagerAmount);
 
   const users = validUsers.map((user, index) =>
     normalizeLeaderboardUser(user, index + 1)
