@@ -28,7 +28,7 @@ function PodiumCard({ user, rank, delay }: PodiumCardProps) {
   return (
     <article
       className={cn(
-        "podium-card group relative flex h-full flex-col overflow-hidden rounded-[1.9rem] p-6",
+        "podium-card group relative flex h-full flex-col overflow-hidden rounded-[0.6rem] p-6",
         rank === 1 ? "podium-card--first" : "podium-card--secondary"
       )}
       style={{ animationDelay: `${delay}ms` } as CSSProperties}
@@ -46,7 +46,7 @@ function PodiumCard({ user, rank, delay }: PodiumCardProps) {
             <div
               className={cn(
                 "truncate text-lg font-semibold md:text-xl",
-                rank === 1 ? "text-white" : "text-[#17333d]"
+                rank === 1 ? "text-white" : "text-[var(--shib-cream)]"
               )}
             >
               {user.name}
@@ -55,7 +55,7 @@ function PodiumCard({ user, rank, delay }: PodiumCardProps) {
               <div
                 className={cn(
                   "mt-1 truncate text-sm",
-                  rank === 1 ? "text-white/80" : "text-[#54727a]"
+                  rank === 1 ? "text-white/80" : "text-[var(--shib-muted-soft)]"
                 )}
               >
                 {secondaryLabel}
@@ -64,7 +64,7 @@ function PodiumCard({ user, rank, delay }: PodiumCardProps) {
               <div
                 className={cn(
                   "mt-1 text-sm",
-                  rank === 1 ? "text-white/80" : "text-[#54727a]"
+                  rank === 1 ? "text-white/80" : "text-[var(--shib-muted-soft)]"
                 )}
               >
                 Live competitor
@@ -78,12 +78,12 @@ function PodiumCard({ user, rank, delay }: PodiumCardProps) {
         </div>
       </div>
 
-      <div className="relative mt-8 flex items-end justify-between gap-4 border-t border-[rgba(47,143,131,0.14)] pt-5">
+      <div className="relative mt-8 flex items-end justify-between gap-4 border-t border-[rgba(255,209,120,0.12)] pt-5">
         <div>
           <div
             className={cn(
               "text-[0.68rem] uppercase tracking-[0.24em]",
-              rank === 1 ? "text-white/70" : "text-[#6b8a90]"
+              rank === 1 ? "text-white/70" : "text-[var(--shib-muted)]"
             )}
           >
             Current score
@@ -91,7 +91,7 @@ function PodiumCard({ user, rank, delay }: PodiumCardProps) {
           <div
               className={cn(
                 "mt-2 text-[2rem] font-semibold tracking-[-0.06em] md:text-[2.6rem]",
-                rank === 1 ? "text-white" : "text-[#102830]"
+                rank === 1 ? "text-white" : "text-[var(--shib-fur-bright)]"
               )}
             >
               {formatNumberCompact(user.score)}

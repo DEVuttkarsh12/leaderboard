@@ -4,7 +4,7 @@ export function PodiumSkeleton() {
       {[2, 1, 3].map((height) => (
         <div
           key={height}
-          className="leaderboard-shell shimmer-panel rounded-[1.8rem] p-6"
+          className="leaderboard-shell shimmer-panel rounded-[0.6rem] p-6"
           style={{ height: 188 + height * 34 }}
         >
           <div className="mb-4 flex items-center gap-3">
@@ -28,7 +28,7 @@ export function TableSkeleton() {
       {Array.from({ length: 10 }).map((_, i) => (
         <div
           key={i}
-          className="leaderboard-shell shimmer-panel flex items-center gap-4 rounded-[1.5rem] p-4"
+          className="leaderboard-shell shimmer-panel flex items-center gap-4 rounded-[0.5rem] p-4"
         >
           <div className="h-11 w-11 rounded-[1rem] bg-[rgba(111,76,209,0.14)]" />
           <div className="h-11 w-11 rounded-full bg-[rgba(111,76,209,0.14)]" />

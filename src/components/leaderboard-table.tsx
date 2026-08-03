@@ -29,7 +29,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
         <article
           key={user.id}
           className={cn(
-            "row-card group relative overflow-hidden rounded-[1.6rem] px-4 py-4 md:px-5 md:py-[1.125rem]",
+            "row-card group relative overflow-hidden rounded-[0.5rem] px-4 py-4 md:px-5 md:py-[1.125rem]",
             user.rank <= 3 ? "row-card--accent" : "row-card--default"
           )}
           style={{ animationDelay: `${Math.min(index, 14) * 40}ms` } as CSSProperties}
@@ -40,7 +40,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
             <div className="flex items-center gap-3 md:min-w-[15rem]">
               <div
                 className={cn(
-                  "row-rank flex h-12 min-w-12 items-center justify-center rounded-[1rem] text-sm font-semibold",
+                  "row-rank flex h-12 min-w-12 items-center justify-center rounded-[0.35rem] text-sm font-semibold",
                   user.rank === 1 && "row-rank--gold",
                   user.rank === 2 && "row-rank--silver",
                   user.rank === 3 && "row-rank--bronze",
@@ -53,10 +53,10 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
               <UserAvatar name={user.name} avatarUrl={user.avatarUrl} />
 
               <div className="min-w-0">
-                <div className="truncate text-[0.96rem] font-semibold text-[#25143f] md:text-base">
+                <div className="truncate text-[0.96rem] font-semibold text-[var(--shib-cream)] md:text-base">
                   {user.name}
                 </div>
-                <div className="mt-1 truncate text-sm text-[#735f97]">
+                <div className="mt-1 truncate text-sm text-[var(--shib-muted-soft)]">
                   {getMetaLine(user)}
                 </div>
               </div>
@@ -72,10 +72,10 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
               </div>
 
               <div className="text-right md:ml-auto">
-                <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[#8b79af]">
+                <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
                   Score
                 </div>
-                <div className="mt-1 text-[1.6rem] font-semibold tracking-[-0.05em] text-[#23133d] tabular-nums md:text-[1.95rem]">
+                <div className="mt-1 text-[1.6rem] font-semibold tracking-[-0.05em] text-[var(--shib-fur-bright)] tabular-nums md:text-[1.95rem]">
                   {formatNumberCompact(user.score)}
                 </div>
               </div>

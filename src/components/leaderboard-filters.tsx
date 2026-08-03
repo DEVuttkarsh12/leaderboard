@@ -60,7 +60,7 @@ export default function LeaderboardFilters({
           onChange={(e) => handleSearchInput(e.target.value)}
           placeholder="Search by name..."
           aria-label="Search by user name"
-          className="search-shell w-full rounded-[1.35rem] py-3.5 pl-11 pr-12 text-sm text-[var(--shib-cream)] placeholder:text-[var(--shib-muted)] focus:outline-none"
+          className="search-shell w-full rounded-[0.4rem] py-3.5 pl-11 pr-12 text-sm text-[var(--shib-cream)] placeholder:text-[var(--shib-muted)] focus:outline-none"
         />
         {localSearch && (
           <button
@@ -80,7 +80,7 @@ export default function LeaderboardFilters({
         <button
           onClick={toggleSort}
           className={cn(
-            "filter-button inline-flex items-center gap-2 rounded-[1.2rem] px-4 py-3 text-sm font-medium"
+            "filter-button inline-flex items-center gap-2 rounded-[0.4rem] px-4 py-3 text-sm font-medium"
           )}
         >
           <ArrowUpDown className="h-4 w-4" />
@@ -90,7 +90,7 @@ export default function LeaderboardFilters({
           </span>
         </button>
 
-        <div className="score-pill rounded-[1.2rem] px-4 py-3 text-sm text-[var(--shib-fur-bright)]">
+        <div className="score-pill rounded-[0.4rem] px-4 py-3 text-sm text-[var(--shib-fur-bright)]">
           {resultCount}
           {resultCount !== totalCount && ` / ${totalCount}`} results
         </div>

@@ -83,10 +83,7 @@ export default function LeaderboardSection() {
             <h2 className="display-logo mt-5 text-[3.4rem] leading-none text-[var(--shib-cream)] drop-shadow-[0_6px_0_rgba(29,107,99,0.62)] md:text-[4.8rem]">
               RankBoard
             </h2>
-            <div className="display-serif mt-3 text-[2.2rem] font-semibold tracking-[-0.06em] text-[var(--shib-heading)] md:text-[3rem]">
-              Read-only live leaderboard
-            </div>
-            <h3 className="mt-4 text-5xl font-black tracking-[-0.06em] text-[var(--shib-fur)] md:text-6xl">
+            <h3 className="mt-5 text-5xl font-black tracking-[-0.06em] text-[var(--shib-fur)] md:text-6xl">
               $25,200
             </h3>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[var(--shib-muted-soft)]">
@@ -136,7 +133,7 @@ export default function LeaderboardSection() {
           </div>
         ) : (
           <>
-            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem] px-5 py-5 md:px-7 md:py-7">
+            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-5xl overflow-hidden rounded-[0.55rem] px-5 py-5 md:px-7 md:py-7">
               <div className="flex flex-col gap-5 border-b border-[var(--border)] pb-6 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl">
                   <div className="muted-label">Podium</div>
@@ -150,7 +147,7 @@ export default function LeaderboardSection() {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="tinted-panel rounded-[1.3rem] px-4 py-4">
+                  <div className="tinted-panel rounded-[0.45rem] px-4 py-4">
                     <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
                       Average score
                     </div>
@@ -158,7 +155,7 @@ export default function LeaderboardSection() {
                       {formatNumberCompact(averageScore)}
                     </div>
                   </div>
-                  <div className="tinted-panel rounded-[1.3rem] px-4 py-4">
+                  <div className="tinted-panel rounded-[0.45rem] px-4 py-4">
                     <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
                       Board state
                     </div>
@@ -175,7 +172,7 @@ export default function LeaderboardSection() {
               </div>
             </div>
 
-            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-3xl overflow-hidden rounded-[2rem] px-4 py-4 md:px-5 md:py-5">
+            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-3xl overflow-hidden rounded-[0.55rem] px-4 py-4 md:px-5 md:py-5">
               <div className="mb-5 flex flex-col gap-4 border-b border-[var(--border)] pb-5 md:flex-row md:items-end md:justify-between">
                 <div>
                   <div className="text-[11px] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
@@ -186,7 +183,7 @@ export default function LeaderboardSection() {
                   </h3>
                 </div>
 
-                <div className="score-pill rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--shib-fur-bright)]">
+                <div className="score-pill rounded-[0.4rem] px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--shib-fur-bright)]">
                   {filteredUsers.length} Players visible
                 </div>
               </div>
@@ -210,7 +207,7 @@ export default function LeaderboardSection() {
               <div className="flex justify-center pt-1">
                 <button
                   onClick={() => setPage((currentPage) => currentPage + 1)}
-                  className="primary-button rounded-full px-8 py-3 text-sm font-semibold text-[#2d1600]"
+                  className="primary-button rounded-[0.4rem] px-8 py-3 text-sm font-semibold text-[#2d1600]"
                 >
                   Load More ({filteredUsers.length - paginatedUsers.length} remaining)
                 </button>
