@@ -51,16 +51,16 @@ export default function LeaderboardFilters({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <div className="relative flex-1 min-w-[200px]">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6f6b7a]" />
+    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="relative min-w-[200px] flex-1">
+        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--shib-muted)]" />
         <input
           type="text"
           value={localSearch}
           onChange={(e) => handleSearchInput(e.target.value)}
           placeholder="Search by name..."
           aria-label="Search by user name"
-          className="w-full rounded-lg border border-[#e8e4f0] bg-white py-2.5 pl-10 pr-4 text-sm text-[#17151f] placeholder:text-[#6f6b7a] focus:border-[#7257d5] focus:outline-none focus:ring-1 focus:ring-[#7257d5]/20"
+          className="search-shell w-full rounded-[1.35rem] py-3.5 pl-11 pr-12 text-sm text-[var(--shib-cream)] placeholder:text-[var(--shib-muted)] focus:outline-none"
         />
         {localSearch && (
           <button
@@ -69,30 +69,31 @@ export default function LeaderboardFilters({
               onSearchChange("");
             }}
             aria-label="Clear search"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6f6b7a] hover:text-[#17151f]"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--shib-muted)] transition-colors hover:text-[var(--shib-cream)]"
           >
             <X className="h-4 w-4" />
           </button>
         )}
       </div>
 
-      <button
-        onClick={toggleSort}
-        className={cn(
-          "inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors",
-          "border-[#e8e4f0] bg-white text-[#6f6b7a] hover:border-[#d4cee6] hover:text-[#17151f]"
-        )}
-      >
-        <ArrowUpDown className="h-4 w-4" />
-        {sortField === "rank" ? "Rank" : "Score"}
-        <span className="text-xs text-[#6f6b7a]">
-          ({sortDirection === "asc" ? "↑" : "↓"})
-        </span>
-      </button>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          onClick={toggleSort}
+          className={cn(
+            "filter-button inline-flex items-center gap-2 rounded-[1.2rem] px-4 py-3 text-sm font-medium"
+          )}
+        >
+          <ArrowUpDown className="h-4 w-4" />
+          Sort: {sortField === "rank" ? "Rank" : "Score"}
+          <span className="text-xs text-[var(--shib-muted)]">
+            ({sortDirection === "asc" ? "↑" : "↓"})
+          </span>
+        </button>
 
-      <div className="text-sm text-[#6f6b7a]">
-        {resultCount}
-        {resultCount !== totalCount && ` / ${totalCount}`} results
+        <div className="score-pill rounded-[1.2rem] px-4 py-3 text-sm text-[var(--shib-fur-bright)]">
+          {resultCount}
+          {resultCount !== totalCount && ` / ${totalCount}`} results
+        </div>
       </div>
     </div>
   );

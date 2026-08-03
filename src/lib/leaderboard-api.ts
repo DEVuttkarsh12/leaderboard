@@ -1,17 +1,10 @@
-import type { NormalizedLeaderboardUser } from "@/types/leaderboard";
+import type { LeaderboardApiResponse } from "@/types/leaderboard";
 
 const API_TIMEOUT = 10_000;
 
-export type FetchLeaderboardResult = {
-  users: NormalizedLeaderboardUser[];
-  total: number;
-  highestScore: number;
-  averageScore: number;
-};
-
 export async function fetchLeaderboardFromApi(
   signal?: AbortSignal
-): Promise<FetchLeaderboardResult> {
+): Promise<LeaderboardApiResponse> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
@@ -31,7 +24,7 @@ export async function fetchLeaderboardFromApi(
       );
     }
 
-    return await response.json();
+    return (await response.json()) as LeaderboardApiResponse;
   } finally {
     clearTimeout(timeoutId);
   }

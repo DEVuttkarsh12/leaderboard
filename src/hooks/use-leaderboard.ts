@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import type { NormalizedLeaderboardUser, ApiErrorResponse } from "@/types/leaderboard";
+import { fetchLeaderboardFromApi } from "@/lib/leaderboard-api";
+import type {
+  NormalizedLeaderboardUser,
+  LeaderboardApiResponse,
+} from "@/types/leaderboard";
 
 type LeaderboardState = {
   users: NormalizedLeaderboardUser[];
@@ -11,13 +15,6 @@ type LeaderboardState = {
   lastUpdated: Date | null;
   isLoading: boolean;
   error: string | null;
-};
-
-type FetchResult = {
-  users: NormalizedLeaderboardUser[];
-  total: number;
-  highestScore: number;
-  averageScore: number;
 };
 
 export function useLeaderboard() {
@@ -44,18 +41,9 @@ export function useLeaderboard() {
     abortRef.current = controller;
 
     try {
-      const res = await fetch("/api/leaderboard", { signal: controller.signal });
-
-      if (!res.ok) {
-        let msg = "The leaderboard could not be loaded.";
-        try {
-          const err: ApiErrorResponse = await res.json();
-          msg = err.message || msg;
-        } catch {}
-        throw new Error(msg);
-      }
-
-      const data: FetchResult = await res.json();
+      const data: LeaderboardApiResponse = await fetchLeaderboardFromApi(
+        controller.signal
+      );
 
       if (mountedRef.current) {
         setState({
@@ -63,7 +51,7 @@ export function useLeaderboard() {
           total: data.total,
           highestScore: data.highestScore,
           averageScore: data.averageScore,
-          lastUpdated: new Date(),
+          lastUpdated: new Date(data.lastUpdated),
           isLoading: false,
           error: null,
         });

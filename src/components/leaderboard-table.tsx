@@ -1,118 +1,88 @@
+import type { CSSProperties } from "react";
 import type { NormalizedLeaderboardUser } from "@/types/leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import UserAvatar from "./user-avatar";
 
 type LeaderboardTableProps = {
   users: NormalizedLeaderboardUser[];
 };
 
-function Avatar({ name }: { name: string }) {
-  const initials = name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase();
+function getMetaLine(user: NormalizedLeaderboardUser): string {
+  if (user.globalName && user.globalName !== user.name) {
+    return user.globalName;
+  }
 
-  return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f2effc] text-xs font-semibold text-[#7257d5]">
-      {initials}
-    </div>
-  );
+  if (user.username && user.username !== user.name) {
+    return `@${user.username}`;
+  }
+
+  return "Live competitor";
 }
 
 export default function LeaderboardTable({ users }: LeaderboardTableProps) {
   if (users.length === 0) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#e8e4f0] bg-white">
-      <div className="hidden md:block">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[#e8e4f0] bg-[#f8f7fc]">
-              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6b7a]">
-                Rank
-              </th>
-              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6b7a]">
-                User
-              </th>
-              <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-[#6f6b7a]">
-                Wager Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#e8e4f0]">
-            {users.map((user) => (
-              <tr
-                key={user.id}
+    <div className="space-y-3">
+      {users.map((user, index) => (
+        <article
+          key={user.id}
+          className={cn(
+            "row-card group relative overflow-hidden rounded-[1.6rem] px-4 py-4 md:px-5 md:py-[1.125rem]",
+            user.rank <= 3 ? "row-card--accent" : "row-card--default"
+          )}
+          style={{ animationDelay: `${Math.min(index, 14) * 40}ms` } as CSSProperties}
+        >
+          <div className="row-card__shine" aria-hidden="true" />
+
+          <div className="relative flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="flex items-center gap-3 md:min-w-[15rem]">
+              <div
                 className={cn(
-                  "transition-colors hover:bg-[#f8f7fc]",
-                  user.rank <= 3 && "bg-[#f2effc]/30"
+                  "row-rank flex h-12 min-w-12 items-center justify-center rounded-[1rem] text-sm font-semibold",
+                  user.rank === 1 && "row-rank--gold",
+                  user.rank === 2 && "row-rank--silver",
+                  user.rank === 3 && "row-rank--bronze",
+                  user.rank > 3 && "row-rank--default"
                 )}
               >
-                <td className="px-5 py-4">
-                  <span
-                    className={cn(
-                      "inline-flex h-7 w-7 items-center justify-center rounded-md text-xs font-semibold",
-                      user.rank === 1 && "bg-amber-100 text-amber-700",
-                      user.rank === 2 && "bg-slate-100 text-slate-600",
-                      user.rank === 3 && "bg-orange-100 text-orange-700",
-                      user.rank > 3 && "text-[#6f6b7a]"
-                    )}
-                  >
-                    {user.rank}
-                  </span>
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar name={user.name} />
-                    <span className="font-medium text-[#17151f]">
-                      {user.name}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-5 py-4 text-right font-medium text-[#17151f] tabular-nums">
-                  {formatNumberCompact(user.score)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                #{user.rank}
+              </div>
 
-      <div className="divide-y divide-[#e8e4f0] md:hidden">
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className={cn(
-              "flex items-center gap-4 px-5 py-4 transition-colors hover:bg-[#f8f7fc]",
-              user.rank <= 3 && "bg-[#f2effc]/30"
-            )}
-          >
-            <span
-              className={cn(
-                "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold",
-                user.rank === 1 && "bg-amber-100 text-amber-700",
-                user.rank === 2 && "bg-slate-100 text-slate-600",
-                user.rank === 3 && "bg-orange-100 text-orange-700",
-                user.rank > 3 && "text-[#6f6b7a]"
-              )}
-            >
-              {user.rank}
-            </span>
-            <Avatar name={user.name} />
-            <div className="flex-1 min-w-0">
-              <div className="truncate font-medium text-[#17151f]">
-                {user.name}
+              <UserAvatar name={user.name} avatarUrl={user.avatarUrl} />
+
+              <div className="min-w-0">
+                <div className="truncate text-[0.96rem] font-semibold text-[#25143f] md:text-base">
+                  {user.name}
+                </div>
+                <div className="mt-1 truncate text-sm text-[#735f97]">
+                  {getMetaLine(user)}
+                </div>
               </div>
             </div>
-            <div className="text-right font-medium text-[#17151f] tabular-nums">
-              {formatNumberCompact(user.score)}
+
+            <div className="flex flex-1 items-center justify-between gap-3">
+              <div className="hidden items-center gap-2 md:flex">
+                {user.verified ? (
+                  <span className="row-chip">Verified</span>
+                ) : (
+                  <span className="row-chip row-chip--muted">Active board</span>
+                )}
+              </div>
+
+              <div className="text-right md:ml-auto">
+                <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[#8b79af]">
+                  Score
+                </div>
+                <div className="mt-1 text-[1.6rem] font-semibold tracking-[-0.05em] text-[#23133d] tabular-nums md:text-[1.95rem]">
+                  {formatNumberCompact(user.score)}
+                </div>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        </article>
+      ))}
     </div>
   );
 }

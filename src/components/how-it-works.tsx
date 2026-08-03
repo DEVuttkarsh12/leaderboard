@@ -1,36 +1,40 @@
-import { Target, Trophy, Zap } from "lucide-react";
+import { ArrowRight, Trophy, WalletCards } from "lucide-react";
 
 const steps = [
   {
-    icon: Target,
-    title: "Participate",
+    icon: ArrowRight,
+    title: "Join a campaign",
     description:
-      "Complete activities and take part in the community to start earning.",
-  },
-  {
-    icon: Zap,
-    title: "Earn Points",
-    description:
-      "Build your score through verified actions and consistent engagement.",
+      "Start from the active reward campaign and move into the supported play or participation flow.",
   },
   {
     icon: Trophy,
-    title: "Rise in Rank",
+    title: "Climb the board",
     description:
-      "Move higher on the leaderboard as your score grows over time.",
+      "Progress through quests and score accumulation while the public board reflects the live ordering.",
+  },
+  {
+    icon: WalletCards,
+    title: "Claim rewards",
+    description:
+      "Once a campaign closes, the reward layer becomes the destination instead of the leaderboard itself.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-white py-16 md:py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold text-[#17151f] md:text-4xl">
-            How It Works
-          </h2>
-          <p className="mt-2 text-[#6f6b7a]">
-            Three simple steps to climb the rankings.
+    <section id="how-it-works" className="px-4 py-12 md:px-6 md:py-16">
+      <div className="section-wrap section-shell">
+        <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl">
+            <div className="muted-label">How It Works</div>
+            <h2 className="display-serif mt-4 text-4xl font-semibold tracking-[-0.05em] text-[var(--text-primary)] md:text-5xl">
+              A cleaner rewards flow.
+            </h2>
+          </div>
+          <p className="max-w-sm text-sm leading-6 text-[var(--text-secondary)]">
+            The UX should make progression feel obvious: enter, compete, and claim
+            without burying the live board beneath generic dashboard chrome.
           </p>
         </div>
 
@@ -38,23 +42,25 @@ export default function HowItWorks() {
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <div
+              <article
                 key={step.title}
-                className="rounded-2xl border border-[#e8e4f0] bg-[#f8f7fc] p-8 text-center transition-all hover:-translate-y-0.5"
+                className="group border-t border-[rgba(255,216,166,0.12)] pt-6 transition-transform duration-300 hover:-translate-y-1"
               >
-                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[#f2effc]">
-                  <Icon className="h-7 w-7 text-[#7257d5]" />
+                <div className="flex items-center justify-between">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(255,216,166,0.18)] text-[var(--shib-fur-bright)] transition-transform duration-300 group-hover:scale-105">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="text-sm font-medium text-[var(--text-muted)]">
+                    0{index + 1}
+                  </div>
                 </div>
-                <div className="mb-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#7257d5] text-xs font-semibold text-white">
-                  {index + 1}
-                </div>
-                <h3 className="mt-3 text-lg font-semibold text-[#17151f]">
+                <h3 className="mt-6 text-xl font-medium text-[var(--text-primary)]">
                   {step.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#6f6b7a]">
+                <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
                   {step.description}
                 </p>
-              </div>
+              </article>
             );
           })}
         </div>

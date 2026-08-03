@@ -13,21 +13,23 @@ export default function ErrorState({
 }: ErrorStateProps) {
   return (
     <div
-      className="flex flex-col items-center justify-center rounded-2xl border border-[#e8e4f0] bg-white px-6 py-16 text-center"
+      className="leaderboard-shell premium-outline flex flex-col items-center justify-center rounded-[2rem] px-6 py-20 text-center"
       role="alert"
       aria-live="assertive"
     >
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#f2effc]">
-        <AlertCircle className="h-7 w-7 text-[#7257d5]" />
+      <div className="score-pill mb-5 flex h-16 w-16 items-center justify-center rounded-full">
+        <AlertCircle className="h-7 w-7 text-[var(--primary-deep)]" />
       </div>
-      <h3 className="text-lg font-semibold text-[#17151f]">
+      <h3 className="display-serif text-3xl font-semibold tracking-[-0.05em] text-[var(--text-primary)]">
         Unable to load the leaderboard
       </h3>
-      <p className="mt-2 max-w-sm text-sm text-[#6f6b7a]">{message}</p>
+      <p className="mt-3 max-w-sm text-sm leading-6 text-[var(--text-secondary)]">
+        {message}
+      </p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-6 rounded-lg bg-[#7257d5] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#4f3aa8]"
+          className="primary-button mt-7 rounded-full px-6 py-3 text-sm font-semibold text-white"
         >
           Try Again
         </button>
