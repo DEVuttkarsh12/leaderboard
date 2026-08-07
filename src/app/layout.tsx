@@ -1,29 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Caveat_Brush, Outfit } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import SiteBackground from "@/components/site-background";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
-const displayFont = Caveat_Brush({
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-display",
 });
 
-const bodyFont = Outfit({
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
-  title: "RankBoard | Rewards Hub",
+  title: "RankBoard | Live Rewards Floor",
   description:
-    "A multi-page rewards hub with live read-only leaderboard standings, campaign pages, and support surfaces.",
+    "A live rewards floor with real read-only leaderboard standings, event routes, reward surfaces, and support pages.",
   openGraph: {
-    title: "RankBoard | Rewards Hub",
+    title: "RankBoard | Live Rewards Floor",
     description:
-      "A multi-page rewards hub with live read-only leaderboard standings, campaign pages, and support surfaces.",
+      "A live rewards floor with real read-only leaderboard standings, event routes, reward surfaces, and support pages.",
     type: "website",
   },
 };
@@ -42,16 +40,25 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${displayFont.variable} ${bodyFont.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body
         suppressHydrationWarning
-        className="flex min-h-full flex-col text-slate-950"
+        className="min-h-full bg-[var(--bg)] text-[var(--text-primary)]"
       >
-        <SiteBackground />
-        <SiteHeader />
-        <main className="site-shell-content flex-1">{children}</main>
-        <SiteFooter />
+        <div className="product-page app-product-shell">
+          <div className="casino-suit-cloud" aria-hidden="true">
+            <span>♠</span>
+            <span>♦</span>
+            <span>♣</span>
+            <span>♥</span>
+            <i>777</i>
+          </div>
+          <div className="product-noise" aria-hidden="true" />
+          <SiteHeader />
+          <main className="product-main">{children}</main>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   );

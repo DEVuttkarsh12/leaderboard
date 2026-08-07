@@ -1,10 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { siteNavigation } from "@/lib/site-content";
+import ProductLogo from "./product-logo";
+
+const primaryLinks = [
+  { label: "Home", href: "/" },
+  { label: "Leaderboard", href: "/leaderboard" },
+  { label: "Challenges", href: "/challenges" },
+  { label: "Bonus Hunts", href: "/bonus-hunts" },
+  { label: "Store", href: "/store" },
+  { label: "Help", href: "/help" },
+] as const;
+
+const accountLinks = [
+  { label: "Login", href: "/login" },
+  { label: "Support", href: "/support" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+] as const;
 
 function isActivePath(pathname: string, href: string) {
   if (href === "/") {
@@ -16,9 +32,9 @@ function isActivePath(pathname: string, href: string) {
 
 export default function SiteHeader() {
   const pathname = usePathname();
-  const shellRef = useRef<HTMLDivElement | null>(null);
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const shellRef = useRef<HTMLElement | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -27,15 +43,15 @@ export default function SiteHeader() {
         event.target instanceof Node &&
         !shellRef.current.contains(event.target)
       ) {
-        setOpenMenu(null);
         setMobileOpen(false);
+        setAccountOpen(false);
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setOpenMenu(null);
         setMobileOpen(false);
+        setAccountOpen(false);
       }
     }
 
@@ -49,172 +65,117 @@ export default function SiteHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 px-4 pt-4 md:px-6 md:pt-6">
-      <div
-        ref={shellRef}
-        className={`site-nav-frame ${mobileOpen ? "site-nav-frame--open" : ""}`}
-      >
-        <div className="site-nav-main">
-          <Link
-            href="/"
-            className="site-nav-brand"
-            onClick={() => {
-              setOpenMenu(null);
-              setMobileOpen(false);
-            }}
-          >
-            <div className="site-nav-brand__mark">RB</div>
-            <div className="site-nav-brand__copy">
-              <span className="site-nav-brand__title">RankBoard</span>
-              <span className="site-nav-brand__subtitle">
-                live rewards shell
-              </span>
-            </div>
-          </Link>
-
-          <nav className="site-nav-desktop">
-            {siteNavigation.map((item) => {
-              const active = item.href
-                ? isActivePath(pathname, item.href)
-                : item.children?.some((child) =>
-                    isActivePath(pathname, child.href)
-                  );
-              const isOpen = openMenu === item.label;
-
-              if (item.href) {
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={`site-nav-pill ${
-                      active ? "site-nav-pill--active" : ""
-                    }`}
-                    onClick={() => setOpenMenu(null)}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              }
-
-              return (
-                <div
-                  key={item.label}
-                  className="site-nav-dropdown-shell"
-                  onMouseEnter={() => setOpenMenu(item.label)}
-                  onMouseLeave={() =>
-                    setOpenMenu((current) =>
-                      current === item.label ? null : current
-                    )
-                  }
-                >
-                  <button
-                    type="button"
-                    className={`site-nav-pill ${active ? "site-nav-pill--active" : ""}`}
-                    aria-expanded={isOpen}
-                    aria-haspopup="menu"
-                    onClick={() =>
-                      setOpenMenu((current) =>
-                        current === item.label ? null : item.label
-                      )
-                    }
-                  >
-                    {item.label}
-                    <ChevronDown
-                      className={`h-4 w-4 transition-transform duration-200 ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  <div
-                    className={`site-nav-desktop-dropdown ${
-                      isOpen
-                        ? "pointer-events-auto translate-y-0 opacity-100"
-                        : "pointer-events-none -translate-y-1 opacity-0"
-                    }`}
-                  >
-                    {item.children?.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className={`site-nav-desktop-dropdown__link ${
-                          isActivePath(pathname, child.href)
-                            ? "site-nav-desktop-dropdown__link--active"
-                            : ""
-                        }`}
-                        onClick={() => setOpenMenu(null)}
-                      >
-                        <span>{child.label}</span>
-                        {child.description ? (
-                          <small>{child.description}</small>
-                        ) : null}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </nav>
-
-          <div className="site-nav-actions">
-            <Link href="/login" className="site-nav-cta">
-              Log in
+    <>
+      <header ref={shellRef} className="product-header">
+        <ProductLogo
+          onClick={() => {
+            setMobileOpen(false);
+            setAccountOpen(false);
+          }}
+        />
+        <nav className={`product-nav${mobileOpen ? " open" : ""}`} aria-label="Primary navigation">
+          {primaryLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={isActivePath(pathname, link.href) ? "active" : ""}
+              onClick={() => {
+                setMobileOpen(false);
+                setAccountOpen(false);
+              }}
+            >
+              {link.label}
             </Link>
+          ))}
+        </nav>
+        <div className="product-actions">
+          <span className="product-live">
+            <i />
+            LIVE READ ONLY
+          </span>
+          <Link className="notification-trigger" href="/leaderboard" aria-label="Open leaderboard">
+            <span>◇</span>
+            <b>1</b>
+          </Link>
+          <div className="account-wrap">
             <button
               type="button"
-              className="site-nav-toggle md:hidden"
-              aria-expanded={mobileOpen}
-              aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-              onClick={() => setMobileOpen((current) => !current)}
+              className="account-trigger"
+              aria-expanded={accountOpen}
+              onClick={() => {
+                setAccountOpen((current) => !current);
+                setMobileOpen(false);
+              }}
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <span className="mini-player tone-coral">
+                RB
+                <i />
+              </span>
+              <span>
+                <strong>LIVE FLOOR</strong>
+                <small>RankBoard shell</small>
+              </span>
+              <b>⌄</b>
             </button>
-          </div>
-        </div>
-
-        {mobileOpen ? (
-          <div className="site-nav-mobile-panel md:hidden">
-            {siteNavigation.map((item) => {
-              if (item.href) {
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={`site-nav-mobile-link ${
-                      isActivePath(pathname, item.href)
-                        ? "site-nav-mobile-link--active"
-                        : ""
-                    }`}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              }
-
-              return (
-                <div key={item.label} className="site-nav-mobile-group">
-                  <div className="site-nav-mobile-group__title">{item.label}</div>
-                  {item.children?.map((child) => (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      className={`site-nav-mobile-link ${
-                        isActivePath(pathname, child.href)
-                          ? "site-nav-mobile-link--active"
-                          : ""
-                      }`}
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {child.label}
-                    </Link>
-                  ))}
+            {accountOpen ? (
+              <div className="account-menu">
+                <div>
+                  <span className="mini-player tone-coral">
+                    RB
+                    <i />
+                  </span>
+                  <p>
+                    <strong>RankBoard</strong>
+                    <small>Real data. Design shell.</small>
+                  </p>
                 </div>
-              );
-            })}
+                {accountLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setAccountOpen(false)}
+                  >
+                    {link.label}
+                    <span>↗</span>
+                  </Link>
+                ))}
+                <button type="button" onClick={() => setAccountOpen(false)}>
+                  CLOSE
+                  <span>→</span>
+                </button>
+              </div>
+            ) : null}
           </div>
-        ) : null}
+          <button
+            type="button"
+            className="product-menu"
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            onClick={() => {
+              setMobileOpen((current) => !current);
+              setAccountOpen(false);
+            }}
+          >
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        </div>
+      </header>
+      <div className="casino-status-strip" aria-label="Platform status">
+        <div>
+          <span>
+            <i>♠</i> LIVE BOARD <strong>READ ONLY</strong>
+          </span>
+          <span>
+            <i className="red">♦</i> REAL DATA <strong>SERVER ROUTE</strong>
+          </span>
+          <span>
+            <i>♣</i> REWARD SHELL <strong>MULTI PAGE</strong>
+          </span>
+          <span>
+            <b>777</b> POLLING <strong>60 SECOND SYNC</strong>
+          </span>
+        </div>
       </div>
-    </header>
+    </>
   );
 }

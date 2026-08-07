@@ -2,24 +2,19 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowRight, RefreshCcw, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
-import {
-  formatLastUpdated,
-  formatShortDate,
-} from "@/lib/formatters";
+import { formatLastUpdated, formatShortDate } from "@/lib/formatters";
 import { getSearchableNames } from "@/lib/normalize-leaderboard";
-import type { SortField, SortDirection } from "./leaderboard-filters";
-import TopThreePodium from "./top-three-podium";
-import LeaderboardFilters from "./leaderboard-filters";
-import LeaderboardTable from "./leaderboard-table";
+import { getInitials, getToneByIndex } from "@/lib/player-presentation";
 import EmptyState from "./empty-state";
 import ErrorState from "./error-state";
-import { PodiumSkeleton, TableSkeleton } from "./loading-skeleton";
 import CountUpValue from "./count-up-value";
-import CountdownStrip from "./countdown-strip";
 
 const PAGE_SIZE = 20;
+
+type SortField = "rank" | "score";
+type SortDirection = "asc" | "desc";
 
 type LeaderboardSectionProps = {
   countdownTarget?: string | null;
@@ -62,9 +57,7 @@ export default function LeaderboardSection({
         return sortDirection === "asc" ? a.rank - b.rank : b.rank - a.rank;
       }
 
-      return sortDirection === "desc"
-        ? b.score - a.score
-        : a.score - b.score;
+      return sortDirection === "desc" ? b.score - a.score : a.score - b.score;
     });
 
     return result;
@@ -76,227 +69,323 @@ export default function LeaderboardSection({
   const topPlayer = users[0] ?? null;
   const targetDate = countdownTarget ? new Date(countdownTarget) : null;
   const hasSearchResults = filteredUsers.length > 0;
+  const podiumUsers = users.slice(0, 3);
+  const orderedPodiumUsers =
+    podiumUsers.length === 3 ? [podiumUsers[1], podiumUsers[0], podiumUsers[2]] : podiumUsers;
+  const boardPulseUsers = filteredUsers.slice(0, 4);
 
   return (
-    <section id="leaderboard" className="relative px-4 py-10 md:px-6 md:py-14">
-      <div className="section-wrap relative flex flex-col gap-6">
-        <div className="leaderboard-hero">
-          <div className="leaderboard-hero__copy">
-            <div className="hero-kicker-row">
-              <div className="hero-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.26em]">
-                <span className="live-dot" aria-hidden="true" />
-                Live leaderboard
-              </div>
-              <div className="hero-inline-note">
-                Live route. Read only client.
-              </div>
-            </div>
-
-            <h1 className="display-serif mt-5 max-w-4xl text-6xl font-normal leading-[0.9] text-[var(--shib-cream)] md:text-7xl">
-              Current leaderboard round.
-            </h1>
-
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--shib-muted-soft)]">
-              Search, sort, refresh cadence, and rank order still run through
-              the same protected route. Only the presentation layer changed.
+    <section id="leaderboard" className="product-section board-product-section">
+      <section className="product-intro">
+        <div className="intro-index">
+          01
+          <span>/05</span>
+        </div>
+        <div>
+          <span className="product-kicker">LIVE BOARD · REAL DATA</span>
+          <h1>
+            THE BOARD
+            <em> NEVER SLEEPS.</em>
+          </h1>
+        </div>
+        <div className="intro-aside">
+          <div className="season-clock">
+            <span>BOARD STATE</span>
+            <strong>
+              {lastUpdated ? formatLastUpdated(lastUpdated).toUpperCase() : "CONNECTING"}
+            </strong>
+            <i>
+              <b
+                style={{
+                  width: `${Math.max(
+                    18,
+                    Math.min(100, (averageScore / Math.max(highestScore, 1)) * 100)
+                  )}%`,
+                }}
+              />
+            </i>
+            <p>
+              {targetDate
+                ? `Round target ${formatShortDate(targetDate)}`
+                : "Existing provider and ranking logic preserved."}
             </p>
-            <div className="leaderboard-hero__actions mt-7 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={retry}
-                className="secondary-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-[var(--shib-cream)]"
-              >
-                <RefreshCcw className="h-4 w-4" />
-                Refresh board
-              </button>
-              <Link
-                href="/challenges"
-                className="primary-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-[var(--shib-ink)]"
-              >
-                Open reward routes
-                <ArrowRight className="h-4 w-4" />
+          </div>
+        </div>
+      </section>
+
+      {!isLoading && podiumUsers.length > 0 ? (
+        <section className="product-podium" aria-label="Top three players">
+          <div className="podium-atmosphere">
+            <i />
+            <i />
+            <i />
+          </div>
+          {orderedPodiumUsers.map((user) => {
+            if (!user) {
+              return null;
+            }
+
+            const tone = getToneByIndex(user.rank - 1);
+
+            return (
+              <article className={`product-podium-card place-${user.rank}`} key={user.id}>
+                <span className="podium-place">#{user.rank.toString().padStart(2, "0")}</span>
+                {user.rank === 1 ? (
+                  <span className="product-crown">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                ) : null}
+                <span className={`product-avatar ${user.rank === 1 ? "large" : "medium"} tone-${tone}`}>
+                  {getInitials(user.name)}
+                  <i />
+                </span>
+                <h2>{user.name}</h2>
+                <p>{user.username ? `@${user.username}` : "Live competitor"}</p>
+                <strong>
+                  <CountUpValue value={user.score} mode="score" />
+                </strong>
+                <small>WEIGHTED XP</small>
+                <div>
+                  <span>WAGERED</span>
+                  <b>
+                    <CountUpValue value={user.points ?? 0} mode="score" />
+                  </b>
+                </div>
+              </article>
+            );
+          })}
+          <div className="podium-float float-rank">
+            <span>{topPlayer ? `#${topPlayer.rank}` : "#01"}</span>
+            <small>LIVE LEAD</small>
+          </div>
+          <div className="podium-float float-move">
+            <span className={`product-avatar small tone-${getToneByIndex(3)}`}>
+              {topPlayer ? getInitials(topPlayer.name) : "RB"}
+              <i />
+            </span>
+            <span>
+              <strong>{topPlayer ? topPlayer.name : "Connecting"}</strong>
+              <small>{lastUpdated ? `Updated ${formatLastUpdated(lastUpdated)}` : "Syncing"}</small>
+            </span>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="product-section board-product-section">
+        <div className="product-section-title">
+          <div>
+            <span className="product-kicker">COMPLETE STANDINGS</span>
+            <h2>REAL RANKS. LIVE ORDER.</h2>
+          </div>
+          <button className="refresh-board" type="button" onClick={retry}>
+            <RefreshCcw className="h-4 w-4" />
+            <span>REFRESH</span>
+          </button>
+        </div>
+
+        <div className="board-product-grid">
+          <div className="full-board-panel">
+            <div className="full-board-controls">
+              <label className="product-search">
+                <span>⌕</span>
+                <input
+                  aria-label="Search players"
+                  placeholder="Search player, username, or handle"
+                  value={search}
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                    setPage(1);
+                  }}
+                />
+                {search ? (
+                  <button type="button" onClick={() => setSearch("")} aria-label="Clear search">
+                    ×
+                  </button>
+                ) : null}
+              </label>
+              <div className="product-segments" aria-label="Leaderboard sort">
+                <button
+                  type="button"
+                  className={sortField === "score" && sortDirection === "desc" ? "active" : ""}
+                  onClick={() => {
+                    setSortField("score");
+                    setSortDirection("desc");
+                    setPage(1);
+                  }}
+                >
+                  TOP XP
+                </button>
+                <button
+                  type="button"
+                  className={sortField === "rank" && sortDirection === "asc" ? "active" : ""}
+                  onClick={() => {
+                    setSortField("rank");
+                    setSortDirection("asc");
+                    setPage(1);
+                  }}
+                >
+                  RANK ORDER
+                </button>
+              </div>
+              <Link className="refresh-board" href="/challenges">
+                <span>REWARD ROUTES</span>
               </Link>
             </div>
 
-            <div className="leaderboard-hero__signals mt-7 flex flex-wrap gap-3">
-              <div className="hero-support-card">
-                <ShieldCheck className="h-4 w-4 text-[var(--shib-gold)]" />
-                Read-only leaderboard API
-              </div>
-              <div className="hero-support-card">
-                <Trophy className="h-4 w-4 text-[var(--shib-violet-soft)]" />
-                Weighted XP determines order
-              </div>
-              <div className="hero-support-card">
-                <Sparkles className="h-4 w-4 text-[var(--shib-gold)]" />
-                Search, sort, and paging remain intact
-              </div>
+            <div className="full-board-head">
+              <span>RANK / PLAYER</span>
+              <span>STATUS</span>
+              <span>WEIGHTED XP</span>
+              <span>WAGERED</span>
             </div>
 
-            <div className="leaderboard-summary-card mt-8">
-              <div className="leaderboard-summary-card__header">
-                <span className="muted-label">Board state</span>
-                <span className="leaderboard-summary-card__status">
-                  <span className="live-dot" aria-hidden="true" />
-                  {lastUpdated
-                    ? `Updated ${formatLastUpdated(lastUpdated)}`
-                    : "Connecting"}
-                </span>
-              </div>
-
-              <div className="leaderboard-summary-card__leader">
-                <div className="leaderboard-summary-card__label">Current leader</div>
-                <div className="leaderboard-summary-card__title">
-                  {topPlayer ? topPlayer.name : "Waiting for data"}
-                </div>
-                <div className="leaderboard-summary-card__value">
-                  {topPlayer ? (
-                    <CountUpValue value={topPlayer.score} mode="score" />
-                  ) : (
-                    "..."
-                  )}
-                </div>
-                <div className="leaderboard-summary-card__subvalue">
-                  {targetDate ? `Round target ${formatShortDate(targetDate)}` : "Live standings"}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {countdownTarget ? (
-          <CountdownStrip
-            targetIso={countdownTarget}
-            label="Leaderboard window closes"
-          />
-        ) : null}
-
-        {isLoading ? (
-          <>
-            <div className="mx-auto w-full max-w-6xl">
-              <PodiumSkeleton />
-            </div>
-            <div className="mx-auto w-full max-w-6xl">
-              <TableSkeleton />
-            </div>
-          </>
-        ) : error ? (
-          <div className="mx-auto w-full max-w-4xl">
-            <ErrorState message={error} onRetry={retry} />
-          </div>
-        ) : users.length === 0 ? (
-          <div className="mx-auto w-full max-w-4xl">
-            <EmptyState />
-          </div>
-        ) : (
-          <>
-            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] px-5 py-7 md:px-7 md:py-9">
-              <div className="leaderboard-stage-head">
-                <div className="muted-label">Top positions</div>
-                <h2 className="display-serif mt-4 text-5xl font-normal leading-[0.92] text-[var(--shib-cream)] md:text-6xl">
-                  Front-runners on the board.
-                </h2>
-                <div className="leaderboard-stage-metrics mt-6">
-                  <div className="leaderboard-stat-card">
-                    <span className="leaderboard-stat-card__label">Entries</span>
-                    <span className="leaderboard-stat-card__value">
-                      {isLoading ? "..." : <CountUpValue value={total} mode="whole" />}
-                    </span>
+            <div className="full-board-body" aria-live="polite">
+              {error ? (
+                <ErrorState message={error} onRetry={retry} />
+              ) : isLoading ? (
+                Array.from({ length: 8 }).map((_, index) => (
+                  <div className="product-skeleton-row" key={index}>
+                    <i />
+                    <i />
+                    <i />
+                    <i />
                   </div>
-                  <div className="leaderboard-stat-card">
-                    <span className="leaderboard-stat-card__label">Top weighted XP</span>
-                    <span className="leaderboard-stat-card__value">
-                      {isLoading ? "..." : <CountUpValue value={highestScore} mode="score" />}
-                    </span>
-                  </div>
-                  <div className="leaderboard-stat-card">
-                    <span className="leaderboard-stat-card__label">Average XP</span>
-                    <span className="leaderboard-stat-card__value">
-                      {isLoading ? "..." : <CountUpValue value={averageScore} mode="score" />}
-                    </span>
-                  </div>
-                  <div className="leaderboard-stat-card">
-                    <span className="leaderboard-stat-card__label">Visible wager volume</span>
-                    <span className="leaderboard-stat-card__value">
-                      {isLoading ? "..." : <CountUpValue value={totalWager} mode="score" />}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                ))
+              ) : hasSearchResults ? (
+                paginatedUsers.map((user, index) => {
+                  const leaderScore = filteredUsers[0]?.score ?? user.score;
+                  const progressPercent =
+                    leaderScore > 0
+                      ? Math.max(8, Math.min(100, Math.round((user.score / leaderScore) * 100)))
+                      : 0;
+                  const tone = getToneByIndex(index);
 
-              <div className="mt-8">
-                <TopThreePodium users={users} />
-              </div>
+                  return (
+                    <article className="full-board-row" key={user.id}>
+                      <span className="full-rank">#{user.rank.toString().padStart(2, "0")}</span>
+                      <span className={`product-avatar small tone-${tone}`}>
+                        {getInitials(user.name)}
+                        <i />
+                      </span>
+                      <span className="full-identity">
+                        <strong>{user.name}</strong>
+                        <small>
+                          {user.username
+                            ? `@${user.username}`
+                            : user.globalName ?? user.kickUsername ?? "Live competitor"}
+                        </small>
+                      </span>
+                      <span className={`product-movement ${user.rank <= 3 ? "up" : "same"}`}>
+                        {user.rank <= 3 ? "HOT" : "LIVE"}
+                      </span>
+                      <span className="full-xp">
+                        <strong>
+                          <CountUpValue value={user.score} mode="score" />
+                        </strong>
+                        <i>
+                          <b style={{ width: `${progressPercent}%` }} />
+                        </i>
+                      </span>
+                      <span className="full-reward">
+                        <CountUpValue value={user.points ?? 0} mode="score" />
+                      </span>
+                      <span className="row-open">↗</span>
+                    </article>
+                  );
+                })
+              ) : (
+                <EmptyState
+                  title="No players matched that search"
+                  description="Try another username or clear the filter to return to the full live board."
+                  action={
+                    <button type="button" onClick={() => setSearch("")}>
+                      CLEAR SEARCH
+                    </button>
+                  }
+                />
+              )}
             </div>
-
-            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] px-4 py-5 md:px-5 md:py-6">
-              <div className="section-head section-head--tight">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
-                    Ranked players
-                  </div>
-                  <h2 className="display-serif mt-3 text-5xl font-normal leading-[0.92] text-[var(--shib-cream)] md:text-[3.6rem]">
-                    Full standings
-                  </h2>
-                </div>
-
-                <div className="score-pill rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--shib-gold)]">
-                  {filteredUsers.length} visible
-                </div>
-              </div>
-
-              <LeaderboardFilters
-                search={search}
-                onSearchChange={(value) => {
-                  setSearch(value);
-                  setPage(1);
-                }}
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onSortChange={(field, direction) => {
-                  setSortField(field);
-                  setSortDirection(direction);
-                  setPage(1);
-                }}
-                resultCount={paginatedUsers.length}
-                totalCount={filteredUsers.length}
-              />
-
-              <div className="mt-5">
-                {hasSearchResults ? (
-                  <LeaderboardTable users={paginatedUsers} />
-                ) : (
-                  <EmptyState
-                    title="No players matched that search"
-                    description="Try another handle, username, or clear the filter to return to the full board."
-                    action={
-                      <button
-                        type="button"
-                        onClick={() => setSearch("")}
-                        className="primary-button rounded-full px-5 py-3 text-sm font-semibold text-[var(--accent-ink)]"
-                      >
-                        Clear search
-                      </button>
-                    }
-                  />
-                )}
-              </div>
-            </div>
-
-            {hasMore ? (
-              <div className="flex justify-center pt-1">
-                <button
-                  type="button"
-                  onClick={() => setPage((currentPage) => currentPage + 1)}
-                  className="primary-button rounded-full px-8 py-3 text-sm font-semibold text-[var(--accent-ink)]"
-                >
-                  Load more players ({filteredUsers.length - paginatedUsers.length} remaining)
-                </button>
-              </div>
+            {hasMore && !error && hasSearchResults ? (
+              <button className="load-more" type="button" onClick={() => setPage((value) => value + 1)}>
+                LOAD MORE PLAYERS
+                <span>{filteredUsers.length - paginatedUsers.length} REMAIN</span>
+              </button>
             ) : null}
-          </>
-        )}
-      </div>
+          </div>
+
+          <aside className="board-product-aside">
+            <article className="you-position-card">
+              <div>
+                <span>BOARD METRICS</span>
+                <b>LIVE</b>
+              </div>
+              <strong>
+                <small>#</small>
+                {total}
+              </strong>
+              <div className="you-player">
+                <span className={`product-avatar medium tone-${getToneByIndex(0)}`}>
+                  {topPlayer ? getInitials(topPlayer.name) : "RB"}
+                  <i />
+                </span>
+                <p>
+                  <b>{topPlayer ? topPlayer.name : "Waiting for data"}</b>
+                  <span>{lastUpdated ? `Updated ${formatLastUpdated(lastUpdated)}` : "Connecting"}</span>
+                </p>
+                <span className="product-movement up">LIVE</span>
+              </div>
+              <div className="next-rank">
+                <div>
+                  <span>VISIBLE WAGER VOLUME</span>
+                  <b>
+                    <CountUpValue value={totalWager} mode="score" />
+                  </b>
+                </div>
+                <i>
+                  <b
+                    style={{
+                      width: `${Math.max(
+                        14,
+                        Math.min(100, (averageScore / Math.max(highestScore, 1)) * 100)
+                      )}%`,
+                    }}
+                  />
+                </i>
+                <small>
+                  {targetDate
+                    ? `Round target ${formatShortDate(targetDate)}`
+                    : "Existing backend and provider remain unchanged."}
+                </small>
+              </div>
+              <Link href="/support">OPEN SUPPORT ↗</Link>
+            </article>
+
+            <article className="board-pulse-card">
+              <div className="pulse-head">
+                <span>
+                  <i />
+                  BOARD PULSE
+                </span>
+                <b>NOW</b>
+              </div>
+              {boardPulseUsers.map((user) => (
+                <div className="pulse-item" key={user.id}>
+                  <span>{getInitials(user.name)}</span>
+                  <p>
+                    <strong>{user.name}</strong>
+                    <small>RANK #{user.rank}</small>
+                  </p>
+                  <b>
+                    <CountUpValue value={user.score} mode="score" />
+                  </b>
+                </div>
+              ))}
+            </article>
+          </aside>
+        </div>
+      </section>
     </section>
   );
 }
