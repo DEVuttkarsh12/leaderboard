@@ -274,7 +274,18 @@ export default function FaultyTerminal({
     const container = containerRef.current;
     if (!container) return;
 
-    const renderer = new Renderer({ dpr });
+    let renderer;
+    try {
+      renderer = new Renderer({ dpr });
+    } catch (error) {
+      console.warn("faulty-terminal: unable to create webgl renderer", error);
+      return;
+    }
+
+    if (!renderer?.gl) {
+      return;
+    }
+
     rendererRef.current = renderer;
     const { gl } = renderer;
     gl.clearColor(0, 0, 0, 1);

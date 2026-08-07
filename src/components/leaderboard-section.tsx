@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { ArrowRight, RefreshCcw, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
-import { formatLastUpdated, formatNumberCompact } from "@/lib/formatters";
+import {
+  formatLastUpdated,
+  formatShortDate,
+} from "@/lib/formatters";
+import { getSearchableNames } from "@/lib/normalize-leaderboard";
 import type { SortField, SortDirection } from "./leaderboard-filters";
 import TopThreePodium from "./top-three-podium";
 import LeaderboardFilters from "./leaderboard-filters";
@@ -10,10 +16,22 @@ import LeaderboardTable from "./leaderboard-table";
 import EmptyState from "./empty-state";
 import ErrorState from "./error-state";
 import { PodiumSkeleton, TableSkeleton } from "./loading-skeleton";
+import CountUpValue from "./count-up-value";
+import CountdownStrip from "./countdown-strip";
 
 const PAGE_SIZE = 20;
 
-export default function LeaderboardSection() {
+type LeaderboardSectionProps = {
+  countdownTarget?: string | null;
+};
+
+function getTotalWager(users: ReturnType<typeof useLeaderboard>["users"]): number {
+  return users.reduce((sum, user) => sum + (user.points ?? 0), 0);
+}
+
+export default function LeaderboardSection({
+  countdownTarget = null,
+}: LeaderboardSectionProps) {
   const {
     users,
     total,
@@ -29,23 +47,13 @@ export default function LeaderboardSection() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [page, setPage] = useState(1);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    setPage(1);
-  }, []);
-
-  const handleSortChange = useCallback(
-    (field: SortField, direction: SortDirection) => {
-      setSortField(field);
-      setSortDirection(direction);
-    },
-    []
-  );
-
   const filteredUsers = useMemo(() => {
-    const result = search.trim()
+    const query = search.trim().toLowerCase();
+    const result = query
       ? users.filter((user) =>
-          user.name.toLowerCase().includes(search.trim().toLowerCase())
+          getSearchableNames(user).some((name) =>
+            name.toLowerCase().includes(query)
+          )
         )
       : [...users];
 
@@ -64,105 +72,154 @@ export default function LeaderboardSection() {
 
   const paginatedUsers = filteredUsers.slice(0, page * PAGE_SIZE);
   const hasMore = page * PAGE_SIZE < filteredUsers.length;
+  const totalWager = useMemo(() => getTotalWager(users), [users]);
+  const topPlayer = users[0] ?? null;
+  const targetDate = countdownTarget ? new Date(countdownTarget) : null;
+  const hasSearchResults = filteredUsers.length > 0;
 
   return (
-    <section
-      id="leaderboard"
-      className="relative px-4 py-10 md:px-6 md:py-14"
-    >
+    <section id="leaderboard" className="relative px-4 py-10 md:px-6 md:py-14">
       <div className="section-wrap relative flex flex-col gap-6">
-        <div className="absolute -left-12 top-20 hidden h-44 w-44 rounded-full bg-[radial-gradient(circle,rgba(47,143,131,0.18),transparent_68%)] blur-3xl lg:block" />
-        <div className="absolute -right-10 top-64 hidden h-36 w-36 rounded-full bg-[radial-gradient(circle,rgba(255,199,106,0.16),transparent_70%)] blur-3xl lg:block" />
-
-        <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 text-center">
-          <div className="max-w-3xl">
-            <div className="hero-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.26em]">
-              <span className="live-dot" aria-hidden="true" />
-              Live leaderboard
+        <div className="leaderboard-hero">
+          <div className="leaderboard-hero__copy">
+            <div className="hero-kicker-row">
+              <div className="hero-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.26em]">
+                <span className="live-dot" aria-hidden="true" />
+                Live leaderboard
+              </div>
+              <div className="hero-inline-note">
+                Live route. Read only client.
+              </div>
             </div>
-            <h2 className="display-logo mt-5 text-[3.4rem] leading-none text-[var(--shib-cream)] drop-shadow-[0_6px_0_rgba(29,107,99,0.62)] md:text-[4.8rem]">
-              RankBoard
-            </h2>
-            <h3 className="mt-5 text-5xl font-black tracking-[-0.06em] text-[var(--shib-fur)] md:text-6xl">
-              $25,200
-            </h3>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[var(--shib-muted-soft)]">
-              Same ranking engine, same live feed, same search and sort behavior.
-              Only the stage, motion, and board presentation have changed.
+
+            <h1 className="display-serif mt-5 max-w-4xl text-6xl font-normal leading-[0.9] text-[var(--shib-cream)] md:text-7xl">
+              Current leaderboard round.
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--shib-muted-soft)]">
+              Search, sort, refresh cadence, and rank order still run through
+              the same protected route. Only the presentation layer changed.
             </p>
-          </div>
+            <div className="leaderboard-hero__actions mt-7 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={retry}
+                className="secondary-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-[var(--shib-cream)]"
+              >
+                <RefreshCcw className="h-4 w-4" />
+                Refresh board
+              </button>
+              <Link
+                href="/challenges"
+                className="primary-button inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-[var(--shib-ink)]"
+              >
+                Open reward routes
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
 
-          <div className="grid w-full max-w-3xl gap-3 sm:grid-cols-3">
-            <div className="leaderboard-stat-card">
-              <span className="leaderboard-stat-card__label">Entries</span>
-              <span className="leaderboard-stat-card__value">
-                {isLoading ? "..." : total}
-              </span>
+            <div className="leaderboard-hero__signals mt-7 flex flex-wrap gap-3">
+              <div className="hero-support-card">
+                <ShieldCheck className="h-4 w-4 text-[var(--shib-gold)]" />
+                Read-only leaderboard API
+              </div>
+              <div className="hero-support-card">
+                <Trophy className="h-4 w-4 text-[var(--shib-violet-soft)]" />
+                Weighted XP determines order
+              </div>
+              <div className="hero-support-card">
+                <Sparkles className="h-4 w-4 text-[var(--shib-gold)]" />
+                Search, sort, and paging remain intact
+              </div>
             </div>
-            <div className="leaderboard-stat-card">
-              <span className="leaderboard-stat-card__label">Top score</span>
-              <span className="leaderboard-stat-card__value">
-                {isLoading ? "..." : formatNumberCompact(highestScore)}
-              </span>
-            </div>
-            <div className="leaderboard-stat-card">
-              <span className="leaderboard-stat-card__label">Last refresh</span>
-              <span className="leaderboard-stat-card__value leaderboard-stat-card__value--small">
-                {lastUpdated ? formatLastUpdated(lastUpdated) : "Waiting"}
-              </span>
+
+            <div className="leaderboard-summary-card mt-8">
+              <div className="leaderboard-summary-card__header">
+                <span className="muted-label">Board state</span>
+                <span className="leaderboard-summary-card__status">
+                  <span className="live-dot" aria-hidden="true" />
+                  {lastUpdated
+                    ? `Updated ${formatLastUpdated(lastUpdated)}`
+                    : "Connecting"}
+                </span>
+              </div>
+
+              <div className="leaderboard-summary-card__leader">
+                <div className="leaderboard-summary-card__label">Current leader</div>
+                <div className="leaderboard-summary-card__title">
+                  {topPlayer ? topPlayer.name : "Waiting for data"}
+                </div>
+                <div className="leaderboard-summary-card__value">
+                  {topPlayer ? (
+                    <CountUpValue value={topPlayer.score} mode="score" />
+                  ) : (
+                    "..."
+                  )}
+                </div>
+                <div className="leaderboard-summary-card__subvalue">
+                  {targetDate ? `Round target ${formatShortDate(targetDate)}` : "Live standings"}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
+        {countdownTarget ? (
+          <CountdownStrip
+            targetIso={countdownTarget}
+            label="Leaderboard window closes"
+          />
+        ) : null}
+
         {isLoading ? (
           <>
-            <div className="mx-auto w-full max-w-5xl">
+            <div className="mx-auto w-full max-w-6xl">
               <PodiumSkeleton />
             </div>
-            <div className="mx-auto w-full max-w-3xl">
+            <div className="mx-auto w-full max-w-6xl">
               <TableSkeleton />
             </div>
           </>
         ) : error ? (
-          <div className="mx-auto w-full max-w-3xl">
+          <div className="mx-auto w-full max-w-4xl">
             <ErrorState message={error} onRetry={retry} />
           </div>
         ) : users.length === 0 ? (
-          <div className="mx-auto w-full max-w-3xl">
+          <div className="mx-auto w-full max-w-4xl">
             <EmptyState />
           </div>
         ) : (
           <>
-            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-5xl overflow-hidden rounded-[0.55rem] px-5 py-5 md:px-7 md:py-7">
-              <div className="flex flex-col gap-5 border-b border-[var(--border)] pb-6 md:flex-row md:items-end md:justify-between">
-                <div className="max-w-2xl">
-                  <div className="muted-label">Podium</div>
-                  <h3 className="display-serif mt-3 text-4xl font-semibold tracking-[-0.05em] text-[var(--shib-cream)] md:text-[3.4rem]">
-                    Front-runner focus
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-[var(--shib-muted-soft)]">
-                    The first three places get their own stage before the full board
-                    settles into a tighter list view.
-                  </p>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="tinted-panel rounded-[0.45rem] px-4 py-4">
-                    <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
-                      Average score
-                    </div>
-                    <div className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-[var(--shib-cream)]">
-                      {formatNumberCompact(averageScore)}
-                    </div>
+            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] px-5 py-7 md:px-7 md:py-9">
+              <div className="leaderboard-stage-head">
+                <div className="muted-label">Top positions</div>
+                <h2 className="display-serif mt-4 text-5xl font-normal leading-[0.92] text-[var(--shib-cream)] md:text-6xl">
+                  Front-runners on the board.
+                </h2>
+                <div className="leaderboard-stage-metrics mt-6">
+                  <div className="leaderboard-stat-card">
+                    <span className="leaderboard-stat-card__label">Entries</span>
+                    <span className="leaderboard-stat-card__value">
+                      {isLoading ? "..." : <CountUpValue value={total} mode="whole" />}
+                    </span>
                   </div>
-                  <div className="tinted-panel rounded-[0.45rem] px-4 py-4">
-                    <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
-                      Board state
-                    </div>
-                    <div className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--shib-fur-bright)]">
-                      <span className="live-dot" aria-hidden="true" />
-                      Updated {lastUpdated ? formatLastUpdated(lastUpdated) : "recently"}
-                    </div>
+                  <div className="leaderboard-stat-card">
+                    <span className="leaderboard-stat-card__label">Top weighted XP</span>
+                    <span className="leaderboard-stat-card__value">
+                      {isLoading ? "..." : <CountUpValue value={highestScore} mode="score" />}
+                    </span>
+                  </div>
+                  <div className="leaderboard-stat-card">
+                    <span className="leaderboard-stat-card__label">Average XP</span>
+                    <span className="leaderboard-stat-card__value">
+                      {isLoading ? "..." : <CountUpValue value={averageScore} mode="score" />}
+                    </span>
+                  </div>
+                  <div className="leaderboard-stat-card">
+                    <span className="leaderboard-stat-card__label">Visible wager volume</span>
+                    <span className="leaderboard-stat-card__value">
+                      {isLoading ? "..." : <CountUpValue value={totalWager} mode="score" />}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -172,47 +229,71 @@ export default function LeaderboardSection() {
               </div>
             </div>
 
-            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-3xl overflow-hidden rounded-[0.55rem] px-4 py-4 md:px-5 md:py-5">
-              <div className="mb-5 flex flex-col gap-4 border-b border-[var(--border)] pb-5 md:flex-row md:items-end md:justify-between">
+            <div className="leaderboard-shell premium-outline mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] px-4 py-5 md:px-5 md:py-6">
+              <div className="section-head section-head--tight">
                 <div>
                   <div className="text-[11px] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
-                    Ranked Players
+                    Ranked players
                   </div>
-                  <h3 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-[var(--shib-cream)] md:text-[2.4rem]">
+                  <h2 className="display-serif mt-3 text-5xl font-normal leading-[0.92] text-[var(--shib-cream)] md:text-[3.6rem]">
                     Full standings
-                  </h3>
+                  </h2>
                 </div>
 
-                <div className="score-pill rounded-[0.4rem] px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--shib-fur-bright)]">
-                  {filteredUsers.length} Players visible
+                <div className="score-pill rounded-full px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--shib-gold)]">
+                  {filteredUsers.length} visible
                 </div>
               </div>
 
               <LeaderboardFilters
                 search={search}
-                onSearchChange={handleSearchChange}
+                onSearchChange={(value) => {
+                  setSearch(value);
+                  setPage(1);
+                }}
                 sortField={sortField}
                 sortDirection={sortDirection}
-                onSortChange={handleSortChange}
+                onSortChange={(field, direction) => {
+                  setSortField(field);
+                  setSortDirection(direction);
+                  setPage(1);
+                }}
                 resultCount={paginatedUsers.length}
                 totalCount={filteredUsers.length}
               />
 
               <div className="mt-5">
-                <LeaderboardTable users={paginatedUsers} />
+                {hasSearchResults ? (
+                  <LeaderboardTable users={paginatedUsers} />
+                ) : (
+                  <EmptyState
+                    title="No players matched that search"
+                    description="Try another handle, username, or clear the filter to return to the full board."
+                    action={
+                      <button
+                        type="button"
+                        onClick={() => setSearch("")}
+                        className="primary-button rounded-full px-5 py-3 text-sm font-semibold text-[var(--accent-ink)]"
+                      >
+                        Clear search
+                      </button>
+                    }
+                  />
+                )}
               </div>
             </div>
 
-            {hasMore && (
+            {hasMore ? (
               <div className="flex justify-center pt-1">
                 <button
+                  type="button"
                   onClick={() => setPage((currentPage) => currentPage + 1)}
-                  className="primary-button rounded-[0.4rem] px-8 py-3 text-sm font-semibold text-[#2d1600]"
+                  className="primary-button rounded-full px-8 py-3 text-sm font-semibold text-[var(--accent-ink)]"
                 >
-                  Load More ({filteredUsers.length - paginatedUsers.length} remaining)
+                  Load more players ({filteredUsers.length - paginatedUsers.length} remaining)
                 </button>
               </div>
-            )}
+            ) : null}
           </>
         )}
       </div>

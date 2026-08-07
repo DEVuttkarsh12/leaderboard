@@ -13,11 +13,11 @@ const REDUCED_MOTION_VISIBLE_MS = 260;
 export default function SiteEntryLoader({
   embedded = false,
 }: SiteEntryLoaderProps) {
-  const [phase, setPhase] = useState<"visible" | "exiting" | "hidden">("visible");
+  const [phase, setPhase] = useState<"visible" | "exiting" | "hidden">(
+    "visible"
+  );
 
   useEffect(() => {
-    if (embedded) return;
-
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
@@ -53,32 +53,33 @@ export default function SiteEntryLoader({
 
       <div className="site-loader__stage">
         <div className="site-loader__deck" aria-hidden="true">
+          <div className="site-loader__shadow" />
           <div className="site-loader__orbit site-loader__orbit--outer" />
           <div className="site-loader__orbit site-loader__orbit--inner" />
 
           <div className="site-loader__card site-loader__card--one">
             <span className="site-loader__card-label">#03</span>
-            <span className="site-loader__card-value">46.2K</span>
+            <span className="site-loader__card-value">XP</span>
           </div>
           <div className="site-loader__card site-loader__card--two">
             <span className="site-loader__card-label">#01</span>
-            <span className="site-loader__card-value">58.3K</span>
+            <span className="site-loader__card-value">LIVE</span>
           </div>
           <div className="site-loader__card site-loader__card--three">
             <span className="site-loader__card-label">#02</span>
-            <span className="site-loader__card-value">48.3K</span>
+            <span className="site-loader__card-value">TOP</span>
           </div>
           <div className="site-loader__card site-loader__card--four">
-            <span className="site-loader__card-label">LIVE</span>
-            <span className="site-loader__card-value">BOARD</span>
+            <span className="site-loader__card-label">READ</span>
+            <span className="site-loader__card-value">ONLY</span>
           </div>
         </div>
 
         <div className="site-loader__copy">
           <div className="site-loader__eyebrow">Preparing leaderboard</div>
-          <div className="site-loader__label">Stacking the live board</div>
+          <div className="site-loader__label">Shuffling the deck</div>
           <div className="site-loader__subcopy">
-            Premium surface loading. Data remains read-only.
+            Cards are stacking first. The live board opens right after.
           </div>
         </div>
       </div>

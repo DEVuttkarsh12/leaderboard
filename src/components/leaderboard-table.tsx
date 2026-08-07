@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { NormalizedLeaderboardUser } from "@/types/leaderboard";
-import { formatNumberCompact } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import CountUpValue from "./count-up-value";
 import UserAvatar from "./user-avatar";
 
 type LeaderboardTableProps = {
@@ -17,72 +17,111 @@ function getMetaLine(user: NormalizedLeaderboardUser): string {
     return `@${user.username}`;
   }
 
+  if (user.kickUsername) {
+    return `Kick: ${user.kickUsername}`;
+  }
+
   return "Live competitor";
 }
 
 export default function LeaderboardTable({ users }: LeaderboardTableProps) {
-  if (users.length === 0) return null;
+  if (users.length === 0) {
+    return null;
+  }
+
+  const leaderScore = users[0]?.score ?? 0;
 
   return (
-    <div className="space-y-3">
-      {users.map((user, index) => (
-        <article
-          key={user.id}
-          className={cn(
-            "row-card group relative overflow-hidden rounded-[0.5rem] px-4 py-4 md:px-5 md:py-[1.125rem]",
-            user.rank <= 3 ? "row-card--accent" : "row-card--default"
-          )}
-          style={{ animationDelay: `${Math.min(index, 14) * 40}ms` } as CSSProperties}
-        >
-          <div className="row-card__shine" aria-hidden="true" />
+    <div className="table-stack">
+      {users.map((user, index) => {
+        const scoreShare =
+          leaderScore > 0 ? Math.max(5, Math.min(100, (user.score / leaderScore) * 100)) : 0;
+        const gapToLeader = Math.max(0, leaderScore - user.score);
 
-          <div className="relative flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="flex items-center gap-3 md:min-w-[15rem]">
-              <div
-                className={cn(
-                  "row-rank flex h-12 min-w-12 items-center justify-center rounded-[0.35rem] text-sm font-semibold",
-                  user.rank === 1 && "row-rank--gold",
-                  user.rank === 2 && "row-rank--silver",
-                  user.rank === 3 && "row-rank--bronze",
-                  user.rank > 3 && "row-rank--default"
-                )}
-              >
-                #{user.rank}
+        return (
+          <article
+            key={user.id}
+            className={cn(
+              "row-card group relative overflow-hidden rounded-[1.4rem] px-4 py-4 md:px-5 md:py-4.5",
+              user.rank <= 3 ? "row-card--accent" : "row-card--default"
+            )}
+            style={{ animationDelay: `${Math.min(index, 14) * 38}ms` } as CSSProperties}
+          >
+            <div className="row-card__shine" aria-hidden="true" />
+
+            <div className="relative grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_auto] lg:items-center">
+              <div className="flex items-center gap-4">
+                <div
+                  className={cn(
+                    "row-rank flex h-13 min-w-13 items-center justify-center rounded-[1rem] text-sm font-semibold",
+                    user.rank === 1 && "row-rank--gold",
+                    user.rank === 2 && "row-rank--silver",
+                    user.rank === 3 && "row-rank--bronze",
+                    user.rank > 3 && "row-rank--default"
+                  )}
+                >
+                  #{user.rank}
+                </div>
+
+                <UserAvatar name={user.name} avatarUrl={user.avatarUrl} />
+
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[1rem] font-semibold text-[var(--text-primary)] md:text-[1.08rem]">
+                    {user.name}
+                  </div>
+                  <div className="mt-1 truncate text-sm text-[var(--text-secondary)]">
+                    {getMetaLine(user)}
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="row-chip">
+                      Weighted XP
+                    </span>
+                    <span className="row-chip row-chip--muted">
+                      Gap {gapToLeader > 0 ? <CountUpValue value={gapToLeader} mode="score" /> : "Leader"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <UserAvatar name={user.name} avatarUrl={user.avatarUrl} />
-
-              <div className="min-w-0">
-                <div className="truncate text-[0.96rem] font-semibold text-[var(--shib-cream)] md:text-base">
-                  {user.name}
+              <div className="row-stats">
+                <div className="row-stat-block row-stat-block--score">
+                  <div>
+                    <div className="row-stat-block__label">Weighted XP</div>
+                    <div className="row-stat-block__value">
+                      <CountUpValue value={user.score} mode="score" />
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-1 truncate text-sm text-[var(--shib-muted-soft)]">
-                  {getMetaLine(user)}
+
+                <div className="row-stat-block row-stat-block--ticket">
+                  <div>
+                    <div className="row-stat-block__label">Wagered</div>
+                    <div className="row-stat-block__value row-stat-block__value--secondary">
+                      <CountUpValue value={user.points ?? 0} mode="score" />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-1 items-center justify-between gap-3">
-              <div className="hidden items-center gap-2 md:flex">
-                {user.verified ? (
-                  <span className="row-chip">Verified</span>
-                ) : (
-                  <span className="row-chip row-chip--muted">Active board</span>
-                )}
-              </div>
-
-              <div className="text-right md:ml-auto">
-                <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
-                  Score
+            <div className="relative mt-4">
+              <div className="row-progress">
+                <div className="row-progress__label">
+                  <span>Relative pace</span>
+                  <span>{scoreShare.toFixed(0)}%</span>
                 </div>
-                <div className="mt-1 text-[1.6rem] font-semibold tracking-[-0.05em] text-[var(--shib-fur-bright)] tabular-nums md:text-[1.95rem]">
-                  {formatNumberCompact(user.score)}
+                <div className="row-progress__track">
+                  <span
+                    className="row-progress__fill"
+                    style={{ width: `${scoreShare}%` }}
+                  />
                 </div>
               </div>
             </div>
-          </div>
-        </article>
-      ))}
+          </article>
+        );
+      })}
     </div>
   );
 }

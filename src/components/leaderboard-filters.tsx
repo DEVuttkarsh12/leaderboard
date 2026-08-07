@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
-import { Search, ArrowUpDown, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowDownWideNarrow, ArrowUpWideNarrow, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type SortField = "rank" | "score";
@@ -29,70 +29,97 @@ export default function LeaderboardFilters({
   const [localSearch, setLocalSearch] = useState(search);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const debouncedSearch = useCallback(
-    (value: string) => {
-      onSearchChange(value);
-    },
-    [onSearchChange]
-  );
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   const handleSearchInput = (value: string) => {
     setLocalSearch(value);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => debouncedSearch(value), 250);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      onSearchChange(value);
+    }, 180);
   };
 
-  const toggleSort = () => {
-    if (sortField === "rank") {
-      onSortChange("score", "desc");
-    } else {
-      onSortChange("rank", "asc");
-    }
-  };
+  const sortOptions: Array<{
+    label: string;
+    field: SortField;
+    direction: SortDirection;
+    icon: typeof ArrowDownWideNarrow;
+  }> = [
+    {
+      label: "Top XP",
+      field: "score",
+      direction: "desc",
+      icon: ArrowDownWideNarrow,
+    },
+    {
+      label: "Rank order",
+      field: "rank",
+      direction: "asc",
+      icon: ArrowUpWideNarrow,
+    },
+  ];
 
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <div className="relative min-w-[200px] flex-1">
-        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--shib-muted)]" />
+    <div className="filters-shell">
+      <div className="relative min-w-[220px] flex-1">
+        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-dim)]" />
         <input
           type="text"
           value={localSearch}
-          onChange={(e) => handleSearchInput(e.target.value)}
-          placeholder="Search by name..."
-          aria-label="Search by user name"
-          className="search-shell w-full rounded-[0.4rem] py-3.5 pl-11 pr-12 text-sm text-[var(--shib-cream)] placeholder:text-[var(--shib-muted)] focus:outline-none"
+          onChange={(event) => handleSearchInput(event.target.value)}
+          placeholder="Search player, username, or handle"
+          aria-label="Search players"
+          className="search-shell w-full rounded-[1.15rem] py-3.5 pl-11 pr-12 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-dim)] focus:outline-none"
         />
-        {localSearch && (
+        {localSearch ? (
           <button
+            type="button"
             onClick={() => {
               setLocalSearch("");
               onSearchChange("");
             }}
             aria-label="Clear search"
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--shib-muted)] transition-colors hover:text-[var(--shib-cream)]"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)] hover:text-[var(--text-primary)]"
           >
             <X className="h-4 w-4" />
           </button>
-        )}
+        ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          onClick={toggleSort}
-          className={cn(
-            "filter-button inline-flex items-center gap-2 rounded-[0.4rem] px-4 py-3 text-sm font-medium"
-          )}
-        >
-          <ArrowUpDown className="h-4 w-4" />
-          Sort: {sortField === "rank" ? "Rank" : "Score"}
-          <span className="text-xs text-[var(--shib-muted)]">
-            ({sortDirection === "asc" ? "↑" : "↓"})
-          </span>
-        </button>
+        <div className="sort-pill-group">
+          {sortOptions.map((option) => {
+            const active =
+              sortField === option.field && sortDirection === option.direction;
+            const Icon = option.icon;
 
-        <div className="score-pill rounded-[0.4rem] px-4 py-3 text-sm text-[var(--shib-fur-bright)]">
+            return (
+              <button
+                key={option.label}
+                type="button"
+                onClick={() => onSortChange(option.field, option.direction)}
+                className={cn("sort-pill", active && "sort-pill--active")}
+              >
+                <Icon className="h-4 w-4" />
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="score-pill rounded-full px-4 py-3 text-sm text-[var(--accent)]">
           {resultCount}
-          {resultCount !== totalCount && ` / ${totalCount}`} results
+          {resultCount !== totalCount ? ` / ${totalCount}` : ""} shown
         </div>
       </div>
     </div>

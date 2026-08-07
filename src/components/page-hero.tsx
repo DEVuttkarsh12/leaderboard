@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
+import TextRevealScroll from "./text-reveal-scroll";
 
 type HeroAction = {
   label: string;
@@ -48,12 +49,20 @@ export default function PageHero({
                 ) : null}
 
                 <div>
-                  <h1 className="display-serif text-4xl font-semibold tracking-[-0.06em] text-[var(--shib-cream)] md:text-5xl">
+                  <TextRevealScroll
+                    as="h1"
+                    revealMode="chars"
+                    className="display-serif text-4xl font-semibold tracking-[-0.06em] text-[var(--shib-cream)] md:text-5xl"
+                  >
                     {title}
-                  </h1>
-                  <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--shib-muted-soft)] md:text-base">
+                  </TextRevealScroll>
+                  <TextRevealScroll
+                    as="p"
+                    revealMode="words"
+                    className="mt-4 max-w-2xl text-sm leading-7 text-[var(--shib-muted-soft)] md:text-base"
+                  >
                     {description}
-                  </p>
+                  </TextRevealScroll>
                 </div>
               </div>
 

@@ -1,23 +1,24 @@
 import { ArrowRight, Trophy, WalletCards } from "lucide-react";
+import TextRevealScroll from "./text-reveal-scroll";
 
 const steps = [
   {
     icon: ArrowRight,
-    title: "Join a campaign",
+    title: "Enter the round",
     description:
-      "Start from the active reward campaign and move into the supported play or participation flow.",
+      "Start from the active campaign surface and move into the supported play or participation flow.",
   },
   {
     icon: Trophy,
     title: "Climb the board",
     description:
-      "Progress through quests and score accumulation while the public board reflects the live ordering.",
+      "Progress through quests and score accumulation while the public board reflects the live order in real time.",
   },
   {
     icon: WalletCards,
-    title: "Claim rewards",
+    title: "Unlock rewards",
     description:
-      "Once a campaign closes, the reward layer becomes the destination instead of the leaderboard itself.",
+      "Once backend reward logic exists, the reward layer becomes the destination instead of the leaderboard itself.",
   },
 ];
 
@@ -28,14 +29,22 @@ export default function HowItWorks() {
         <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <div className="muted-label">How It Works</div>
-            <h2 className="display-serif mt-4 text-4xl font-semibold tracking-[-0.05em] text-[var(--text-primary)] md:text-5xl">
-              A cleaner rewards flow.
-            </h2>
+            <TextRevealScroll
+              as="h2"
+              revealMode="chars"
+              className="display-serif mt-4 text-4xl font-semibold tracking-[-0.05em] text-[var(--text-primary)] md:text-5xl"
+            >
+              A tighter competition loop.
+            </TextRevealScroll>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-[var(--text-secondary)]">
-            The UX should make progression feel obvious: enter, compete, and claim
-            without burying the live board beneath generic dashboard chrome.
-          </p>
+          <TextRevealScroll
+            as="p"
+            revealMode="words"
+            className="max-w-sm text-sm leading-6 text-[var(--text-secondary)]"
+          >
+            The UX should make progression feel obvious: enter, compete, and
+            return without burying the live board beneath generic dashboard chrome.
+          </TextRevealScroll>
         </div>
 
         <div className="grid gap-8 md:grid-cols-3">
@@ -54,12 +63,20 @@ export default function HowItWorks() {
                     0{index + 1}
                   </div>
                 </div>
-                <h3 className="mt-6 text-xl font-medium text-[var(--text-primary)]">
+                <TextRevealScroll
+                  as="h3"
+                  revealMode="chars"
+                  className="mt-6 text-xl font-medium text-[var(--text-primary)]"
+                >
                   {step.title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
+                </TextRevealScroll>
+                <TextRevealScroll
+                  as="p"
+                  revealMode="words"
+                  className="mt-3 text-sm leading-6 text-[var(--text-secondary)]"
+                >
                   {step.description}
-                </p>
+                </TextRevealScroll>
               </article>
             );
           })}

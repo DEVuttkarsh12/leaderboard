@@ -92,25 +92,25 @@ export const routeHubCards = [
     eyebrow: "Live Board",
     title: "Leaderboard",
     href: "/leaderboard",
-    description: "The same read-only live standings, moved into their own page.",
+    description: "Watch the live standings, search the field, and track weighted XP without leaving the public surface.",
   },
   {
     eyebrow: "Rewards",
     title: "Challenges",
     href: "/challenges",
-    description: "Campaign and quest surfaces now live outside the board page.",
+    description: "Quest and campaign layouts live beside the board, ready for backend mission logic when it arrives.",
   },
   {
     eyebrow: "Stream",
     title: "Bonus Hunts",
     href: "/bonus-hunts",
-    description: "A dedicated surface for stream events, recaps, and spotlights.",
+    description: "Keep live-event storytelling, recaps, and creator spotlights off the leaderboard and inside their own route.",
   },
   {
     eyebrow: "Utility",
     title: "Help Center",
     href: "/help",
-    description: "Support, FAQ, and policy pages now have proper destinations.",
+    description: "Support, FAQ, and policy surfaces sit inside the same premium shell as the live board.",
   },
 ];
 
@@ -127,7 +127,7 @@ export const streamCards: SiteFeatureCard[] = [
   {
     title: "Bonus Hunts",
     description:
-      "Separate stream-event pages keep hunt recaps and featured moments out of the leaderboard screen.",
+      "Separate stream-event pages keep hunt recaps, featured moments, and live session framing off the leaderboard screen.",
     href: "/bonus-hunts",
     cta: "Open bonus hunts",
     meta: "Stream route",
@@ -136,7 +136,7 @@ export const streamCards: SiteFeatureCard[] = [
   {
     title: "Tournaments",
     description:
-      "Scheduled event cards, prize summaries, and bracket-style content give competition pages their own space.",
+      "Scheduled event cards, prize summaries, and bracket-style content give competition pages their own stage.",
     href: "/tournaments",
     cta: "Open tournaments",
     meta: "Event route",
@@ -145,7 +145,7 @@ export const streamCards: SiteFeatureCard[] = [
   {
     title: "Wager Raffles",
     description:
-      "Ticket and raffle UI can live in a dedicated page without changing how the live board fetches data.",
+      "Ticket and raffle UI can live in a dedicated route without changing how the live board fetches data.",
     href: "/wager-raffles",
     cta: "Open raffles",
     meta: "Rewards route",
@@ -157,7 +157,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Store",
     description:
-      "Reward catalog and redemption cards are now separated from the competition surface.",
+      "Reward catalog and redemption cards are staged separately from the competition surface.",
     href: "/store",
     cta: "Open store",
     meta: "Commerce route",
@@ -166,7 +166,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Help",
     description:
-      "FAQ, category cards, and support navigation mirror the public help layer from the reference app.",
+      "FAQ, category cards, and support navigation give the platform a clear public help layer.",
     href: "/help",
     cta: "Open help",
     meta: "Support route",
@@ -175,7 +175,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Support",
     description:
-      "Account, connection, and claim-assistance UI now live on a proper support page instead of inside the homepage copy.",
+      "Account, connection, and claim-assistance UI live on a dedicated support destination instead of inside homepage copy.",
     href: "/support",
     cta: "Open support",
     meta: "Contact route",
@@ -184,7 +184,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Login",
     description:
-      "Authentication entry can sit on its own route while the rest of the site stays browseable.",
+      "Authentication entry has its own route while the rest of the site stays browseable and public.",
     href: "/login",
     cta: "Open login",
     meta: "Auth route",

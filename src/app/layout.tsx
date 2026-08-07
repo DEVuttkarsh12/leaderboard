@@ -1,17 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+import { Caveat_Brush, Outfit } from "next/font/google";
 import "./globals.css";
 import SiteBackground from "@/components/site-background";
-import SiteEntryLoader from "@/components/site-entry-loader";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
-const displayFont = Bricolage_Grotesque({
+const displayFont = Caveat_Brush({
   subsets: ["latin"],
+  weight: "400",
   variable: "--font-display",
 });
 
-const bodyFont = Instrument_Sans({
+const bodyFont = Outfit({
   subsets: ["latin"],
   variable: "--font-body",
 });
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#071118",
+  themeColor: "#14061f",
 };
 
 export default function RootLayout({
@@ -44,9 +44,11 @@ export default function RootLayout({
       lang="en"
       className={`${displayFont.variable} ${bodyFont.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col text-slate-950">
+      <body
+        suppressHydrationWarning
+        className="flex min-h-full flex-col text-slate-950"
+      >
         <SiteBackground />
-        <SiteEntryLoader />
         <SiteHeader />
         <main className="site-shell-content flex-1">{children}</main>
         <SiteFooter />

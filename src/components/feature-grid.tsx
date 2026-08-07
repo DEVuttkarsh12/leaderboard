@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
+import TextRevealScroll from "./text-reveal-scroll";
 
 export type FeatureCard = {
   title: string;
@@ -39,13 +40,21 @@ export default function FeatureGridSection({
         <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <div className="muted-label">{eyebrow}</div>
-            <h2 className="display-serif mt-4 text-4xl font-semibold tracking-[-0.05em] text-[var(--text-primary)] md:text-5xl">
+            <TextRevealScroll
+              as="h2"
+              revealMode="chars"
+              className="display-serif mt-4 text-4xl font-semibold tracking-[-0.05em] text-[var(--text-primary)] md:text-5xl"
+            >
               {title}
-            </h2>
+            </TextRevealScroll>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-[var(--text-secondary)]">
+          <TextRevealScroll
+            as="p"
+            revealMode="words"
+            className="max-w-sm text-sm leading-6 text-[var(--text-secondary)]"
+          >
             {description}
-          </p>
+          </TextRevealScroll>
         </div>
 
         <div className={`grid gap-4 ${gridClassName}`}>
@@ -55,31 +64,39 @@ export default function FeatureGridSection({
             return (
               <article
                 key={item.title}
-                className="border-t border-[rgba(255,216,166,0.12)] pt-6"
+                className="feature-grid-card"
               >
                 <div className="flex items-start justify-between gap-5">
                   <div>
-                    <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--shib-muted)]">
+                    <div className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--text-dim)]">
                       {item.eyebrow ?? eyebrow}
                     </div>
-                    <h3 className="mt-4 text-xl font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
+                    <TextRevealScroll
+                      as="h3"
+                      revealMode="chars"
+                      className="mt-4 text-xl font-semibold tracking-[-0.04em] text-[var(--text-primary)]"
+                    >
                       {item.title}
-                    </h3>
+                    </TextRevealScroll>
                   </div>
 
                   {Icon ? (
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[rgba(255,216,166,0.18)] text-[var(--shib-fur-bright)]">
+                    <div className="feature-grid-card__icon flex h-11 w-11 items-center justify-center rounded-full">
                       <Icon className="h-5 w-5" />
                     </div>
                   ) : null}
                 </div>
 
-                <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
+                <TextRevealScroll
+                  as="p"
+                  revealMode="words"
+                  className="mt-3 text-sm leading-6 text-[var(--text-secondary)]"
+                >
                   {item.description}
-                </p>
+                </TextRevealScroll>
 
                 {item.meta ? (
-                  <div className="mt-5 text-[0.72rem] uppercase tracking-[0.2em] text-[var(--shib-fur-bright)]">
+                  <div className="mt-5 text-[0.72rem] uppercase tracking-[0.2em] text-[var(--accent-strong)]">
                     {item.meta}
                   </div>
                 ) : null}
@@ -87,7 +104,7 @@ export default function FeatureGridSection({
                 {item.href ? (
                   <Link
                     href={item.href}
-                    className="mt-5 inline-flex text-sm font-semibold text-[var(--shib-fur-bright)] transition-colors hover:text-[var(--shib-cream)]"
+                    className="mt-5 inline-flex text-sm font-semibold text-[var(--accent-strong)] transition-colors hover:text-[var(--text-primary)]"
                   >
                     {item.cta ?? "Open page"}
                   </Link>
