@@ -89,28 +89,28 @@ export const footerMenus = [
 
 export const routeHubCards = [
   {
-    eyebrow: "Live Board",
+    eyebrow: "♠ Live Board",
     title: "Leaderboard",
     href: "/leaderboard",
-    description: "Watch the live standings, search the field, and track weighted XP without leaving the public surface.",
+    description: "Chase top 3.",
   },
   {
-    eyebrow: "Rewards",
+    eyebrow: "♦ Rewards",
     title: "Challenges",
     href: "/challenges",
-    description: "Quest and campaign layouts live beside the board, ready for backend mission logic when it arrives.",
+    description: "Hit missions.",
   },
   {
-    eyebrow: "Stream",
+    eyebrow: "♣ Stream",
     title: "Bonus Hunts",
     href: "/bonus-hunts",
-    description: "Keep live-event storytelling, recaps, and creator spotlights off the leaderboard and inside their own route.",
+    description: "Watch heat.",
   },
   {
-    eyebrow: "Utility",
+    eyebrow: "777 Utility",
     title: "Help Center",
     href: "/help",
-    description: "Support, FAQ, and policy surfaces sit inside the same premium shell as the live board.",
+    description: "Fast exits.",
   },
 ];
 
@@ -127,28 +127,28 @@ export const streamCards: SiteFeatureCard[] = [
   {
     title: "Bonus Hunts",
     description:
-      "Separate stream-event pages keep hunt recaps, featured moments, and live session framing off the leaderboard screen.",
+      "Live heat.",
     href: "/bonus-hunts",
-    cta: "Open bonus hunts",
-    meta: "Stream route",
+    cta: "Play zone",
+    meta: "Hot table",
     icon: Radio,
   },
   {
     title: "Tournaments",
     description:
-      "Scheduled event cards, prize summaries, and bracket-style content give competition pages their own stage.",
+      "Bracket rush.",
     href: "/tournaments",
-    cta: "Open tournaments",
-    meta: "Event route",
+    cta: "Enter",
+    meta: "Prize table",
     icon: Trophy,
   },
   {
     title: "Wager Raffles",
     description:
-      "Ticket and raffle UI can live in a dedicated route without changing how the live board fetches data.",
+      "Ticket drops.",
     href: "/wager-raffles",
-    cta: "Open raffles",
-    meta: "Rewards route",
+    cta: "Grab tickets",
+    meta: "Lucky draw",
     icon: Tickets,
   },
 ];
@@ -157,7 +157,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Store",
     description:
-      "Reward catalog and redemption cards are staged separately from the competition surface.",
+      "Boosts, drops, and flex rewards.",
     href: "/store",
     cta: "Open store",
     meta: "Commerce route",
@@ -166,7 +166,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Help",
     description:
-      "FAQ, category cards, and support navigation give the platform a clear public help layer.",
+      "Fast answers without the bloat.",
     href: "/help",
     cta: "Open help",
     meta: "Support route",
@@ -175,7 +175,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Support",
     description:
-      "Account, connection, and claim-assistance UI live on a dedicated support destination instead of inside homepage copy.",
+      "Fixes, claims, and clean escalations.",
     href: "/support",
     cta: "Open support",
     meta: "Contact route",
@@ -184,7 +184,7 @@ export const platformCards: SiteFeatureCard[] = [
   {
     title: "Login",
     description:
-      "Authentication entry has its own route while the rest of the site stays browseable and public.",
+      "One door for account moves.",
     href: "/login",
     cta: "Open login",
     meta: "Auth route",

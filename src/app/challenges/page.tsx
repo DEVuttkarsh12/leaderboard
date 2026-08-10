@@ -12,35 +12,35 @@ const challengeCards = [
   {
     title: "Daily Missions",
     description:
-      "Compact challenge cards for quick-turn objectives like check-ins, play streaks, or small score pushes.",
+      "Quick hits. Fast goals.",
     meta: "24-hour cadence",
     icon: Zap,
   },
   {
     title: "Weekly Tracks",
     description:
-      "Longer-running mission groups that sit between the homepage and the live leaderboard.",
+      "Longer arcs. Bigger swings.",
     meta: "7-day cadence",
     icon: Target,
   },
   {
     title: "Milestone Goals",
     description:
-      "Progress-based reward cards that give users a clear next step before they care about rank position.",
+      "Clear next targets.",
     meta: "Progress UI",
     icon: Flag,
   },
   {
     title: "Seasonal Campaigns",
     description:
-      "Full campaign blocks with a prize headline, active dates, and a callout to the final leaderboard page.",
+      "Big rounds. Big hooks.",
     meta: "Campaign framing",
     icon: Sparkles,
   },
   {
     title: "Leaderboard Unlocks",
     description:
-      "Challenge completions can point back into the standings without changing the board logic itself.",
+      "Everything points back to rank.",
     meta: "Cross-route CTA",
     icon: Trophy,
   },
@@ -52,7 +52,7 @@ export default function ChallengesPage() {
       <PageHero
         eyebrow="Rewards"
         title="Challenges get their own destination."
-        description="This page mirrors the reference-style challenge surface without changing any live ranking logic. It gives campaign objectives a dedicated UI layer before users jump into the board."
+        description=""
         icon={Target}
         actions={[
           { label: "View leaderboard", href: "/leaderboard" },
@@ -60,14 +60,14 @@ export default function ChallengesPage() {
         ]}
         stats={[
           { label: "Purpose", value: "Campaign entry point" },
-          { label: "Board logic", value: "Unchanged" },
-          { label: "Implementation", value: "UI-only surface" },
+          { label: "Board focus", value: "Ranks stay central" },
+          { label: "Implementation", value: "Campaign surface" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Challenges"
         title="Mission, milestone, and campaign blocks."
-        description="These feature cards give the site the same kind of rewards depth the reference experience exposes around its public routes."
+        description=""
         items={challengeCards}
       />
     </>

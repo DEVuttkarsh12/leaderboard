@@ -10,20 +10,20 @@ const sections = [
   {
     heading: "Overview",
     paragraphs: [
-      "This page describes the privacy posture of the RankBoard rewards shell as of August 3, 2026.",
-      "The current implementation adds public-facing routes and UI surfaces around the leaderboard. It does not introduce new browser-side write access into the live leaderboard data flow.",
+      "This page describes the privacy posture of the RankBoard rewards shell as of August 8, 2026.",
+      "RankBoard presents standings, rewards, and support routes in one connected experience.",
     ],
   },
   {
-    heading: "Leaderboard Data",
+    heading: "Leaderboard Experience",
     paragraphs: [
-      "The leaderboard experience remains read-only from the client.",
-      "Users browse leaderboard standings through the existing local API route and server-side provider selection already present in the project.",
+      "Players can browse standings, rankings, and round activity directly from the leaderboard.",
+      "The board experience is designed to stay fast, clear, and focused during active competition.",
     ],
     bullets: [
-      "The browser reads from /api/leaderboard.",
-      "Provider selection remains server-side.",
-      "No new challenge, store, or raffle write operations were added in this UI pass.",
+      "Standings are available in the leaderboard route.",
+      "Support, rewards, and account pages are accessible from the main shell.",
+      "Competition views are kept separate from support and rewards flows.",
     ],
   },
   {
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
     <LegalPage
       eyebrow="Privacy"
       title="Privacy for the rewards shell."
-      intro="This route rounds out the public product structure and documents the current read-only nature of the leaderboard experience."
+      intro="This route rounds out the public product structure and documents how RankBoard presents standings, rewards, and support surfaces."
       sections={sections}
     />
   );

@@ -1,5 +1,5 @@
-const DEFAULT_START_TIME = 1785456000;
-const DEFAULT_END_TIME = 1786665599;
+const DEFAULT_START_TIME = 1786147293;
+const DEFAULT_END_TIME = 1788739292;
 
 export type ShuffleLeaderboardWindow = {
   startTime: number;
@@ -52,4 +52,3 @@ export function isShuffleWindowActive(nowMs: number = Date.now()): boolean {
   const nowUnix = Math.floor(nowMs / 1000);
   return nowUnix >= startTime && nowUnix <= endTime;
 }
-

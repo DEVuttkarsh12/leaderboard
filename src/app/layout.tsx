@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import CustomCursor from "@/components/custom-cursor";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
@@ -17,11 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "RankBoard | Live Rewards Floor",
   description:
-    "A live rewards floor with real read-only leaderboard standings, event routes, reward surfaces, and support pages.",
+    "A live rewards floor with standings, event routes, reward surfaces, and support pages.",
   openGraph: {
     title: "RankBoard | Live Rewards Floor",
     description:
-      "A live rewards floor with real read-only leaderboard standings, event routes, reward surfaces, and support pages.",
+      "A live rewards floor with standings, event routes, reward surfaces, and support pages.",
     type: "website",
   },
 };
@@ -58,6 +59,7 @@ export default function RootLayout({
           <SiteHeader />
           <main className="product-main">{children}</main>
           <SiteFooter />
+          <CustomCursor />
         </div>
       </body>
     </html>

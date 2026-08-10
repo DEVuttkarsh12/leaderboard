@@ -4,7 +4,7 @@ import { getShuffleLeaderboardWindow } from "@/lib/server/leaderboard/shuffle-wi
 
 export const metadata: Metadata = {
   title: "Leaderboard | RankBoard",
-  description: "Read-only live leaderboard standings.",
+  description: "Live leaderboard standings.",
 };
 
 function getCountdownTarget(): string | null {

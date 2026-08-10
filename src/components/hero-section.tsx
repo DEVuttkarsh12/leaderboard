@@ -30,16 +30,14 @@ export default function HeroSection({
             <div className="rivl-eyebrow">
               <i />
               LIVE LEADERBOARD FLOOR
-              <span>READ ONLY</span>
+              <span>HOT NOW</span>
             </div>
             <h1 id="hero-title">
-              CLIMB
-              <span>THE FLOOR.</span>
+              PLAY
+              <span>THE BOARD.</span>
             </h1>
             <p>
-              The working leaderboard engine remains intact while the public
-              frontend is rebuilt around the visual system from the Design
-              reference.
+              Chase rank. Hit rewards.
             </p>
             <div className="rivl-hero-actions">
               <Link className="primary-button" href="/leaderboard">
@@ -157,12 +155,12 @@ export default function HeroSection({
           </div>
         ) : null}
 
-        <div className="marquee" aria-label="Live platform updates">
+            <div className="marquee" aria-label="Live platform updates">
           <div>
-            <span>♠ LIVE BOARD READS FROM THE EXISTING API ROUTE</span>
-            <span>♦ NO WRITE OPERATIONS WERE ADDED TO THE LEADERBOARD FLOW</span>
-            <span>777 REAL XP, REAL RANKS, REBUILT PRESENTATION</span>
-            <span>♣ SEARCH, SORT, AND REFRESH STILL USE THE EXISTING APP LOGIC</span>
+            <span>♠ PLAY NOW.</span>
+            <span>♦ CLIMB FAST.</span>
+            <span>777 CHASE HEAT.</span>
+            <span>♣ CLAIM DROPS.</span>
           </div>
         </div>
       </div>

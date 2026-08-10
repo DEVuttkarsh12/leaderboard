@@ -10,27 +10,27 @@ const sections = [
   {
     heading: "Site Structure",
     paragraphs: [
-      "As of Monday, August 3, 2026, RankBoard operates as a multi-page rewards shell around a live leaderboard module.",
-      "The pages added in this pass are UI destinations intended to mirror the broader public feature set of the reference site.",
+      "As of Saturday, August 8, 2026, RankBoard operates as a multi-page rewards shell around its competition experience.",
+      "The site includes standings, rewards, help, and account-oriented destinations within one connected surface.",
     ],
   },
   {
     heading: "Leaderboard Use",
     paragraphs: [
-      "The leaderboard page remains informational and read-only from the browser.",
-      "Search, sort, pagination, and refresh behavior continue to rely on the existing app logic already present in the repository.",
+      "The leaderboard page is built for browsing standings, tracking momentum, and checking rank movement.",
+      "Search, sort, pagination, and refresh behavior support a faster competition experience across the board.",
     ],
     bullets: [
-      "No new browser-side mutation path was added for leaderboard data.",
-      "Provider and upstream fetch logic remain server-controlled.",
-      "Campaign and support pages are structural UI additions only.",
+      "Standings are presented through the leaderboard route.",
+      "Campaign and support pages complement the main competition flow.",
+      "Rewards and account surfaces remain clearly separated from the standings view.",
     ],
   },
   {
     heading: "Future Expansion",
     paragraphs: [
       "Challenge, raffle, store, login, and support routes can be connected to real backend flows later.",
-      "Those future changes should be treated independently from this route-structure and visual-shell update.",
+      "Those future changes can expand the product without changing the public-facing navigation structure.",
     ],
   },
 ];
@@ -40,7 +40,7 @@ export default function TermsPage() {
     <LegalPage
       eyebrow="Terms"
       title="Terms for the current rewards shell."
-      intro="These terms summarize the current shape of the app after the multi-page UI expansion and clarify that the live leaderboard engine was not altered."
+      intro="These terms summarize the current shape of the app after the multi-page expansion across standings, rewards, and support."
       sections={sections}
     />
   );

@@ -12,28 +12,28 @@ const tournamentCards = [
   {
     title: "Upcoming Brackets",
     description:
-      "Use tournament cards to show windows, formats, and prize hooks before participants ever hit the live board.",
+      "Set the bracket table.",
     meta: "Upcoming",
     icon: CalendarDays,
   },
   {
     title: "Match Flow",
     description:
-      "Head-to-head or round-based UI can live here rather than trying to fit inside leaderboard rows.",
+      "Head-to-head belongs here.",
     meta: "Competition format",
     icon: Swords,
   },
   {
     title: "Prize Breakdown",
     description:
-      "Tournament-specific prize cards let event pages carry their own hierarchy and incentives.",
+      "Let prizes hit harder.",
     meta: "Reward summary",
     icon: Trophy,
   },
   {
     title: "Winners Surface",
     description:
-      "Champion and finalist cards can be showcased in an event route without affecting the live ranking module.",
+      "Give winners a proper wall.",
     meta: "Results layout",
     icon: Medal,
   },
@@ -45,7 +45,7 @@ export default function TournamentsPage() {
       <PageHero
         eyebrow="Stream"
         title="Tournament pages no longer depend on the homepage."
-        description="This route gives tournaments a proper destination in the same navigation shape as the reference site, while preserving the existing board engine."
+        description=""
         icon={Trophy}
         actions={[
           { label: "Open bonus hunts", href: "/bonus-hunts" },
@@ -60,7 +60,7 @@ export default function TournamentsPage() {
       <FeatureGridSection
         eyebrow="Tournaments"
         title="Schedule, results, and prize framing."
-        description="Event pages are now independent routes in the app shell, which is the main structural change the user asked for."
+        description=""
         items={tournamentCards}
         columns={2}
       />

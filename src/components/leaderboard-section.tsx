@@ -82,7 +82,7 @@ export default function LeaderboardSection({
           <span>/05</span>
         </div>
         <div>
-          <span className="product-kicker">LIVE BOARD · REAL DATA</span>
+          <span className="product-kicker">LIVE BOARD · FRONTLINE RANKS</span>
           <h1>
             THE BOARD
             <em> NEVER SLEEPS.</em>
@@ -107,7 +107,7 @@ export default function LeaderboardSection({
             <p>
               {targetDate
                 ? `Round target ${formatShortDate(targetDate)}`
-                : "Existing provider and ranking logic preserved."}
+                : "The board is in motion."}
             </p>
           </div>
         </div>
@@ -141,13 +141,17 @@ export default function LeaderboardSection({
                   {getInitials(user.name)}
                   <i />
                 </span>
-                <h2>{user.name}</h2>
-                <p>{user.username ? `@${user.username}` : "Live competitor"}</p>
-                <strong>
+                <h2 className="product-podium-card__name">{user.name}</h2>
+                <p className="product-podium-card__handle">
+                  {user.username ? `@${user.username}` : "Live competitor"}
+                </p>
+                <strong className="product-podium-card__score">
                   <CountUpValue value={user.score} mode="score" />
                 </strong>
-                <small>WEIGHTED XP</small>
-                <div>
+                <small className="product-podium-card__score-label">
+                  WEIGHTED XP
+                </small>
+                <div className="product-podium-card__wager">
                   <span>WAGERED</span>
                   <b>
                     <CountUpValue value={user.points ?? 0} mode="score" />
@@ -298,7 +302,7 @@ export default function LeaderboardSection({
               ) : (
                 <EmptyState
                   title="No players matched that search"
-                  description="Try another username or clear the filter to return to the full live board."
+                  description="Try another username or clear the filter to return to the full board."
                   action={
                     <button type="button" onClick={() => setSearch("")}>
                       CLEAR SEARCH
@@ -356,7 +360,7 @@ export default function LeaderboardSection({
                 <small>
                   {targetDate
                     ? `Round target ${formatShortDate(targetDate)}`
-                    : "Existing backend and provider remain unchanged."}
+                    : "Current round status is active."}
                 </small>
               </div>
               <Link href="/support">OPEN SUPPORT ↗</Link>

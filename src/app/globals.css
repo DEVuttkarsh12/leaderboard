@@ -2,32 +2,33 @@
 @import "../../Design/app/product.css";
 
 :root {
+  --font-casino: "Gill Sans", "Trebuchet MS", "Segoe UI Variable Display", "Arial Rounded MT Bold", sans-serif;
   --ink: #0b0614;
   --ink-2: #140a25;
-  --orange: #ff9b45;
-  --orange-hot: #ff6e35;
+  --orange: #ffb33f;
+  --orange-hot: #ff6538;
   --cream: #f7f0df;
   --muted: #a69aad;
-  --casino-gold: #ffd07a;
-  --casino-red: #ff4968;
-  --bg: #06070a;
-  --bg-deep: #090c10;
+  --casino-gold: #ffd766;
+  --casino-red: #ff3f62;
+  --bg: #050807;
+  --bg-deep: #07100d;
   --bg-panel: rgba(11, 16, 28, 0.84);
   --bg-panel-strong: rgba(12, 18, 31, 0.94);
   --bg-soft: rgba(255, 255, 255, 0.035);
   --text-primary: #f4f6fb;
   --text-secondary: #b7bfcb;
   --text-dim: #7c8799;
-  --accent: #e6b15d;
-  --accent-strong: #ffe0a8;
+  --accent: #f6c24a;
+  --accent-strong: #ffed9b;
   --accent-ink: #2c1807;
   --ember: #cf6b41;
   --violet: #6f82ff;
   --violet-bright: #bfd1ff;
   --violet-soft: rgba(112, 140, 255, 0.14);
   --gold-soft: rgba(230, 177, 93, 0.18);
-  --emerald: #3ac28a;
-  --emerald-soft: rgba(58, 194, 138, 0.12);
+  --emerald: #29e08c;
+  --emerald-soft: rgba(41, 224, 140, 0.12);
   --ruby: #d45b66;
   --felt: #0d1816;
   --line: rgba(255, 255, 255, 0.08);
@@ -50,10 +51,10 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 14% 10%, rgba(111, 141, 255, 0.14), transparent 24%),
-    radial-gradient(circle at 84% 12%, rgba(230, 177, 93, 0.16), transparent 20%),
-    radial-gradient(circle at 50% 120%, rgba(23, 72, 59, 0.18), transparent 28%),
-    linear-gradient(180deg, #0c1217 0%, #091015 32%, #06080c 100%);
+    radial-gradient(circle at 14% 10%, rgba(255, 197, 69, 0.16), transparent 23%),
+    radial-gradient(circle at 84% 12%, rgba(255, 57, 89, 0.12), transparent 20%),
+    radial-gradient(circle at 50% 115%, rgba(26, 185, 103, 0.2), transparent 30%),
+    linear-gradient(180deg, #0a1010 0%, #0a1117 38%, #05070b 100%);
   color: var(--text-primary);
   font-family: var(--font-body), "Instrument Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -115,8 +116,105 @@ footer {
 }
 
 ::selection {
-  background: rgba(140, 116, 255, 0.35);
+  background: rgba(255, 179, 63, 0.35);
   color: var(--text-primary);
+}
+
+@media (pointer: fine) {
+  .custom-cursor-ready,
+  .custom-cursor-ready * {
+    cursor: none !important;
+  }
+}
+
+.custom-cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.custom-cursor--visible {
+  opacity: 1;
+}
+
+.custom-cursor__dot,
+.custom-cursor__ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.custom-cursor__dot {
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at 35% 30%, #fff8c8 0 18%, #ffd766 38%, #ff6538 100%);
+  box-shadow:
+    0 0 12px rgba(255, 215, 102, 0.72),
+    0 0 28px rgba(255, 101, 56, 0.4);
+}
+
+.custom-cursor__ring {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 215, 102, 0.68);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 215, 102, 0.14), transparent 58%),
+    conic-gradient(from 18deg, rgba(255, 215, 102, 0.9), rgba(255, 63, 98, 0.8), rgba(41, 224, 140, 0.7), rgba(255, 215, 102, 0.9));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 24px rgba(255, 179, 63, 0.25);
+  transition:
+    width 180ms ease,
+    height 180ms ease,
+    border-color 180ms ease,
+    opacity 180ms ease,
+    background 180ms ease;
+}
+
+.custom-cursor__ring::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  background: rgba(5, 8, 7, 0.72);
+}
+
+.custom-cursor__ring span {
+  position: absolute;
+  inset: -0.18rem;
+  border-radius: inherit;
+  border-top: 2px solid rgba(255, 237, 155, 0.95);
+  border-right: 2px solid transparent;
+  transform: rotate(38deg);
+}
+
+.custom-cursor--active .custom-cursor__ring {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-color: rgba(41, 224, 140, 0.82);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(41, 224, 140, 0.2), transparent 58%),
+    conic-gradient(from 72deg, rgba(41, 224, 140, 0.86), rgba(255, 215, 102, 0.88), rgba(255, 63, 98, 0.72), rgba(41, 224, 140, 0.86));
+}
+
+.custom-cursor--text .custom-cursor__ring {
+  width: 1.05rem;
+  height: 2.4rem;
+  border-radius: 9999px;
+  border-color: rgba(191, 209, 255, 0.82);
+  background: rgba(191, 209, 255, 0.1);
+}
+
+.custom-cursor-pressed .custom-cursor__ring {
+  width: 1.8rem;
+  height: 1.8rem;
 }
 
 a,
@@ -2770,12 +2868,12 @@ header {
 
 .rivl-hero-copy h1 {
   margin: 0;
-  max-width: 34rem;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: clamp(4.6rem, 8vw, 8.5rem);
-  line-height: 0.76;
-  letter-spacing: -0.09em;
-  font-weight: 500;
+  max-width: 32rem;
+  font-family: var(--font-casino);
+  font-size: clamp(3.6rem, 6.6vw, 6.9rem);
+  line-height: 0.86;
+  letter-spacing: -0.075em;
+  font-weight: 900;
   text-transform: uppercase;
 }
 
@@ -3084,16 +3182,20 @@ header {
   margin: 0;
   font-size: 0.95rem;
   letter-spacing: -0.035em;
+  background: transparent;
 }
 
 .place-1 .rivl-podium-player h3 {
   font-size: 1.08rem;
+  color: #fff6dc;
+  background: transparent;
 }
 
 .rivl-podium-player p {
   margin: 0.3rem 0 0;
   font-size: 0.5rem;
   color: #897e90;
+  background: transparent;
 }
 
 .rivl-xp-block {
@@ -3101,6 +3203,18 @@ header {
   margin-top: 1.2rem;
   display: grid;
   gap: 0.28rem;
+}
+
+.place-1 .rivl-xp-block {
+  width: min(100%, 12.75rem);
+  margin-inline: auto;
+  padding: 0.88rem 0.75rem 0.7rem;
+  border: 1px solid rgba(255, 217, 102, 0.28);
+  border-radius: 15px 15px 24px 15px;
+  background: rgba(5, 12, 10, 0.58);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    5px 5px 0 rgba(255, 63, 98, 0.28);
 }
 
 .rivl-xp-block strong {
@@ -3111,7 +3225,7 @@ header {
 }
 
 .place-1 .rivl-xp-block strong {
-  color: var(--orange);
+  color: #ffe083;
   font-size: 1.65rem;
   text-shadow: 0 0 24px rgba(255, 150, 65, 0.25);
 }
@@ -3202,10 +3316,11 @@ header {
 .marquee span {
   white-space: nowrap;
   font-family: var(--font-geist-mono);
-  font-size: 0.46rem;
-  letter-spacing: 0.13em;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
   color: #8f8495;
-  padding-right: 70px;
+  padding-right: 88px;
+  text-transform: uppercase;
 }
 
 .marquee span::first-letter {
@@ -3244,6 +3359,7 @@ header {
   display: grid;
   gap: 0.85rem;
   margin-top: 1.5rem;
+  max-width: 15rem;
 }
 
 .design-page-intro__stats div {
@@ -3266,11 +3382,17 @@ header {
 }
 
 .design-section-copy {
-  max-width: 20rem;
+  max-width: 15rem;
   margin: 0;
-  color: #8e8394;
-  font-size: 0.82rem;
-  line-height: 1.7;
+  color: #b69ec5;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .design-card-grid {
@@ -3291,14 +3413,26 @@ header {
 }
 
 .design-card {
-  padding: 1.2rem;
+  padding: 1.15rem;
   border: 1px solid rgba(255, 208, 122, 0.14);
   background: linear-gradient(145deg, rgba(29, 12, 42, 0.78), rgba(12, 5, 20, 0.82));
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-  min-height: 18rem;
+  min-height: 13.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.95rem;
+  gap: 0.72rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.design-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--orange), transparent 78%);
+  opacity: 0.75;
 }
 
 .design-card__top {
@@ -3325,16 +3459,26 @@ header {
 
 .design-card h3 {
   margin: 0;
-  font-size: 1.4rem;
-  line-height: 0.95;
-  letter-spacing: -0.05em;
+  max-width: 10ch;
+  font-family: var(--font-casino);
+  font-size: 1.85rem;
+  line-height: 0.94;
+  letter-spacing: -0.065em;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #fff0df;
 }
 
 .design-card p {
   margin: 0;
   color: #94889c;
-  font-size: 0.82rem;
-  line-height: 1.75;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  max-width: 22ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .design-card__footer {
@@ -3384,8 +3528,13 @@ header {
 
 .legal-card h2 {
   margin: 0.9rem 0 0;
-  font-size: 1.65rem;
-  letter-spacing: -0.05em;
+  max-width: 10ch;
+  font-family: var(--font-casino);
+  font-size: 2rem;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: #fff0df;
 }
 
 .legal-card__copy {
@@ -3451,16 +3600,29 @@ header {
   }
 
   .rivl-podium-grid {
-    grid-template-columns: repeat(3, 230px);
-    overflow-x: auto;
+    grid-template-columns: 1fr;
+    overflow-x: visible;
     justify-content: start;
     padding-bottom: 0.4rem;
   }
 
   .rivl-podium-card,
   .rivl-podium-card.place-1 {
-    min-height: 24rem;
+    min-height: 21rem;
     padding-top: 3.5rem;
+    transform: none;
+  }
+
+  .rivl-podium-card.place-1 {
+    order: 1;
+  }
+
+  .rivl-podium-card.place-2 {
+    order: 2;
+  }
+
+  .rivl-podium-card.place-3 {
+    order: 3;
   }
 
   .rivl-hero-meta {
@@ -3482,5 +3644,2977 @@ header {
 
   .design-card-grid--4 {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Readability pass */
+
+:root {
+  --readable-micro: 0.78rem;
+  --readable-caption: 0.88rem;
+  --readable-small: 0.96rem;
+}
+
+.site-nav-brand__subtitle,
+.site-nav-desktop-dropdown__link small,
+.site-nav-mobile-group__title,
+.muted-label,
+.site-nav-shell__eyebrow,
+.site-nav-shell__meta,
+.hero-inline-note,
+.hero-command-card__label,
+.metric-pill__label,
+.leaderboard-stat-card__label,
+.countdown-strip__label,
+.countdown-segment__label,
+.row-stat-block__label,
+.podium-kicker,
+.leaderboard-summary-card__label,
+.podium-chip,
+.row-chip,
+.podium-meta__label,
+.home-route-link__index,
+.footer-meta-card__label,
+.site-loader__eyebrow,
+.hero-money-panel__label,
+.rivl-eyebrow,
+.rivl-hero-actions .text-button,
+.rivl-hero-meta span,
+.rivl-stage-kicker,
+.rivl-stage-sync,
+.rivl-podium-player p,
+.rivl-xp-block span,
+.rivl-podium-prize span,
+.rivl-stage-ribbon,
+.marquee span,
+.design-page-intro__stats span,
+.design-card__index,
+.design-card__footer small,
+.design-card__footer a,
+.legal-card__index,
+.product-kicker,
+.product-live,
+.account-trigger strong,
+.account-trigger small,
+.account-menu > div strong,
+.account-menu > div small,
+.account-menu a,
+.account-menu > button,
+.drawer-summary,
+.notification-list strong,
+.notification-list small,
+.drawer-empty,
+.intro-index,
+.season-clock span,
+.vault-balance > span,
+.points-wallet > span,
+.vault-balance p,
+.points-wallet > div,
+.product-footer nav a,
+.product-footer > span,
+.status-badge,
+.product-podium-card p,
+.product-podium-card > small,
+.product-podium-card > div span,
+.float-rank small,
+.float-move strong,
+.float-move small,
+.signal-button,
+.product-segments button,
+.refresh-board span,
+.full-board-head,
+.full-rank,
+.full-identity small,
+.load-more,
+.load-more span,
+.product-empty-state > button,
+.product-error-state > button,
+.you-position-card > div:first-child,
+.next-rank > div {
+  font-size: var(--readable-micro);
+}
+
+.hero-command-card__meta,
+.hero-rank-card__footer,
+.hero-footer-panel__subcopy,
+.leaderboard-summary-card__subvalue,
+.countdown-strip__date,
+.leaderboard-summary-card__footer,
+.podium-points,
+.podium-progress__label,
+.row-progress__label,
+.podium-meta__value,
+.footer-meta-card__value,
+.site-loader__card-label,
+.site-loader__subcopy,
+.site-footer__bottom,
+.hero-money-panel__meta,
+.design-section-copy,
+.design-card p,
+.legal-card__copy p,
+.legal-card__list li,
+.notification-list p,
+.product-search input,
+.full-reward,
+.product-empty-state > p,
+.product-error-state > p,
+.you-player p span {
+  font-size: var(--readable-caption);
+}
+
+.hero-footer-panel__copy,
+.leaderboard-stat-card__value--small,
+.full-identity strong,
+.full-xp strong,
+.you-player p b,
+.design-page-intro__stats strong,
+.product-empty-state > strong,
+.product-error-state > strong {
+  font-size: var(--readable-small);
+}
+
+.rivl-stage-header h2,
+.rivl-podium-player h3,
+.rivl-podium-prize strong,
+.design-card h3,
+.legal-card h2 {
+  line-height: 1.08;
+}
+
+/* Podium layout correction */
+
+.product-podium-card__name {
+  margin: 17px 0 2px;
+  font-size: 17px;
+  letter-spacing: -0.04em;
+  text-align: center;
+  line-height: 1.05;
+}
+
+.product-podium-card__handle {
+  margin: 0;
+  color: #776c7d;
+  font-size: 0.78rem;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.product-podium-card__score {
+  display: block;
+  margin-top: 25px;
+  color: #d8ccdc;
+  font: 900 23px/1 var(--font-geist-mono);
+  letter-spacing: -0.07em;
+  text-align: center;
+}
+
+.product-podium-card__score-label {
+  margin-top: 6px;
+  color: #655b6a;
+  font: 700 0.78rem/1.1 var(--font-geist-mono);
+  letter-spacing: 0.15em;
+  text-align: center;
+}
+
+.product-podium-card__wager {
+  width: 100%;
+  min-height: 57px;
+  margin-top: auto;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--p-line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.product-podium-card__wager span {
+  color: #6f6575;
+  font: 700 0.78rem/1 var(--font-geist-mono);
+}
+
+.product-podium-card__wager b {
+  font-size: 15px;
+}
+
+.product-podium-card.place-1 .product-podium-card__name {
+  margin-top: 19px;
+  font-size: 1.55rem;
+}
+
+.product-podium-card.place-1 .product-podium-card__handle {
+  color: #a78fb3;
+}
+
+.product-podium-card.place-1 .product-podium-card__score {
+  width: min(100%, 12.75rem);
+  margin-inline: auto;
+  margin-top: 24px;
+  padding: 0.9rem 0.85rem 0.7rem;
+  color: var(--orange);
+  font-size: 1.95rem;
+  line-height: 0.92;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 197, 112, 0.26);
+  background: linear-gradient(115deg, rgba(255, 208, 122, 0.16), rgba(255, 155, 69, 0.1));
+  box-shadow: 5px 5px 0 rgba(123, 69, 210, 0.4);
+}
+
+.product-podium-card.place-1 .product-podium-card__score-label {
+  display: block;
+  width: fit-content;
+  margin: 0.55rem auto 0;
+  color: #f6d9a6;
+}
+
+.product-podium-card.place-1 .product-podium-card__wager {
+  width: calc(100% - 1.1rem);
+  margin-inline: auto;
+  margin-top: auto;
+}
+
+/* Funkier headline pass */
+
+.product-section-title h2,
+.product-intro h1 {
+  text-transform: uppercase;
+}
+
+.product-section-title h2 {
+  max-width: 12ch;
+  font-family: var(--font-casino);
+  font-size: clamp(2.05rem, 3vw, 3.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.06em;
+  font-weight: 900;
+  color: #fff0df;
+  text-shadow:
+    4px 4px 0 rgba(111, 59, 191, 0.46),
+    0 0 28px rgba(255, 155, 69, 0.08);
+}
+
+.product-section-title {
+  align-items: flex-start;
+}
+
+.intro-aside > p {
+  max-width: 18rem;
+  color: #c1a8cd;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Behance-inspired casino polish */
+
+.product-page {
+  --p-bg: #050807;
+  --p-panel: #101813;
+  --p-panel-2: #17251c;
+  --p-line: rgba(255, 217, 102, 0.16);
+  --p-muted: #94a18f;
+  background:
+    radial-gradient(circle at 15% 4%, rgba(255, 189, 67, 0.2), transparent 22%),
+    radial-gradient(circle at 84% 12%, rgba(255, 62, 92, 0.15), transparent 20%),
+    radial-gradient(circle at 45% 112%, rgba(41, 224, 140, 0.16), transparent 30%),
+    linear-gradient(180deg, #08110d 0%, #0a1411 42%, #040706 100%);
+}
+
+.product-page::before {
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(255, 215, 102, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 215, 102, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px, 64px 64px, 22px 22px;
+}
+
+.casino-suit-cloud {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.casino-suit-cloud span,
+.casino-suit-cloud i {
+  position: absolute;
+  font-family: var(--font-casino);
+  font-style: normal;
+  line-height: 1;
+  opacity: 0.1;
+  filter: blur(0.2px);
+  text-shadow: 0 0 28px rgba(255, 179, 63, 0.26);
+  animation: casinoDrift 12s ease-in-out infinite;
+}
+
+.casino-suit-cloud span:nth-child(1) {
+  --drift-rotate: -14deg;
+  left: 4%;
+  top: 17%;
+  color: var(--casino-gold);
+  font-size: clamp(5rem, 11vw, 12rem);
+  transform: rotate(-14deg);
+}
+
+.casino-suit-cloud span:nth-child(2) {
+  --drift-rotate: 10deg;
+  right: 7%;
+  top: 21%;
+  color: var(--casino-red);
+  font-size: clamp(4.2rem, 9vw, 10rem);
+  animation-delay: -3s;
+}
+
+.casino-suit-cloud span:nth-child(3) {
+  --drift-rotate: 12deg;
+  left: 9%;
+  bottom: 8%;
+  color: var(--emerald);
+  font-size: clamp(4.5rem, 8vw, 9rem);
+  animation-delay: -6s;
+}
+
+.casino-suit-cloud span:nth-child(4) {
+  --drift-rotate: -7deg;
+  right: 19%;
+  bottom: 13%;
+  color: #ff6b82;
+  font-size: clamp(3.8rem, 7vw, 8rem);
+  animation-delay: -9s;
+}
+
+.casino-suit-cloud i {
+  --drift-rotate: -3deg;
+  right: 2%;
+  bottom: -2%;
+  color: rgba(255, 215, 102, 0.82);
+  font-size: clamp(10rem, 19vw, 20rem);
+  letter-spacing: -0.12em;
+  opacity: 0.07;
+}
+
+.product-header {
+  width: min(1500px, calc(100% - 44px));
+  margin-top: 16px;
+  padding-inline: 18px;
+  border: 1px solid rgba(255, 217, 102, 0.2);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 13% 0, rgba(255, 217, 102, 0.22), transparent 32%),
+    radial-gradient(circle at 82% 0, rgba(41, 224, 140, 0.15), transparent 28%),
+    linear-gradient(180deg, rgba(13, 24, 18, 0.94), rgba(7, 12, 11, 0.88));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(22px) saturate(1.14);
+}
+
+.product-nav a {
+  letter-spacing: 0.02em;
+}
+
+.product-nav a.active::after {
+  bottom: -27px;
+  background: var(--casino-gold);
+  box-shadow: 0 0 18px var(--casino-gold);
+}
+
+.notification-trigger,
+.account-trigger,
+.product-search,
+.product-segments,
+.refresh-board,
+.season-clock,
+.vault-balance,
+.points-wallet {
+  border-radius: 16px;
+}
+
+.notification-trigger:hover,
+.account-trigger:hover,
+.refresh-board:hover,
+.product-segments button:not(.active):hover,
+.category-strip button:not(.active):hover,
+.event-filters button:not(.active):hover,
+.achievement-filters button:not(.active):hover {
+  border-color: rgba(255, 217, 102, 0.34);
+  background: rgba(255, 217, 102, 0.055);
+  color: var(--cream);
+}
+
+.casino-status-strip {
+  width: min(1500px, calc(100% - 44px));
+  height: 42px;
+  margin: 12px auto 0;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+  border: 1px solid rgba(255, 217, 102, 0.14);
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(255, 179, 63, 0.11), rgba(255, 62, 92, 0.08), rgba(41, 224, 140, 0.1)),
+    rgba(6, 12, 10, 0.68);
+  box-shadow: inset 0 0 24px rgba(255, 217, 102, 0.035);
+}
+
+.casino-status-strip > div {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 42px;
+  width: max-content;
+  padding-inline: 22px;
+  animation: marquee 34s linear infinite;
+}
+
+.casino-status-strip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  color: #9ead9f;
+  font: 800 0.68rem/1 var(--font-geist-mono);
+  letter-spacing: 0.13em;
+}
+
+.casino-status-strip i,
+.casino-status-strip b {
+  color: var(--casino-gold);
+  font-style: normal;
+}
+
+.casino-status-strip .red {
+  color: var(--casino-red);
+}
+
+.casino-status-strip strong {
+  color: var(--cream);
+  font-weight: 900;
+}
+
+.rivl-hero {
+  min-height: min(88vh, 950px);
+}
+
+.app-product-shell .product-main > .product-section:nth-of-type(n + 2) {
+  padding-block: clamp(2.5rem, 5vw, 4.2rem);
+}
+
+.rivl-hero-shell::before {
+  content: "";
+  position: absolute;
+  inset: 4% -2% auto;
+  height: 48%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 64% 48%, rgba(255, 179, 63, 0.2), transparent 24%),
+    radial-gradient(circle at 78% 34%, rgba(255, 63, 98, 0.13), transparent 21%),
+    radial-gradient(circle at 45% 75%, rgba(41, 224, 140, 0.12), transparent 25%);
+  filter: blur(14px);
+}
+
+.rivl-hero-copy h1 {
+  max-width: 38rem;
+  text-shadow:
+    1px 1px 0 rgba(255, 255, 255, 0.08),
+    5px 5px 0 rgba(255, 63, 98, 0.18),
+    0 0 42px rgba(255, 179, 63, 0.12);
+}
+
+.rivl-hero-copy h1 span {
+  color: var(--casino-gold);
+  text-shadow:
+    4px 4px 0 rgba(17, 111, 72, 0.52),
+    0 0 32px rgba(255, 215, 102, 0.2);
+}
+
+.rivl-hero-copy > p {
+  color: #d0d9c9;
+  font-size: 1.13rem;
+}
+
+.rivl-hero-actions .primary-button,
+.featured-copy button,
+.giveaway-copy > button,
+.redeem-button,
+.prediction-submit,
+.design-page-intro__actions .primary-button {
+  border: 1px solid rgba(255, 238, 155, 0.34);
+  background:
+    linear-gradient(180deg, #ffe083, #ffb33f 52%, #ff7b3d);
+  box-shadow:
+    5px 5px 0 rgba(41, 224, 140, 0.32),
+    0 0 30px rgba(255, 179, 63, 0.16);
+}
+
+.rivl-hero-actions .primary-button:hover,
+.featured-copy button:hover,
+.giveaway-copy > button:hover,
+.redeem-button:hover,
+.prediction-submit:hover,
+.design-page-intro__actions .primary-button:hover {
+  transform: translate(-2px, -3px);
+  box-shadow:
+    8px 8px 0 rgba(41, 224, 140, 0.38),
+    0 0 42px rgba(255, 179, 63, 0.22);
+}
+
+.rivl-hero-actions .text-button,
+.design-page-intro__actions .text-button {
+  color: #e6d9bf;
+}
+
+.rivl-hero-actions .text-button:hover,
+.design-page-intro__actions .text-button:hover {
+  color: var(--casino-gold);
+  transform: translateX(4px);
+}
+
+.rivl-hero-meta {
+  border-top-color: rgba(255, 217, 102, 0.18);
+}
+
+.rivl-hero-meta div {
+  position: relative;
+  padding: 0.85rem 0.9rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 217, 102, 0.055), rgba(255, 255, 255, 0.018));
+}
+
+.rivl-hero-meta div + div {
+  border-left: 0;
+}
+
+.rivl-hero-meta strong {
+  color: #ffed9b;
+  text-shadow: 0 0 20px rgba(255, 179, 63, 0.18);
+}
+
+.rivl-stage,
+.product-podium,
+.full-board-panel,
+.board-pulse-card,
+.history-table,
+.giveaway-feature,
+.watch-panel,
+.daily-rewards-panel,
+.reward-detail-modal,
+.event-detail-modal,
+.player-preview-modal,
+.legal-card {
+  border-radius: 22px 22px 44px 22px;
+  border-color: rgba(255, 217, 102, 0.18);
+  background:
+    radial-gradient(circle at 74% 8%, rgba(255, 179, 63, 0.13), transparent 24%),
+    radial-gradient(circle at 14% 22%, rgba(41, 224, 140, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(14, 30, 21, 0.82), rgba(6, 12, 11, 0.92));
+  box-shadow:
+    0 34px 90px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.rivl-stage::after,
+.product-podium::after,
+.full-board-panel::after,
+.design-card::after,
+.reward-product-card::after,
+.giveaway-grid article::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: inherit;
+}
+
+.full-board-panel,
+.design-card,
+.reward-product-card,
+.giveaway-grid article {
+  position: relative;
+}
+
+.rivl-stage-header h2,
+.product-section-title h2,
+.product-intro h1,
+.design-card h3,
+.legal-card h2 {
+  text-shadow:
+    3px 3px 0 rgba(255, 63, 98, 0.19),
+    0 0 28px rgba(255, 179, 63, 0.1);
+}
+
+.rivl-stage-header h2 {
+  color: #fff6dc;
+  text-shadow:
+    2px 2px 0 rgba(255, 63, 98, 0.18),
+    0 0 18px rgba(255, 179, 63, 0.08);
+}
+
+.rivl-podium-card,
+.product-podium-card,
+.design-card,
+.reward-product-card,
+.giveaway-grid article {
+  border-radius: 18px 18px 34px 18px;
+  border-color: rgba(255, 217, 102, 0.18);
+  background:
+    radial-gradient(circle at 80% 6%, rgba(255, 179, 63, 0.14), transparent 26%),
+    linear-gradient(155deg, rgba(21, 46, 31, 0.76), rgba(7, 13, 12, 0.9));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+.rivl-podium-card::before,
+.product-podium-card::before,
+.reward-product-card::before,
+.giveaway-grid article::before {
+  content: "777";
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  color: rgba(255, 217, 102, 0.08);
+  font-family: var(--font-casino);
+  font-size: 3.2rem;
+  letter-spacing: -0.13em;
+  line-height: 1;
+}
+
+.rivl-podium-card:hover,
+.rivl-podium-card:focus-visible,
+.product-podium-card:hover,
+.product-podium-card:focus-visible,
+.design-card:hover,
+.design-card:focus-within,
+.reward-product-card:hover,
+.reward-product-card:focus-visible,
+.giveaway-grid article:hover {
+  transform: translateY(-9px) rotate(0deg);
+  border-color: rgba(255, 217, 102, 0.54);
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.34),
+    0 0 42px rgba(255, 179, 63, 0.12);
+}
+
+.rivl-podium-card.place-1,
+.product-podium-card.place-1 {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 217, 102, 0.22), transparent 27%),
+    linear-gradient(180deg, rgba(36, 70, 43, 0.85), rgba(8, 15, 13, 0.94));
+  border-color: rgba(255, 217, 102, 0.68);
+}
+
+.rivl-rank-tab,
+.podium-place,
+.pulse-item > span {
+  background: linear-gradient(135deg, #173d2b, #2b6848);
+  border: 1px solid rgba(255, 217, 102, 0.16);
+}
+
+.place-1 .rivl-rank-tab,
+.place-1 .podium-place,
+.product-segments button.active,
+.category-strip button.active,
+.event-filters button.active,
+.achievement-filters button.active {
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  color: #141007;
+}
+
+.rivl-crown i,
+.product-crown i {
+  background: linear-gradient(180deg, #fff0a6, #ffb33f 65%, #ff7b3d);
+  box-shadow: 0 0 18px rgba(255, 179, 63, 0.22);
+}
+
+.rivl-avatar,
+.product-avatar {
+  border-color: rgba(255, 217, 102, 0.42);
+  box-shadow:
+    0 0 0 5px rgba(255, 217, 102, 0.055),
+    0 16px 34px rgba(0, 0, 0, 0.36);
+}
+
+.tone-coral,
+.tone-orange,
+.tone-violet,
+.tone-cream,
+.tone-blue,
+.tone-pink,
+.tone-green {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.4), transparent 20%),
+    linear-gradient(145deg, #ffbd43, #ff4968 48%, #127a4f);
+}
+
+.rivl-podium-prize,
+.product-podium-card__wager {
+  border-radius: 14px 14px 24px 14px;
+  background: rgba(255, 217, 102, 0.055);
+  border-top-color: rgba(255, 217, 102, 0.14);
+}
+
+.place-1 .rivl-podium-prize,
+.product-podium-card.place-1 .product-podium-card__wager,
+.you-position-card,
+.daily-drop {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.36), transparent 20%),
+    linear-gradient(180deg, #ffe083, #ffb33f 58%, #ff7b3d);
+  color: #141007;
+  box-shadow: 7px 7px 0 rgba(41, 224, 140, 0.32);
+}
+
+.design-card {
+  min-height: 12.4rem;
+  isolation: isolate;
+  transition:
+    transform 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.design-card::before {
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(180deg, var(--casino-gold), var(--casino-red), var(--emerald));
+}
+
+.design-card:nth-child(3n + 2) {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(255, 63, 98, 0.13), transparent 25%),
+    linear-gradient(155deg, rgba(43, 25, 27, 0.76), rgba(7, 13, 12, 0.9));
+}
+
+.design-card:nth-child(3n + 3) {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(255, 217, 102, 0.15), transparent 25%),
+    linear-gradient(155deg, rgba(44, 41, 19, 0.72), rgba(7, 13, 12, 0.9));
+}
+
+.design-card__index {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: #171008;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  box-shadow: 0 0 22px rgba(255, 179, 63, 0.18);
+}
+
+.design-card__icon {
+  border-radius: 16px;
+  background: rgba(41, 224, 140, 0.07);
+  border-color: rgba(41, 224, 140, 0.24);
+  color: #6cf0ad;
+}
+
+.design-card h3 {
+  max-width: 12ch;
+}
+
+.design-card-grid .design-card::after {
+  content: "♠";
+  inset: auto 0.85rem 0.65rem auto;
+  border: 0;
+  color: rgba(255, 217, 102, 0.13);
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: clamp(4.3rem, 7vw, 7.5rem);
+  line-height: 0.8;
+}
+
+.design-card-grid .design-card:nth-child(2)::after {
+  content: "♦";
+  color: rgba(255, 63, 98, 0.14);
+}
+
+.design-card-grid .design-card:nth-child(3)::after {
+  content: "♣";
+  color: rgba(41, 224, 140, 0.13);
+}
+
+.design-card-grid .design-card:nth-child(4)::after {
+  content: "777";
+  color: rgba(255, 217, 102, 0.11);
+  letter-spacing: -0.13em;
+}
+
+.design-card h3 {
+  position: relative;
+  z-index: 1;
+  max-width: 8ch;
+  font-size: clamp(1.85rem, 2.35vw, 2.65rem);
+}
+
+.design-card p {
+  position: relative;
+  z-index: 1;
+  width: max-content;
+  max-width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  border-radius: 999px;
+  background: rgba(5, 12, 10, 0.52);
+  color: #fff4d2;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.design-card__footer {
+  position: relative;
+  z-index: 1;
+}
+
+.design-card__footer small {
+  width: max-content;
+  max-width: 100%;
+  padding: 0.45rem 0.62rem;
+  border: 1px solid rgba(255, 217, 102, 0.15);
+  border-radius: 999px;
+  color: #ffed9b;
+  background: rgba(255, 217, 102, 0.045);
+}
+
+.design-card__footer a {
+  min-width: 4.6rem;
+  justify-content: center;
+  color: #140f07;
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  box-shadow: 3px 3px 0 rgba(41, 224, 140, 0.28);
+}
+
+.product-section {
+  padding-block: clamp(3.5rem, 7vw, 5.8rem);
+}
+
+.product-section-title {
+  margin-bottom: clamp(1.45rem, 3.5vw, 2.55rem);
+}
+
+.product-section-title h2 {
+  max-width: 7ch;
+}
+
+.product-section-title .design-section-copy {
+  width: max-content;
+  max-width: 18rem;
+  padding: 0.72rem 0.9rem;
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 217, 102, 0.045);
+  color: #ffed9b;
+}
+
+.design-card p,
+.design-section-copy,
+.intro-aside > p {
+  color: #bac8b8;
+}
+
+.design-card__footer {
+  border-top-color: rgba(255, 217, 102, 0.13);
+}
+
+.design-card__footer a {
+  padding: 0.62rem 0.8rem;
+  border: 1px solid rgba(255, 217, 102, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 217, 102, 0.045);
+}
+
+.design-card__footer a:hover {
+  color: #141007;
+  background: var(--casino-gold);
+  transform: translateY(-2px);
+}
+
+.full-board-row:hover,
+.full-board-row:focus-visible {
+  background: linear-gradient(90deg, rgba(255, 179, 63, 0.13), rgba(41, 224, 140, 0.055));
+  box-shadow: inset 4px 0 var(--casino-gold);
+}
+
+.full-board-row.is-you {
+  background: linear-gradient(90deg, rgba(255, 179, 63, 0.18), rgba(41, 224, 140, 0.07));
+  box-shadow: inset 4px 0 var(--casino-gold);
+}
+
+.full-xp i b,
+.season-clock > i b,
+.vault-balance > i b,
+.weekly-drop > i b,
+.watch-progress > i b,
+.rank-chase-track > i b {
+  background: linear-gradient(90deg, var(--casino-red), var(--casino-gold), var(--emerald));
+  box-shadow: 0 0 16px rgba(255, 179, 63, 0.18);
+}
+
+.reward-product-art,
+.giveaway-art,
+.live-event-art,
+.event-card-art,
+.profile-hero-art,
+.player-preview-art,
+.reward-detail-art {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 217, 102, 0.18), transparent 23%),
+    linear-gradient(145deg, #16432c, #101512 72%);
+}
+
+.reward-product-art > span,
+.team-mark,
+.giveaway-mini-art span,
+.profile-hero-monogram,
+.player-preview-art > span {
+  text-shadow:
+    5px 5px 0 rgba(255, 63, 98, 0.5),
+    10px 10px 0 rgba(41, 224, 140, 0.32);
+}
+
+@keyframes casinoDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--drift-rotate, -8deg));
+  }
+  50% {
+    transform: translate3d(0, -18px, 0) rotate(calc(var(--drift-rotate, -8deg) + 6deg));
+  }
+}
+
+@media (max-width: 1100px) {
+  .product-header,
+  .casino-status-strip,
+  .product-main,
+  .product-footer {
+    width: min(100% - 28px, 1500px);
+  }
+}
+
+@media (max-width: 760px) {
+  .product-header {
+    height: auto;
+    min-height: 72px;
+    border-radius: 24px;
+    grid-template-columns: 1fr auto;
+  }
+
+  .casino-status-strip {
+    height: 38px;
+    border-radius: 18px;
+  }
+
+  .casino-status-strip span {
+    font-size: 0.58rem;
+  }
+
+  .rivl-hero-copy h1 {
+    font-size: clamp(3.25rem, 14vw, 4.8rem);
+  }
+
+  .rivl-stage,
+  .product-podium,
+  .full-board-panel,
+  .design-card {
+    border-radius: 18px 18px 32px 18px;
+  }
+}
+
+/* Premium nav and motion pass */
+
+.product-page {
+  font-family: var(--font-casino);
+}
+
+.product-header {
+  position: sticky;
+  top: 14px;
+  height: 86px;
+  margin-bottom: 1.1rem;
+  padding-inline: clamp(1rem, 2vw, 1.6rem);
+  transform-origin: top center;
+  animation: navReveal 700ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.product-header::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -2;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(255, 217, 102, 0.25), transparent 18% 78%, rgba(41, 224, 140, 0.2)),
+    rgba(255, 255, 255, 0.018);
+  pointer-events: none;
+}
+
+.product-header::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 217, 102, 0.14), transparent),
+    radial-gradient(circle at 82% 40%, rgba(41, 224, 140, 0.12), transparent 24%);
+  opacity: 0.34;
+  transition: opacity 260ms ease;
+}
+
+.product-header:hover::after {
+  opacity: 1;
+}
+
+.p-brand {
+  gap: 0.82rem;
+  font-family: var(--font-casino);
+  font-size: clamp(1.08rem, 1.6vw, 1.5rem);
+  letter-spacing: 0;
+  transform-origin: left center;
+}
+
+.p-brand:hover {
+  transform: translateY(-2px) scale(1.015);
+}
+
+.p-brand-mark {
+  width: 2.35rem;
+  height: 2.45rem;
+  padding: 0.25rem;
+  border: 1px solid rgba(255, 217, 102, 0.3);
+  border-radius: 0.85rem;
+  background:
+    linear-gradient(145deg, rgba(255, 217, 102, 0.16), rgba(255, 63, 98, 0.07)),
+    rgba(255, 217, 102, 0.045);
+  box-shadow:
+    0 0 26px rgba(255, 179, 63, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.p-brand small {
+  padding: 0.28rem 0.45rem;
+  border: 1px solid rgba(41, 224, 140, 0.2);
+  border-radius: 999px;
+  color: #8ff0bd;
+  background: rgba(41, 224, 140, 0.055);
+}
+
+.product-nav {
+  gap: 0.2rem;
+  padding: 0.38rem;
+  border: 1px solid rgba(255, 217, 102, 0.14);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.018)),
+    rgba(5, 12, 10, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.product-nav a {
+  min-width: 5.2rem;
+  min-height: 2.65rem;
+  padding: 0.76rem 0.95rem;
+  border-radius: 999px;
+  color: #aab6a7;
+  font-family: var(--font-casino);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.015em;
+  text-align: center;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    color 220ms ease,
+    transform 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.product-nav a::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(135deg, rgba(255, 217, 102, 0.2), rgba(41, 224, 140, 0.14)),
+    rgba(255, 255, 255, 0.025);
+  opacity: 0;
+  transform: scale(0.82);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.product-nav a:hover,
+.product-nav a:focus-visible,
+.product-nav a.active {
+  color: #fff6dc;
+  transform: translateY(-2px);
+}
+
+.product-nav a:hover::before,
+.product-nav a:focus-visible::before,
+.product-nav a.active::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.product-nav a.active {
+  color: #150f07;
+  background:
+    linear-gradient(180deg, #fff1a7, #ffbd48 58%, #ff9d32);
+  box-shadow:
+    0 14px 26px rgba(255, 179, 63, 0.16),
+    0 0 28px rgba(255, 179, 63, 0.22),
+    3px 3px 0 rgba(41, 224, 140, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.product-nav a.active::after {
+  content: "";
+  width: 0.42rem;
+  height: 0.42rem;
+  left: 50%;
+  right: auto;
+  bottom: -0.7rem;
+  transform: translateX(-50%);
+  background: #8ff0bd;
+  box-shadow: 0 0 18px #8ff0bd;
+}
+
+.product-actions {
+  gap: 0.55rem;
+}
+
+.product-live {
+  min-height: 2.62rem;
+  padding: 0.66rem 0.92rem;
+  border: 1px solid rgba(41, 224, 140, 0.26);
+  border-radius: 999px;
+  color: #a9ffd0;
+  background:
+    linear-gradient(180deg, rgba(41, 224, 140, 0.12), rgba(41, 224, 140, 0.035)),
+    rgba(5, 12, 10, 0.44);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 22px rgba(41, 224, 140, 0.1);
+}
+
+.notification-trigger,
+.account-trigger,
+.product-menu {
+  border-color: rgba(255, 217, 102, 0.16);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018)),
+    rgba(5, 12, 10, 0.56);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.notification-trigger:hover,
+.account-trigger:hover,
+.product-menu:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22), 0 0 20px rgba(255, 179, 63, 0.1);
+}
+
+.account-trigger {
+  min-width: 10.4rem;
+  height: 3.08rem;
+  border-radius: 999px;
+  padding-right: 0.9rem;
+}
+
+.account-trigger strong {
+  font-family: var(--font-casino);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.account-trigger small {
+  font-size: 0.68rem;
+}
+
+.account-menu {
+  top: calc(100% + 0.9rem);
+  border-radius: 1.2rem;
+  border-color: rgba(255, 217, 102, 0.24);
+  background:
+    radial-gradient(circle at 88% 0, rgba(255, 179, 63, 0.16), transparent 30%),
+    radial-gradient(circle at 8% 8%, rgba(41, 224, 140, 0.1), transparent 24%),
+    rgba(7, 14, 12, 0.97);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: menuPop 240ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.account-menu a,
+.account-menu > button {
+  border-radius: 0.9rem;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.account-menu a:hover,
+.account-menu a:focus-visible,
+.account-menu > button:hover,
+.account-menu > button:focus-visible {
+  transform: translateX(2px);
+  border-color: rgba(255, 217, 102, 0.22);
+  background: rgba(255, 217, 102, 0.075);
+  color: #fff6dc;
+}
+
+.casino-status-strip {
+  height: 36px;
+  animation: stripReveal 760ms 120ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.casino-status-strip span {
+  font-size: 0.58rem;
+}
+
+.rivl-hero-copy {
+  animation: contentRise 800ms 130ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.rivl-stage {
+  animation: stageDeal 900ms 220ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.rivl-podium-card {
+  animation: cardDeal 720ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.rivl-podium-card.place-1 {
+  animation-delay: 420ms;
+}
+
+.rivl-podium-card.place-2 {
+  animation-delay: 300ms;
+}
+
+.rivl-podium-card.place-3 {
+  animation-delay: 520ms;
+}
+
+.product-section {
+  animation: sectionFade 720ms 180ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+}
+
+.design-card {
+  transform-origin: center bottom;
+}
+
+.design-card:hover {
+  transform: translateY(-10px) rotate(-0.35deg) scale(1.012);
+}
+
+.design-card:nth-child(even):hover {
+  transform: translateY(-10px) rotate(0.35deg) scale(1.012);
+}
+
+.design-card__index {
+  animation: chipBlink 2.8s ease-in-out infinite;
+}
+
+.rivl-hero-copy h1 {
+  font-size: clamp(3.2rem, 5.7vw, 6.05rem);
+}
+
+.product-section-title h2 {
+  font-size: clamp(1.8rem, 2.55vw, 2.75rem);
+}
+
+.design-card h3 {
+  font-size: clamp(1.55rem, 2vw, 2.25rem);
+  line-height: 0.98;
+}
+
+@keyframes navReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes stripReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes contentRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes stageDeal {
+  from {
+    opacity: 0;
+    transform: translateY(34px) rotateX(8deg) scale(0.97);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes cardDeal {
+  from {
+    opacity: 0;
+    transform: translateY(30px) rotate(2deg) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(34px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes chipBlink {
+  0%,
+  100% {
+    box-shadow: 0 0 22px rgba(255, 179, 63, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(255, 179, 63, 0.34);
+  }
+}
+
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-header,
+  .casino-status-strip,
+  .rivl-hero-copy,
+  .rivl-stage,
+  .rivl-podium-card,
+  .product-section,
+  .design-card__index {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .product-header {
+    top: 10px;
+    height: 72px;
+    grid-template-columns: 1fr auto;
+  }
+
+  .product-nav {
+    top: calc(100% + 0.7rem);
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0.6rem;
+    gap: 0.42rem;
+    border-radius: 1.35rem;
+    background:
+      radial-gradient(circle at 92% 0, rgba(255, 179, 63, 0.15), transparent 28%),
+      rgba(6, 13, 11, 0.98);
+    backdrop-filter: blur(18px);
+  }
+
+  .product-nav.open {
+    animation: mobileMenuDrop 260ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  }
+
+  .product-nav a {
+    min-height: 2.95rem;
+    min-width: 0;
+    justify-content: space-between;
+    padding-inline: 1rem;
+    text-align: left;
+    border: 1px solid rgba(255, 217, 102, 0.08);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .product-nav a::after {
+    display: none;
+  }
+
+  .product-nav a.active {
+    color: #150f07;
+  }
+
+  .product-live {
+    display: none;
+  }
+
+  .product-menu {
+    display: grid;
+    border-radius: 999px;
+  }
+
+  .casino-status-strip {
+    margin-top: 0.6rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .product-header {
+    width: calc(100% - 22px);
+    min-height: 66px;
+    padding-inline: 0.7rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .p-brand {
+    font-size: 0.98rem;
+    gap: 0.45rem;
+  }
+
+  .p-brand-mark {
+    width: 1.95rem;
+    height: 2.05rem;
+  }
+
+  .notification-trigger {
+    display: none;
+  }
+
+  .account-trigger {
+    min-width: 2.35rem;
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .account-trigger > span:nth-child(2),
+  .account-trigger > b {
+    display: none;
+  }
+
+  .casino-status-strip {
+    width: calc(100% - 22px);
+    height: 32px;
+  }
+
+  .casino-status-strip span {
+    font-size: 0.5rem;
+  }
+
+  .rivl-hero-copy h1 {
+    font-size: clamp(2.75rem, 12vw, 4.15rem);
+  }
+}
+
+@keyframes mobileMenuDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Casino lobby section UX */
+
+.casino-lobby-section,
+.casino-rewards-section {
+  position: relative;
+}
+
+.casino-lobby-section::before,
+.casino-rewards-section::before {
+  content: "";
+  position: absolute;
+  inset: 12% -4% auto;
+  height: 68%;
+  z-index: -1;
+  opacity: 0.54;
+  background:
+    radial-gradient(circle at 18% 26%, rgba(255, 217, 102, 0.1), transparent 24%),
+    radial-gradient(circle at 80% 34%, rgba(255, 63, 98, 0.1), transparent 22%),
+    radial-gradient(circle at 48% 72%, rgba(41, 224, 140, 0.11), transparent 28%);
+  filter: blur(18px);
+}
+
+.casino-section-title {
+  align-items: center;
+}
+
+.casino-section-pulse {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 217, 102, 0.04);
+}
+
+.casino-section-pulse span {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #160f07;
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  font: 900 0.75rem/1 var(--font-casino);
+  box-shadow: 0 0 22px rgba(255, 179, 63, 0.18);
+  animation: chipBlink 2.4s ease-in-out infinite;
+}
+
+.casino-section-pulse span:nth-child(2) {
+  animation-delay: -0.7s;
+}
+
+.casino-section-pulse span:nth-child(3) {
+  animation-delay: -1.3s;
+}
+
+.casino-lobby-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.72fr) 9rem;
+  grid-template-areas:
+    "feature stack meter"
+    "feature actions actions";
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.casino-feature-table,
+.casino-mini-table,
+.casino-side-meter,
+.casino-quick-actions,
+.casino-vault-card,
+.casino-reward-chip,
+.casino-ticket-strip {
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  background:
+    radial-gradient(circle at 78% 14%, rgba(255, 217, 102, 0.13), transparent 24%),
+    linear-gradient(155deg, rgba(18, 44, 29, 0.84), rgba(5, 12, 10, 0.94));
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.casino-feature-table {
+  grid-area: feature;
+  min-height: 24rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: clamp(1.3rem, 3vw, 2rem);
+  border-radius: 2rem 2rem 4.2rem 2rem;
+  isolation: isolate;
+}
+
+.casino-feature-table::before {
+  content: "";
+  position: absolute;
+  inset: 1rem;
+  z-index: -1;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: inherit;
+}
+
+.casino-feature-table strong {
+  max-width: 8ch;
+  color: #fff6dc;
+  font: 900 clamp(2.6rem, 5vw, 5.1rem)/0.88 var(--font-casino);
+  letter-spacing: -0.08em;
+  text-transform: uppercase;
+  text-shadow:
+    4px 4px 0 rgba(255, 63, 98, 0.18),
+    0 0 30px rgba(255, 179, 63, 0.12);
+}
+
+.casino-feature-table small,
+.casino-table-badge {
+  width: max-content;
+  max-width: 100%;
+  padding: 0.52rem 0.7rem;
+  border: 1px solid rgba(255, 217, 102, 0.17);
+  border-radius: 999px;
+  color: #ffed9b;
+  background: rgba(255, 217, 102, 0.055);
+  font: 900 0.68rem/1 var(--font-geist-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.casino-feature-table > i {
+  position: absolute;
+  right: 1.2rem;
+  top: 1.1rem;
+  z-index: -1;
+  color: rgba(255, 217, 102, 0.11);
+  font: 900 clamp(5rem, 11vw, 10rem)/0.8 var(--font-casino);
+  letter-spacing: -0.13em;
+}
+
+.casino-feature-table > b {
+  width: max-content;
+  min-width: 9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 0.9rem 1rem;
+  border-radius: 999px;
+  color: #151007;
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  box-shadow: 5px 5px 0 rgba(41, 224, 140, 0.3);
+  font: 900 0.75rem/1 var(--font-casino);
+  letter-spacing: 0.04em;
+}
+
+.casino-table-stack {
+  grid-area: stack;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.casino-mini-table {
+  min-height: 7.45rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "num copy"
+    "tag tag";
+  gap: 0.7rem 0.9rem;
+  align-content: center;
+  padding: 1rem;
+  border-radius: 1.35rem;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.casino-mini-table:hover,
+.casino-feature-table:hover,
+.casino-reward-chip:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 217, 102, 0.42);
+  box-shadow:
+    0 34px 82px rgba(0, 0, 0, 0.32),
+    0 0 36px rgba(255, 179, 63, 0.1);
+}
+
+.casino-mini-table > span {
+  grid-area: num;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #151007;
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  font: 900 0.64rem/1 var(--font-geist-mono);
+}
+
+.casino-mini-table div {
+  grid-area: copy;
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.casino-mini-table small {
+  color: #ffcf55;
+  font: 900 0.62rem/1 var(--font-geist-mono);
+  letter-spacing: 0.1em;
+}
+
+.casino-mini-table strong {
+  color: #fff6dc;
+  font: 900 clamp(1.25rem, 2vw, 1.8rem)/0.95 var(--font-casino);
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+}
+
+.casino-mini-table > b {
+  grid-area: tag;
+  width: max-content;
+  padding: 0.42rem 0.62rem;
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  border-radius: 999px;
+  color: #ffed9b;
+  background: rgba(255, 217, 102, 0.045);
+  font: 900 0.6rem/1 var(--font-geist-mono);
+}
+
+.casino-side-meter {
+  grid-area: meter;
+  min-height: 15.6rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 999px;
+  text-align: center;
+}
+
+.casino-side-meter span,
+.casino-side-meter small {
+  color: #ffcf55;
+  font: 900 0.62rem/1 var(--font-geist-mono);
+  letter-spacing: 0.14em;
+}
+
+.casino-side-meter strong {
+  color: #fff6dc;
+  font: 900 3.2rem/0.9 var(--font-casino);
+  letter-spacing: -0.09em;
+}
+
+.casino-side-meter > i {
+  width: 0.42rem;
+  height: 5.8rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.casino-side-meter > i b {
+  display: block;
+  width: 100%;
+  height: 78%;
+  margin-top: 22%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--casino-gold), var(--emerald));
+}
+
+.casino-quick-actions {
+  grid-area: actions;
+  min-height: 5.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border-radius: 1.4rem;
+}
+
+.casino-quick-actions a {
+  flex: 1;
+  min-height: 3.35rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 217, 102, 0.14);
+  border-radius: 999px;
+  color: #ffed9b;
+  background: rgba(255, 217, 102, 0.045);
+  font: 900 0.68rem/1 var(--font-geist-mono);
+  letter-spacing: 0.08em;
+}
+
+.casino-quick-actions a:hover {
+  color: #151007;
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  transform: translateY(-2px);
+}
+
+.casino-reward-cage {
+  display: grid;
+  grid-template-columns: minmax(17rem, 0.42fr) minmax(0, 1fr);
+  grid-template-areas:
+    "vault rail"
+    "strip rail";
+  gap: 1rem;
+}
+
+.casino-vault-card {
+  grid-area: vault;
+  min-height: 19rem;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  align-content: end;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 2rem 2rem 4rem 2rem;
+}
+
+.casino-vault-card span,
+.casino-vault-card small {
+  width: max-content;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  border-radius: 999px;
+  color: #ffed9b;
+  background: rgba(255, 217, 102, 0.045);
+  font: 900 0.65rem/1 var(--font-geist-mono);
+  letter-spacing: 0.12em;
+}
+
+.casino-vault-card strong {
+  color: #fff6dc;
+  font: 900 clamp(4.5rem, 8vw, 8rem)/0.8 var(--font-casino);
+  letter-spacing: -0.12em;
+}
+
+.casino-vault-card i {
+  position: absolute;
+  right: -0.8rem;
+  top: 0.8rem;
+  color: rgba(41, 224, 140, 0.14);
+  font: 900 10rem/0.8 Georgia, serif;
+}
+
+.casino-reward-rail {
+  grid-area: rail;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.casino-reward-chip {
+  min-height: 19rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 1.35rem 1.35rem 2.4rem 1.35rem;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.casino-reward-chip::after {
+  content: "♦";
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.4rem;
+  color: rgba(255, 63, 98, 0.13);
+  font: 900 5.4rem/0.8 Georgia, serif;
+}
+
+.casino-reward-chip:nth-child(odd)::after {
+  content: "♠";
+  color: rgba(255, 217, 102, 0.12);
+}
+
+.casino-reward-chip:nth-child(3)::after {
+  content: "♣";
+  color: rgba(41, 224, 140, 0.14);
+}
+
+.casino-reward-chip > span {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #151007;
+  background: linear-gradient(180deg, #ffe083, #ffb33f);
+  font: 900 0.64rem/1 var(--font-geist-mono);
+}
+
+.casino-reward-chip strong {
+  color: #fff6dc;
+  font: 900 clamp(1.55rem, 2.3vw, 2.25rem)/0.95 var(--font-casino);
+  letter-spacing: -0.07em;
+  text-transform: uppercase;
+}
+
+.casino-reward-chip small {
+  width: max-content;
+  padding: 0.45rem 0.62rem;
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  border-radius: 999px;
+  color: #ffed9b;
+  background: rgba(255, 217, 102, 0.045);
+  font: 900 0.6rem/1 var(--font-geist-mono);
+}
+
+.casino-ticket-strip {
+  grid-area: strip;
+  min-height: 5.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 1.4rem;
+}
+
+.casino-ticket-strip span {
+  color: #ffed9b;
+  font: 900 0.68rem/1 var(--font-geist-mono);
+  letter-spacing: 0.12em;
+}
+
+.casino-ticket-strip i {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--casino-gold);
+  box-shadow: 0 0 14px var(--casino-gold);
+}
+
+@media (max-width: 1100px) {
+  .casino-lobby-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
+    grid-template-areas:
+      "feature stack"
+      "meter actions";
+  }
+
+  .casino-side-meter {
+    min-height: 6rem;
+    grid-template-columns: auto auto 1fr auto;
+    border-radius: 1.4rem;
+  }
+
+  .casino-side-meter > i {
+    width: 100%;
+    height: 0.42rem;
+  }
+
+  .casino-side-meter > i b {
+    width: 78%;
+    height: 100%;
+    margin-top: 0;
+  }
+
+  .casino-reward-cage {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "vault"
+      "rail"
+      "strip";
+  }
+
+  .casino-vault-card {
+    min-height: 14rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .casino-section-title {
+    align-items: flex-start;
+  }
+
+  .casino-section-pulse {
+    display: none;
+  }
+
+  .casino-lobby-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "feature"
+      "stack"
+      "meter"
+      "actions";
+  }
+
+  .casino-feature-table {
+    min-height: 17rem;
+    border-radius: 1.35rem 1.35rem 2.6rem 1.35rem;
+  }
+
+  .casino-feature-table strong {
+    max-width: 100%;
+    font-size: clamp(1.9rem, 10vw, 2.7rem);
+    overflow-wrap: anywhere;
+  }
+
+  .casino-table-stack,
+  .casino-reward-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .casino-mini-table,
+  .casino-reward-chip {
+    min-height: 8.5rem;
+  }
+
+  .casino-reward-chip {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.7rem 0.9rem;
+  }
+
+  .casino-reward-chip small {
+    grid-column: 2;
+  }
+
+  .casino-quick-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .casino-quick-actions a {
+    min-height: 2.8rem;
+  }
+
+  .casino-vault-card {
+    min-height: 12rem;
+  }
+}
+
+/* Liquid glass container pass */
+
+.product-page {
+  --glass-surface: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.16),
+      rgba(255, 255, 255, 0.045) 34%,
+      rgba(6, 16, 13, 0.54) 100%
+    );
+  --glass-surface-strong: linear-gradient(
+      145deg,
+      rgba(255, 238, 178, 0.2),
+      rgba(255, 255, 255, 0.06) 38%,
+      rgba(5, 13, 11, 0.62) 100%
+    );
+  --glass-border: rgba(255, 244, 204, 0.22);
+  --glass-border-soft: rgba(255, 255, 255, 0.12);
+  --glass-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.08);
+}
+
+.product-header,
+.casino-status-strip,
+.season-clock,
+.vault-balance,
+.points-wallet,
+.rivl-hero-meta div,
+.rivl-stage,
+.product-podium,
+.full-board-panel,
+.board-pulse-card,
+.history-table,
+.giveaway-feature,
+.watch-panel,
+.daily-rewards-panel,
+.reward-detail-modal,
+.event-detail-modal,
+.player-preview-modal,
+.legal-card,
+.hero-command-card,
+.leaderboard-stat-card,
+.tinted-panel,
+.leaderboard-summary-card,
+.hero-support-card,
+.hero-rank-card,
+.podium-card,
+.row-card,
+.feature-grid-card,
+.footer-meta-card,
+.rivl-podium-card,
+.product-podium-card,
+.design-card,
+.reward-product-card,
+.giveaway-grid article,
+.casino-feature-table,
+.casino-mini-table,
+.casino-side-meter,
+.casino-quick-actions,
+.casino-vault-card,
+.casino-reward-chip,
+.casino-ticket-strip,
+.account-menu,
+.notification-drawer,
+.product-search,
+.product-segments,
+.refresh-board,
+.notification-trigger,
+.account-trigger,
+.product-menu {
+  border-color: var(--glass-border);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.18), transparent 30%),
+    radial-gradient(circle at 86% 10%, rgba(255, 217, 102, 0.14), transparent 28%),
+    radial-gradient(circle at 42% 115%, rgba(41, 224, 140, 0.1), transparent 34%),
+    var(--glass-surface);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(22px) saturate(1.34);
+  -webkit-backdrop-filter: blur(22px) saturate(1.34);
+}
+
+.rivl-stage,
+.product-podium,
+.full-board-panel,
+.board-pulse-card,
+.history-table,
+.giveaway-feature,
+.watch-panel,
+.daily-rewards-panel,
+.reward-detail-modal,
+.event-detail-modal,
+.player-preview-modal,
+.legal-card,
+.casino-feature-table,
+.casino-mini-table,
+.casino-side-meter,
+.casino-quick-actions,
+.casino-vault-card,
+.casino-reward-chip,
+.casino-ticket-strip {
+  border-color: rgba(255, 244, 204, 0.26);
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.2), transparent 29%),
+    radial-gradient(circle at 78% 6%, rgba(255, 217, 102, 0.17), transparent 26%),
+    radial-gradient(circle at 50% 112%, rgba(41, 224, 140, 0.12), transparent 34%),
+    var(--glass-surface-strong);
+}
+
+.rivl-podium-card,
+.product-podium-card,
+.design-card,
+.reward-product-card,
+.giveaway-grid article,
+.hero-command-card,
+.leaderboard-stat-card,
+.hero-rank-card,
+.podium-card,
+.row-card,
+.feature-grid-card,
+.footer-meta-card {
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.045) 42%, rgba(7, 15, 13, 0.56)),
+    radial-gradient(circle at 82% 0%, rgba(255, 217, 102, 0.13), transparent 31%);
+  box-shadow:
+    0 22px 58px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.07);
+}
+
+.product-header,
+.casino-status-strip,
+.account-menu,
+.notification-drawer,
+.product-search,
+.product-segments,
+.refresh-board,
+.notification-trigger,
+.account-trigger,
+.product-menu {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 45%, rgba(4, 12, 10, 0.5)),
+    radial-gradient(circle at 18% 0%, rgba(255, 217, 102, 0.12), transparent 32%);
+}
+
+.place-1 .rivl-podium-prize,
+.product-podium-card.place-1 .product-podium-card__wager,
+.you-position-card,
+.product-segments button.active {
+  background:
+    linear-gradient(145deg, rgba(255, 238, 155, 0.94), rgba(255, 179, 63, 0.82)),
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.45), transparent 34%);
+  box-shadow:
+    0 18px 42px rgba(255, 179, 63, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+}
+
+.full-board-head,
+.full-board-row,
+.product-podium-card__wager,
+.rivl-podium-prize,
+.design-card p,
+.casino-feature-table small,
+.casino-table-badge,
+.casino-mini-table > b,
+.casino-vault-card span,
+.casino-vault-card small,
+.casino-reward-chip small,
+.casino-quick-actions a,
+.casino-section-pulse,
+.status-badge {
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+
+.rivl-stage::after,
+.product-podium::after,
+.full-board-panel::after,
+.design-card::after,
+.reward-product-card::after,
+.giveaway-grid article::after {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 0 34px rgba(255, 255, 255, 0.035),
+    inset 0 0 60px rgba(255, 217, 102, 0.03);
+}
+
+.casino-mini-table:hover,
+.casino-feature-table:hover,
+.casino-reward-chip:hover,
+.rivl-podium-card:hover,
+.rivl-podium-card:focus-visible,
+.product-podium-card:hover,
+.product-podium-card:focus-visible,
+.design-card:hover,
+.design-card:focus-within,
+.reward-product-card:hover,
+.reward-product-card:focus-visible,
+.giveaway-grid article:hover {
+  border-color: rgba(255, 244, 204, 0.42);
+  box-shadow:
+    0 34px 88px rgba(0, 0, 0, 0.32),
+    0 0 44px rgba(255, 217, 102, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+/* Gloss boost */
+
+.product-page {
+  --glass-surface: linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0.13) 10%,
+      rgba(255, 255, 255, 0.045) 34%,
+      rgba(8, 20, 16, 0.48) 66%,
+      rgba(3, 9, 8, 0.68) 100%
+    );
+  --glass-surface-strong: linear-gradient(
+      152deg,
+      rgba(255, 247, 221, 0.34) 0%,
+      rgba(255, 255, 255, 0.14) 12%,
+      rgba(255, 255, 255, 0.05) 36%,
+      rgba(8, 22, 17, 0.5) 68%,
+      rgba(3, 10, 8, 0.7) 100%
+    );
+  --glass-shine:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.3) 0 8%, transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 32%);
+  --glass-border: rgba(255, 250, 224, 0.32);
+  --glass-shadow:
+    0 30px 88px rgba(0, 0, 0, 0.26),
+    0 0 42px rgba(255, 217, 102, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.12);
+}
+
+.rivl-stage,
+.product-podium,
+.full-board-panel,
+.board-pulse-card,
+.history-table,
+.giveaway-feature,
+.watch-panel,
+.daily-rewards-panel,
+.reward-detail-modal,
+.event-detail-modal,
+.player-preview-modal,
+.legal-card,
+.casino-feature-table,
+.casino-mini-table,
+.casino-side-meter,
+.casino-quick-actions,
+.casino-vault-card,
+.casino-reward-chip,
+.casino-ticket-strip {
+  background:
+    var(--glass-shine),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.16), transparent 30%),
+    radial-gradient(circle at 78% 6%, rgba(255, 217, 102, 0.18), transparent 26%),
+    radial-gradient(circle at 50% 112%, rgba(41, 224, 140, 0.13), transparent 34%),
+    var(--glass-surface-strong);
+  background-blend-mode: screen, screen, screen, normal, normal;
+}
+
+.rivl-podium-card,
+.product-podium-card,
+.reward-product-card,
+.giveaway-grid article,
+.hero-command-card,
+.leaderboard-stat-card,
+.hero-rank-card,
+.podium-card,
+.row-card,
+.feature-grid-card,
+.footer-meta-card {
+  border-color: rgba(255, 250, 224, 0.28);
+  background:
+    var(--glass-shine),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.055) 42%, rgba(7, 15, 13, 0.52)),
+    radial-gradient(circle at 82% 0%, rgba(255, 217, 102, 0.15), transparent 31%);
+  background-blend-mode: screen, normal, normal;
+  box-shadow:
+    0 22px 62px rgba(0, 0, 0, 0.24),
+    0 0 32px rgba(255, 217, 102, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.1);
+}
+
+.design-card {
+  border-color: rgba(255, 250, 224, 0.28);
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.28) 0 8%, transparent 24%),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.055) 42%, rgba(7, 15, 13, 0.52)),
+    radial-gradient(circle at 82% 0%, rgba(255, 217, 102, 0.15), transparent 31%);
+  box-shadow:
+    0 22px 62px rgba(0, 0, 0, 0.24),
+    0 0 32px rgba(255, 217, 102, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.1);
+}
+
+.design-card:nth-child(3n + 2) {
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.28) 0 8%, transparent 24%),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.18), rgba(255, 63, 98, 0.08) 45%, rgba(7, 15, 13, 0.52)),
+    radial-gradient(circle at 82% 10%, rgba(255, 63, 98, 0.16), transparent 25%);
+}
+
+.design-card:nth-child(3n + 3) {
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.28) 0 8%, transparent 24%),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.18), rgba(255, 217, 102, 0.08) 45%, rgba(7, 15, 13, 0.52)),
+    radial-gradient(circle at 82% 10%, rgba(255, 217, 102, 0.18), transparent 25%);
+}
+
+.product-header,
+.casino-status-strip,
+.account-menu,
+.notification-drawer,
+.product-search,
+.product-segments,
+.refresh-board,
+.notification-trigger,
+.account-trigger,
+.product-menu,
+.season-clock,
+.vault-balance,
+.points-wallet,
+.rivl-hero-meta div {
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.24) 0 10%, transparent 28%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.045) 46%, rgba(4, 12, 10, 0.46)),
+    radial-gradient(circle at 18% 0%, rgba(255, 217, 102, 0.14), transparent 32%);
+  box-shadow:
+    0 20px 58px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.09);
+}
+
+.rivl-stage::after,
+.product-podium::after,
+.full-board-panel::after,
+.reward-product-card::after,
+.giveaway-grid article::after {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 22% 76%, rgba(255, 255, 255, 0.06)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 38%);
+}
+
+.full-board-head,
+.full-board-row,
+.product-podium-card__wager,
+.rivl-podium-prize,
+.casino-feature-table small,
+.casino-table-badge,
+.casino-mini-table > b,
+.casino-vault-card span,
+.casino-vault-card small,
+.casino-reward-chip small,
+.casino-quick-actions a,
+.casino-section-pulse,
+.status-badge {
+  border-color: rgba(255, 250, 224, 0.18);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035)),
+    rgba(255, 255, 255, 0.035);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.06);
+}
+
+/* Clear-glass correction: transparent gloss without milky white fills */
+
+.product-page {
+  --glass-surface: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.025) 16%,
+      rgba(10, 26, 20, 0.32) 48%,
+      rgba(3, 10, 8, 0.5) 100%
+    );
+  --glass-surface-strong: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      rgba(255, 255, 255, 0.03) 18%,
+      rgba(10, 29, 21, 0.36) 52%,
+      rgba(3, 10, 8, 0.54) 100%
+    );
+  --glass-shine:
+    linear-gradient(119deg, rgba(255, 255, 255, 0.12) 0 5%, transparent 19%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 27%);
+  --glass-border: rgba(255, 217, 102, 0.24);
+  --glass-shadow:
+    0 30px 86px rgba(0, 0, 0, 0.3),
+    0 0 38px rgba(41, 224, 140, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.08);
+}
+
+.rivl-stage,
+.product-podium,
+.full-board-panel,
+.board-pulse-card,
+.history-table,
+.giveaway-feature,
+.watch-panel,
+.daily-rewards-panel,
+.reward-detail-modal,
+.event-detail-modal,
+.player-preview-modal,
+.legal-card,
+.casino-feature-table,
+.casino-mini-table,
+.casino-side-meter,
+.casino-quick-actions,
+.casino-vault-card,
+.casino-reward-chip,
+.casino-ticket-strip {
+  border-color: rgba(255, 217, 102, 0.22);
+  background:
+    var(--glass-shine),
+    radial-gradient(circle at 75% 8%, rgba(255, 217, 102, 0.11), transparent 25%),
+    radial-gradient(circle at 16% 20%, rgba(41, 224, 140, 0.07), transparent 28%),
+    linear-gradient(150deg, rgba(12, 36, 25, 0.24), rgba(4, 10, 9, 0.52));
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(26px) saturate(1.45) contrast(1.04);
+  -webkit-backdrop-filter: blur(26px) saturate(1.45) contrast(1.04);
+}
+
+.rivl-podium-card,
+.product-podium-card,
+.design-card,
+.reward-product-card,
+.giveaway-grid article,
+.hero-command-card,
+.leaderboard-stat-card,
+.hero-rank-card,
+.podium-card,
+.row-card,
+.feature-grid-card,
+.footer-meta-card {
+  border-color: rgba(255, 217, 102, 0.2);
+  background:
+    linear-gradient(119deg, rgba(255, 255, 255, 0.1) 0 5%, transparent 19%),
+    radial-gradient(circle at 84% 0%, rgba(255, 217, 102, 0.1), transparent 30%),
+    linear-gradient(145deg, rgba(12, 34, 25, 0.22), rgba(4, 10, 9, 0.46));
+  box-shadow:
+    0 22px 62px rgba(0, 0, 0, 0.27),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.07);
+  backdrop-filter: blur(24px) saturate(1.4) contrast(1.04);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4) contrast(1.04);
+}
+
+.design-card:nth-child(3n + 2) {
+  background:
+    linear-gradient(119deg, rgba(255, 255, 255, 0.1) 0 5%, transparent 19%),
+    radial-gradient(circle at 82% 10%, rgba(255, 63, 98, 0.11), transparent 28%),
+    linear-gradient(145deg, rgba(36, 18, 20, 0.2), rgba(4, 10, 9, 0.46));
+}
+
+.design-card:nth-child(3n + 3) {
+  background:
+    linear-gradient(119deg, rgba(255, 255, 255, 0.1) 0 5%, transparent 19%),
+    radial-gradient(circle at 82% 10%, rgba(255, 217, 102, 0.12), transparent 28%),
+    linear-gradient(145deg, rgba(34, 32, 14, 0.2), rgba(4, 10, 9, 0.46));
+}
+
+.product-header,
+.casino-status-strip,
+.account-menu,
+.notification-drawer,
+.product-search,
+.product-segments,
+.refresh-board,
+.notification-trigger,
+.account-trigger,
+.product-menu,
+.season-clock,
+.vault-balance,
+.points-wallet,
+.rivl-hero-meta div {
+  border-color: rgba(255, 217, 102, 0.2);
+  background:
+    linear-gradient(119deg, rgba(255, 255, 255, 0.1) 0 6%, transparent 22%),
+    radial-gradient(circle at 20% 0%, rgba(255, 217, 102, 0.08), transparent 34%),
+    linear-gradient(145deg, rgba(9, 24, 18, 0.24), rgba(4, 10, 9, 0.44));
+  box-shadow:
+    0 20px 58px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.07);
+  backdrop-filter: blur(24px) saturate(1.42) contrast(1.04);
+  -webkit-backdrop-filter: blur(24px) saturate(1.42) contrast(1.04);
+}
+
+.rivl-stage::after,
+.product-podium::after,
+.full-board-panel::after,
+.reward-product-card::after,
+.giveaway-grid article::after {
+  border-color: rgba(255, 217, 102, 0.12);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 22% 78%, rgba(255, 217, 102, 0.04)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 36%);
+  box-shadow:
+    inset 0 0 30px rgba(255, 255, 255, 0.02),
+    inset 0 0 64px rgba(41, 224, 140, 0.025);
+}
+
+.full-board-head,
+.full-board-row,
+.product-podium-card__wager,
+.rivl-podium-prize,
+.casino-feature-table small,
+.casino-table-badge,
+.casino-mini-table > b,
+.casino-vault-card span,
+.casino-vault-card small,
+.casino-reward-chip small,
+.casino-quick-actions a,
+.casino-section-pulse,
+.status-badge {
+  border-color: rgba(255, 217, 102, 0.14);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)),
+    rgba(5, 14, 11, 0.26);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(255, 217, 102, 0.05);
+}
+
+.casino-mini-table:hover,
+.casino-feature-table:hover,
+.casino-reward-chip:hover,
+.rivl-podium-card:hover,
+.rivl-podium-card:focus-visible,
+.product-podium-card:hover,
+.product-podium-card:focus-visible,
+.design-card:hover,
+.design-card:focus-within,
+.reward-product-card:hover,
+.reward-product-card:focus-visible,
+.giveaway-grid article:hover {
+  border-color: rgba(255, 217, 102, 0.34);
+  box-shadow:
+    0 34px 88px rgba(0, 0, 0, 0.34),
+    0 0 34px rgba(41, 224, 140, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Homepage section revamp */
+
+.casino-section-title {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.36fr) auto;
+  align-items: end;
+}
+
+.casino-section-title h2 {
+  position: relative;
+}
+
+.casino-section-title h2::after {
+  content: "";
+  display: block;
+  width: min(11rem, 44vw);
+  height: 0.32rem;
+  margin-top: 0.72rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--casino-gold), var(--casino-red), var(--emerald), transparent);
+  box-shadow: 0 0 24px rgba(255, 179, 63, 0.16);
+}
+
+.casino-section-copy {
+  max-width: 21rem;
+  margin: 0;
+  color: #c7d6c9;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.casino-lobby-grid {
+  gap: clamp(0.9rem, 1.8vw, 1.25rem);
+  perspective: 1200px;
+}
+
+.casino-feature-table {
+  min-height: 28rem;
+  justify-content: space-between;
+  padding: clamp(1.2rem, 2.8vw, 2.25rem);
+  transform-style: preserve-3d;
+}
+
+.casino-feature-table::after {
+  content: "";
+  position: absolute;
+  inset: auto 1.2rem 1.2rem auto;
+  width: min(15rem, 44%);
+  aspect-ratio: 1;
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 217, 102, 0.18), transparent 58%),
+    conic-gradient(from 30deg, rgba(255, 217, 102, 0.32), rgba(255, 63, 98, 0.16), rgba(41, 224, 140, 0.22), rgba(255, 217, 102, 0.32));
+  opacity: 0.72;
+  filter: blur(0.2px);
+  mask-image: radial-gradient(circle, transparent 42%, #000 43% 58%, transparent 59%);
+}
+
+.casino-table-orbit {
+  position: absolute;
+  inset: 1.1rem 1.1rem auto auto;
+  width: min(12rem, 36%);
+  aspect-ratio: 1;
+  pointer-events: none;
+  opacity: 0.72;
+}
+
+.casino-table-orbit span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 217, 102, 0.18);
+  border-radius: 50%;
+  transform: rotate(var(--orbit-rotate, 0deg)) scale(var(--orbit-scale, 1));
+}
+
+.casino-table-orbit span:nth-child(2) {
+  --orbit-rotate: 28deg;
+  --orbit-scale: 0.72;
+  border-color: rgba(255, 63, 98, 0.2);
+}
+
+.casino-table-orbit span:nth-child(3) {
+  --orbit-rotate: -22deg;
+  --orbit-scale: 0.48;
+  border-color: rgba(41, 224, 140, 0.2);
+}
+
+.casino-feature-table strong {
+  max-width: 9ch;
+  margin-top: auto;
+  font-size: clamp(3rem, 6.2vw, 6.6rem);
+  text-shadow:
+    4px 4px 0 rgba(255, 63, 98, 0.2),
+    8px 8px 0 rgba(41, 224, 140, 0.12),
+    0 0 40px rgba(255, 179, 63, 0.16);
+}
+
+.casino-feature-table small {
+  font-size: 0.78rem;
+}
+
+.casino-feature-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.48rem;
+  max-width: 25rem;
+}
+
+.casino-feature-stats span {
+  padding: 0.52rem 0.68rem;
+  border: 1px solid rgba(255, 217, 102, 0.15);
+  border-radius: 999px;
+  color: #ffed9b;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+    rgba(5, 14, 11, 0.26);
+  font: 900 0.62rem/1 var(--font-geist-mono);
+  letter-spacing: 0.1em;
+  backdrop-filter: blur(14px) saturate(1.25);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+}
+
+.casino-feature-table > b {
+  min-width: 10.75rem;
+  min-height: 3.1rem;
+  box-shadow:
+    0 16px 32px rgba(255, 179, 63, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.44);
+}
+
+.casino-table-stack {
+  gap: 0.95rem;
+}
+
+.casino-mini-table {
+  position: relative;
+  overflow: hidden;
+  min-height: 8.6rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "num copy arrow"
+    "tag tag arrow";
+  align-content: stretch;
+}
+
+.casino-mini-table::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--casino-gold), var(--casino-red), var(--emerald));
+  opacity: 0.82;
+}
+
+.casino-mini-table > span {
+  box-shadow:
+    0 0 20px rgba(255, 179, 63, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.casino-mini-table > b {
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.casino-mini-table em {
+  grid-area: arrow;
+  align-self: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 217, 102, 0.15);
+  border-radius: 50%;
+  color: #ffed9b;
+  background: rgba(255, 217, 102, 0.055);
+  font-style: normal;
+  transition:
+    transform 220ms ease,
+    background-color 220ms ease,
+    color 220ms ease;
+}
+
+.casino-mini-table:hover em {
+  color: #141007;
+  background: var(--casino-gold);
+  transform: translate(2px, -2px);
+}
+
+.casino-side-meter {
+  overflow: hidden;
+  position: relative;
+}
+
+.casino-side-meter::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: inherit;
+  border: 1px dashed rgba(255, 217, 102, 0.18);
+  pointer-events: none;
+}
+
+.casino-side-meter strong {
+  text-shadow:
+    3px 3px 0 rgba(255, 63, 98, 0.16),
+    0 0 26px rgba(255, 217, 102, 0.16);
+}
+
+.casino-reward-cage {
+  align-items: stretch;
+}
+
+.casino-vault-card {
+  min-height: 22rem;
+  align-content: space-between;
+}
+
+.casino-vault-card strong {
+  text-shadow:
+    5px 5px 0 rgba(255, 63, 98, 0.18),
+    0 0 42px rgba(255, 217, 102, 0.16);
+}
+
+.casino-vault-meter,
+.casino-reward-meter {
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.065);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.casino-vault-meter {
+  width: min(16rem, 100%);
+  height: 0.45rem;
+}
+
+.casino-vault-meter b,
+.casino-reward-meter b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--casino-red), var(--casino-gold), var(--emerald));
+  box-shadow: 0 0 18px rgba(255, 179, 63, 0.2);
+}
+
+.casino-vault-meter b {
+  width: 84%;
+}
+
+.casino-vault-tags {
+  display: flex;
+  gap: 0.48rem;
+  flex-wrap: wrap;
+}
+
+.casino-vault-tags span {
+  width: auto;
+  background: rgba(41, 224, 140, 0.07);
+  color: #8ff0bd;
+}
+
+.casino-reward-rail {
+  gap: 1rem;
+}
+
+.casino-reward-chip {
+  isolation: isolate;
+}
+
+.casino-reward-chip > span {
+  box-shadow:
+    0 0 20px rgba(255, 179, 63, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.casino-reward-chip strong {
+  position: relative;
+  z-index: 1;
+}
+
+.casino-reward-meter {
+  width: 100%;
+  height: 0.38rem;
+  margin-top: 0.5rem;
+}
+
+.casino-ticket-strip {
+  justify-content: space-between;
+  padding-inline: clamp(1rem, 2vw, 1.4rem);
+}
+
+.casino-ticket-strip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
+  padding: 0 0.8rem;
+  border: 1px solid rgba(255, 217, 102, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 217, 102, 0.045);
+}
+
+@media (max-width: 1100px) {
+  .casino-section-title {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .casino-section-copy {
+    grid-column: 1 / -1;
+    max-width: 32rem;
+  }
+
+  .casino-vault-card {
+    min-height: 15rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .casino-section-title {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .casino-section-copy {
+    max-width: 100%;
+  }
+
+  .casino-feature-table {
+    min-height: 21rem;
+  }
+
+  .casino-feature-table::after,
+  .casino-table-orbit {
+    width: 8rem;
+  }
+
+  .casino-feature-stats {
+    display: none;
+  }
+
+  .casino-mini-table {
+    min-height: 7.6rem;
+  }
+
+  .casino-ticket-strip {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }

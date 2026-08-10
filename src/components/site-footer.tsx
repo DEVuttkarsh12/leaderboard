@@ -7,7 +7,7 @@ export default function SiteFooter() {
     <footer className="product-footer">
       <div>
         <ProductLogo />
-        <p>Real leaderboard logic. Adapted RIVL visual system. No duplicate backend.</p>
+        <p>Sharp board. Loud shell.</p>
       </div>
       <nav aria-label="Footer navigation">
         {footerMenus.flatMap((menu) => menu.links).slice(0, 8).map((link) => (
@@ -17,7 +17,7 @@ export default function SiteFooter() {
         ))}
       </nav>
       <span>
-        LIVE FLOOR · READ ONLY API · 2026
+        LIVE FLOOR · 2026
       </span>
     </footer>
   );

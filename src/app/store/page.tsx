@@ -12,28 +12,28 @@ const storeCards = [
   {
     title: "Boost Packs",
     description:
-      "Promotional reward cards for XP boosts, access perks, or time-limited campaign bonuses.",
+      "Boosts with bite.",
     meta: "Store item",
     icon: BadgePercent,
   },
   {
     title: "Reward Drops",
     description:
-      "Spotlight cards for claimable drops and reward releases keep the store distinct from the standings screen.",
+      "Drops worth checking.",
     meta: "Drop surface",
     icon: Gift,
   },
   {
     title: "Merch Entries",
     description:
-      "Catalog cards can tease physical or digital merch-style rewards without needing live redemption logic yet.",
+      "Merch with some flex.",
     meta: "Catalog block",
     icon: ShoppingBag,
   },
   {
     title: "Voucher Rewards",
     description:
-      "Coupon, voucher, or ticket items fit better on a dedicated store route than inside challenge cards.",
+      "Vouchers and ticket loot.",
     meta: "Redemption block",
     icon: Ticket,
   },
@@ -45,7 +45,7 @@ export default function StorePage() {
       <PageHero
         eyebrow="Store"
         title="The rewards store now lives on its own route."
-        description="This page mirrors the reference product shape by giving reward inventory a dedicated destination. The live standings and their data flow stay exactly where they were."
+        description=""
         icon={ShoppingBag}
         actions={[
           { label: "Open challenges", href: "/challenges" },
@@ -53,14 +53,14 @@ export default function StorePage() {
         ]}
         stats={[
           { label: "Surface", value: "Reward catalog" },
-          { label: "Engine", value: "Leaderboard untouched" },
-          { label: "Use", value: "UI-only preview" },
+          { label: "Engine", value: "Competition aligned" },
+          { label: "Use", value: "Store preview" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Store"
         title="Catalog and redemption-inspired cards."
-        description="The goal here is route completeness and UI parity around the leaderboard, not new transactional logic."
+        description=""
         items={storeCards}
         columns={2}
       />

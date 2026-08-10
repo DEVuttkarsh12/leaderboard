@@ -12,28 +12,28 @@ const supportCards = [
   {
     title: "Account Access",
     description:
-      "A clean route for login or connection issues keeps account recovery separate from the leaderboard.",
+      "Fix access fast.",
     meta: "Auth help",
     icon: KeyRound,
   },
   {
     title: "Reward Questions",
     description:
-      "Users can land here for store, raffle, or challenge clarifications instead of scanning the homepage for answers.",
+      "Store and prize questions.",
     meta: "Reward help",
     icon: BadgeHelp,
   },
   {
     title: "Claim Escalations",
     description:
-      "This is the right place for claim-status UI and issue funnels when backend claim logic arrives later.",
+      "Claim issues land here.",
     meta: "Claim route",
     icon: ShieldAlert,
   },
   {
     title: "Conversation Surface",
     description:
-      "Chat or ticket-style support layouts now have a route to live in without affecting the board module.",
+      "Tickets and chat energy.",
     meta: "Support shell",
     icon: MessagesSquare,
   },
@@ -45,7 +45,7 @@ export default function SupportPage() {
       <PageHero
         eyebrow="Support"
         title="Support now sits in its own route."
-        description="This is a UI-only support surface for the new shell. It gives the app the same structural depth as the reference site without changing your existing leaderboard logic."
+        description=""
         icon={BadgeHelp}
         actions={[
           { label: "Open help center", href: "/help" },
@@ -53,14 +53,14 @@ export default function SupportPage() {
         ]}
         stats={[
           { label: "Role", value: "Support destination" },
-          { label: "Current scope", value: "UI only" },
-          { label: "Board module", value: "Unaffected" },
+          { label: "Current scope", value: "Help and routing" },
+          { label: "Board focus", value: "Stays clear" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Support"
         title="Account, claim, and ticket-style surfaces."
-        description="These blocks complete the public shell around the leaderboard and give support-related UI a real home."
+        description=""
         items={supportCards}
         columns={2}
       />

@@ -33,7 +33,7 @@ export default function FeatureGridSection({
           <span className="product-kicker">{eyebrow}</span>
           <h2>{title}</h2>
         </div>
-        <p className="design-section-copy">{description}</p>
+        {description ? <p className="design-section-copy">{description}</p> : null}
       </div>
 
       <div className={`design-card-grid design-card-grid--${columns}`}>
@@ -52,7 +52,7 @@ export default function FeatureGridSection({
               </div>
               <span className="product-kicker">{item.eyebrow ?? eyebrow}</span>
               <h3>{item.title}</h3>
-              <p>{item.description}</p>
+              {item.description ? <p>{item.description}</p> : null}
               <div className="design-card__footer">
                 <small>{item.meta ?? "LIVE ROUTE"}</small>
                 {item.href ? (

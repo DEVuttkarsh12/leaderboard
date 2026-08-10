@@ -1,51 +1,74 @@
 const items = [
   {
-    title: "Campaign framing",
-    description:
-      "Lead with why the round matters before sending people into raw rows and numbers.",
+    title: "Daily Drop",
+    description: "Open",
   },
   {
-    title: "Quest-driven participation",
-    description:
-      "Give the platform space for daily missions, streaks, and event quests without crowding the live board.",
+    title: "Streak Heat",
+    description: "Burn",
   },
   {
-    title: "Reward architecture",
-    description:
-      "Store, claims, and unlock surfaces can plug into these routes later without touching the leaderboard provider.",
+    title: "Prize Vault",
+    description: "Unlock",
   },
   {
-    title: "Community loop",
-    description:
-      "Keep stream status, campaign updates, and support surfaces visible so the experience feels alive beyond the rankings.",
+    title: "Lucky Spin",
+    description: "Spin",
   },
 ];
 
 export default function RewardsOverview() {
   return (
-    <section id="rewards" className="product-section">
-      <div className="product-section-title">
+    <section id="rewards" className="product-section casino-rewards-section">
+      <div className="product-section-title casino-section-title">
         <div>
-          <span className="product-kicker">REWARDS OVERVIEW</span>
-          <h2>BUILT FOR RETURN VISITS.</h2>
+          <span className="product-kicker">Reward Cage</span>
+          <h2>Grab heat.</h2>
         </div>
-        <p className="design-section-copy">
-          The site now reads like a rewards floor with a live competitive core,
-          not a generic dashboard wrapped around a table.
+        <p className="casino-section-copy">
+          Reward lanes stack daily drops, streak boosts, vault prizes, and lucky spins.
         </p>
+        <div className="casino-section-pulse" aria-hidden="true">
+          <span>777</span>
+          <span>♢</span>
+        </div>
       </div>
 
-      <div className="design-card-grid design-card-grid--4">
-        {items.map((item, index) => (
-          <article className="design-card" key={item.title}>
-            <div className="design-card__top">
-              <span className="design-card__index">{`0${index + 1}`}</span>
-            </div>
-            <span className="product-kicker">REWARD SYSTEM</span>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
-          </article>
-        ))}
+      <div className="casino-reward-cage">
+        <div className="casino-vault-card">
+          <span>VAULT</span>
+          <strong>4X</strong>
+          <small>Drops active</small>
+          <div className="casino-vault-meter" aria-hidden="true">
+            <b />
+          </div>
+          <div className="casino-vault-tags" aria-hidden="true">
+            <span>HOT</span>
+            <span>READY</span>
+          </div>
+          <i aria-hidden="true">♣</i>
+        </div>
+
+        <div className="casino-reward-rail">
+          {items.map((item, index) => (
+            <article className="casino-reward-chip" key={item.title}>
+              <span>{`0${index + 1}`}</span>
+              <strong>{item.title}</strong>
+              <small>{item.description}</small>
+              <div className="casino-reward-meter" aria-hidden="true">
+                <b style={{ width: `${72 + index * 7}%` }} />
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="casino-ticket-strip" aria-label="Reward rhythm">
+          <span>DROP</span>
+          <i />
+          <span>STREAK</span>
+          <i />
+          <span>SPIN</span>
+        </div>
       </div>
     </section>
   );

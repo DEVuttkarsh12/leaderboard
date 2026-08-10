@@ -58,7 +58,7 @@ export default function PageHero({
               <Icon className="h-6 w-6" />
             </div>
           ) : null}
-          <p>{description}</p>
+          {description ? <p>{description}</p> : null}
           {stats.length ? (
             <div className="design-page-intro__stats">
               {stats.map((stat) => (

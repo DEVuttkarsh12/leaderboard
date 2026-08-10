@@ -12,7 +12,7 @@ const helpCards = [
   {
     title: "Leaderboard Basics",
     description:
-      "Explain that the standings are live, public, and read-only from the browser experience.",
+      "How the board moves.",
     meta: "Core guide",
     icon: CircleHelp,
     href: "/leaderboard",
@@ -21,7 +21,7 @@ const helpCards = [
   {
     title: "Challenge and Reward Pages",
     description:
-      "Show users where challenge, raffle, and store routes now live in the navigation shell.",
+      "Where rewards live.",
     meta: "Route guide",
     icon: BookOpen,
     href: "/challenges",
@@ -30,7 +30,7 @@ const helpCards = [
   {
     title: "Support Escalation",
     description:
-      "Move users into a dedicated support route instead of burying help text on the homepage.",
+      "Take issues off the floor.",
     meta: "Support route",
     icon: LifeBuoy,
     href: "/support",
@@ -39,7 +39,7 @@ const helpCards = [
   {
     title: "Policy Links",
     description:
-      "Privacy and terms are first-class routes now, matching the broader public-shell structure.",
+      "Quick policy exits.",
     meta: "Legal route",
     icon: ShieldCheck,
     href: "/privacy",
@@ -53,7 +53,7 @@ export default function HelpPage() {
       <PageHero
         eyebrow="Help"
         title="Support and FAQ now have a dedicated home."
-        description="The reference site exposes separate help and policy routes. This page adds that support layer around your leaderboard app without touching the live data implementation."
+        description=""
         icon={CircleHelp}
         actions={[
           { label: "Open support", href: "/support" },
@@ -62,13 +62,13 @@ export default function HelpPage() {
         stats={[
           { label: "Coverage", value: "Help and legal links" },
           { label: "Experience", value: "Multi-page" },
-          { label: "Board data", value: "Still read-only" },
+          { label: "Board focus", value: "Ranks and progress" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Help Center"
         title="FAQ, support routing, and policy entry points."
-        description="This keeps the informational surfaces where users expect them while the competitive board stays focused on rankings."
+        description=""
         items={helpCards}
         columns={2}
       />

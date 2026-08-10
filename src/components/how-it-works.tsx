@@ -1,18 +1,18 @@
 const steps = [
   {
-    title: "Enter the round",
+    title: "Tap In",
     description:
-      "Start from the active campaign or event route and move into the supported participation flow.",
+      "Join.",
   },
   {
-    title: "Climb the board",
+    title: "Climb",
     description:
-      "Progress through real score accumulation while the public board reflects the live order in real time.",
+      "Push.",
   },
   {
-    title: "Return for rewards",
+    title: "Cash Heat",
     description:
-      "Supporting routes now carry the tension, progression, and prize framing around the read-only live board.",
+      "Collect.",
   },
 ];
 
@@ -22,11 +22,10 @@ export default function HowItWorks() {
       <div className="product-section-title">
         <div>
           <span className="product-kicker">HOW IT WORKS</span>
-          <h2>A TIGHTER COMPETITION LOOP.</h2>
+          <h2>Three moves.</h2>
         </div>
         <p className="design-section-copy">
-          The experience should make progression obvious: enter, compete, and
-          return without burying the live board beneath generic product chrome.
+          Play. Rise. Claim.
         </p>
       </div>
 
@@ -36,7 +35,7 @@ export default function HowItWorks() {
             <div className="design-card__top">
               <span className="design-card__index">{`0${index + 1}`}</span>
             </div>
-            <span className="product-kicker">COMPETITION LOOP</span>
+            <span className="product-kicker">PLAY LOOP</span>
             <h3>{step.title}</h3>
             <p>{step.description}</p>
           </article>

@@ -2,22 +2,22 @@ const faqs = [
   {
     question: "How do rewards connect to the leaderboard?",
     answer:
-      "The leaderboard is still the visibility layer. Campaigns and quests drive participation, while supporting routes frame the broader product loop.",
+      "The board brings the heat. Rewards keep people chasing.",
   },
   {
     question: "Did the redesign change live board logic?",
     answer:
-      "No. The new work changes presentation, layout, and interaction patterns while the real data path and ranking engine remain intact.",
+      "No. The board still behaves like the board.",
   },
   {
-    question: "Is the data still read-only?",
+    question: "Does the board still update normally?",
     answer:
-      "Yes. The browser continues to read through the existing app route and no write methods were introduced for the leaderboard flow.",
+      "Yes. The ranks keep moving.",
   },
   {
     question: "What still needs backend work later?",
     answer:
-      "Reward redemption, account linking, deeper event logic, and claims still need dedicated backend support when you choose to add them.",
+      "Claims, accounts, and deeper reward loops.",
   },
 ];
 
@@ -30,8 +30,7 @@ export default function FAQSection() {
           <h2>ANSWER THE IMPORTANT QUESTIONS FAST.</h2>
         </div>
         <p className="design-section-copy">
-          Keep the explanations product-level and direct. The live board stays
-          technically isolated while the rest of the site becomes more premium.
+          Fast answers. No essay energy.
         </p>
       </div>
 

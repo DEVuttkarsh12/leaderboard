@@ -12,28 +12,28 @@ const raffleCards = [
   {
     title: "Ticket Thresholds",
     description:
-      "Show how ticket counts are earned with clear thresholds and next-step messaging.",
+      "Know the next threshold.",
     meta: "Ticket rules",
     icon: Tickets,
   },
   {
     title: "Prize Tiers",
     description:
-      "Separate prize bands make raffles feel like a destination instead of a note buried on the homepage.",
+      "Prize stacks with shape.",
     meta: "Tiered rewards",
     icon: Trophy,
   },
   {
     title: "Claim Readiness",
     description:
-      "Claim-state UI can exist here without touching the live leaderboard provider or polling path.",
+      "Claim flow stays off-board.",
     meta: "Claim surface",
     icon: Gift,
   },
   {
     title: "Entry Summary",
     description:
-      "Personal entry cards and totals fit naturally on this route while the leaderboard remains public-facing.",
+      "Your ticket stack, clean.",
     meta: "Account summary",
     icon: Wallet,
   },
@@ -45,22 +45,22 @@ export default function WagerRafflesPage() {
       <PageHero
         eyebrow="Rewards"
         title="Wager raffles sit outside the board page."
-        description="Ticket-based reward mechanics now have a dedicated route in the shell, matching the reference product structure while leaving the leaderboard engine alone."
+        description=""
         icon={Tickets}
         actions={[
           { label: "Back to challenges", href: "/challenges" },
           { label: "Open leaderboard", href: "/leaderboard", variant: "secondary" },
         ]}
         stats={[
-          { label: "Mode", value: "Raffle UI only" },
-          { label: "Board path", value: "Still isolated" },
+          { label: "Mode", value: "Raffle destination" },
+          { label: "Board path", value: "Competition first" },
           { label: "Reference fit", value: "Rewards destination" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Raffles"
         title="Ticket and prize surfaces."
-        description="This page gives raffle mechanics a proper home and keeps the surrounding flows from crowding the live standings."
+        description=""
         items={raffleCards}
         columns={2}
       />

@@ -8,10 +8,10 @@ import ProductLogo from "./product-logo";
 
 const primaryLinks = [
   { label: "Home", href: "/" },
-  { label: "Leaderboard", href: "/leaderboard" },
-  { label: "Challenges", href: "/challenges" },
-  { label: "Bonus Hunts", href: "/bonus-hunts" },
-  { label: "Store", href: "/store" },
+  { label: "Board", href: "/leaderboard" },
+  { label: "Missions", href: "/challenges" },
+  { label: "Hunts", href: "/bonus-hunts" },
+  { label: "Vault", href: "/store" },
   { label: "Help", href: "/help" },
 ] as const;
 
@@ -91,7 +91,7 @@ export default function SiteHeader() {
         <div className="product-actions">
           <span className="product-live">
             <i />
-            LIVE READ ONLY
+            LIVE
           </span>
           <Link className="notification-trigger" href="/leaderboard" aria-label="Open leaderboard">
             <span>◇</span>
@@ -102,6 +102,7 @@ export default function SiteHeader() {
               type="button"
               className="account-trigger"
               aria-expanded={accountOpen}
+              aria-haspopup="menu"
               onClick={() => {
                 setAccountOpen((current) => !current);
                 setMobileOpen(false);
@@ -112,13 +113,13 @@ export default function SiteHeader() {
                 <i />
               </span>
               <span>
-                <strong>LIVE FLOOR</strong>
-                <small>RankBoard shell</small>
+                <strong>PLAY FLOOR</strong>
+                <small>VIP lane</small>
               </span>
-              <b>⌄</b>
+              <b aria-hidden="true">⌄</b>
             </button>
             {accountOpen ? (
-              <div className="account-menu">
+              <div className="account-menu" role="menu">
                 <div>
                   <span className="mini-player tone-coral">
                     RB
@@ -126,7 +127,7 @@ export default function SiteHeader() {
                   </span>
                   <p>
                     <strong>RankBoard</strong>
-                    <small>Real data. Design shell.</small>
+                    <small>VIP lane</small>
                   </p>
                 </div>
                 {accountLinks.map((link) => (
@@ -160,22 +161,6 @@ export default function SiteHeader() {
           </button>
         </div>
       </header>
-      <div className="casino-status-strip" aria-label="Platform status">
-        <div>
-          <span>
-            <i>♠</i> LIVE BOARD <strong>READ ONLY</strong>
-          </span>
-          <span>
-            <i className="red">♦</i> REAL DATA <strong>SERVER ROUTE</strong>
-          </span>
-          <span>
-            <i>♣</i> REWARD SHELL <strong>MULTI PAGE</strong>
-          </span>
-          <span>
-            <b>777</b> POLLING <strong>60 SECOND SYNC</strong>
-          </span>
-        </div>
-      </div>
     </>
   );
 }

@@ -12,28 +12,28 @@ const huntCards = [
   {
     title: "Live Session Cards",
     description:
-      "Feature the active hunt, the host, and the current slot mix in a route that feels built for stream coverage.",
+      "Show the live hunt fast.",
     meta: "Stream event",
     icon: Radio,
   },
   {
     title: "Schedule Blocks",
     description:
-      "Future hunts can be listed with times, prize hooks, and CTA paths without polluting the leaderboard page.",
+      "Line up the next hit.",
     meta: "Forward schedule",
     icon: Clock3,
   },
   {
     title: "Highlight Recaps",
     description:
-      "Recap cards and standout moments belong in a stream page, not inside the standings shell.",
+      "Save the loud moments.",
     meta: "Content recap",
     icon: Sparkles,
   },
   {
     title: "Clip Surface",
     description:
-      "Video or highlight placeholders can live here while the board continues to focus on score ordering only.",
+      "Clips live here, not on-rank.",
     meta: "Media block",
     icon: Video,
   },
@@ -45,7 +45,7 @@ export default function BonusHuntsPage() {
       <PageHero
         eyebrow="Stream"
         title="Bonus hunts get their own event page."
-        description="The reference site separates stream-led content from the leaderboard. This route does the same, adding event UI without touching any ranking behavior."
+        description=""
         icon={Radio}
         actions={[
           { label: "Open tournaments", href: "/tournaments" },
@@ -53,14 +53,14 @@ export default function BonusHuntsPage() {
         ]}
         stats={[
           { label: "Route type", value: "Stream surface" },
-          { label: "State", value: "UI-only" },
-          { label: "Live board", value: "Unaffected" },
+          { label: "State", value: "Event stage" },
+          { label: "Live board", value: "Competition focus" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Bonus Hunts"
         title="Scheduling, highlights, and stream framing."
-        description="Breaking this content out into its own route makes the overall site behave more like the reference hub."
+        description=""
         items={huntCards}
         columns={2}
       />
