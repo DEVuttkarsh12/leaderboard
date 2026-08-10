@@ -44,7 +44,7 @@ export default function TournamentsPage() {
     <>
       <PageHero
         eyebrow="Stream"
-        title="Tournament pages no longer depend on the homepage."
+        title="Tournaments"
         description=""
         icon={Trophy}
         actions={[
@@ -52,14 +52,14 @@ export default function TournamentsPage() {
           { label: "View leaderboard", href: "/leaderboard", variant: "secondary" },
         ]}
         stats={[
-          { label: "Purpose", value: "Event destination" },
-          { label: "Ranking logic", value: "Unchanged" },
-          { label: "Shell type", value: "Multi-page" },
+          { label: "Mode", value: "Bracket" },
+          { label: "State", value: "Upcoming" },
+          { label: "Focus", value: "Prize run" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Tournaments"
-        title="Schedule, results, and prize framing."
+        title="Enter the bracket."
         description=""
         items={tournamentCards}
         columns={2}

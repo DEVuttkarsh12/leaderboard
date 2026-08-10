@@ -44,7 +44,7 @@ export default function WagerRafflesPage() {
     <>
       <PageHero
         eyebrow="Rewards"
-        title="Wager raffles sit outside the board page."
+        title="Wager raffles"
         description=""
         icon={Tickets}
         actions={[
@@ -52,14 +52,14 @@ export default function WagerRafflesPage() {
           { label: "Open leaderboard", href: "/leaderboard", variant: "secondary" },
         ]}
         stats={[
-          { label: "Mode", value: "Raffle destination" },
-          { label: "Board path", value: "Competition first" },
-          { label: "Reference fit", value: "Rewards destination" },
+          { label: "Mode", value: "Tickets" },
+          { label: "State", value: "Draw ready" },
+          { label: "Focus", value: "Prize drops" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Raffles"
-        title="Ticket and prize surfaces."
+        title="Ticket drops."
         description=""
         items={raffleCards}
         columns={2}

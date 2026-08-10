@@ -39,8 +39,8 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       eyebrow="Privacy"
-      title="Privacy for the rewards shell."
-      intro="This route rounds out the public product structure and documents how RankBoard presents standings, rewards, and support surfaces."
+      title="Privacy"
+      intro="How RankBoard presents standings, rewards, and support surfaces."
       sections={sections}
     />
   );

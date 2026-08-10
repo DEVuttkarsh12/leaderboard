@@ -52,7 +52,7 @@ export default function HelpPage() {
     <>
       <PageHero
         eyebrow="Help"
-        title="Support and FAQ now have a dedicated home."
+        title="Help center"
         description=""
         icon={CircleHelp}
         actions={[
@@ -60,14 +60,14 @@ export default function HelpPage() {
           { label: "Read terms", href: "/terms", variant: "secondary" },
         ]}
         stats={[
-          { label: "Coverage", value: "Help and legal links" },
-          { label: "Experience", value: "Multi-page" },
-          { label: "Board focus", value: "Ranks and progress" },
+          { label: "Mode", value: "Answers" },
+          { label: "State", value: "Fast links" },
+          { label: "Focus", value: "Support" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Help Center"
-        title="FAQ, support routing, and policy entry points."
+        title="Quick answers."
         description=""
         items={helpCards}
         columns={2}

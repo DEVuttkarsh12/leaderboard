@@ -44,7 +44,7 @@ export default function LoginPage() {
     <>
       <PageHero
         eyebrow="Login"
-        title="Authentication has a dedicated entry route."
+        title="Account entry"
         description=""
         icon={KeyRound}
         actions={[
@@ -52,14 +52,14 @@ export default function LoginPage() {
           { label: "View leaderboard", href: "/leaderboard", variant: "secondary" },
         ]}
         stats={[
-          { label: "Mode", value: "Account entry" },
-          { label: "Leaderboard access", value: "Open board view" },
-          { label: "Future use", value: "Account gateway" },
+          { label: "Mode", value: "Login" },
+          { label: "State", value: "Gateway" },
+          { label: "Focus", value: "Account" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Authentication"
-        title="Entry-point UI for account features."
+        title="One door in."
         description=""
         items={loginCards}
         columns={2}

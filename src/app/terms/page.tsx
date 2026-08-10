@@ -39,8 +39,8 @@ export default function TermsPage() {
   return (
     <LegalPage
       eyebrow="Terms"
-      title="Terms for the current rewards shell."
-      intro="These terms summarize the current shape of the app after the multi-page expansion across standings, rewards, and support."
+      title="Terms"
+      intro="The current app shape across standings, rewards, and support."
       sections={sections}
     />
   );

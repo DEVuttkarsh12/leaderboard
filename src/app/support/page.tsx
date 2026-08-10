@@ -44,7 +44,7 @@ export default function SupportPage() {
     <>
       <PageHero
         eyebrow="Support"
-        title="Support now sits in its own route."
+        title="Support"
         description=""
         icon={BadgeHelp}
         actions={[
@@ -52,14 +52,14 @@ export default function SupportPage() {
           { label: "Open login", href: "/login", variant: "secondary" },
         ]}
         stats={[
-          { label: "Role", value: "Support destination" },
-          { label: "Current scope", value: "Help and routing" },
-          { label: "Board focus", value: "Stays clear" },
+          { label: "Mode", value: "Help desk" },
+          { label: "State", value: "Claims" },
+          { label: "Focus", value: "Fix fast" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Support"
-        title="Account, claim, and ticket-style surfaces."
+        title="Fix it fast."
         description=""
         items={supportCards}
         columns={2}

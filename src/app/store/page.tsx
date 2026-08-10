@@ -44,7 +44,7 @@ export default function StorePage() {
     <>
       <PageHero
         eyebrow="Store"
-        title="The rewards store now lives on its own route."
+        title="Reward store"
         description=""
         icon={ShoppingBag}
         actions={[
@@ -52,14 +52,14 @@ export default function StorePage() {
           { label: "Need support?", href: "/support", variant: "secondary" },
         ]}
         stats={[
-          { label: "Surface", value: "Reward catalog" },
-          { label: "Engine", value: "Competition aligned" },
-          { label: "Use", value: "Store preview" },
+          { label: "Mode", value: "Catalog" },
+          { label: "State", value: "Drops" },
+          { label: "Focus", value: "Redeem" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Store"
-        title="Catalog and redemption-inspired cards."
+        title="Grab rewards."
         description=""
         items={storeCards}
         columns={2}

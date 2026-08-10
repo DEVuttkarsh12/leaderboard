@@ -6618,3 +6618,215 @@ header {
     justify-content: center;
   }
 }
+
+/* Compact secondary pages */
+
+.product-main > .product-section:first-child:not(:has(.rivl-hero)) {
+  padding-block: clamp(1.9rem, 4vw, 3rem);
+}
+
+.design-page-intro {
+  min-height: auto;
+  gap: clamp(1rem, 2.4vw, 1.6rem);
+  align-items: center;
+  padding-block: clamp(1.15rem, 2.8vw, 1.8rem);
+}
+
+.product-intro h1 {
+  max-width: 13ch;
+  font-size: clamp(2.05rem, 4vw, 3.55rem);
+  line-height: 1;
+  letter-spacing: 0;
+  text-shadow:
+    2px 2px 0 rgba(255, 63, 98, 0.18),
+    0 0 24px rgba(255, 179, 63, 0.1);
+}
+
+.intro-index {
+  width: 3.4rem;
+  height: 3.4rem;
+  font-size: 0.78rem;
+}
+
+.intro-aside {
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 16px;
+}
+
+.intro-aside > p {
+  max-width: 22rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+}
+
+.design-page-intro__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 14px;
+}
+
+.design-page-intro__stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.design-page-intro__stats div {
+  min-height: 4.4rem;
+  padding: 0.72rem;
+  border-radius: 14px;
+}
+
+.design-page-intro__stats strong {
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+
+.product-section {
+  padding-block: clamp(2.2rem, 4.5vw, 3.8rem);
+}
+
+.app-product-shell .product-main > .product-section:nth-of-type(n + 2) {
+  padding-block: clamp(2rem, 4vw, 3.2rem);
+}
+
+.product-section-title {
+  margin-bottom: clamp(1rem, 2.4vw, 1.6rem);
+  gap: 0.8rem;
+}
+
+.product-section-title h2,
+.casino-section-title h2 {
+  max-width: 16ch;
+  font-size: clamp(1.45rem, 2.3vw, 2.25rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-shadow:
+    2px 2px 0 rgba(255, 63, 98, 0.16),
+    0 0 20px rgba(255, 179, 63, 0.08);
+}
+
+.product-section-title .design-section-copy,
+.design-section-copy {
+  max-width: 22rem;
+  padding: 0.55rem 0.72rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+}
+
+.design-card-grid {
+  gap: clamp(0.85rem, 1.8vw, 1.15rem);
+}
+
+.design-card {
+  min-height: 10.4rem;
+  padding: 1rem;
+  border-radius: 14px 14px 24px 14px;
+  gap: 0.58rem;
+}
+
+.design-card:hover,
+.design-card:focus-within,
+.design-card:nth-child(even):hover {
+  transform: translateY(-5px);
+}
+
+.design-card__index {
+  width: 34px;
+  height: 34px;
+}
+
+.design-card__icon {
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 12px;
+}
+
+.design-card h3 {
+  max-width: 13ch;
+  font-size: clamp(1.15rem, 1.55vw, 1.5rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.design-card p {
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.42rem 0.58rem;
+  font-size: 0.76rem;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+}
+
+.design-card-grid .design-card::after {
+  font-size: clamp(2.7rem, 4.8vw, 4.8rem);
+  opacity: 0.62;
+}
+
+.design-card__footer {
+  margin-top: auto;
+  gap: 0.65rem;
+}
+
+.design-card__footer small,
+.design-card__footer a {
+  font-size: 0.74rem;
+}
+
+.legal-card {
+  min-height: auto;
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border-radius: 16px 16px 28px 16px;
+}
+
+.legal-card h2 {
+  max-width: 18ch;
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.legal-card__copy p,
+.legal-card__list li {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .design-page-intro {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-index {
+    display: none;
+  }
+
+  .design-page-intro__stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .product-intro h1 {
+    font-size: clamp(1.85rem, 9vw, 2.7rem);
+  }
+
+  .product-section-title h2,
+  .casino-section-title h2 {
+    font-size: clamp(1.35rem, 7vw, 1.9rem);
+  }
+
+  .design-page-intro__actions {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .design-page-intro__actions .primary-button,
+  .design-page-intro__actions .text-button {
+    width: fit-content;
+    max-width: 100%;
+    justify-content: flex-start;
+  }
+}

@@ -51,7 +51,7 @@ export default function ChallengesPage() {
     <>
       <PageHero
         eyebrow="Rewards"
-        title="Challenges get their own destination."
+        title="Challenges"
         description=""
         icon={Target}
         actions={[
@@ -59,14 +59,14 @@ export default function ChallengesPage() {
           { label: "Open store", href: "/store", variant: "secondary" },
         ]}
         stats={[
-          { label: "Purpose", value: "Campaign entry point" },
-          { label: "Board focus", value: "Ranks stay central" },
-          { label: "Implementation", value: "Campaign surface" },
+          { label: "Mode", value: "Missions" },
+          { label: "Flow", value: "Daily + weekly" },
+          { label: "Focus", value: "Rank climb" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Challenges"
-        title="Mission, milestone, and campaign blocks."
+        title="Pick a mission."
         description=""
         items={challengeCards}
       />

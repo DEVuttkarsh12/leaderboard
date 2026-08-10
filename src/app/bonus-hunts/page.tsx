@@ -44,7 +44,7 @@ export default function BonusHuntsPage() {
     <>
       <PageHero
         eyebrow="Stream"
-        title="Bonus hunts get their own event page."
+        title="Bonus hunts"
         description=""
         icon={Radio}
         actions={[
@@ -52,14 +52,14 @@ export default function BonusHuntsPage() {
           { label: "Open help", href: "/help", variant: "secondary" },
         ]}
         stats={[
-          { label: "Route type", value: "Stream surface" },
-          { label: "State", value: "Event stage" },
-          { label: "Live board", value: "Competition focus" },
+          { label: "Mode", value: "Stream" },
+          { label: "State", value: "Live heat" },
+          { label: "Focus", value: "Big hits" },
         ]}
       />
       <FeatureGridSection
         eyebrow="Bonus Hunts"
-        title="Scheduling, highlights, and stream framing."
+        title="Live heat."
         description=""
         items={huntCards}
         columns={2}
