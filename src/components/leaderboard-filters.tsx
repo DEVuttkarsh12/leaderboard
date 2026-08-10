@@ -77,7 +77,7 @@ export default function LeaderboardFilters({
           type="text"
           value={localSearch}
           onChange={(event) => handleSearchInput(event.target.value)}
-          placeholder="Search player, username, or handle"
+          placeholder="Search masked player or handle"
           aria-label="Search players"
           className="search-shell w-full rounded-[1.15rem] py-3.5 pl-11 pr-12 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-dim)] focus:outline-none"
         />

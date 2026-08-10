@@ -30,3 +30,33 @@ export function getInitials(name: string): string {
 export function getToneByIndex(index: number): PlayerTone {
   return toneSequence[index % toneSequence.length];
 }
+
+function maskToken(token: string): string {
+  const clean = token.trim();
+
+  if (!clean) return "";
+  if (clean.length <= 2) return `${clean[0] ?? ""}.`;
+  if (clean.length <= 4) return `${clean[0]}...${clean.at(-1)}`;
+
+  return `${clean.slice(0, 2)}...${clean.at(-1)}`;
+}
+
+export function maskPlayerName(name: string | null | undefined): string {
+  const clean = name?.trim();
+
+  if (!clean) return "Hidden player";
+
+  return clean
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(maskToken)
+    .join(" ");
+}
+
+export function maskPlayerHandle(handle: string | null | undefined): string {
+  const clean = handle?.trim().replace(/^@+/, "");
+
+  if (!clean) return "Masked competitor";
+
+  return `@${maskToken(clean)}`;
+}

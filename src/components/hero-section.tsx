@@ -4,7 +4,12 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated } from "@/lib/formatters";
-import { getInitials, getToneByIndex } from "@/lib/player-presentation";
+import {
+  getInitials,
+  getToneByIndex,
+  maskPlayerHandle,
+  maskPlayerName,
+} from "@/lib/player-presentation";
 import CountUpValue from "./count-up-value";
 import CountdownStrip from "./countdown-strip";
 
@@ -155,8 +160,8 @@ export default function HeroSection({
                       <i className="status-dot" />
                     </div>
                     <div className="rivl-podium-player">
-                      <h3>{user.name}</h3>
-                      <p>{user.username ? `@${user.username}` : "Live competitor"}</p>
+                      <h3>{maskPlayerName(user.name)}</h3>
+                      <p>{maskPlayerHandle(user.username)}</p>
                     </div>
                     <div className="rivl-xp-block">
                       <strong>

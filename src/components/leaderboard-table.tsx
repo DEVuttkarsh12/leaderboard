@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { NormalizedLeaderboardUser } from "@/types/leaderboard";
+import { maskPlayerHandle, maskPlayerName } from "@/lib/player-presentation";
 import { cn } from "@/lib/utils";
 import CountUpValue from "./count-up-value";
 import UserAvatar from "./user-avatar";
@@ -10,15 +11,15 @@ type LeaderboardTableProps = {
 
 function getMetaLine(user: NormalizedLeaderboardUser): string {
   if (user.globalName && user.globalName !== user.name) {
-    return user.globalName;
+    return maskPlayerHandle(user.globalName);
   }
 
   if (user.username && user.username !== user.name) {
-    return `@${user.username}`;
+    return maskPlayerHandle(user.username);
   }
 
   if (user.kickUsername) {
-    return `Kick: ${user.kickUsername}`;
+    return maskPlayerHandle(user.kickUsername);
   }
 
   return "Live competitor";
@@ -67,7 +68,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
 
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[1rem] font-semibold text-[var(--text-primary)] md:text-[1.08rem]">
-                    {user.name}
+                    {maskPlayerName(user.name)}
                   </div>
                   <div className="mt-1 truncate text-sm text-[var(--text-secondary)]">
                     {getMetaLine(user)}

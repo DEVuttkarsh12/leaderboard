@@ -6,7 +6,12 @@ import { RefreshCcw } from "lucide-react";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated, formatShortDate } from "@/lib/formatters";
 import { getSearchableNames } from "@/lib/normalize-leaderboard";
-import { getInitials, getToneByIndex } from "@/lib/player-presentation";
+import {
+  getInitials,
+  getToneByIndex,
+  maskPlayerHandle,
+  maskPlayerName,
+} from "@/lib/player-presentation";
 import EmptyState from "./empty-state";
 import ErrorState from "./error-state";
 import CountUpValue from "./count-up-value";
@@ -141,9 +146,9 @@ export default function LeaderboardSection({
                   {getInitials(user.name)}
                   <i />
                 </span>
-                <h2 className="product-podium-card__name">{user.name}</h2>
+                <h2 className="product-podium-card__name">{maskPlayerName(user.name)}</h2>
                 <p className="product-podium-card__handle">
-                  {user.username ? `@${user.username}` : "Live competitor"}
+                  {maskPlayerHandle(user.username)}
                 </p>
                 <strong className="product-podium-card__score">
                   <CountUpValue value={user.score} mode="score" />
@@ -170,7 +175,7 @@ export default function LeaderboardSection({
               <i />
             </span>
             <span>
-              <strong>{topPlayer ? topPlayer.name : "Connecting"}</strong>
+              <strong>{topPlayer ? maskPlayerName(topPlayer.name) : "Connecting"}</strong>
               <small>{lastUpdated ? `Updated ${formatLastUpdated(lastUpdated)}` : "Syncing"}</small>
             </span>
           </div>
@@ -196,7 +201,7 @@ export default function LeaderboardSection({
                 <span>⌕</span>
                 <input
                   aria-label="Search players"
-                  placeholder="Search player, username, or handle"
+                  placeholder="Search masked player or handle"
                   value={search}
                   onChange={(event) => {
                     setSearch(event.target.value);
@@ -274,11 +279,11 @@ export default function LeaderboardSection({
                         <i />
                       </span>
                       <span className="full-identity">
-                        <strong>{user.name}</strong>
+                        <strong>{maskPlayerName(user.name)}</strong>
                         <small>
-                          {user.username
-                            ? `@${user.username}`
-                            : user.globalName ?? user.kickUsername ?? "Live competitor"}
+                          {maskPlayerHandle(
+                            user.username ?? user.globalName ?? user.kickUsername
+                          )}
                         </small>
                       </span>
                       <span className={`product-movement ${user.rank <= 3 ? "up" : "same"}`}>
@@ -302,7 +307,7 @@ export default function LeaderboardSection({
               ) : (
                 <EmptyState
                   title="No players matched that search"
-                  description="Try another username or clear the filter to return to the full board."
+                  description="Try another masked name or clear the filter to return to the full board."
                   action={
                     <button type="button" onClick={() => setSearch("")}>
                       CLEAR SEARCH
@@ -335,7 +340,7 @@ export default function LeaderboardSection({
                   <i />
                 </span>
                 <p>
-                  <b>{topPlayer ? topPlayer.name : "Waiting for data"}</b>
+                  <b>{topPlayer ? maskPlayerName(topPlayer.name) : "Waiting for data"}</b>
                   <span>{lastUpdated ? `Updated ${formatLastUpdated(lastUpdated)}` : "Connecting"}</span>
                 </p>
                 <span className="product-movement up">LIVE</span>
@@ -378,7 +383,7 @@ export default function LeaderboardSection({
                 <div className="pulse-item" key={user.id}>
                   <span>{getInitials(user.name)}</span>
                   <p>
-                    <strong>{user.name}</strong>
+                    <strong>{maskPlayerName(user.name)}</strong>
                     <small>RANK #{user.rank}</small>
                   </p>
                   <b>

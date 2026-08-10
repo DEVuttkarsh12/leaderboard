@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { Crown, Sparkles } from "lucide-react";
 import type { NormalizedLeaderboardUser } from "@/types/leaderboard";
+import { maskPlayerHandle, maskPlayerName } from "@/lib/player-presentation";
 import { cn } from "@/lib/utils";
 import CountUpValue from "./count-up-value";
 import UserAvatar from "./user-avatar";
@@ -14,11 +15,11 @@ type PodiumCardProps = {
 
 function getSecondaryLabel(user: NormalizedLeaderboardUser): string {
   if (user.globalName && user.globalName !== user.name) {
-    return user.globalName;
+    return maskPlayerHandle(user.globalName);
   }
 
   if (user.username && user.username !== user.name) {
-    return `@${user.username}`;
+    return maskPlayerHandle(user.username);
   }
 
   return "Live competitor";
@@ -64,7 +65,7 @@ function PodiumCard({ user, rank, delay, leaderScore }: PodiumCardProps) {
               {rank === 1 ? "Top seat" : `Podium ${rank}`}
             </div>
             <div className="mt-3 truncate text-xl font-semibold text-white md:text-2xl">
-              {user.name}
+              {maskPlayerName(user.name)}
             </div>
             <div className="mt-1 truncate text-sm text-white/72">
               {secondaryLabel}

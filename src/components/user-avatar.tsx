@@ -43,7 +43,7 @@ export default function UserAvatar({
       {avatarUrl && !failed ? (
         <Image
           src={avatarUrl}
-          alt={name}
+          alt="Masked player avatar"
           width={imageSize}
           height={imageSize}
           className="h-full w-full object-cover"
