@@ -21,6 +21,10 @@ export default function HeroSection({
   const leaders = users.slice(0, 3);
   const orderedLeaders =
     leaders.length === 3 ? [leaders[1], leaders[0], leaders[2]] : leaders;
+  const stageLeaders =
+    orderedLeaders.length > 0
+      ? orderedLeaders
+      : ([null, null, null] as Array<(typeof orderedLeaders)[number] | null>);
 
   return (
     <section className="px-4 pb-8 pt-8 md:px-6 md:pb-12 md:pt-10">
@@ -86,9 +90,45 @@ export default function HeroSection({
             </div>
 
             <div className="rivl-podium-grid">
-              {orderedLeaders.map((user) => {
+              {stageLeaders.map((user, index) => {
                 if (!user) {
-                  return null;
+                  const rank = index === 1 ? 1 : index === 0 ? 2 : 3;
+
+                  return (
+                    <article
+                      key={`loading-leader-${rank}`}
+                      className={`rivl-podium-card rivl-podium-card--loading place-${rank}`}
+                      aria-hidden="true"
+                    >
+                      <div className="rivl-rank-tab">
+                        <span>#{rank.toString().padStart(2, "0")}</span>
+                        <small>SYNC</small>
+                      </div>
+                      {rank === 1 ? (
+                        <div className="rivl-crown" aria-label="Loading champion">
+                          <i />
+                          <i />
+                          <i />
+                        </div>
+                      ) : null}
+                      <div className="rivl-avatar">
+                        <span>RB</span>
+                        <i className="status-dot" />
+                      </div>
+                      <div className="rivl-podium-player">
+                        <h3>Syncing</h3>
+                        <p>Live competitor</p>
+                      </div>
+                      <div className="rivl-xp-block">
+                        <strong>...</strong>
+                        <span>WEIGHTED XP</span>
+                      </div>
+                      <div className="rivl-podium-prize">
+                        <span>WAGERED</span>
+                        <strong>...</strong>
+                      </div>
+                    </article>
+                  );
                 }
 
                 const tone = getToneByIndex(user.rank - 1);

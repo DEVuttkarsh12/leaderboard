@@ -6830,3 +6830,477 @@ header {
     justify-content: flex-start;
   }
 }
+
+/* Playful clean revamp */
+
+.product-page {
+  --neon-lime: #8cffb8;
+  --neon-coral: #ff5f7a;
+  --neon-cyan: #7bdcff;
+  background:
+    radial-gradient(circle at 9% 10%, rgba(255, 217, 102, 0.18), transparent 22%),
+    radial-gradient(circle at 86% 6%, rgba(255, 95, 122, 0.14), transparent 20%),
+    radial-gradient(circle at 76% 76%, rgba(123, 220, 255, 0.1), transparent 24%),
+    radial-gradient(circle at 33% 118%, rgba(140, 255, 184, 0.13), transparent 30%),
+    linear-gradient(180deg, #07110d 0%, #09100f 42%, #040706 100%);
+}
+
+.product-page::before {
+  opacity: 0.16;
+  background-image:
+    linear-gradient(rgba(255, 217, 102, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 255, 184, 0.04) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(180deg, transparent, #000 12%, #000 72%, transparent);
+}
+
+.casino-suit-cloud span,
+.casino-suit-cloud i {
+  opacity: 0.075;
+  mix-blend-mode: screen;
+}
+
+.product-header {
+  width: min(1480px, calc(100% - 36px));
+  min-height: 78px;
+  border-color: rgba(255, 237, 155, 0.3);
+  background:
+    linear-gradient(100deg, rgba(255, 217, 102, 0.13), transparent 24% 74%, rgba(140, 255, 184, 0.11)),
+    linear-gradient(180deg, rgba(9, 21, 16, 0.86), rgba(4, 10, 9, 0.76));
+}
+
+.product-nav {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018)),
+    rgba(3, 10, 8, 0.54);
+}
+
+.product-nav a,
+.p-brand,
+.rivl-hero-copy h1,
+.rivl-hero-copy h1 span,
+.product-intro h1,
+.product-section-title h2,
+.casino-section-title h2,
+.design-card h3,
+.legal-card h2 {
+  letter-spacing: 0;
+}
+
+.product-nav a.active {
+  background:
+    linear-gradient(180deg, #fff5b9, #ffbf46 58%, #ff8d3d);
+  box-shadow:
+    0 14px 28px rgba(255, 179, 63, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.24) inset,
+    4px 4px 0 rgba(140, 255, 184, 0.3);
+}
+
+.product-live {
+  border-color: rgba(140, 255, 184, 0.36);
+  color: #c8ffdc;
+}
+
+.rivl-hero {
+  min-height: min(82vh, 860px);
+  grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.rivl-hero-shell::before {
+  inset: 3% -4% auto;
+  height: 62%;
+  opacity: 0.92;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 217, 102, 0.16), transparent 22%),
+    radial-gradient(circle at 66% 36%, rgba(255, 95, 122, 0.14), transparent 24%),
+    radial-gradient(circle at 82% 64%, rgba(123, 220, 255, 0.1), transparent 22%),
+    radial-gradient(circle at 44% 80%, rgba(140, 255, 184, 0.13), transparent 24%);
+  filter: blur(18px);
+}
+
+.rivl-eyebrow,
+.product-kicker,
+.rivl-stage-kicker {
+  color: #ffe083;
+}
+
+.rivl-hero-copy {
+  position: relative;
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.rivl-hero-copy::before {
+  content: "";
+  position: absolute;
+  inset: auto auto 0 0;
+  width: min(16rem, 74%);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 217, 102, 0.55), transparent);
+}
+
+.rivl-hero-copy h1 {
+  max-width: 36rem;
+  font-size: clamp(3.35rem, 6.4vw, 6.65rem);
+  line-height: 0.9;
+  text-shadow:
+    2px 2px 0 rgba(255, 255, 255, 0.08),
+    6px 6px 0 rgba(255, 95, 122, 0.2),
+    0 0 44px rgba(255, 217, 102, 0.13);
+}
+
+.rivl-hero-copy h1 span {
+  color: #ffe56f;
+  text-shadow:
+    4px 4px 0 rgba(18, 122, 79, 0.56),
+    0 0 34px rgba(140, 255, 184, 0.22);
+}
+
+.rivl-hero-copy > p {
+  width: fit-content;
+  margin-top: 1.55rem;
+  padding: 0.62rem 0.82rem;
+  border: 1px solid rgba(255, 217, 102, 0.18);
+  border-radius: 999px;
+  color: #f5ead5;
+  background: rgba(5, 14, 11, 0.42);
+}
+
+.rivl-hero-actions .primary-button,
+.design-page-intro__actions .primary-button {
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.46), transparent 34%),
+    linear-gradient(180deg, #fff0a0, #ffb33f 54%, #ff6d4d);
+}
+
+.rivl-hero-actions .text-button {
+  min-height: 2.8rem;
+  padding-inline: 0.85rem;
+  border: 1px solid rgba(255, 217, 102, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.rivl-hero-meta {
+  width: min(34rem, 100%);
+  gap: 0.75rem;
+  margin-top: 2.1rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.rivl-hero-meta div {
+  min-width: 0;
+  flex: 1;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 217, 102, 0.16);
+  border-radius: 14px;
+}
+
+.rivl-hero-meta div + div {
+  padding-left: 0.9rem;
+  border-left: 1px solid rgba(255, 217, 102, 0.16);
+}
+
+.rivl-hero-meta strong {
+  color: #fff7dd;
+  font-size: 1.08rem;
+}
+
+.rivl-stage {
+  min-height: 34rem;
+  padding: clamp(1rem, 2vw, 1.4rem);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 22%),
+    radial-gradient(circle at 70% 24%, rgba(255, 217, 102, 0.15), transparent 26%),
+    radial-gradient(circle at 18% 78%, rgba(140, 255, 184, 0.11), transparent 30%),
+    repeating-conic-gradient(from 0deg at 74% 58%, rgba(255, 255, 255, 0.028) 0 8deg, transparent 8deg 17deg),
+    rgba(5, 14, 11, 0.54);
+}
+
+.rivl-stage::before {
+  border-color: rgba(255, 217, 102, 0.1);
+  border-radius: 16px;
+}
+
+.rivl-stage-header {
+  align-items: center;
+  padding-bottom: 1rem;
+}
+
+.rivl-stage-header h2 {
+  font-size: clamp(1.05rem, 1.7vw, 1.45rem);
+}
+
+.rivl-podium-grid {
+  min-height: 24rem;
+  gap: clamp(0.7rem, 1.2vw, 1rem);
+}
+
+.rivl-podium-card {
+  min-height: 18.4rem;
+  padding: 2.6rem 0.9rem 0.9rem;
+  border-radius: 16px;
+}
+
+.rivl-podium-card.place-1 {
+  min-height: 23.5rem;
+  border-color: rgba(255, 229, 111, 0.72);
+  transform: translateY(-0.35rem);
+}
+
+.rivl-podium-card--loading {
+  opacity: 0.76;
+}
+
+.rivl-podium-card--loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(105deg, transparent 0 34%, rgba(255, 255, 255, 0.08) 45%, transparent 58%),
+    radial-gradient(circle at 50% 18%, rgba(255, 217, 102, 0.12), transparent 30%);
+  transform: translateX(-120%);
+  animation: cardSyncSweep 2.2s ease-in-out infinite;
+}
+
+@keyframes cardSyncSweep {
+  0%,
+  28% {
+    transform: translateX(-120%);
+  }
+  72%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.rivl-podium-card.place-2,
+.rivl-podium-card.place-3 {
+  transform: translateY(0.85rem);
+}
+
+.rivl-podium-card.place-2:hover,
+.rivl-podium-card.place-3:hover {
+  transform: translateY(0.35rem);
+}
+
+.rivl-avatar {
+  border-width: 3px;
+}
+
+.place-1 .rivl-avatar {
+  width: 86px;
+  height: 86px;
+}
+
+.rivl-xp-block strong {
+  font-size: 1.05rem;
+}
+
+.place-1 .rivl-xp-block strong {
+  font-size: 1.42rem;
+}
+
+.place-1 .rivl-podium-player h3,
+.place-1 .rivl-podium-player p {
+  padding: 0;
+  color: #fff7dd;
+  background: transparent !important;
+}
+
+.place-1 .rivl-podium-player p {
+  color: #d7c6ac;
+}
+
+.rivl-podium-prize {
+  border-radius: 12px;
+}
+
+.marquee {
+  margin-top: 1rem;
+  border-block: 1px solid rgba(255, 217, 102, 0.12);
+}
+
+.product-intro,
+.design-page-intro {
+  border-bottom: 1px solid rgba(255, 217, 102, 0.12);
+}
+
+.board-product-section > .product-intro {
+  min-height: auto;
+  padding-block: clamp(1.6rem, 4vw, 3.2rem);
+  align-items: center;
+}
+
+.board-product-section > .product-intro h1 {
+  max-width: 12ch;
+  font-size: clamp(2.3rem, 4.6vw, 4.25rem);
+  line-height: 0.95;
+}
+
+.board-product-section > .product-intro h1 em {
+  display: block;
+}
+
+.board-product-section > .product-podium {
+  margin-top: clamp(1.2rem, 2.5vw, 1.8rem);
+}
+
+.board-product-section > .product-section {
+  padding-top: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.product-intro h1 {
+  color: #fff7e4;
+  text-shadow:
+    3px 3px 0 rgba(255, 95, 122, 0.18),
+    0 0 26px rgba(255, 217, 102, 0.1);
+}
+
+.intro-aside,
+.season-clock {
+  border-color: rgba(255, 217, 102, 0.18);
+}
+
+.product-podium,
+.full-board-panel,
+.board-pulse-card,
+.design-card,
+.legal-card {
+  border-radius: 18px;
+}
+
+.product-podium {
+  padding: clamp(1rem, 2vw, 1.4rem);
+}
+
+.product-podium-card {
+  border-radius: 16px;
+}
+
+.product-podium-card.place-1 {
+  transform: translateY(-0.35rem);
+}
+
+.full-board-controls {
+  gap: 0.75rem;
+}
+
+.product-search {
+  min-height: 3rem;
+  border-radius: 14px;
+}
+
+.product-segments {
+  min-height: 3rem;
+  border-radius: 14px;
+}
+
+.product-segments button {
+  border-radius: 10px;
+}
+
+.full-board-head,
+.full-board-row {
+  border-radius: 12px;
+}
+
+.full-board-row {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.full-board-row:hover,
+.full-board-row:focus-visible {
+  transform: translateX(4px);
+  border-color: rgba(255, 217, 102, 0.34);
+  background:
+    linear-gradient(90deg, rgba(255, 217, 102, 0.08), rgba(140, 255, 184, 0.04)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.design-card {
+  overflow: hidden;
+}
+
+.design-card::before {
+  width: 5px;
+}
+
+.design-card h3 {
+  color: #fff8e5;
+}
+
+.design-card p {
+  color: #f8edcf;
+  border-color: rgba(255, 217, 102, 0.18);
+}
+
+.design-card__footer a {
+  border-radius: 8px;
+}
+
+.product-footer {
+  border-top-color: rgba(255, 217, 102, 0.14);
+}
+
+@media (max-width: 1100px) {
+  .rivl-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .rivl-stage {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .product-header {
+    width: calc(100% - 22px);
+  }
+
+  .rivl-hero-copy {
+    padding-inline: 0;
+  }
+
+  .rivl-hero-copy h1 {
+    font-size: clamp(2.8rem, 13vw, 4.35rem);
+  }
+
+  .rivl-hero-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .rivl-podium-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rivl-podium-card,
+  .rivl-podium-card.place-1,
+  .rivl-podium-card.place-2,
+  .rivl-podium-card.place-3 {
+    min-height: 16.5rem;
+    transform: none;
+  }
+
+  .full-board-row:hover,
+  .full-board-row:focus-visible {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rivl-podium-card--loading::after {
+    animation: none;
+    transform: none;
+  }
+}
