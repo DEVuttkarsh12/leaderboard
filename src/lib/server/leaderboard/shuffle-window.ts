@@ -20,15 +20,27 @@ function parseUnixSeconds(
   return Math.trunc(parsed);
 }
 
+function shouldUseConfiguredWindow(): boolean {
+  return (
+    process.env.SHUFFLE_LEADERBOARD_WINDOW_SOURCE?.trim().toLowerCase() ===
+    "env"
+  );
+}
+
 export function getShuffleLeaderboardWindow(): ShuffleLeaderboardWindow {
-  const startTime = parseUnixSeconds(
-    process.env.SHUFFLE_LEADERBOARD_START_TIME,
-    DEFAULT_START_TIME
-  );
-  const endTime = parseUnixSeconds(
-    process.env.SHUFFLE_LEADERBOARD_END_TIME,
-    DEFAULT_END_TIME
-  );
+  const useConfiguredWindow = shouldUseConfiguredWindow();
+  const startTime = useConfiguredWindow
+    ? parseUnixSeconds(
+        process.env.SHUFFLE_LEADERBOARD_START_TIME,
+        DEFAULT_START_TIME
+      )
+    : DEFAULT_START_TIME;
+  const endTime = useConfiguredWindow
+    ? parseUnixSeconds(
+        process.env.SHUFFLE_LEADERBOARD_END_TIME,
+        DEFAULT_END_TIME
+      )
+    : DEFAULT_END_TIME;
 
   if (startTime > endTime) {
     throw new Error("Shuffle leaderboard window is invalid.");
