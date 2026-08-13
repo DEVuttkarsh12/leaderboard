@@ -1,77 +1,11 @@
 import type { Metadata } from "next";
-import { BookOpen, CircleHelp, LifeBuoy, ShieldCheck } from "lucide-react";
-import FeatureGridSection from "@/components/feature-grid";
-import PageHero from "@/components/page-hero";
+import RankBoardApp from "@/components/rankboard-app";
 
 export const metadata: Metadata = {
   title: "Help | RankBoard",
   description: "Help center pages for the rewards hub.",
 };
 
-const helpCards = [
-  {
-    title: "Leaderboard Basics",
-    description:
-      "How the board moves.",
-    meta: "Core guide",
-    icon: CircleHelp,
-    href: "/leaderboard",
-    cta: "Open leaderboard",
-  },
-  {
-    title: "Challenge and Reward Pages",
-    description:
-      "Where rewards live.",
-    meta: "Route guide",
-    icon: BookOpen,
-    href: "/challenges",
-    cta: "Open challenges",
-  },
-  {
-    title: "Support Escalation",
-    description:
-      "Take issues off the floor.",
-    meta: "Support route",
-    icon: LifeBuoy,
-    href: "/support",
-    cta: "Open support",
-  },
-  {
-    title: "Policy Links",
-    description:
-      "Quick policy exits.",
-    meta: "Legal route",
-    icon: ShieldCheck,
-    href: "/privacy",
-    cta: "Open privacy",
-  },
-];
-
 export default function HelpPage() {
-  return (
-    <>
-      <PageHero
-        eyebrow="Help"
-        title="Help center"
-        description=""
-        icon={CircleHelp}
-        actions={[
-          { label: "Open support", href: "/support" },
-          { label: "Read terms", href: "/terms", variant: "secondary" },
-        ]}
-        stats={[
-          { label: "Mode", value: "Answers" },
-          { label: "State", value: "Fast links" },
-          { label: "Focus", value: "Support" },
-        ]}
-      />
-      <FeatureGridSection
-        eyebrow="Help Center"
-        title="Quick answers."
-        description=""
-        items={helpCards}
-        columns={2}
-      />
-    </>
-  );
+  return <RankBoardApp route="help" />;
 }

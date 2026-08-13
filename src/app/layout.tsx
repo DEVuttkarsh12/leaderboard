@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import CustomCursor from "@/components/custom-cursor";
-import SiteFooter from "@/components/site-footer";
-import SiteHeader from "@/components/site-header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,21 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RankBoard | Live Rewards Floor",
-  description:
-    "A live rewards floor with standings, event routes, reward surfaces, and support pages.",
-  openGraph: {
-    title: "RankBoard | Live Rewards Floor",
-    description:
-      "A live rewards floor with standings, event routes, reward surfaces, and support pages.",
-    type: "website",
+  title: "RankBoard",
+  description: "Live gaming rewards, leaderboard rankings, missions, and prize drops.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#14061f",
+  themeColor: "#070807",
 };
 
 export default function RootLayout({
@@ -41,26 +35,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
     >
-      <body
-        suppressHydrationWarning
-        className="min-h-full bg-[var(--bg)] text-[var(--text-primary)]"
-      >
-        <div className="product-page app-product-shell">
-          <div className="casino-suit-cloud" aria-hidden="true">
-            <span>♠</span>
-            <span>♦</span>
-            <span>♣</span>
-            <span>♥</span>
-            <i>777</i>
-          </div>
-          <div className="product-noise" aria-hidden="true" />
-          <SiteHeader />
-          <main className="product-main">{children}</main>
-          <SiteFooter />
-          <CustomCursor />
-        </div>
+      <body suppressHydrationWarning>
+        {children}
       </body>
     </html>
   );

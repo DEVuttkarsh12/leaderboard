@@ -13,7 +13,7 @@ export default function ProductLogo({ onClick }: ProductLogoProps) {
         <i />
       </span>
       <span>RANKBOARD</span>
-      <small>// LIVE</small>
+      <small>{"// LIVE"}</small>
     </Link>
   );
 }

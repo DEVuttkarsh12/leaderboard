@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LeaderboardSection from "@/components/leaderboard-section";
+import RankBoardApp from "@/components/rankboard-app";
 import { getShuffleLeaderboardWindow } from "@/lib/server/leaderboard/shuffle-window";
 
 export const metadata: Metadata = {
@@ -21,5 +21,5 @@ function getCountdownTarget(): string | null {
 }
 
 export default function LeaderboardPage() {
-  return <LeaderboardSection countdownTarget={getCountdownTarget()} />;
+  return <RankBoardApp route="leaderboard" countdownTarget={getCountdownTarget()} />;
 }
