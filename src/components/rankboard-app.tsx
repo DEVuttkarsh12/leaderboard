@@ -19,24 +19,24 @@ const NAV = [
   ["Home", "/", "⌂"],
   ["Board", "/leaderboard", "↗"],
   ["Missions", "/challenges", "◎"],
+  ["Bets", "/custom-bets", "$"],
+  ["Watch", "/watch-points", "●"],
   ["Hunts", "/bonus-hunts", "◈"],
-  ["Tourneys", "/tournaments", "♜"],
-  ["Raffles", "/wager-raffles", "◆"],
+  ["Profile", "/profile", "◇"],
   ["Vault", "/store", "◇"],
-  ["Help", "/help", "?"],
-  ["Support", "/support", "!"],
+  ["Admin", "/admin", "♜"],
   ["Account", "/login", "●"],
 ] as const;
 
 const launchpad = [
   ["Live Board", "Climb ranks", "/leaderboard", "01", "lime"],
-  ["Missions", "Stack XP", "/challenges", "02", "violet"],
-  ["Bonus Hunts", "Chase heat", "/bonus-hunts", "03", "coral"],
-  ["Tournaments", "Enter bracket", "/tournaments", "04", "blue"],
-  ["Raffles", "Fire tickets", "/wager-raffles", "05", "yellow"],
+  ["Custom Bets", "Pick sides", "/custom-bets", "02", "orange"],
+  ["Watch Points", "Earn live", "/watch-points", "03", "violet"],
+  ["Profile", "Link accounts", "/profile", "04", "blue"],
+  ["Missions", "Stack XP", "/challenges", "05", "mint"],
   ["Store", "Spend points", "/store", "06", "pink"],
-  ["Support", "Fix fast", "/support", "07", "mint"],
-  ["Account", "Save rewards", "/login", "08", "orange"],
+  ["Admin", "Run ops", "/admin", "07", "yellow"],
+  ["Support", "Fix fast", "/support", "08", "coral"],
 ] as const;
 
 const pageData: Record<string, { title: string; eyebrow: string; copy: string; actions: [string, string][]; stats: [string, string][]; features: [string, string, string][] }> = {
@@ -69,6 +69,30 @@ const pageData: Record<string, { title: string; eyebrow: string; copy: string; a
     actions: [["Open challenges", "/challenges"], ["Need support?", "/support"]],
     stats: [["Mode", "Catalog"], ["State", "Drops"], ["Focus", "Redeem"]],
     features: [["Boost Packs", "Power-ups.", "From 2K"], ["Reward Drops", "Limited drops.", "6 live"], ["Merch Entries", "Gear shots.", "Limited"], ["Voucher Rewards", "Voucher claims.", "12 types"]],
+  },
+  "custom-bets": {
+    title: "Custom Bets", eyebrow: "PREDICTION FLOOR", copy: "Pick side. Bet points. Sweat.",
+    actions: [["Open store", "/store"], ["View profile", "/profile"]],
+    stats: [["Mode", "Markets"], ["State", "Live odds"], ["Focus", "Point wins"]],
+    features: [["Custom Odds", "Streamer odds.", "2.00x"], ["Current Bets", "Open slips.", "Live"], ["Past Bets", "Settled slips.", "History"], ["Admin Settlement", "Pick winner.", "Auto pay"], ["Winnings", "Points paid.", "Instant"]],
+  },
+  "watch-points": {
+    title: "Watch Points", eyebrow: "KICK BOT", copy: "Watch stream. Earn points.",
+    actions: [["Open profile", "/profile"], ["Open store", "/store"]],
+    stats: [["Mode", "Watch"], ["Rate", "Auto earn"], ["Focus", "Reward cash"]],
+    features: [["Kick Link", "Connect once.", "OAuth"], ["Watch Timer", "Bot pulse.", "Live"], ["Daily Bonus", "Come back.", "+500"], ["Weekly Bonus", "Hold streak.", "7 days"], ["Spend Points", "Use vault.", "Store"]],
+  },
+  profile: {
+    title: "Profile", eyebrow: "PLAYER HUB", copy: "Accounts. Casinos. Rewards.",
+    actions: [["Open bets", "/custom-bets"], ["Open watch", "/watch-points"]],
+    stats: [["Mode", "Account"], ["State", "Linked"], ["Focus", "Progress"]],
+    features: [["Kick Account", "Stream link.", "Status"], ["Discord Account", "Community link.", "Status"], ["Casino Names", "Match wagers.", "3 sites"], ["Purchase History", "Track claims.", "Vault"], ["Badges", "Flex wins.", "Earned"]],
+  },
+  admin: {
+    title: "Admin", eyebrow: "CONTROL ROOM", copy: "Manage users. Settle bets.",
+    actions: [["Open bets", "/custom-bets"], ["Open store", "/store"]],
+    stats: [["Mode", "Ops"], ["State", "Control"], ["Focus", "No dev needed"]],
+    features: [["User Management", "Points and bans.", "Live"], ["Leaderboard Ops", "Mode and status.", "Rounds"], ["Store Builder", "Items and stock.", "Catalog"], ["Bet Settlement", "Winner and payout.", "Auto pay"], ["Site Banners", "Promos.", "Live"]],
   },
   help: {
     title: "Help Center", eyebrow: "FIND YOUR ANSWER", copy: "Search. Fix. Move.",
@@ -133,7 +157,7 @@ function Header({ path, accountOpen, setAccountOpen }: { path: string; accountOp
   return <header className="header">
     <Link className="brand" href="/" aria-label="RankBoard home"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link>
     <nav className="nav" aria-label="Primary navigation">{NAV.map(([label, href, icon]) => <Link key={href} className={path === href ? "active" : ""} href={href}><i>{icon}</i>{label}</Link>)}</nav>
-    <div className="header-actions"><span className="live-pill"><b /> LIVE</span><button className="icon-button" aria-label="Leaderboard notifications">♜<span>3</span></button><div className="account-wrap"><button className="avatar-button" onClick={() => setAccountOpen(!accountOpen)} aria-expanded={accountOpen}>DV</button>{accountOpen && <div className="account-menu"><p>PLAYER MENU <span>LV.12</span></p>{[["Login", "/login"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]].map(([n,h]) => <Link key={h} href={h}>{n}<span>↗</span></Link>)}</div>}</div></div>
+    <div className="header-actions"><span className="live-pill"><b /> LIVE</span><button className="icon-button" aria-label="Leaderboard notifications">♜<span>3</span></button><div className="account-wrap"><button className="avatar-button" onClick={() => setAccountOpen(!accountOpen)} aria-expanded={accountOpen}>DV</button>{accountOpen && <div className="account-menu"><p>PLAYER MENU <span>LV.12</span></p>{[["Profile", "/profile"], ["Login", "/login"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]].map(([n,h]) => <Link key={h} href={h}>{n}<span>↗</span></Link>)}</div>}</div></div>
   </header>;
 }
 
@@ -308,9 +332,10 @@ function FloatingDock({ path }: { path: string }) {
 
   const quickLinks = [
     ["◎", "Missions", "/challenges"],
-    ["◈", "Hunts", "/bonus-hunts"],
+    ["$", "Bets", "/custom-bets"],
+    ["●", "Watch", "/watch-points"],
     ["◇", "Vault", "/store"],
-    ["?", "Help", "/help"],
+    ["◇", "Profile", "/profile"],
   ] as const;
 
   return (
@@ -390,4 +415,4 @@ function FloatingDock({ path }: { path: string }) {
 
 function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>◇</span> RANKBOARD LEGAL</p><h1>{privacy?"PRIVACY":"TERMS"}<em>.</em></h1><p className="legal-lead">{privacy?"How RankBoard handles player information, session data, and reward activity.":"The ground rules for using RankBoard, joining reward activity, and keeping play fair."}</p><div className="legal-layout"><aside><span>LAST UPDATED</span><strong>AUG 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","RankBoard may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using RankBoard","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
 
-function Footer(){return <footer className="footer"><div className="footer-top page-width"><div><Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link><p>PLAY THE BOARD.<br/>OWN THE NIGHT.</p></div><div className="footer-links">{[["Home","/"],["Leaderboard","/leaderboard"],["Challenges","/challenges"],["Store","/store"],["Bonus Hunts","/bonus-hunts"],["Tournaments","/tournaments"],["Wager Raffles","/wager-raffles"],["Support","/support"],["Help","/help"],["Privacy","/privacy"],["Terms","/terms"]].map(([n,h])=><Link key={h} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>THE BOARD IS LIVE <b>●</b></span><span>PLAY RESPONSIBLY · 18+</span></div></footer>}
+function Footer(){return <footer className="footer"><div className="footer-top page-width"><div><Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link><p>PLAY THE BOARD.<br/>OWN THE NIGHT.</p></div><div className="footer-links">{[["Home","/"],["Leaderboard","/leaderboard"],["Custom Bets","/custom-bets"],["Watch Points","/watch-points"],["Profile","/profile"],["Admin","/admin"],["Challenges","/challenges"],["Store","/store"],["Bonus Hunts","/bonus-hunts"],["Tournaments","/tournaments"],["Wager Raffles","/wager-raffles"],["Support","/support"],["Help","/help"],["Privacy","/privacy"],["Terms","/terms"]].map(([n,h])=><Link key={h} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>THE BOARD IS LIVE <b>●</b></span><span>PLAY RESPONSIBLY · 18+</span></div></footer>}
