@@ -64,11 +64,11 @@ const storeItems = [
 ];
 
 const faq = [
-  { q: "How does weighted XP work?", a: "Weighted XP comes from the live leaderboard API and is shown read-only on the board." },
-  { q: "Where do mission claims go?", a: "Mission claims update your local account points in this build." },
-  { q: "Can I redeem store rewards?", a: "Yes. Store redemptions spend local points and add items to your inventory." },
-  { q: "How do raffle tickets work?", a: "Enter a wager amount to convert it into tickets, then commit tickets to the current draw." },
-  { q: "Does support send to a backend?", a: "Not yet. Tickets are saved locally so the workflow is testable without backend writes." },
+  { q: "Weighted XP", a: "Live API. Read-only." },
+  { q: "Mission claims", a: "Local points." },
+  { q: "Store rewards", a: "Spend. Stash." },
+  { q: "Raffle tickets", a: "Wager to tickets." },
+  { q: "Support backend", a: "Local tickets." },
 ];
 
 function nowStamp() {
@@ -159,7 +159,7 @@ function ChallengesWorkspace({
             <article className="action-card" key={mission.id}>
               <small>{mission.meta}</small>
               <h3>{mission.title}</h3>
-              <p>{mission.description}</p>
+              <p>{percent}% charged</p>
               <ProgressBar value={percent} />
               <div className="action-card__footer">
                 <strong>{isClaimed ? "Claimed" : `${mission.reward.toLocaleString()} pts`}</strong>
@@ -191,7 +191,7 @@ function HuntsWorkspace() {
             <article className="action-card" key={hunt.id}>
               <small>{hunt.status} · {hunt.time}</small>
               <h3>{hunt.title}</h3>
-              <p>{hunt.host} · heat {hunt.heat}%</p>
+              <p>{hunt.host} · {hunt.heat}% heat</p>
               <ProgressBar value={hunt.heat} />
               <div className="action-card__footer">
                 <strong>{isFollowed ? "Reminder on" : "Reminder off"}</strong>
@@ -211,7 +211,7 @@ function HuntsWorkspace() {
               <span>CLIP</span>
               <div>
                 <h3>{clip.title}</h3>
-                <p>{clip.stat} · {votes[clip.id] ?? 0} votes</p>
+                <p>{votes[clip.id] ?? 0} votes · {saved ? "saved" : clip.stat}</p>
               </div>
               <button type="button" onClick={() => setVotes((current) => ({ ...current, [clip.id]: (current[clip.id] ?? 0) + 1 }))}>Vote</button>
               <button type="button" onClick={() => setSavedClips((current) => saved ? current.filter((id) => id !== clip.id) : [...current, clip.id])}>{saved ? "Saved" : "Save"}</button>
@@ -239,7 +239,7 @@ function TournamentsWorkspace() {
             <article className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id}>
               <small>{item.starts}</small>
               <h3>{item.title}</h3>
-              <p>{item.taken + (isJoined ? 1 : 0)} / {item.seats} seats · prize {item.prize}</p>
+              <p>{item.taken + (isJoined ? 1 : 0)} / {item.seats} · {item.prize}</p>
               <ProgressBar value={((item.taken + (isJoined ? 1 : 0)) / item.seats) * 100} />
               <div className="action-card__footer">
                 <strong>{isJoined ? "Entered" : "Open"}</strong>
@@ -253,7 +253,7 @@ function TournamentsWorkspace() {
         <div>
           <small>ACTIVE BRACKET</small>
           <h3>{tournament.title}</h3>
-          <p>{tournament.starts} · {tournament.prize}</p>
+          <p>{tournament.prize}</p>
         </div>
         <div className="bracket-lanes">
           {["Qualifiers", "Quarterfinal", "Semifinal", "Final"].map((round, index) => (
@@ -290,7 +290,7 @@ function RafflesWorkspace() {
           <article className="action-card" key={amount}>
             <small>DRAW ENTRY</small>
             <h3>{amount} ticket{amount > 1 ? "s" : ""}</h3>
-            <p>Send to draw.</p>
+            <p>{tickets >= amount ? "Ready" : "Locked"}</p>
             <div className="action-card__footer">
               <strong>{tickets >= amount ? "Ready" : "Need tickets"}</strong>
               <button type="button" disabled={tickets < amount} onClick={() => { setTickets((current) => current - amount); setEntries((current) => current + amount); }}>
@@ -335,7 +335,7 @@ function StoreWorkspace({
           <article className="action-card" key={item.id}>
             <small>{item.tag}</small>
             <h3>{item.title}</h3>
-            <p>{item.description}</p>
+            <p>{item.cost.toLocaleString()} pts</p>
             <div className="action-card__footer">
               <strong>{item.cost.toLocaleString()} pts</strong>
               <button type="button" disabled={account.points < item.cost} onClick={() => redeem(item)}>Redeem</button>
@@ -360,7 +360,7 @@ function HelpWorkspace() {
       <WorkspaceHeader overline="HELP INDEX" title="Search. Fix. Go." meta={`${results.length} answers`} />
       <label className="wide-search">
         <span>SEARCH HELP</span>
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search XP, rewards, support, tickets" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="XP, rewards, tickets" />
       </label>
       <div className="workspace-list">
         {results.map((item) => (
@@ -405,7 +405,7 @@ function SupportWorkspace() {
       <form className="support-form" onSubmit={submit}>
         <label>CATEGORY<select value={category} onChange={(event) => setCategory(event.target.value)}><option>Reward</option><option>Account</option><option>Leaderboard</option><option>Claim</option></select></label>
         <label>SUBJECT<input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="What broke?" /></label>
-        <label>MESSAGE<textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Add the useful details." /></label>
+        <label>MESSAGE<textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Useful details." /></label>
         <button className="button primary" type="submit">Create ticket <span>↗</span></button>
       </form>
       <div className="workspace-list">
@@ -414,11 +414,11 @@ function SupportWorkspace() {
             <span>{ticket.status}</span>
             <div>
               <h3>{ticket.subject}</h3>
-              <p>{ticket.category} · {ticket.createdAt} · {ticket.message}</p>
+              <p>{ticket.category} · {ticket.createdAt}</p>
             </div>
             <button type="button" onClick={() => setTickets((current) => current.map((item) => item.id === ticket.id ? { ...item, status: item.status === "Open" ? "Waiting" : "Solved" } : item))}>Advance</button>
           </article>
-        )) : <article><span>EMPTY</span><div><h3>No tickets yet</h3><p>Create a ticket above to test the support flow.</p></div></article>}
+        )) : <article><span>EMPTY</span><div><h3>No tickets</h3><p>Open one above.</p></div></article>}
       </div>
     </section>
   );
@@ -490,7 +490,7 @@ function Inventory({ items }: { items: string[] }) {
   return (
     <div className="inventory-panel">
       <small>INVENTORY</small>
-      {items.length ? <div>{items.map((item, index) => <span key={`${item}-${index}`}>{item}</span>)}</div> : <p>No rewards claimed yet.</p>}
+      {items.length ? <div>{items.map((item, index) => <span key={`${item}-${index}`}>{item}</span>)}</div> : <p>Vault empty.</p>}
     </div>
   );
 }
