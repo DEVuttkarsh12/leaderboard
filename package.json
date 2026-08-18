@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "admin:list": "node scripts/set-admin.cjs list",
+    "admin:promote": "node scripts/set-admin.cjs promote",
+    "admin:demote": "node scripts/set-admin.cjs demote"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
