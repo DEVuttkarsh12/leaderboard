@@ -2,32 +2,44 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import type { AuthAccountPayload } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
 
 type Provider = "kick" | "discord";
 type Casino = "thrill" | "packdraw" | "shuffle";
 
-type ConnectedAccount = {
-  connected: boolean;
-  username: string;
-  id: string;
-};
-
-type Account = {
+type Account = AuthAccountPayload & {
   handle: string;
   accessKey: string;
+};
+
+type AdminUser = {
+  id: string;
+  handle: string;
+  email: string;
+  image: string;
   points: number;
   xp: number;
-  streak: number;
-  inventory: string[];
-  connected: Record<Provider, ConnectedAccount>;
-  casinos: Record<Casino, string>;
-  lifetimeWager: number;
-  watchMinutes: number;
+  role: "PLAYER" | "ADMIN";
   banned: boolean;
+  bannedReason: string;
   timeoutUntil: string;
-  badges: string[];
+  connected: {
+    kick: {
+      connected: boolean;
+      username: string;
+      id: string;
+    };
+    discord: {
+      connected: boolean;
+      username: string;
+      id: string;
+    };
+  };
+  casinos: Record<Casino, string>;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type Ticket = {
@@ -92,6 +104,8 @@ type SiteConfig = {
 
 const defaultAccount: Account = {
   handle: "@guest",
+  image: "",
+  profileProvider: "email",
   accessKey: "",
   points: 18500,
   xp: 4200,
@@ -199,6 +213,61 @@ function normalizeAccount(value: Partial<Account> | null | undefined): Account {
     },
     badges: Array.isArray(value?.badges) ? value.badges : defaultAccount.badges,
   };
+}
+
+function accountFromPayload(payload: AuthAccountPayload): Account {
+  return normalizeAccount({
+    ...payload,
+    accessKey: "",
+  });
+}
+
+function AccountImage({
+  account,
+  className,
+}: {
+  account: Account;
+  className: string;
+}) {
+  const initials = account.handle.slice(1, 3).toUpperCase() || "RB";
+
+  return (
+    <span className={className}>
+      {account.image ? <img src={account.image} alt="" /> : initials}
+    </span>
+  );
+}
+
+function accountProviderLabel(account: Account) {
+  if (account.profileProvider === "kick" && account.connected.kick.username) {
+    return "Kick";
+  }
+
+  if (account.profileProvider === "discord" && account.connected.discord.username) {
+    return "Discord";
+  }
+
+  if (account.connected.kick.connected) {
+    return "Kick";
+  }
+
+  if (account.connected.discord.connected) {
+    return "Discord";
+  }
+
+  return "Signed in";
+}
+
+function accountDisplayName(account: Account) {
+  if (account.profileProvider === "kick" && account.connected.kick.username) {
+    return `@${account.connected.kick.username.replace(/^@/, "")}`;
+  }
+
+  if (account.profileProvider === "discord" && account.connected.discord.username) {
+    return account.connected.discord.username;
+  }
+
+  return account.handle;
 }
 
 function useStoredState<T>(key: string, fallback: T) {
@@ -639,33 +708,77 @@ function ProfileWorkspace({
   const { users } = useLeaderboard();
   const [purchases] = useStoredState<Purchase[]>("rankboard-purchases", []);
   const [bets] = useStoredState<Bet[]>("rankboard-bets", []);
+  const [profileStatus, setProfileStatus] = useState("Profile ready");
+  const [savingCasinos, setSavingCasinos] = useState(false);
   const linkedShuffle = account.casinos.shuffle.trim().toLowerCase();
   const liveUser = linkedShuffle ? users.find((user) => user.username?.toLowerCase() === linkedShuffle || user.name.toLowerCase() === linkedShuffle) : null;
   const lifetimeWager = liveUser?.points ?? account.lifetimeWager;
 
-  function saveCasino(casino: Casino, value: string) {
+  function updateCasinoDraft(casino: Casino, value: string) {
     setAccount((current) => {
       const safe = normalizeAccount(current);
       return { ...safe, casinos: { ...safe.casinos, [casino]: value } };
     });
+    setProfileStatus("Unsaved casino names");
+  }
+
+  async function saveCasinos() {
+    setSavingCasinos(true);
+    setProfileStatus("Saving casino names");
+
+    if (account.handle === "@guest") {
+      setAccount((current) => {
+        const safe = normalizeAccount(current);
+        return { ...safe, casinos: account.casinos };
+      });
+      setSavingCasinos(false);
+      setProfileStatus("Sign in to sync casino names");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ casinos: account.casinos }),
+      });
+      const payload = (await response.json()) as {
+        account?: AuthAccountPayload;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.account) {
+        throw new Error(payload.error ?? "Profile update failed");
+      }
+
+      setAccount(accountFromPayload(payload.account));
+      setProfileStatus("Casino names saved");
+    } catch (error) {
+      setProfileStatus(error instanceof Error ? error.message : "Profile update failed");
+    } finally {
+      setSavingCasinos(false);
+    }
   }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="PLAYER PROFILE" title="Linked. Ranked. Paid." meta={liveUser ? `Rank #${liveUser.rank}` : "Link casino name"} />
+      <WorkspaceHeader overline="PLAYER PROFILE" title="Linked. Ranked. Paid." meta={profileStatus === "Profile ready" && liveUser ? `Rank #${liveUser.rank}` : profileStatus} />
       <div className="profile-layout">
         <article className="profile-card">
-          <div className="profile-avatar">{account.handle.slice(1, 3).toUpperCase() || "RB"}</div>
-          <h3>{account.handle}</h3>
+          <AccountImage account={account} className="profile-avatar" />
+          <h3>{accountDisplayName(account)}</h3>
           <p>{account.banned ? "Banned" : account.timeoutUntil ? "Timed out" : "Active"}</p>
           <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["Lifetime", formatNumberCompact(lifetimeWager)], ["Rank", liveUser ? `#${liveUser.rank}` : "--"], ["Badges", String(account.badges.length)]]} />
         </article>
         <div className="profile-panels">
-          <ConnectionPanel account={account} setAccount={setAccount} />
+          <ConnectionPanel account={account} setAccount={setAccount} onStatus={setProfileStatus} />
           <div className="casino-link-panel">
             {(Object.keys(account.casinos) as Casino[]).map((casino) => (
-              <label key={casino}>{casino}<input value={account.casinos[casino]} onChange={(event) => saveCasino(casino, event.target.value)} placeholder={`${casino} username`} /></label>
+              <label key={casino}>{casino}<input value={account.casinos[casino]} onChange={(event) => updateCasinoDraft(casino, event.target.value)} placeholder={`${casino} username`} /></label>
             ))}
+            <button type="button" onClick={saveCasinos} disabled={savingCasinos}>{savingCasinos ? "Saving" : "Save names"}</button>
           </div>
         </div>
       </div>
@@ -688,9 +801,65 @@ function AdminWorkspace({
   const [markets, setMarkets] = useStoredState<BetMarket[]>("rankboard-bet-markets", defaultMarkets);
   const [bets, setBets] = useStoredState<Bet[]>("rankboard-bets", []);
   const [siteConfig, setSiteConfig] = useStoredState<SiteConfig>("rankboard-site-config", defaultSiteConfig);
-  const [tickets] = useStoredState<Ticket[]>("rankboard-support-tickets", []);
   const [newItem, setNewItem] = useState({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
   const [newMarket, setNewMarket] = useState({ title: "", type: "Stream", sideA: "Yes", sideB: "No", oddsA: "2.00", oddsB: "1.50", deadline: "23:00" });
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [adminQuery, setAdminQuery] = useState("");
+  const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
+  const [adminUserStatus, setAdminUserStatus] = useState("Loading users");
+  const [adminUsersLoading, setAdminUsersLoading] = useState(false);
+  const selectedAdminUser =
+    adminUsers.find((user) => user.id === selectedAdminUserId) ??
+    adminUsers[0] ??
+    null;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setAdminUsersLoading(true);
+
+      try {
+        const params = new URLSearchParams();
+        if (adminQuery.trim()) {
+          params.set("q", adminQuery.trim());
+        }
+        const response = await fetch(`/api/admin/users?${params.toString()}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as {
+          users?: AdminUser[];
+          error?: string;
+        };
+
+        if (!response.ok || !payload.users) {
+          throw new Error(payload.error ?? "Could not load users");
+        }
+
+        setAdminUsers(payload.users);
+        setSelectedAdminUserId((current) => {
+          if (current && payload.users?.some((user) => user.id === current)) {
+            return current;
+          }
+          return payload.users?.[0]?.id ?? "";
+        });
+        setAdminUserStatus(`${payload.users.length} users loaded`);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setAdminUserStatus(error instanceof Error ? error.message : "Could not load users");
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setAdminUsersLoading(false);
+        }
+      }
+    }, 250);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [adminQuery]);
 
   function givePoints(amount: number) {
     setAccount((current) => {
@@ -744,9 +913,100 @@ function AdminWorkspace({
     if (payout > 0) givePoints(payout);
   }
 
+  async function updateSelectedUser(patch: Partial<Pick<AdminUser, "points" | "xp" | "banned" | "bannedReason" | "role">> & { timeoutUntil?: string | null }) {
+    if (!selectedAdminUser) return;
+    setAdminUserStatus("Updating user");
+
+    try {
+      const response = await fetch(`/api/admin/users/${selectedAdminUser.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(patch),
+      });
+      const payload = (await response.json()) as {
+        user?: AdminUser;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.user) {
+        throw new Error(payload.error ?? "User update failed");
+      }
+
+      setAdminUsers((current) =>
+        current.map((user) => (user.id === payload.user?.id ? payload.user : user))
+      );
+      setSelectedAdminUserId(payload.user.id);
+      setAdminUserStatus(`${payload.user.handle} updated`);
+    } catch (error) {
+      setAdminUserStatus(error instanceof Error ? error.message : "User update failed");
+    }
+  }
+
+  function adjustSelectedUser(field: "points" | "xp", amount: number) {
+    if (!selectedAdminUser) return;
+    updateSelectedUser({
+      [field]: Math.max(0, selectedAdminUser[field] + amount),
+    });
+  }
+
+  function timeoutSelectedUser(hours: number) {
+    updateSelectedUser({
+      timeoutUntil: new Date(Date.now() + hours * 60 * 60 * 1000).toISOString(),
+    });
+  }
+
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="ADMIN FLOOR" title="Control. Settle. Ship." meta={`${tickets.length} tickets / ${purchases.length} purchases`} />
+      <WorkspaceHeader overline="ADMIN FLOOR" title="Control. Settle. Ship." meta={adminUserStatus} />
+      <div className="admin-user-manager">
+        <div className="admin-user-manager__bar">
+          <label>USER SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Email, handle, Discord, Kick, casino" /></label>
+          <button type="button" onClick={() => setAdminQuery((value) => value.trim())} disabled={adminUsersLoading}>{adminUsersLoading ? "Loading" : "Refresh"}</button>
+        </div>
+        <div className="admin-user-layout">
+          <div className="admin-user-list">
+            {adminUsers.length ? adminUsers.map((user) => (
+              <button className={selectedAdminUser?.id === user.id ? "selected" : ""} key={user.id} type="button" onClick={() => setSelectedAdminUserId(user.id)}>
+                <span>{user.image ? <img src={user.image} alt="" /> : user.handle.slice(1, 3).toUpperCase()}</span>
+                <strong>{user.handle}</strong>
+                <small>{user.role} / {user.banned ? "BANNED" : user.timeoutUntil ? "TIMEOUT" : "ACTIVE"}</small>
+              </button>
+            )) : <p>{adminUsersLoading ? "Loading users." : "No users found."}</p>}
+          </div>
+          <article className="admin-user-detail">
+            {selectedAdminUser ? (
+              <>
+                <div className="admin-user-detail__head">
+                  <span>{selectedAdminUser.image ? <img src={selectedAdminUser.image} alt="" /> : selectedAdminUser.handle.slice(1, 3).toUpperCase()}</span>
+                  <div>
+                    <small>{selectedAdminUser.email || "No email"}</small>
+                    <h3>{selectedAdminUser.handle}</h3>
+                    <p>{selectedAdminUser.connected.kick.connected ? `Kick ${selectedAdminUser.connected.kick.username}` : "Kick off"} / {selectedAdminUser.connected.discord.connected ? `Discord ${selectedAdminUser.connected.discord.username}` : "Discord off"}</p>
+                  </div>
+                </div>
+                <StatusGrid items={[["Points", formatNumberCompact(selectedAdminUser.points)], ["XP", formatNumberCompact(selectedAdminUser.xp)], ["Role", selectedAdminUser.role], ["State", selectedAdminUser.banned ? "Banned" : selectedAdminUser.timeoutUntil ? "Timed out" : "Active"]]} />
+                <div className="admin-action-grid">
+                  <button type="button" onClick={() => adjustSelectedUser("points", 1000)}>+1K points</button>
+                  <button type="button" onClick={() => adjustSelectedUser("points", -1000)}>-1K points</button>
+                  <button type="button" onClick={() => adjustSelectedUser("xp", 1000)}>+1K XP</button>
+                  <button type="button" onClick={() => adjustSelectedUser("xp", -1000)}>-1K XP</button>
+                  <button type="button" onClick={() => updateSelectedUser({ banned: !selectedAdminUser.banned, bannedReason: selectedAdminUser.banned ? "" : "Admin action" })}>{selectedAdminUser.banned ? "Unban" : "Ban"}</button>
+                  <button type="button" onClick={() => timeoutSelectedUser(24)}>24h timeout</button>
+                  <button type="button" onClick={() => updateSelectedUser({ timeoutUntil: null })}>Clear timeout</button>
+                  <button type="button" onClick={() => updateSelectedUser({ role: selectedAdminUser.role === "ADMIN" ? "PLAYER" : "ADMIN" })}>{selectedAdminUser.role === "ADMIN" ? "Demote" : "Promote"}</button>
+                </div>
+                <div className="admin-casino-strip">
+                  {(Object.keys(selectedAdminUser.casinos) as Casino[]).map((casino) => <span key={casino}>{casino}<b>{selectedAdminUser.casinos[casino] || "Not linked"}</b></span>)}
+                </div>
+              </>
+            ) : (
+              <p className="admin-empty-state">Sign in as an admin to manage users.</p>
+            )}
+          </article>
+        </div>
+      </div>
       <div className="admin-grid">
         <article className="admin-panel">
           <small>USER</small>
@@ -900,32 +1160,194 @@ function LoginWorkspace({
   account: Account;
   setAccount: (value: Account | ((current: Account) => Account)) => void;
 }) {
-  const [handle, setHandle] = useState(account.handle);
-  const [accessKey, setAccessKey] = useState("");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState(account.handle === "@guest" ? "" : account.handle.replace(/^@/, ""));
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState(account.handle === "@guest" ? "Signed out" : "Session active");
+  const [busy, setBusy] = useState(false);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    let active = true;
+
+    async function loadSession() {
+      try {
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+        });
+        const payload = (await response.json()) as {
+          account: AuthAccountPayload | null;
+        };
+
+        if (!active) {
+          return;
+        }
+
+        if (payload.account) {
+          const nextAccount = accountFromPayload(payload.account);
+          setAccount(nextAccount);
+          setDisplayName(nextAccount.handle.replace(/^@/, ""));
+          setStatus("Session active");
+          return;
+        }
+
+        setAccount(defaultAccount);
+        setStatus("Signed out");
+      } catch {
+        if (active) {
+          setStatus("Session check failed");
+        }
+      }
+    }
+
+    loadSession();
+
+    return () => {
+      active = false;
+    };
+  }, [setAccount]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      const authError = params.get("auth_error");
+      const discord = params.get("discord");
+      const kick = params.get("kick");
+
+      if (kick === "connected") {
+        setStatus("Kick connected");
+      } else if (discord === "connected") {
+        setStatus("Discord connected");
+      } else if (authError) {
+        setStatus("Login failed");
+      }
+
+      if (kick || discord || authError) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      return {
-        ...safe,
-        handle: handle.trim().startsWith("@") ? handle.trim() : `@${handle.trim() || "guest"}`,
-        accessKey,
-        streak: Math.max(1, safe.streak),
+    setBusy(true);
+    setStatus(mode === "signup" ? "Creating account" : "Signing in");
+
+    try {
+      const response = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mode,
+          email,
+          password,
+          displayName: mode === "signup" ? displayName : undefined,
+        }),
+      });
+      const payload = (await response.json()) as {
+        account?: AuthAccountPayload;
+        error?: string;
       };
-    });
+
+      if (!response.ok || !payload.account) {
+        throw new Error(payload.error ?? "Login failed");
+      }
+
+      const nextAccount = accountFromPayload(payload.account);
+      setAccount(nextAccount);
+      setDisplayName(nextAccount.handle.replace(/^@/, ""));
+      setPassword("");
+      setStatus("Session active");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Login failed");
+    } finally {
+      setBusy(false);
+    }
   }
 
+  async function signOut() {
+    setBusy(true);
+    setStatus("Signing out");
+
+    try {
+      await fetch("/api/auth/session", {
+        method: "DELETE",
+      });
+      setAccount(defaultAccount);
+      setEmail("");
+      setDisplayName("");
+      setPassword("");
+      setStatus("Signed out");
+      window.localStorage.removeItem("rankboard-account");
+      window.dispatchEvent(new CustomEvent("rankboard-storage"));
+    } catch {
+      setStatus("Sign out failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function beginOauth(provider: Provider) {
+    setBusy(true);
+    setStatus(`Opening ${provider === "kick" ? "Kick" : "Discord"}`);
+    window.location.assign(`/api/auth/${provider}`);
+  }
+
+  const signedIn = account.handle !== "@guest";
+
   return (
-    <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="PLAYER ACCOUNT" title="Kick. Discord. Go." meta={account.handle === "@guest" ? "Guest session" : `${account.handle} active`} />
-      <ConnectionPanel account={account} setAccount={setAccount} />
-      <form className="support-form account-form" onSubmit={submit}>
-        <label>PLAYER HANDLE<input value={handle} onChange={(event) => setHandle(event.target.value)} placeholder="@yourhandle" /></label>
-        <label>ACCESS KEY<input type="password" value={accessKey} onChange={(event) => setAccessKey(event.target.value)} placeholder="Access key" /></label>
-        <button className="button primary" type="submit">Save session <span>↗</span></button>
-        <button className="button ghost" type="button" onClick={() => setAccount(defaultAccount)}>Reset local <span>↻</span></button>
-      </form>
+    <section className="section page-width app-workspace auth-workspace">
+      <WorkspaceHeader overline="PLAYER ACCOUNT" title="Secure entry." meta={status} />
+      <div className="auth-modal-shell" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <div className="auth-panel">
+          <div className="auth-copy">
+            <p>ACCOUNT ACCESS</p>
+            <h3 id="auth-title">{signedIn ? "Account active" : "Login to RankBoard"}</h3>
+            <span>{account.handle}</span>
+          </div>
+          <div className="auth-card">
+            {signedIn ? (
+              <>
+                <div className="auth-session-card">
+                  <AccountImage account={account} className="auth-avatar" />
+                  <div>
+                    <strong>{accountDisplayName(account)}</strong>
+                    <small>{accountProviderLabel(account)}</small>
+                  </div>
+                </div>
+                <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["XP", formatNumberCompact(account.xp)], ["Kick", account.connected.kick.connected ? "Linked" : "Off"], ["Discord", account.connected.discord.connected ? "Linked" : "Off"]]} />
+                <div className="auth-session-actions">
+                  <Link className="button primary" href="/profile">Open profile <span>↗</span></Link>
+                  <button className="button ghost" type="button" onClick={signOut} disabled={busy}>{busy ? "Working" : "Logout"} <span>↻</span></button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="auth-tabs" role="tablist" aria-label="Login mode">
+                  <button type="button" className={mode === "signin" ? "active" : ""} onClick={() => setMode("signin")}>Sign in</button>
+                  <button type="button" className={mode === "signup" ? "active" : ""} onClick={() => setMode("signup")}>Create</button>
+                </div>
+                <form className="auth-form" onSubmit={submit}>
+                  {mode === "signup" ? <label>DISPLAY NAME<input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Player name" autoComplete="name" /></label> : null}
+                  <label>EMAIL<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
+                  <label>PASSWORD<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Minimum 8 characters" autoComplete={mode === "signup" ? "new-password" : "current-password"} required minLength={8} /></label>
+                  <button className="button primary" type="submit" disabled={busy}>{busy ? "Working" : mode === "signup" ? "Create account" : "Sign in"} <span>↗</span></button>
+                </form>
+                <div className="auth-divider"><span>OR</span></div>
+                <div className="auth-actions">
+                  <button className="button ghost" type="button" onClick={() => beginOauth("discord")} disabled={busy}>Login with Discord <span>◇</span></button>
+                  <button className="button ghost" type="button" onClick={() => beginOauth("kick")} disabled={busy}>Login with Kick <span>●</span></button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <ConnectionPanel account={account} setAccount={setAccount} onStatus={setStatus} />
       <AccountStrip account={account} />
       <Inventory items={account.inventory} />
     </section>
@@ -935,24 +1357,52 @@ function LoginWorkspace({
 function ConnectionPanel({
   account,
   setAccount,
+  onStatus,
 }: {
   account: Account;
   setAccount: (value: Account | ((current: Account) => Account)) => void;
+  onStatus?: (status: string) => void;
 }) {
-  function toggle(provider: Provider) {
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      const connected = safe.connected[provider].connected;
-      return {
-        ...safe,
-        connected: {
-          ...safe.connected,
-          [provider]: connected
-            ? { connected: false, username: "", id: "" }
-            : { connected: true, username: provider === "kick" ? safe.handle.replace("@", "") || "kick_user" : `${safe.handle.replace("@", "") || "player"}#0808`, id: uid(provider) },
-        },
+  const [busyProvider, setBusyProvider] = useState<Provider | null>(null);
+
+  async function toggle(provider: Provider) {
+    const label = provider === "kick" ? "Kick" : "Discord";
+
+    if (provider === "kick" && !account.connected.kick.connected) {
+      onStatus?.("Opening Kick");
+      window.location.assign("/api/auth/kick");
+      return;
+    }
+
+    if (provider === "discord" && !account.connected.discord.connected) {
+      onStatus?.("Opening Discord");
+      window.location.assign("/api/auth/discord");
+      return;
+    }
+
+    setBusyProvider(provider);
+    onStatus?.(`Disconnecting ${label}`);
+
+    try {
+      const response = await fetch(`/api/auth/connections/${provider}`, {
+        method: "DELETE",
+      });
+      const payload = (await response.json()) as {
+        account?: AuthAccountPayload;
+        error?: string;
       };
-    });
+
+      if (!response.ok || !payload.account) {
+        throw new Error(payload.error ?? `Could not disconnect ${label}`);
+      }
+
+      setAccount(accountFromPayload(payload.account));
+      onStatus?.(`${label} disconnected`);
+    } catch (error) {
+      onStatus?.(error instanceof Error ? error.message : `Could not disconnect ${label}`);
+    } finally {
+      setBusyProvider(null);
+    }
   }
 
   return (
@@ -964,7 +1414,7 @@ function ConnectionPanel({
             <small>{provider.toUpperCase()}</small>
             <h3>{state.connected ? state.username : "Not linked"}</h3>
             <p>{state.connected ? "Connected" : "OAuth ready"}</p>
-            <button type="button" onClick={() => toggle(provider)}>{state.connected ? "Disconnect" : `Login ${provider}`}</button>
+            <button type="button" onClick={() => toggle(provider)} disabled={busyProvider === provider}>{busyProvider === provider ? "Working" : state.connected ? "Disconnect" : `Login ${provider}`}</button>
           </article>
         );
       })}

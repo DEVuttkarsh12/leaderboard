@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import FeatureWorkspace from "./feature-workspace";
+import type { AuthAccountPayload } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated, formatNumberCompact, formatShortDate } from "@/lib/formatters";
 import { getSearchableNames } from "@/lib/normalize-leaderboard";
@@ -134,6 +135,168 @@ function totalWager(players: Player[]) {
   return players.reduce((sum, player) => sum + (player.points ?? 0), 0);
 }
 
+type HeaderAccount = {
+  handle: string;
+  image: string;
+  profileProvider: "kick" | "discord" | "email";
+  points: number;
+  xp: number;
+  authenticated: boolean;
+  connected: {
+    kick: {
+      connected: boolean;
+      username: string;
+    };
+    discord: {
+      connected: boolean;
+      username: string;
+    };
+  };
+};
+
+const guestHeaderAccount: HeaderAccount = {
+  handle: "@guest",
+  image: "",
+  profileProvider: "email",
+  points: 18500,
+  xp: 4200,
+  authenticated: false,
+  connected: {
+    kick: {
+      connected: false,
+      username: "",
+    },
+    discord: {
+      connected: false,
+      username: "",
+    },
+  },
+};
+
+function normalizeHeaderAccount(value: Partial<HeaderAccount> | null | undefined): HeaderAccount {
+  return {
+    ...guestHeaderAccount,
+    ...value,
+    connected: {
+      kick: {
+        ...guestHeaderAccount.connected.kick,
+        ...value?.connected?.kick,
+      },
+      discord: {
+        ...guestHeaderAccount.connected.discord,
+        ...value?.connected?.discord,
+      },
+    },
+  };
+}
+
+function headerAccountFromPayload(payload: AuthAccountPayload): HeaderAccount {
+  return normalizeHeaderAccount({
+    handle: payload.handle,
+    image: payload.image,
+    profileProvider: payload.profileProvider,
+    points: payload.points,
+    xp: payload.xp,
+    authenticated: true,
+    connected: {
+      kick: {
+        connected: payload.connected.kick.connected,
+        username: payload.connected.kick.username,
+      },
+      discord: {
+        connected: payload.connected.discord.connected,
+        username: payload.connected.discord.username,
+      },
+    },
+  });
+}
+
+function HeaderAvatar({
+  account,
+  className = "avatar-button",
+}: {
+  account: HeaderAccount;
+  className?: string;
+}) {
+  const cleanHandle = account.handle.replace(/^@/, "") || "guest";
+  const initials = getInitials(cleanHandle);
+
+  return (
+    <span className={className}>
+      {account.image ? <img src={account.image} alt="" /> : initials}
+    </span>
+  );
+}
+
+function readStoredHeaderAccount(): HeaderAccount {
+  const stored = window.localStorage.getItem("rankboard-account");
+  if (!stored) return guestHeaderAccount;
+
+  try {
+    return normalizeHeaderAccount(JSON.parse(stored) as Partial<HeaderAccount>);
+  } catch {
+    window.localStorage.removeItem("rankboard-account");
+    return guestHeaderAccount;
+  }
+}
+
+function useHeaderAccount() {
+  const [account, setAccount] = useState<HeaderAccount>(guestHeaderAccount);
+
+  useEffect(() => {
+    let active = true;
+
+    function syncFromStorage() {
+      setAccount(readStoredHeaderAccount());
+    }
+
+    async function syncFromSession() {
+      syncFromStorage();
+
+      try {
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+        });
+        const payload = (await response.json()) as {
+          account: AuthAccountPayload | null;
+        };
+
+        if (!active) return;
+
+        if (payload.account) {
+          const nextAccount = headerAccountFromPayload(payload.account);
+          setAccount(nextAccount);
+          window.localStorage.setItem(
+            "rankboard-account",
+            JSON.stringify({ ...payload.account, accessKey: "" })
+          );
+          window.dispatchEvent(new CustomEvent("rankboard-storage"));
+        } else {
+          setAccount(guestHeaderAccount);
+          window.localStorage.removeItem("rankboard-account");
+          window.dispatchEvent(new CustomEvent("rankboard-storage"));
+        }
+      } catch {
+        if (active) {
+          syncFromStorage();
+        }
+      }
+    }
+
+    syncFromSession();
+    window.addEventListener("storage", syncFromStorage);
+    window.addEventListener("rankboard-storage", syncFromStorage);
+
+    return () => {
+      active = false;
+      window.removeEventListener("storage", syncFromStorage);
+      window.removeEventListener("rankboard-storage", syncFromStorage);
+    };
+  }, []);
+
+  return account;
+}
+
 export default function RankBoardApp({
   route = "",
   countdownTarget = null,
@@ -142,10 +305,11 @@ export default function RankBoardApp({
   countdownTarget?: string | null;
 }) {
   const [accountOpen, setAccountOpen] = useState(false);
+  const account = useHeaderAccount();
   const path = route ? `/${route}` : "/";
   return (
     <div className="site-shell">
-      <Header path={path} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
+      <Header path={path} account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
       {route === "" ? <Home /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
       <FloatingDock path={path} />
       <Footer />
@@ -153,11 +317,28 @@ export default function RankBoardApp({
   );
 }
 
-function Header({ path, accountOpen, setAccountOpen }: { path: string; accountOpen: boolean; setAccountOpen: (v: boolean) => void }) {
+function Header({ path, account, accountOpen, setAccountOpen }: { path: string; account: HeaderAccount; accountOpen: boolean; setAccountOpen: (v: boolean) => void }) {
+  const cleanHandle = account.handle.replace(/^@/, "") || "guest";
+  const initials = getInitials(cleanHandle);
+  const menuName = account.profileProvider === "kick" && account.connected.kick.username ? account.connected.kick.username : account.profileProvider === "discord" && account.connected.discord.username ? account.connected.discord.username : account.handle;
+  const accountStatus = !account.authenticated ? "GUEST" : account.profileProvider === "kick" ? "KICK" : account.profileProvider === "discord" ? "DISCORD" : "SIGNED IN";
+  const menuLinks = account.authenticated
+    ? [["Profile", "/profile"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]]
+    : [["Profile", "/profile"], ["Login", "/login"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]];
+
+  async function signOut() {
+    await fetch("/api/auth/session", {
+      method: "DELETE",
+    }).catch(() => null);
+    window.localStorage.removeItem("rankboard-account");
+    window.dispatchEvent(new CustomEvent("rankboard-storage"));
+    setAccountOpen(false);
+  }
+
   return <header className="header">
     <Link className="brand" href="/" aria-label="RankBoard home"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link>
     <nav className="nav" aria-label="Primary navigation">{NAV.map(([label, href, icon]) => <Link key={href} className={path === href ? "active" : ""} href={href}><i>{icon}</i>{label}</Link>)}</nav>
-    <div className="header-actions"><span className="live-pill"><b /> LIVE</span><button className="icon-button" aria-label="Leaderboard notifications">♜<span>3</span></button><div className="account-wrap"><button className="avatar-button" onClick={() => setAccountOpen(!accountOpen)} aria-expanded={accountOpen}>DV</button>{accountOpen && <div className="account-menu"><p>PLAYER MENU <span>LV.12</span></p>{[["Profile", "/profile"], ["Login", "/login"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]].map(([n,h]) => <Link key={h} href={h}>{n}<span>↗</span></Link>)}</div>}</div></div>
+    <div className="header-actions"><span className="live-pill"><b /> LIVE</span><button className="icon-button" aria-label="Leaderboard notifications">♜<span>3</span></button><div className="account-wrap"><button className="avatar-button" onClick={() => setAccountOpen(!accountOpen)} aria-expanded={accountOpen} aria-label={`Open account menu for ${menuName}`}>{account.image ? <img src={account.image} alt="" /> : initials}</button>{accountOpen && <div className="account-menu"><div className="account-menu__identity"><HeaderAvatar account={account} /><div><strong>{menuName}</strong><small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small></div></div><p>PLAYER MENU <span>{formatNumberCompact(account.xp)} XP</span></p>{menuLinks.map(([n,h]) => <Link key={h} href={h}>{n}<span>↗</span></Link>)}{account.authenticated ? <button className="account-menu__logout" type="button" onClick={signOut}>Logout<span>↻</span></button> : null}</div>}</div></div>
   </header>;
 }
 
