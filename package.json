@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "postinstall": "prisma generate",
     "admin:list": "node scripts/set-admin.cjs list",
     "admin:promote": "node scripts/set-admin.cjs promote",
     "admin:demote": "node scripts/set-admin.cjs demote"
