@@ -5,6 +5,9 @@ import {
   updateUserCasinoAccounts,
 } from "@/lib/server/auth/session";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const profileSchema = z.object({
   casinos: z
     .object({

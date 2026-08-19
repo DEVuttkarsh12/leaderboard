@@ -9,6 +9,9 @@ function sessionTokenFrom(request: NextRequest) {
   return request.cookies.get(SESSION_COOKIE)?.value;
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function isOAuthProvider(provider: string): provider is OAuthProvider {
   return provider === "kick" || provider === "discord";
 }

@@ -10,6 +10,9 @@ import {
   setSessionCookie,
 } from "@/lib/server/auth/session";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const loginSchema = z.object({
   mode: z.enum(["signin", "signup"]).default("signin"),
   email: z.string().trim().email().max(254),
