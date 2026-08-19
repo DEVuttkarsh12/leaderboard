@@ -174,9 +174,19 @@ const guestHeaderAccount: HeaderAccount = {
 };
 
 function normalizeHeaderAccount(value: Partial<HeaderAccount> | null | undefined): HeaderAccount {
+  const isAuth =
+    typeof value?.authenticated === "boolean"
+      ? value.authenticated
+      : Boolean(
+          value?.connected?.kick?.connected ||
+          value?.connected?.discord?.connected ||
+          (value?.handle && value.handle !== "@guest")
+        );
+
   return {
     ...guestHeaderAccount,
     ...value,
+    authenticated: isAuth,
     connected: {
       kick: {
         ...guestHeaderAccount.connected.kick,

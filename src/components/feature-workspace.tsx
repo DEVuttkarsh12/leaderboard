@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type { AuthAccountPayload } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
@@ -271,33 +271,59 @@ function accountDisplayName(account: Account) {
 }
 
 function useStoredState<T>(key: string, fallback: T) {
-  const [loaded, setLoaded] = useState(false);
   const [value, setValue] = useState<T>(fallback);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
+    try {
       const saved = window.localStorage.getItem(key);
       if (saved) {
-        try {
-          setValue(JSON.parse(saved) as T);
-        } catch {
-          window.localStorage.removeItem(key);
-        }
+        setValue(JSON.parse(saved) as T);
       }
-      setLoaded(true);
-    }, 0);
-
-    return () => window.clearTimeout(timer);
+    } catch {
+      // ignore
+    }
   }, [key]);
 
-  useEffect(() => {
-    if (loaded) {
-      window.localStorage.setItem(key, JSON.stringify(value));
-      window.dispatchEvent(new CustomEvent("rankboard-storage"));
-    }
-  }, [key, loaded, value]);
+  const setStoredValue = useCallback(
+    (nextOrUpdater: T | ((current: T) => T)) => {
+      setValue((prev) => {
+        const next =
+          typeof nextOrUpdater === "function"
+            ? (nextOrUpdater as (current: T) => T)(prev)
+            : nextOrUpdater;
+        try {
+          window.localStorage.setItem(key, JSON.stringify(next));
+          window.dispatchEvent(new CustomEvent("rankboard-storage"));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+    },
+    [key]
+  );
 
-  return [value, setValue] as const;
+  useEffect(() => {
+    function handleStorage() {
+      try {
+        const saved = window.localStorage.getItem(key);
+        if (saved) {
+          setValue(JSON.parse(saved) as T);
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("rankboard-storage", handleStorage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("rankboard-storage", handleStorage);
+    };
+  }, [key]);
+
+  return [value, setStoredValue] as const;
 }
 
 function useAccountState() {
@@ -305,10 +331,28 @@ function useAccountState() {
   const account = useMemo(() => normalizeAccount(rawAccount), [rawAccount]);
 
   useEffect(() => {
-    if (JSON.stringify(rawAccount) !== JSON.stringify(account)) {
-      setRawAccount(account);
+    let active = true;
+
+    async function syncSession() {
+      try {
+        const res = await fetch("/api/auth/session", { cache: "no-store" });
+        const payload = (await res.json()) as { account: AuthAccountPayload | null };
+        if (!active) return;
+
+        if (payload.account) {
+          const next = accountFromPayload(payload.account);
+          setRawAccount(next);
+        }
+      } catch {
+        // ignore
+      }
     }
-  }, [account, rawAccount, setRawAccount]);
+
+    syncSession();
+    return () => {
+      active = false;
+    };
+  }, [setRawAccount]);
 
   return [account, setRawAccount] as const;
 }
