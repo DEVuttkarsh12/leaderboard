@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { AuthAccountPayload } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
@@ -270,58 +277,54 @@ function accountDisplayName(account: Account) {
   return account.handle;
 }
 
-function useStoredState<T>(key: string, fallback: T) {
-  const [value, setValue] = useState<T>(fallback);
+function subscribeToStorage(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener("rankboard-storage", callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("rankboard-storage", callback);
+  };
+}
 
-  useEffect(() => {
+function useStoredState<T>(key: string, fallback: T) {
+  const getSnapshot = useCallback(() => {
     try {
-      const saved = window.localStorage.getItem(key);
-      if (saved) {
-        setValue(JSON.parse(saved) as T);
-      }
+      return window.localStorage.getItem(key);
     } catch {
-      // ignore
+      return null;
     }
   }, [key]);
+
+  const getServerSnapshot = useCallback(() => null, []);
+
+  const raw = useSyncExternalStore(subscribeToStorage, getSnapshot, getServerSnapshot);
+
+  const value: T = useMemo(() => {
+    if (raw === null) return fallback;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return fallback;
+    }
+  }, [raw, fallback]);
 
   const setStoredValue = useCallback(
     (nextOrUpdater: T | ((current: T) => T)) => {
-      setValue((prev) => {
+      try {
+        const currentSaved = window.localStorage.getItem(key);
+        const current: T = currentSaved ? (JSON.parse(currentSaved) as T) : fallback;
         const next =
           typeof nextOrUpdater === "function"
-            ? (nextOrUpdater as (current: T) => T)(prev)
+            ? (nextOrUpdater as (current: T) => T)(current)
             : nextOrUpdater;
-        try {
-          window.localStorage.setItem(key, JSON.stringify(next));
-          window.dispatchEvent(new CustomEvent("rankboard-storage"));
-        } catch {
-          // ignore
-        }
-        return next;
-      });
-    },
-    [key]
-  );
-
-  useEffect(() => {
-    function handleStorage() {
-      try {
-        const saved = window.localStorage.getItem(key);
-        if (saved) {
-          setValue(JSON.parse(saved) as T);
-        }
+        window.localStorage.setItem(key, JSON.stringify(next));
+        window.dispatchEvent(new CustomEvent("rankboard-storage"));
       } catch {
         // ignore
       }
-    }
-
-    window.addEventListener("storage", handleStorage);
-    window.addEventListener("rankboard-storage", handleStorage);
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-      window.removeEventListener("rankboard-storage", handleStorage);
-    };
-  }, [key]);
+    },
+    [key, fallback]
+  );
 
   return [value, setStoredValue] as const;
 }
