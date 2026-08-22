@@ -33,12 +33,55 @@ model User {
   bannedReason    String?
   timeoutUntil    DateTime?
 
-  accounts       Account[]
-  sessions       Session[]
-  casinoAccounts CasinoAccount[]
+  accounts          Account[]
+  sessions          Session[]
+  casinoAccounts    CasinoAccount[]
+  storePurchases    StorePurchase[]
+  pointTransactions PointTransaction[]
+  bets              UserBet[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  REJECTED
+}
+
+model StoreItem {
+  id          String  @id @default(cuid())
+  title       String
+  description String
+  cost        Int
+  tag         String  @default("Reward")
+  stock       Int     @default(0)
+  unlimited   Boolean @default(false)
+  imageLabel  String  @default("NEW")
+  active      Boolean @default(true)
+
+  purchases StorePurchase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StorePurchase {
+  id     String         @id @default(cuid())
+  userId String
+  itemId String
+  cost   Int
+  status PurchaseStatus @default(PENDING)
+
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item StoreItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([itemId])
 }
 
 model Account {
@@ -98,4 +141,73 @@ model CasinoAccount {
 
   @@unique([userId, provider])
   @@index([provider, username])
+}
+
+model PointTransaction {
+  id     String @id @default(cuid())
+  userId String
+  amount Int    // positive = earn, negative = spend
+  reason String // e.g. "leaderboard_sync", "store_purchase", "admin_grant"
+  meta   String @default("") // JSON string for extra context
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum MarketStatus {
+  LIVE
+  LOCKED
+  SETTLED
+  CANCELLED
+}
+
+enum BetStatus {
+  OPEN
+  WON
+  LOST
+  REFUNDED
+}
+
+model BetMarket {
+  id        String       @id @default(cuid())
+  title     String
+  type      String       @default("Stream")
+  deadline  String       @default("23:59")
+  status    MarketStatus @default(LIVE)
+  sideA     String       @default("Yes")
+  sideB     String       @default("No")
+  oddsA     Float        @default(2.0)
+  oddsB     Float        @default(1.5)
+  winner    String?
+
+  bets      UserBet[]
+
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  settledAt DateTime?
+}
+
+model UserBet {
+  id              String    @id @default(cuid())
+  userId          String
+  marketId        String
+  side            String
+  amount          Int
+  odds            Float
+  potentialPayout Int
+  payout          Int       @default(0)
+  status          BetStatus @default(OPEN)
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  market          BetMarket @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([marketId])
 }

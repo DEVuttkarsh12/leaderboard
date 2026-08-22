@@ -82,7 +82,7 @@ type BetMarket = {
   title: string;
   type: string;
   deadline: string;
-  status: "Live" | "Locked" | "Settled";
+  status: "Live" | "Locked" | "Settled" | "Cancelled";
   sides: [string, string];
   odds: [number, number];
   winner: string | null;
@@ -95,8 +95,9 @@ type Bet = {
   side: string;
   amount: number;
   odds: number;
-  status: "Open" | "Won" | "Lost";
-  paid: boolean;
+  status: "Open" | "Won" | "Lost" | "Refunded";
+  paid?: boolean;
+  payout?: number;
   createdAt: string;
 };
 
@@ -561,6 +562,26 @@ function RafflesWorkspace() {
   );
 }
 
+type ApiStoreItem = {
+  id: string;
+  title: string;
+  description: string;
+  cost: number;
+  tag: string;
+  stock: number;
+  unlimited: boolean;
+  imageLabel: string;
+};
+
+type ApiPurchase = {
+  id: string;
+  itemId: string;
+  itemTitle: string;
+  cost: number;
+  status: "PENDING" | "COMPLETED" | "REJECTED";
+  createdAt: string;
+};
+
 function StoreWorkspace({
   account,
   setAccount,
@@ -568,54 +589,158 @@ function StoreWorkspace({
   account: Account;
   setAccount: (value: Account | ((current: Account) => Account)) => void;
 }) {
-  const [items, setItems] = useStoredState<StoreItem[]>("rankboard-store-items", defaultStoreItems);
-  const [purchases, setPurchases] = useStoredState<Purchase[]>("rankboard-purchases", []);
-  const [message, setMessage] = useState("Vault ready.");
+  const [items, setItems] = useState<ApiStoreItem[]>([]);
+  const [purchases, setPurchases] = useState<ApiPurchase[]>([]);
+  const [message, setMessage] = useState("Loading store...");
+  const [busyItemId, setBusyItemId] = useState<string | null>(null);
+  const isGuest = account.handle === "@guest";
 
-  function redeem(item: StoreItem) {
-    if (account.points < item.cost) {
-      setMessage("Need more points.");
-      return;
-    }
-    if (!item.unlimited && item.stock <= 0) {
-      setMessage("Sold out.");
-      return;
-    }
+  // Load items from server
+  useEffect(() => {
+    let active = true;
+    fetch("/api/store/items", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: { items?: ApiStoreItem[]; error?: string }) => {
+        if (!active) return;
+        if (data.items) {
+          setItems(data.items);
+          setMessage(isGuest ? "Sign in to redeem rewards." : "Store ready.");
+        } else {
+          setMessage(data.error ?? "Could not load items.");
+        }
+      })
+      .catch(() => { if (active) setMessage("Could not load items."); });
+    return () => { active = false; };
+  }, [isGuest]);
 
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      return {
-        ...safe,
-        points: safe.points - item.cost,
-        inventory: [...safe.inventory, item.title],
+  // Load purchase history from server (only if signed in)
+  useEffect(() => {
+    if (isGuest) return;
+    let active = true;
+    fetch("/api/store/purchases", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: { purchases?: ApiPurchase[]; error?: string }) => {
+        if (!active) return;
+        if (data.purchases) setPurchases(data.purchases);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [isGuest]);
+
+  async function redeem(item: ApiStoreItem) {
+    if (isGuest) { setMessage("Sign in to redeem rewards."); return; }
+    if (account.points < item.cost) { setMessage("Not enough points."); return; }
+    if (!item.unlimited && item.stock <= 0) { setMessage("Item is sold out."); return; }
+
+    setBusyItemId(item.id);
+    setMessage(`Redeeming ${item.title}...`);
+
+    try {
+      const response = await fetch("/api/store/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: item.id }),
+      });
+      const data = (await response.json()) as {
+        purchase?: ApiPurchase;
+        newPoints?: number;
+        error?: string;
       };
-    });
-    setItems((current) => current.map((entry) => entry.id === item.id && !entry.unlimited ? { ...entry, stock: Math.max(0, entry.stock - 1) } : entry));
-    setPurchases((current) => [{ id: uid("purchase"), item: item.title, cost: item.cost, status: "Pending", createdAt: nowStamp() }, ...current]);
-    setMessage(`${item.title} pending.`);
+
+      if (!response.ok || !data.purchase) {
+        throw new Error(data.error ?? "Redemption failed.");
+      }
+
+      // Update account points from server response
+      setAccount((current) => {
+        const safe = normalizeAccount(current);
+        return { ...safe, points: data.newPoints ?? Math.max(0, safe.points - item.cost) };
+      });
+
+      // Update item stock locally
+      setItems((current) =>
+        current.map((entry) =>
+          entry.id === item.id && !entry.unlimited
+            ? { ...entry, stock: Math.max(0, entry.stock - 1) }
+            : entry
+        )
+      );
+
+      // Prepend the new purchase to history
+      setPurchases((current) => [data.purchase!, ...current]);
+      setMessage(`${item.title} redeemed — pending fulfillment.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Redemption failed.");
+    } finally {
+      setBusyItemId(null);
+    }
   }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="VAULT REGISTER" title="Spend. Claim. Stash." meta={message} />
+      <WorkspaceHeader overline="STORE REGISTER" title="Spend. Claim. Stash." meta={message} />
       <AccountStrip account={account} />
+      {isGuest && (
+        <div className="workspace-notice">
+          <p>Sign in to redeem store rewards and track your purchases.</p>
+          <a className="button primary" href="/login">Sign in <span>↗</span></a>
+        </div>
+      )}
       <div className="workspace-grid">
-        {items.map((item) => (
-          <article className="action-card reward-card" key={item.id}>
-            <small>{item.tag} / {item.unlimited ? "Unlimited" : `${item.stock} left`}</small>
-            <div className="reward-art">{item.image}</div>
-            <h3>{item.title}</h3>
-            <p>{item.cost.toLocaleString()} pts</p>
-            <div className="action-card__footer">
-              <strong>{item.description}</strong>
-              <button type="button" disabled={account.points < item.cost || (!item.unlimited && item.stock <= 0)} onClick={() => redeem(item)}>Redeem</button>
-            </div>
-          </article>
-        ))}
+        {items.length === 0 && !isGuest && (
+          <p style={{ opacity: 0.5 }}>Loading items...</p>
+        )}
+        {items.map((item) => {
+          const isBusy = busyItemId === item.id;
+          const canAfford = account.points >= item.cost;
+          const inStock = item.unlimited || item.stock > 0;
+          return (
+            <article className="action-card reward-card" key={item.id}>
+              <small>{item.tag} / {item.unlimited ? "Unlimited" : `${item.stock} left`}</small>
+              <div className="reward-art">{item.imageLabel}</div>
+              <h3>{item.title}</h3>
+              <p>{item.cost.toLocaleString()} pts</p>
+              <div className="action-card__footer">
+                <strong>{item.description}</strong>
+                <button
+                  type="button"
+                  disabled={isBusy || isGuest || !canAfford || !inStock}
+                  onClick={() => redeem(item)}
+                >
+                  {isBusy ? "Working..." : !inStock ? "Sold Out" : !canAfford ? "Need pts" : "Redeem"}
+                </button>
+              </div>
+            </article>
+          );
+        })}
       </div>
-      <PurchaseList purchases={purchases} />
-      <Inventory items={account.inventory} />
+      <ApiPurchaseList purchases={purchases} />
     </section>
+  );
+}
+
+function ApiPurchaseList({ purchases }: { purchases: ApiPurchase[] }) {
+  function statusLabel(status: ApiPurchase["status"]) {
+    if (status === "COMPLETED") return "Done";
+    if (status === "REJECTED") return "Rejected";
+    return "Pending";
+  }
+
+  return (
+    <div className="workspace-list">
+      {purchases.length ? purchases.map((p) => (
+        <article key={p.id}>
+          <span>{statusLabel(p.status)}</span>
+          <div>
+            <h3>{p.itemTitle}</h3>
+            <p>{p.cost.toLocaleString()} pts / {new Date(p.createdAt).toLocaleDateString()}</p>
+          </div>
+          <a href="/support">Track</a>
+        </article>
+      )) : (
+        <article><span>EMPTY</span><div><h3>No purchases yet</h3><p>Redeem from the store above.</p></div></article>
+      )}
+    </div>
   );
 }
 
@@ -626,47 +751,152 @@ function CustomBetsWorkspace({
   account: Account;
   setAccount: (value: Account | ((current: Account) => Account)) => void;
 }) {
-  const [markets] = useStoredState<BetMarket[]>("rankboard-bet-markets", defaultMarkets);
-  const [bets, setBets] = useStoredState<Bet[]>("rankboard-bets", []);
+  const [markets, setMarkets] = useState<BetMarket[]>([]);
+  const [bets, setBets] = useState<Bet[]>([]);
   const [amounts, setAmounts] = useState<Record<string, string>>({});
+  const [busyMarketId, setBusyMarketId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string>("");
+  const isGuest = account.handle === "@guest";
 
-  function placeBet(market: BetMarket, sideIndex: 0 | 1) {
+  useEffect(() => {
+    let active = true;
+    fetch("/api/bets/markets", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: { markets?: BetMarket[]; error?: string }) => {
+        if (!active) return;
+        if (data.markets) {
+          setMarkets(data.markets);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isGuest) return;
+    let active = true;
+    fetch("/api/bets/my-bets", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: { bets?: Bet[]; error?: string }) => {
+        if (!active) return;
+        if (data.bets) {
+          setBets(data.bets);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [isGuest]);
+
+  async function placeBet(market: BetMarket, sideIndex: 0 | 1) {
+    if (isGuest) {
+      setMessage("Sign in to place bets.");
+      return;
+    }
     const amount = Math.max(0, Math.floor(Number(amounts[market.id] || 0)));
-    if (market.status !== "Live" || amount <= 0 || account.points < amount) return;
+    if (market.status !== "Live") {
+      setMessage("This market is closed.");
+      return;
+    }
+    if (amount <= 0) {
+      setMessage("Enter a valid points amount.");
+      return;
+    }
+    if (account.points < amount) {
+      setMessage("Not enough points.");
+      return;
+    }
+
     const side = market.sides[sideIndex];
-    const odds = market.odds[sideIndex];
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      return { ...safe, points: safe.points - amount };
-    });
-    setBets((current) => [{
-      id: uid("bet"),
-      marketId: market.id,
-      marketTitle: market.title,
-      side,
-      amount,
-      odds,
-      status: "Open",
-      paid: false,
-      createdAt: nowStamp(),
-    }, ...current]);
-    setAmounts((current) => ({ ...current, [market.id]: "" }));
+    setBusyMarketId(market.id);
+    setMessage(`Placing bet on ${side}...`);
+
+    try {
+      const response = await fetch("/api/bets/place", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          marketId: market.id,
+          side,
+          amount,
+        }),
+      });
+      const data = (await response.json()) as {
+        bet?: Bet;
+        newPoints?: number;
+        error?: string;
+      };
+
+      if (!response.ok || !data.bet) {
+        throw new Error(data.error ?? "Failed to place bet.");
+      }
+
+      setAccount((current) => {
+        const safe = normalizeAccount(current);
+        return {
+          ...safe,
+          points: data.newPoints ?? Math.max(0, safe.points - amount),
+        };
+      });
+
+      setBets((current) => [data.bet!, ...current]);
+      setAmounts((current) => ({ ...current, [market.id]: "" }));
+      setMessage(`Bet placed on ${side} for ${amount.toLocaleString()} pts!`);
+      window.dispatchEvent(new CustomEvent("rankboard-storage"));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Bet failed.");
+    } finally {
+      setBusyMarketId(null);
+    }
   }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="BET FLOOR" title="Pick. Bet. Sweat." meta={`${bets.filter((bet) => bet.status === "Open").length} live bets`} />
+      <WorkspaceHeader
+        overline="BET FLOOR"
+        title="Pick. Bet. Sweat."
+        meta={message || `${bets.filter((bet) => bet.status === "Open").length} live bets`}
+      />
       <AccountStrip account={account} />
+      {isGuest && (
+        <div className="workspace-notice">
+          <p>Sign in to bet real points on live prediction markets and win rewards.</p>
+          <a className="button primary" href="/login">Sign in <span>↗</span></a>
+        </div>
+      )}
       <div className="workspace-grid">
+        {markets.length === 0 && (
+          <p style={{ opacity: 0.5 }}>Loading prediction markets...</p>
+        )}
         {markets.map((market) => (
           <article className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id}>
             <small>{market.type} / {market.status} / {market.deadline}</small>
             <h3>{market.title}</h3>
             <p>{market.winner ? `${market.winner} won` : "Market live"}</p>
-            <input className="inline-bet-input" value={amounts[market.id] ?? ""} inputMode="numeric" placeholder="Points" onChange={(event) => setAmounts((current) => ({ ...current, [market.id]: event.target.value.replace(/\D/g, "") }))} />
+            <input
+              className="inline-bet-input"
+              value={amounts[market.id] ?? ""}
+              inputMode="numeric"
+              placeholder="Points"
+              disabled={isGuest || market.status !== "Live" || busyMarketId === market.id}
+              onChange={(event) =>
+                setAmounts((current) => ({
+                  ...current,
+                  [market.id]: event.target.value.replace(/\D/g, ""),
+                }))
+              }
+            />
             <div className="odds-grid">
               {[0, 1].map((index) => (
-                <button key={market.sides[index]} type="button" disabled={market.status !== "Live"} onClick={() => placeBet(market, index as 0 | 1)}>
+                <button
+                  key={market.sides[index]}
+                  type="button"
+                  disabled={isGuest || market.status !== "Live" || busyMarketId === market.id}
+                  onClick={() => placeBet(market, index as 0 | 1)}
+                >
                   <span>{market.sides[index]}</span>
                   <b>{market.odds[index].toFixed(2)}x</b>
                 </button>
@@ -845,7 +1075,7 @@ function AdminWorkspace({
 }) {
   const [items, setItems] = useStoredState<StoreItem[]>("rankboard-store-items", defaultStoreItems);
   const [purchases, setPurchases] = useStoredState<Purchase[]>("rankboard-purchases", []);
-  const [markets, setMarkets] = useStoredState<BetMarket[]>("rankboard-bet-markets", defaultMarkets);
+  const [markets, setMarkets] = useState<BetMarket[]>([]);
   const [bets, setBets] = useStoredState<Bet[]>("rankboard-bets", []);
   const [siteConfig, setSiteConfig] = useStoredState<SiteConfig>("rankboard-site-config", defaultSiteConfig);
   const [newItem, setNewItem] = useState({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
@@ -855,10 +1085,27 @@ function AdminWorkspace({
   const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
   const [adminUserStatus, setAdminUserStatus] = useState("Loading users");
   const [adminUsersLoading, setAdminUsersLoading] = useState(false);
+  const [adminMarketMessage, setAdminMarketMessage] = useState("");
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
     adminUsers[0] ??
     null;
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/bets/markets", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: { markets?: BetMarket[] }) => {
+        if (!active) return;
+        if (data.markets) {
+          setMarkets(data.markets);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -931,33 +1178,64 @@ function AdminWorkspace({
     setNewItem({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
   }
 
-  function addMarket(event: FormEvent<HTMLFormElement>) {
+  async function addMarket(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!newMarket.title.trim()) return;
-    setMarkets((current) => [{
-      id: uid("market"),
-      title: newMarket.title.trim(),
-      type: newMarket.type,
-      deadline: newMarket.deadline,
-      status: "Live",
-      sides: [newMarket.sideA || "Yes", newMarket.sideB || "No"],
-      odds: [Math.max(1, Number(newMarket.oddsA) || 1), Math.max(1, Number(newMarket.oddsB) || 1)],
-      winner: null,
-    }, ...current]);
-    setNewMarket({ title: "", type: "Stream", sideA: "Yes", sideB: "No", oddsA: "2.00", oddsB: "1.50", deadline: "23:00" });
+    setAdminMarketMessage("Creating market...");
+    try {
+      const response = await fetch("/api/admin/bets/markets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newMarket.title.trim(),
+          type: newMarket.type,
+          deadline: newMarket.deadline,
+          sideA: newMarket.sideA || "Yes",
+          sideB: newMarket.sideB || "No",
+          oddsA: Math.max(1.01, Number(newMarket.oddsA) || 2.0),
+          oddsB: Math.max(1.01, Number(newMarket.oddsB) || 1.5),
+        }),
+      });
+      const data = (await response.json()) as { market?: BetMarket; error?: string };
+      if (!response.ok || !data.market) {
+        throw new Error(data.error ?? "Failed to create market");
+      }
+      setMarkets((current) => [data.market!, ...current]);
+      setNewMarket({ title: "", type: "Stream", sideA: "Yes", sideB: "No", oddsA: "2.00", oddsB: "1.50", deadline: "23:00" });
+      setAdminMarketMessage(`Market created: ${data.market.title}`);
+    } catch (error) {
+      setAdminMarketMessage(error instanceof Error ? error.message : "Failed to create market");
+    }
   }
 
-  function settleMarket(market: BetMarket, winner: string) {
-    let payout = 0;
-    const settledBets = bets.map((bet) => {
-      if (bet.marketId !== market.id || bet.status !== "Open") return bet;
-      const won = bet.side === winner;
-      if (won) payout += Math.floor(bet.amount * bet.odds);
-      return { ...bet, status: won ? "Won" : "Lost", paid: won } as Bet;
-    });
-    setBets(settledBets);
-    setMarkets((current) => current.map((entry) => entry.id === market.id ? { ...entry, status: "Settled", winner } : entry));
-    if (payout > 0) givePoints(payout);
+  async function settleMarket(market: BetMarket, winner: string) {
+    setAdminMarketMessage(`Settling ${market.title} for ${winner}...`);
+    try {
+      const response = await fetch("/api/admin/bets/settle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          marketId: market.id,
+          winningSide: winner,
+        }),
+      });
+      const data = (await response.json()) as {
+        ok?: boolean;
+        winnersPaid?: number;
+        totalPointsPaid?: number;
+        error?: string;
+      };
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error ?? "Settlement failed");
+      }
+      setMarkets((current) =>
+        current.map((entry) => (entry.id === market.id ? { ...entry, status: "Settled", winner } : entry))
+      );
+      setAdminMarketMessage(`Settled! Paid ${data.winnersPaid ?? 0} winner(s) a total of ${(data.totalPointsPaid ?? 0).toLocaleString()} pts.`);
+      window.dispatchEvent(new CustomEvent("rankboard-storage"));
+    } catch (error) {
+      setAdminMarketMessage(error instanceof Error ? error.message : "Settlement failed");
+    }
   }
 
   async function updateSelectedUser(patch: Partial<Pick<AdminUser, "points" | "xp" | "banned" | "bannedReason" | "role">> & { timeoutUntil?: string | null }) {
@@ -1087,6 +1365,13 @@ function AdminWorkspace({
           <StatusGrid items={[["API", "GET only"], ["Backend", "Route live"], ["Cache", "No-store"], ["DB adapter", "Ready"]]} />
         </article>
       </div>
+      {/* Store Catalog Management */}
+      <div className="section-heading" style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+        <div>
+          <p style={{ color: "#eab308", fontWeight: 700, letterSpacing: "0.1em" }}>STORE REWARDS CATALOG</p>
+          <h2>MANAGE STORE ITEMS</h2>
+        </div>
+      </div>
       <form className="support-form account-form" onSubmit={addItem}>
         <label>ITEM<input value={newItem.title} onChange={(event) => setNewItem((current) => ({ ...current, title: event.target.value }))} placeholder="Reward name" /></label>
         <label>PRICE<input value={newItem.cost} inputMode="numeric" onChange={(event) => setNewItem((current) => ({ ...current, cost: event.target.value.replace(/\D/g, "") }))} /></label>
@@ -1103,21 +1388,109 @@ function AdminWorkspace({
           </article>
         ))}
       </div>
+
+      {/* Bet Markets & Settlement Section */}
+      <div className="section-heading" style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+        <div>
+          <p style={{ color: "#f59e0b", fontWeight: 700, letterSpacing: "0.1em" }}>🎲 PREDICTION MARKETS & SETTLEMENT</p>
+          <h2>SETTLE BETS & PAYOUT WINNERS</h2>
+        </div>
+      </div>
       <form className="support-form account-form" onSubmit={addMarket}>
         <label>MARKET<input value={newMarket.title} onChange={(event) => setNewMarket((current) => ({ ...current, title: event.target.value }))} placeholder="Will streamer hit max win?" /></label>
-        <label>SIDE A<input value={newMarket.sideA} onChange={(event) => setNewMarket((current) => ({ ...current, sideA: event.target.value }))} /></label>
-        <label>SIDE B<input value={newMarket.sideB} onChange={(event) => setNewMarket((current) => ({ ...current, sideB: event.target.value }))} /></label>
-        <button className="button primary" type="submit">Add bet <span>↗</span></button>
+        <label>SIDE A<input value={newMarket.sideA} onChange={(event) => setNewMarket((current) => ({ ...current, sideA: event.target.value }))} placeholder="Yes" /></label>
+        <label>ODDS A<input value={newMarket.oddsA} onChange={(event) => setNewMarket((current) => ({ ...current, oddsA: event.target.value }))} placeholder="2.00" /></label>
+        <label>SIDE B<input value={newMarket.sideB} onChange={(event) => setNewMarket((current) => ({ ...current, sideB: event.target.value }))} placeholder="No" /></label>
+        <label>ODDS B<input value={newMarket.oddsB} onChange={(event) => setNewMarket((current) => ({ ...current, oddsB: event.target.value }))} placeholder="1.50" /></label>
+        <button className="button primary" type="submit">Add bet market <span>↗</span></button>
       </form>
-      <div className="workspace-list">
+      {adminMarketMessage && (
+        <p style={{ margin: "0.75rem 0", padding: "0.75rem 1rem", borderRadius: 8, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", fontSize: "0.9rem", color: "#4ade80", fontWeight: 600 }}>
+          {adminMarketMessage}
+        </p>
+      )}
+      <div className="workspace-list" style={{ marginTop: "1rem" }}>
         {markets.map((market) => (
-          <article key={market.id}>
-            <span>{market.status}</span>
-            <div><h3>{market.title}</h3><p>{market.sides[0]} {market.odds[0]}x / {market.sides[1]} {market.odds[1]}x</p></div>
-            <button type="button" disabled={market.status === "Settled"} onClick={() => settleMarket(market, market.sides[0])}>{market.sides[0]}</button>
-            <button type="button" disabled={market.status === "Settled"} onClick={() => settleMarket(market, market.sides[1])}>{market.sides[1]}</button>
+          <article
+            key={market.id}
+            style={{
+              background: market.status === "Live" ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.02)",
+              border: market.status === "Live" ? "1px solid rgba(245,158,11,0.3)" : "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 12,
+              padding: "1rem 1.25rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "1.25rem",
+              marginBottom: "0.75rem",
+            }}
+          >
+            <span
+              style={{
+                padding: "0.25rem 0.6rem",
+                borderRadius: 6,
+                fontSize: "0.75rem",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                background: market.status === "Live" ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)",
+                color: market.status === "Live" ? "#4ade80" : "#a1a1aa",
+                border: market.status === "Live" ? "1px solid rgba(34,197,94,0.4)" : "none",
+              }}
+            >
+              {market.status}
+            </span>
+            <div style={{ flex: 1 }}>
+              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{market.title}</h3>
+              <p style={{ margin: "0.25rem 0 0 0", opacity: 0.7, fontSize: "0.85rem" }}>
+                <strong>{market.sides[0]}</strong> ({market.odds[0]}x) vs <strong>{market.sides[1]}</strong> ({market.odds[1]}x)
+                {market.winner && (
+                  <span style={{ marginLeft: "0.75rem", color: "#4ade80", fontWeight: 700 }}>
+                    🏆 {market.winner} WON
+                  </span>
+                )}
+              </p>
+            </div>
+            {market.status === "Live" && (
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  type="button"
+                  style={{
+                    background: "#22c55e",
+                    color: "#000",
+                    fontWeight: 700,
+                    padding: "0.5rem 1rem",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => settleMarket(market, market.sides[0])}
+                >
+                  SETTLE: {market.sides[0].toUpperCase()}
+                </button>
+                <button
+                  type="button"
+                  style={{
+                    background: "#ef4444",
+                    color: "#fff",
+                    fontWeight: 700,
+                    padding: "0.5rem 1rem",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => settleMarket(market, market.sides[1])}
+                >
+                  SETTLE: {market.sides[1].toUpperCase()}
+                </button>
+              </div>
+            )}
           </article>
         ))}
+      </div>
+
+      {/* Store Claims Fulfillment */}
+      <div className="section-heading" style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+        <div>
+          <p style={{ color: "#a855f7", fontWeight: 700, letterSpacing: "0.1em" }}>REWARD CLAIMS</p>
+          <h2>FULFILL RECENT PURCHASES</h2>
+        </div>
       </div>
       <PurchaseList purchases={purchases} onAdvance={(purchase) => setPurchases((current) => current.map((entry) => entry.id === purchase.id ? { ...entry, status: entry.status === "Pending" ? "Completed" : "Pending" } : entry))} />
     </section>
@@ -1504,7 +1877,7 @@ function Inventory({ items }: { items: string[] }) {
   return (
     <div className="inventory-panel">
       <small>INVENTORY</small>
-      {items.length ? <div>{items.map((item, index) => <span key={`${item}-${index}`}>{item}</span>)}</div> : <p>Vault empty.</p>}
+      {items.length ? <div>{items.map((item, index) => <span key={`${item}-${index}`}>{item}</span>)}</div> : <p>Store empty.</p>}
     </div>
   );
 }

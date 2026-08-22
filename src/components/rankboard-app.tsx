@@ -24,7 +24,7 @@ const NAV = [
   ["Watch", "/watch-points", "●"],
   ["Hunts", "/bonus-hunts", "◈"],
   ["Profile", "/profile", "◇"],
-  ["Vault", "/store", "◇"],
+  ["Store", "/store", "◇"],
   ["Admin", "/admin", "♜"],
   ["Account", "/login", "●"],
 ] as const;
@@ -66,7 +66,7 @@ const pageData: Record<string, { title: string; eyebrow: string; copy: string; a
     features: [["Ticket Thresholds", "Wager to ticket.", "1/10K"], ["Prize Tiers", "Drop levels.", "5 tiers"], ["Claim Readiness", "Ready state.", "Instant"], ["Entry Summary", "Ticket count.", "24 entries"]],
   },
   store: {
-    title: "Reward Store", eyebrow: "THE VAULT", copy: "Spend points. Grab drops.",
+    title: "Reward Store", eyebrow: "REWARD STORE", copy: "Spend points. Grab drops.",
     actions: [["Open challenges", "/challenges"], ["Need support?", "/support"]],
     stats: [["Mode", "Catalog"], ["State", "Drops"], ["Focus", "Redeem"]],
     features: [["Boost Packs", "Power-ups.", "From 2K"], ["Reward Drops", "Limited drops.", "6 live"], ["Merch Entries", "Gear shots.", "Limited"], ["Voucher Rewards", "Voucher claims.", "12 types"]],
@@ -81,13 +81,13 @@ const pageData: Record<string, { title: string; eyebrow: string; copy: string; a
     title: "Watch Points", eyebrow: "KICK BOT", copy: "Watch stream. Earn points.",
     actions: [["Open profile", "/profile"], ["Open store", "/store"]],
     stats: [["Mode", "Watch"], ["Rate", "Auto earn"], ["Focus", "Reward cash"]],
-    features: [["Kick Link", "Connect once.", "OAuth"], ["Watch Timer", "Bot pulse.", "Live"], ["Daily Bonus", "Come back.", "+500"], ["Weekly Bonus", "Hold streak.", "7 days"], ["Spend Points", "Use vault.", "Store"]],
+    features: [["Kick Link", "Connect once.", "OAuth"], ["Watch Timer", "Bot pulse.", "Live"], ["Daily Bonus", "Come back.", "+500"], ["Weekly Bonus", "Hold streak.", "7 days"], ["Spend Points", "Use store.", "Store"]],
   },
   profile: {
     title: "Profile", eyebrow: "PLAYER HUB", copy: "Accounts. Casinos. Rewards.",
     actions: [["Open bets", "/custom-bets"], ["Open watch", "/watch-points"]],
     stats: [["Mode", "Account"], ["State", "Linked"], ["Focus", "Progress"]],
-    features: [["Kick Account", "Stream link.", "Status"], ["Discord Account", "Community link.", "Status"], ["Casino Names", "Match wagers.", "3 sites"], ["Purchase History", "Track claims.", "Vault"], ["Badges", "Flex wins.", "Earned"]],
+    features: [["Kick Account", "Stream link.", "Status"], ["Discord Account", "Community link.", "Status"], ["Casino Names", "Match wagers.", "3 sites"], ["Purchase History", "Track claims.", "Store"], ["Badges", "Flex wins.", "Earned"]],
   },
   admin: {
     title: "Admin", eyebrow: "CONTROL ROOM", copy: "Manage users. Settle bets.",
@@ -111,7 +111,7 @@ const pageData: Record<string, { title: string; eyebrow: string; copy: string; a
     title: "Account Entry", eyebrow: "PLAYER ACCESS", copy: "Save handle. Keep rewards.",
     actions: [["Open support", "/support"], ["View leaderboard", "/leaderboard"]],
     stats: [["Session", "Protected"], ["Rewards", "Synced"], ["Status", "Ready"]],
-    features: [["Entry Surface", "Sign in.", "Sign in"], ["Account Benefits", "Saved state.", "Synced"], ["Reward Access", "Your vault.", "Your vault"], ["Security Messaging", "Local session.", "Protected"]],
+    features: [["Entry Surface", "Sign in.", "Sign in"], ["Account Benefits", "Saved state.", "Synced"], ["Reward Access", "Your store.", "Your store"], ["Security Messaging", "Local session.", "Protected"]],
   },
 };
 
@@ -319,9 +319,17 @@ export default function RankBoardApp({
   const path = route ? `/${route}` : "/";
   return (
     <div className="site-shell">
+      <div className="sky-props" aria-hidden="true">
+        <span className="sky-prop sky-die" />
+        <span className="sky-prop sky-coin">$</span>
+        <span className="sky-prop sky-chip" />
+        <span className="sky-prop sky-card" />
+        <span className="sky-prop sky-gem" />
+        <span className="sky-prop sky-seven">7</span>
+      </div>
       <Header path={path} account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
-      {route === "" ? <Home /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
-      <FloatingDock path={path} />
+      {route === "" ? <Home /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : route === "profile" ? <Profile account={account} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
+      <FloatingDock path={path} account={account} />
       <Footer />
     </div>
   );
@@ -355,32 +363,28 @@ function Header({ path, account, accountOpen, setAccountOpen }: { path: string; 
 function Home() {
   const { users, total, highestScore, isLoading } = useLeaderboard();
   const livePlayers = total || users.length;
-  const topPlayer = users[0] ?? null;
   const wager = totalWager(users);
 
   return <main>
     <section className="product-hero page-width">
       <div className="hero-copy">
-        <p className="kicker"><span>●</span> SEASON 08 · LIVE FLOOR</p>
+        <p className="kicker"><span>●</span> SEASON 08</p>
         <h1>PLAY THE <em>BOARD.</em><br/>OWN THE <strong>NIGHT.</strong></h1>
-        <p className="hero-desc">Climb XP. Hit drops. Own the board.</p>
-        <div className="button-row"><Link className="button primary" href="/leaderboard">View leaderboard <span>↗</span></Link><Link className="button ghost" href="/store">Explore rewards <span>◇</span></Link></div>
-        <div className="micro-proof"><span>{isLoading ? "BOARD SYNCING" : `${livePlayers} PLAYERS MOVING`}</span><span>ROUND 08 IS LIVE</span></div>
+        <div className="button-row"><Link className="button primary" href="/leaderboard">View leaderboard <span>↗</span></Link><Link className="button ghost" href="/store">Rewards <span>◇</span></Link></div>
       </div>
       <div className="hero-floor">
-        <div className="floor-top"><span>FRONT THREE</span><span className="pulse-text">● UPDATING</span></div>
+        <div className="floor-top"><span>FRONT THREE</span><span className="pulse-text">●</span></div>
         <Podium players={users.slice(0, 3)} compact />
-        <div className="floor-ticker"><span>{topPlayer ? playerName(topPlayer).toUpperCase() : "BOARD"} <b>{topPlayer ? `${fmt(playerScore(topPlayer))} XP` : "SYNCING"}</b></span><span>{users[1] ? playerName(users[1]).toUpperCase() : "LIVE"} <b>{users[1] ? "CHASING" : "STANDBY"}</b></span></div>
       </div>
       <div className="sticker sticker-one">+XP</div><div className="sticker sticker-two">HOT!</div>
     </section>
-    <section className="metric-strip"><div><span>VISIBLE WAGER</span><strong>{formatNumberCompact(wager)}</strong><small>live volume</small></div><div><span>PLAYERS LIVE</span><strong>{livePlayers}</strong><small>{users.length} visible now</small></div><div><span>TOP XP</span><strong>{formatNumberCompact(highestScore)}</strong><small>{topPlayer ? `${playerName(topPlayer)} leads` : "syncing"}</small></div><div className="round-block"><span>BOARD STATE</span><strong>{isLoading ? "SYNC" : "LIVE"}</strong><small>refreshing data</small></div></section>
-    <section className="section page-width"><SectionHeading overline="CHOOSE YOUR RUN" title="THE FLOOR IS YOURS." link={["Open live board", "/leaderboard"]}/><div className="launch-grid">{launchpad.map(([title,desc,href,num,color]) => <Link className={`launch-card ${color}`} href={href} key={href}><span className="launch-num">{num}</span><span className="launch-icon">↗</span><div><h3>{title}</h3><p>{desc}</p></div></Link>)}</div></section>
-    <section className="section page-width rewards-section"><SectionHeading overline="KEEP THE HEAT" title="REWARDS THAT MOVE." link={["Enter the vault", "/store"]}/><div className="reward-grid">{[["Daily Drop","A fresh reward every 24 hours.","CLAIM IN 04:18","✦"],["Streak Heat","Play days stack into bigger multipliers.","7 DAY STREAK","≈"],["Prize Vault","Top placements unlock rare drops.","3 UNLOCKED","◇"],["Lucky Spin","Turn mission tokens into a wild card.","2 SPINS READY","◎"]].map(([n,d,s,i])=><article className="reward-item" key={n}><span>{i}</span><div><small>{s}</small><h3>{n}</h3><p>{d}</p></div><button aria-label={`Open ${n}`}>↗</button></article>)}</div></section>
+    <section className="metric-strip"><div><span>WAGERED</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>PLAYERS</span><strong>{livePlayers}</strong></div><div><span>TOP XP</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>BOARD</span><strong>{isLoading ? "SYNC" : "LIVE"}</strong></div></section>
+    <section className="section page-width"><SectionHeading title="THE FLOOR IS YOURS." link={["Open board", "/leaderboard"]}/><div className="launch-grid">{launchpad.map(([title,,href,num,color]) => <Link className={`launch-card ${color}`} href={href} key={href}><span className="launch-num">{num}</span><span className="launch-icon">↗</span><div><h3>{title}</h3></div></Link>)}</div></section>
+    <section className="section page-width rewards-section"><SectionHeading title="THE VAULT." link={["Enter", "/store"]}/><div className="reward-grid">{[["Daily Drop","IN 04:18","✦"],["Streak Heat","7 DAYS","≈"],["Prize Store","3 UNLOCKED","◇"],["Lucky Spin","2 READY","◎"]].map(([n,s,i])=><article className="reward-item" key={n}><span>{i}</span><div><small>{s}</small><h3>{n}</h3></div><button aria-label={`Open ${n}`}>↗</button></article>)}</div></section>
   </main>;
 }
 
-function SectionHeading({ overline, title, link }: { overline: string; title: string; link: [string,string] }) { return <div className="section-heading"><div><p>{overline}</p><h2>{title}</h2></div><Link href={link[1]}>{link[0]} <span>↗</span></Link></div> }
+function SectionHeading({ title, link }: { title: string; link: [string,string] }) { return <div className="section-heading"><div><h2>{title}</h2></div><Link href={link[1]}>{link[0]} <span>↗</span></Link></div> }
 
 function Podium({ players, compact = false }: { players: Player[]; compact?: boolean }) {
   if (players.length === 0) {
@@ -434,32 +438,31 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
 
   return <main>
     <section className="board-hero page-width">
-      <div><p className="kicker"><span>●</span> LIVE BOARD · ROUND 08</p><h1>THE BOARD<br/><em>NEVER SLEEPS.</em></h1><p>Every move counts. Every point shifts the floor.</p></div>
-      <div className="round-ticket"><span>RANKBOARD / SEASON 08</span><b>{error ? "CHECKING" : "ROUND LIVE"}</b><strong>{targetDate ? formatShortDate(targetDate).toUpperCase() : "LIVE NOW"}</strong><small>LAST UPDATE · {lastUpdated ? formatLastUpdated(lastUpdated).toUpperCase() : isLoading ? "SYNCING" : "PENDING"}</small></div>
+      <div><p className="kicker"><span>●</span> ROUND 08</p><h1>THE BOARD<br/><em>NEVER SLEEPS.</em></h1></div>
+      <div className="round-ticket"><span>SEASON 08</span><b>{error ? "CHECKING" : "LIVE"}</b><strong>{targetDate ? formatShortDate(targetDate).toUpperCase() : "NOW"}</strong><small>{lastUpdated ? formatLastUpdated(lastUpdated).toUpperCase() : "SYNC"}</small></div>
     </section>
-    <section className="metric-strip board-metrics"><div><span>VISIBLE PLAYERS</span><strong>{total || users.length}</strong><small>{users.length} loaded now</small></div><div><span>VISIBLE WAGER</span><strong>{formatNumberCompact(wager)}</strong><small>live volume</small></div><div><span>TOP XP</span><strong>{formatNumberCompact(highestScore)}</strong><small>{topPlayer ? `${playerName(topPlayer)} leads` : "syncing"}</small></div><div className="round-block"><span>BOARD STATE</span><strong>{error ? "ISSUE" : isLoading ? "SYNC" : "LIVE"}</strong><small>refreshing every 60s</small></div></section>
-    <section className="section page-width"><SectionHeading overline="THE ONES TO CATCH" title="FRONT THREE." link={["Reward routes", "/challenges"]}/><Podium players={users.slice(0, 3)} /></section>
+    <section className="metric-strip board-metrics"><div><span>PLAYERS</span><strong>{total || users.length}</strong></div><div><span>WAGERED</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>TOP XP</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>BOARD</span><strong>{error ? "ISSUE" : isLoading ? "SYNC" : "LIVE"}</strong></div></section>
+    <section className="section page-width"><SectionHeading title="FRONT THREE." link={["Rewards", "/challenges"]}/><Podium players={users.slice(0, 3)} /></section>
     <section className="section page-width board-section">
       <div className="standings">
-        <div className="standings-title"><div><p>FULL STANDINGS</p><h2>CHASE THE CLIMB.</h2></div><Link className="route-link" href="/challenges">Reward routes <span>↗</span></Link></div>
-        <div className="board-controls"><label className="search"><span>⌕</span><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find player or handle" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank order</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard">↻ <span>Refresh</span></button></div>
+        <div className="standings-title"><div><h2>THE CLIMB.</h2></div><Link className="route-link" href="/challenges">Rewards <span>↗</span></Link></div>
+        <div className="board-controls"><label className="search"><span>⌕</span><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard">↻</button></div>
         <div className="table-head"><span>RANK / PLAYER</span><span>STATUS</span><span>WEIGHTED XP</span><span>WAGERED</span><span /></div>
         <div className="player-list" aria-live="polite">
           {error ? (
-            <div className="empty-state"><span>!</span><h3>THE BOARD BLINKED.</h3><p>{error}</p><button type="button" onClick={refresh}>Try again</button></div>
+            <div className="empty-state"><span>!</span><h3>THE BOARD BLINKED.</h3><button type="button" onClick={refresh}>Try again</button></div>
           ) : isLoading && users.length === 0 ? (
             Array.from({ length: 8 }).map((_, index) => <div className="skeleton-row board-skeleton-row" key={index}><i/><span><i/><i/></span></div>)
           ) : visiblePlayers.length ? (
             visiblePlayers.map(p=><PlayerRow key={p.id} player={p} leader={leaderScore} onOpen={()=>setSelected(p)}/>)
           ) : (
-            <div className="empty-state"><span>⌕</span><h3>NO PLAYER ON THIS RUN.</h3><p>Try another masked name or handle.</p><button type="button" onClick={()=>setQuery("")}>Clear search</button></div>
+            <div className="empty-state"><span>⌕</span><h3>NOBODY HERE.</h3><button type="button" onClick={()=>setQuery("")}>Clear search</button></div>
           )}
         </div>
-        {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more players <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
+        {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
       </div>
-      <aside className="board-sidebar"><article className="side-card metrics-card"><p>BOARD METRICS <span>{error ? "CHECK" : "LIVE"}</span></p><div><small>VISIBLE PLAYERS</small><strong>{total || users.length}</strong></div><div><small>TOP PLAYER</small><strong>{topPlayer ? playerName(topPlayer) : "Syncing"}</strong><em>{topPlayer ? fmt(playerScore(topPlayer)) : "0"} XP</em></div><div><small>VISIBLE WAGER</small><strong>{formatNumberCompact(wager)}</strong></div><div><small>AVERAGE XP</small><strong>{formatNumberCompact(averageScore)}</strong></div><Link href="/support">Need board help? <span>↗</span></Link></article><article className="side-card pulse-card"><p>BOARD PULSE <span>●</span></p>{users.slice(3,7).map((p,i)=><div key={p.id}><b>+{[3,1,5,2][i]}</b><span><strong>{playerName(p)}</strong><small>{i%2?"holding pace":"moved up the board"}</small></span><em>{p.lastActive ?? "live"}</em></div>)}</article></aside>
+      <aside className="board-sidebar"><article className="side-card metrics-card"><p>METRICS <span>{error ? "CHECK" : "LIVE"}</span></p><div><small>PLAYERS</small><strong>{total || users.length}</strong></div><div><small>TOP PLAYER</small><strong>{topPlayer ? playerName(topPlayer) : "Syncing"}</strong><em>{topPlayer ? fmt(playerScore(topPlayer)) : "0"} XP</em></div><div><small>WAGERED</small><strong>{formatNumberCompact(wager)}</strong></div><div><small>AVG XP</small><strong>{formatNumberCompact(averageScore)}</strong></div><Link href="/support">Help <span>↗</span></Link></article><article className="side-card pulse-card"><p>PULSE <span>●</span></p>{users.slice(3,7).map((p,i)=><div key={p.id}><b>+{[3,1,5,2][i]}</b><span><strong>{playerName(p)}</strong><small>{i%2?"holding":"climbing"}</small></span><em>{p.lastActive ?? "live"}</em></div>)}</article></aside>
     </section>
-    <section className="section page-width state-lab"><SectionHeading overline="SYSTEM FEEDBACK" title="EVERY STATE, COVERED." link={["Get support", "/support"]}/><div className="state-grid"><article><p>LOADING</p><div className="skeleton-row"><i/><span><i/><i/></span></div><div className="skeleton-row"><i/><span><i/><i/></span></div></article><article className="mini-empty"><p>EMPTY SEARCH</p><span>⌕</span><strong>No players found</strong><small>Switch up the search.</small></article><article className="mini-error"><p>CONNECTION ERROR</p><span>!</span><strong>The board blinked.</strong><small>Last good data is still visible.</small><button onClick={refresh}>Try again</button></article></div></section>
     {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close">×</button><p>PLAYER SNAPSHOT · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"VERIFIED":"CHALLENGER"}</span></div></div><div className="modal-stats"><div><small>WEIGHTED XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>WAGERED</small><strong>{fmt(selected.points)}</strong></div><div><small>LAST ACTIVE</small><strong>{selected.lastActive ?? "Live"}</strong></div></div><Link href="/challenges">View reward routes <span>↗</span></Link></article></div>}
   </main>;
 }
@@ -467,15 +470,15 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
 function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i>✓</i>}</strong><small>{playerHandle(player)}</small></span></div><div><span className={player.rank<7?"status hot":"status live"}>{player.rank<7?"HOT":"LIVE"}</span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row">↗</span></button> }
 
 function FeaturePage({ route, data }: { route: string; data: typeof pageData[string] }) {
-  return <main><section className="subpage-hero page-width"><div><p className="kicker"><span>✦</span> {data.eyebrow}</p><h1>{data.title.toUpperCase()}<em>.</em></h1><p className="hero-hit">{data.copy}</p><div className="button-row">{data.actions.map(([n,h],i)=><Link key={h} className={`button ${i?"ghost":"primary"}`} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="subpage-art"><span className="art-orbit">{data.title.slice(0,2).toUpperCase()}</span><strong>{data.stats[0][1]}</strong><small>RANKBOARD / SEASON 08</small><div className="art-stack">{data.features.slice(0,3).map(([n,,s])=><span key={n}><b>{s}</b>{n}</span>)}</div></div></section><section className="metric-strip sub-stats">{data.stats.map(([n,v],i)=><div key={n} className={i===2?"round-block":""}><span>{n}</span><strong>{v}</strong><small>{i===0?"ACTIVE":i===1?"NOW":"GOAL"}</small></div>)}</section><FeatureWorkspace route={route} /><section className="section page-width feature-flashes"><SectionHeading overline="FAST LANES" title="TAP. CLAIM. MOVE." link={[data.actions[0][0],data.actions[0][1]]}/><div className="feature-flash-grid">{data.features.map(([n,,s],i)=><Link href={data.actions[0][1]} key={n}><span>{String(i+1).padStart(2,"0")}</span><h3>{n}</h3><strong>{s}</strong><b>↗</b></Link>)}</div></section></main>;
+  return <main><section className="subpage-hero page-width"><div><p className="kicker"><span>✦</span> SEASON 08</p><h1>{data.title.toUpperCase()}<em>.</em></h1><div className="button-row">{data.actions.map(([n,h],i)=><Link key={h} className={`button ${i?"ghost":"primary"}`} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="subpage-art"><span className="art-orbit">{data.title.slice(0,2).toUpperCase()}</span><strong>{data.stats[0][1]}</strong><small>S08</small><div className="art-stack">{data.features.slice(0,3).map(([n,,s])=><span key={n}><b>{s}</b>{n}</span>)}</div></div></section><section className="metric-strip sub-stats">{data.stats.map(([n,v],i)=><div key={n} className={i===2?"round-block":""}><span>{n}</span><strong>{v}</strong></div>)}</section><FeatureWorkspace route={route} /><section className="section page-width feature-flashes"><SectionHeading title="FAST LANES." link={[data.actions[0][0],data.actions[0][1]]}/><div className="feature-flash-grid">{data.features.map(([n,,s],i)=><Link href={data.actions[0][1]} key={n}><span>{String(i+1).padStart(2,"0")}</span><h3>{n}</h3><strong>{s}</strong><b>↗</b></Link>)}</div></section></main>;
 }
 
-function FloatingDock({ path }: { path: string }) {
+function FloatingDock({ path, account }: { path: string; account: HeaderAccount }) {
   const [open, setOpen] = useState(false);
   const [floatingState, setFloatingState] = useState({
-    handle: "@guest",
-    points: 18500,
-    xp: 4200,
+    handle: account.handle,
+    points: account.points,
+    xp: account.xp,
     streak: 3,
     inventory: 0,
     tickets: 12,
@@ -485,22 +488,22 @@ function FloatingDock({ path }: { path: string }) {
 
   useEffect(() => {
     function readFloatingState() {
-      const account = window.localStorage.getItem("rankboard-account");
+      const storedAccountStr = window.localStorage.getItem("rankboard-account");
       const progress = window.localStorage.getItem("rankboard-mission-progress");
       const claimed = window.localStorage.getItem("rankboard-mission-claimed");
       const tickets = window.localStorage.getItem("rankboard-raffle-tickets");
       const entries = window.localStorage.getItem("rankboard-raffle-entries");
 
       try {
-        const parsedAccount = account ? JSON.parse(account) as { handle?: string; points?: number; xp?: number; streak?: number; inventory?: string[] } : {};
+        const parsedAccount = storedAccountStr ? JSON.parse(storedAccountStr) as { streak?: number; inventory?: string[] } : {};
         const parsedProgress = progress ? JSON.parse(progress) as Record<string, number> : {};
         const parsedClaimed = claimed ? JSON.parse(claimed) as string[] : [];
         const readyMissions = Object.entries(parsedProgress).filter(([id, value]) => value >= 100 && !parsedClaimed.includes(id)).length;
 
         setFloatingState({
-          handle: parsedAccount.handle ?? "@guest",
-          points: parsedAccount.points ?? 18500,
-          xp: parsedAccount.xp ?? 4200,
+          handle: account.handle,
+          points: account.points,
+          xp: account.xp,
           streak: parsedAccount.streak ?? 3,
           inventory: parsedAccount.inventory?.length ?? 0,
           tickets: tickets ? Number(JSON.parse(tickets)) : 12,
@@ -519,13 +522,13 @@ function FloatingDock({ path }: { path: string }) {
       window.removeEventListener("storage", readFloatingState);
       window.removeEventListener("rankboard-storage", readFloatingState);
     };
-  }, []);
+  }, [account]);
 
   const quickLinks = [
     ["◎", "Missions", "/challenges"],
     ["$", "Bets", "/custom-bets"],
     ["●", "Watch", "/watch-points"],
-    ["◇", "Vault", "/store"],
+    ["◇", "Store", "/store"],
     ["◇", "Profile", "/profile"],
   ] as const;
 
@@ -541,11 +544,11 @@ function FloatingDock({ path }: { path: string }) {
       </aside>
 
       <aside className="floating-pulse-card floating-pulse-card--right">
-        <p><span /> VAULT WATCH</p>
+        <p><span /> STORE WATCH</p>
         <div className="floating-stack">
           <span><b>{floatingState.readyMissions}</b> claims</span>
           <span><b>{floatingState.tickets}</b> tickets</span>
-          <span><b>{floatingState.inventory}</b> vault</span>
+          <span><b>{floatingState.inventory}</b> store</span>
         </div>
       </aside>
 
@@ -606,4 +609,173 @@ function FloatingDock({ path }: { path: string }) {
 
 function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>◇</span> RANKBOARD LEGAL</p><h1>{privacy?"PRIVACY":"TERMS"}<em>.</em></h1><p className="legal-lead">{privacy?"How RankBoard handles player information, session data, and reward activity.":"The ground rules for using RankBoard, joining reward activity, and keeping play fair."}</p><div className="legal-layout"><aside><span>LAST UPDATED</span><strong>AUG 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","RankBoard may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using RankBoard","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
 
-function Footer(){return <footer className="footer"><div className="footer-top page-width"><div><Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link><p>PLAY THE BOARD.<br/>OWN THE NIGHT.</p></div><div className="footer-links">{[["Home","/"],["Leaderboard","/leaderboard"],["Custom Bets","/custom-bets"],["Watch Points","/watch-points"],["Profile","/profile"],["Admin","/admin"],["Challenges","/challenges"],["Store","/store"],["Bonus Hunts","/bonus-hunts"],["Tournaments","/tournaments"],["Wager Raffles","/wager-raffles"],["Support","/support"],["Help","/help"],["Privacy","/privacy"],["Terms","/terms"]].map(([n,h])=><Link key={h} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>THE BOARD IS LIVE <b>●</b></span><span>PLAY RESPONSIBLY · 18+</span></div></footer>}
+
+function Profile({ account }: { account: HeaderAccount }) {
+  const [transactions, setTransactions] = useState<{ id: string; amount: number; reason: string; createdAt: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [casinoNames, setCasinoNames] = useState({ thrill: "", packdraw: "", shuffle: "" });
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
+
+  useEffect(() => {
+    if (!account.authenticated) return;
+    setLoading(true);
+    fetch("/api/points", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => { if (d.transactions) setTransactions(d.transactions); })
+      .finally(() => setLoading(false));
+  }, [account.authenticated]);
+
+  useEffect(() => {
+    if (!account.authenticated) return;
+    fetch("/api/auth/profile", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => { if (d.casinos) setCasinoNames(d.casinos); })
+      .catch(() => null);
+  }, [account.authenticated]);
+
+  async function saveCasinos() {
+    setSaving(true);
+    setSaveMsg("");
+    try {
+      const res = await fetch("/api/auth/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ casinos: casinoNames }),
+      });
+      const d = await res.json();
+      if (d.error) throw new Error(d.error);
+      setSaveMsg("Saved! Points will sync on next leaderboard refresh.");
+      window.dispatchEvent(new CustomEvent("rankboard-storage"));
+    } catch (e) {
+      setSaveMsg(e instanceof Error ? e.message : "Save failed.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function reasonLabel(reason: string) {
+    const map: Record<string, string> = {
+      leaderboard_sync: "Leaderboard sync",
+      store_purchase: "Store purchase",
+      admin_grant: "Admin adjustment",
+    };
+    return map[reason] ?? reason;
+  }
+
+  if (!account.authenticated) {
+    return (
+      <main>
+        <section className="subpage-hero page-width">
+          <div>
+            <p className="kicker"><span>◇</span> PLAYER HUB</p>
+            <h1>PROFILE<em>.</em></h1>
+            <div className="button-row">
+              <Link className="button primary" href="/login">Sign in <span>↗</span></Link>
+            </div>
+          </div>
+          <div className="subpage-art">
+            <span className="art-orbit">PR</span>
+            <strong>LOCKED</strong>
+            <small>S08</small>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main>
+      <section className="subpage-hero page-width">
+        <div>
+          <p className="kicker"><span>◇</span> PLAYER HUB</p>
+          <h1>PROFILE<em>.</em></h1>
+        </div>
+        <div className="subpage-art">
+          <span className="art-orbit">{getInitials(account.handle)}</span>
+          <strong>{fmt(account.points)} PTS</strong>
+          <small>S08</small>
+        </div>
+      </section>
+
+      <section className="metric-strip sub-stats">
+        <div><span>POINTS</span><strong>{fmt(account.points)}</strong></div>
+        <div><span>XP</span><strong>{formatNumberCompact(account.xp)}</strong></div>
+        <div><span>HANDLE</span><strong>{account.handle}</strong></div>
+        <div className="round-block"><span>VIA</span><strong>{account.profileProvider.toUpperCase()}</strong></div>
+      </section>
+
+      <section className="section page-width">
+        <div className="section-heading">
+          <div><h2>LINK CASINOS.</h2></div>
+        </div>
+        <div style={{ maxWidth: 640 }}>
+          {(["thrill", "packdraw", "shuffle"] as const).map((provider) => (
+            <div key={provider} style={{ marginBottom: "1rem" }}>
+              <small style={{ display: "block", textTransform: "uppercase", letterSpacing: "0.08em", opacity: 0.6, marginBottom: "0.4rem" }}>{provider} username</small>
+              <input
+                value={casinoNames[provider]}
+                onChange={(e) => setCasinoNames((p) => ({ ...p, [provider]: e.target.value }))}
+                placeholder={`Your ${provider} username`}
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "0.75rem 1rem", color: "inherit", fontSize: "0.9rem", width: "100%", boxSizing: "border-box" }}
+              />
+            </div>
+          ))}
+          <button
+            className="button primary"
+            onClick={saveCasinos}
+            disabled={saving}
+            style={{ marginTop: "0.5rem" }}
+          >
+            {saving ? "Saving..." : "Save Casino Names"} <span>↗</span>
+          </button>
+          {saveMsg && <p style={{ marginTop: "0.75rem", opacity: 0.7, fontSize: "0.85rem" }}>{saveMsg}</p>}
+        </div>
+      </section>
+
+      <section className="section page-width">
+        <div className="section-heading">
+          <div><h2>HISTORY.</h2></div>
+          <Link href="/store">Spend <span>↗</span></Link>
+        </div>
+        {loading ? (
+          <div className="player-list">{Array.from({ length: 5 }).map((_, i) => <div className="skeleton-row board-skeleton-row" key={i}><i/><span><i/><i/></span></div>)}</div>
+        ) : transactions.length === 0 ? (
+          <div className="empty-state"><span>◎</span><h3>NOTHING YET.</h3><Link href="/store" className="button ghost">Store <span>↗</span></Link></div>
+        ) : (
+          <div className="player-list">
+            {transactions.map((t) => (
+              <div key={t.id} style={{ display: "flex", alignItems: "center", gap: "1rem", padding: "0.75rem 1rem", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <b style={{ color: t.amount > 0 ? "#22c55e" : "#f87171", minWidth: 90, fontVariantNumeric: "tabular-nums" }}>{t.amount > 0 ? "+" : ""}{fmt(t.amount)} PTS</b>
+                <span style={{ flex: 1 }}>{reasonLabel(t.reason)}</span>
+                <small style={{ opacity: 0.5 }}>{new Date(t.createdAt).toLocaleDateString()}</small>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="section page-width">
+        <div className="section-heading">
+          <div><h2>LINKS.</h2></div>
+        </div>
+        <div className="feature-flash-grid">
+          <div>
+            <span>●</span>
+            <h3>Kick</h3>
+            <strong>{account.connected.kick.connected ? account.connected.kick.username : "Not linked"}</strong>
+            <b>{account.connected.kick.connected ? "✓" : "–"}</b>
+          </div>
+          <div>
+            <span>◎</span>
+            <h3>Discord</h3>
+            <strong>{account.connected.discord.connected ? account.connected.discord.username : "Not linked"}</strong>
+            <b>{account.connected.discord.connected ? "✓" : "–"}</b>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function Footer(){return <footer className="footer"><div className="footer-top page-width"><div><Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link><p>PLAY THE BOARD.<br/>OWN THE NIGHT.</p></div><div className="footer-links">{[["Live Board","/leaderboard"],["Custom Bets","/custom-bets"],["Store","/store"],["Watch Points","/watch-points"],["Profile","/profile"],["Support","/support"],["Privacy","/privacy"],["Terms","/terms"]].map(([n,h])=><Link key={h} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>THE BOARD IS LIVE <b>●</b></span><span>PLAY RESPONSIBLY · 18+</span></div></footer>}

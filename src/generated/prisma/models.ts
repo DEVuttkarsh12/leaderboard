@@ -9,8 +9,13 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/StoreItem'
+export type * from './models/StorePurchase'
 export type * from './models/Account'
 export type * from './models/Session'
 export type * from './models/VerificationToken'
 export type * from './models/CasinoAccount'
+export type * from './models/PointTransaction'
+export type * from './models/BetMarket'
+export type * from './models/UserBet'
 export type * from './commonInputTypes'

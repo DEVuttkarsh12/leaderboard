@@ -8,7 +8,7 @@ const items = [
     description: "Burn",
   },
   {
-    title: "Prize Vault",
+    title: "Prize Store",
     description: "Unlock",
   },
   {
@@ -26,7 +26,7 @@ export default function RewardsOverview() {
           <h2>Grab heat.</h2>
         </div>
         <p className="casino-section-copy">
-          Reward lanes stack daily drops, streak boosts, vault prizes, and lucky spins.
+          Reward lanes stack daily drops, streak boosts, store prizes, and lucky spins.
         </p>
         <div className="casino-section-pulse" aria-hidden="true">
           <span>777</span>
@@ -36,7 +36,7 @@ export default function RewardsOverview() {
 
       <div className="casino-reward-cage">
         <div className="casino-vault-card">
-          <span>VAULT</span>
+          <span>STORE</span>
           <strong>4X</strong>
           <small>Drops active</small>
           <div className="casino-vault-meter" aria-hidden="true">

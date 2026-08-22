@@ -47,6 +47,16 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model StoreItem
+ * 
+ */
+export type StoreItem = Prisma.StoreItemModel
+/**
+ * Model StorePurchase
+ * 
+ */
+export type StorePurchase = Prisma.StorePurchaseModel
+/**
  * Model Account
  * 
  */
@@ -66,3 +76,18 @@ export type VerificationToken = Prisma.VerificationTokenModel
  * 
  */
 export type CasinoAccount = Prisma.CasinoAccountModel
+/**
+ * Model PointTransaction
+ * 
+ */
+export type PointTransaction = Prisma.PointTransactionModel
+/**
+ * Model BetMarket
+ * 
+ */
+export type BetMarket = Prisma.BetMarketModel
+/**
+ * Model UserBet
+ * 
+ */
+export type UserBet = Prisma.UserBetModel

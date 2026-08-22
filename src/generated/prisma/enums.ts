@@ -15,3 +15,32 @@ export const UserRole = {
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const PurchaseStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type PurchaseStatus = (typeof PurchaseStatus)[keyof typeof PurchaseStatus]
+
+
+export const MarketStatus = {
+  LIVE: 'LIVE',
+  LOCKED: 'LOCKED',
+  SETTLED: 'SETTLED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type MarketStatus = (typeof MarketStatus)[keyof typeof MarketStatus]
+
+
+export const BetStatus = {
+  OPEN: 'OPEN',
+  WON: 'WON',
+  LOST: 'LOST',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type BetStatus = (typeof BetStatus)[keyof typeof BetStatus]

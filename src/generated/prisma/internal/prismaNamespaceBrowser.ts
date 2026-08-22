@@ -52,10 +52,15 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  StoreItem: 'StoreItem',
+  StorePurchase: 'StorePurchase',
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  CasinoAccount: 'CasinoAccount'
+  CasinoAccount: 'CasinoAccount',
+  PointTransaction: 'PointTransaction',
+  BetMarket: 'BetMarket',
+  UserBet: 'UserBet'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -97,6 +102,36 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const StoreItemScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  cost: 'cost',
+  tag: 'tag',
+  stock: 'stock',
+  unlimited: 'unlimited',
+  imageLabel: 'imageLabel',
+  active: 'active',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StoreItemScalarFieldEnum = (typeof StoreItemScalarFieldEnum)[keyof typeof StoreItemScalarFieldEnum]
+
+
+export const StorePurchaseScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  itemId: 'itemId',
+  cost: 'cost',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StorePurchaseScalarFieldEnum = (typeof StorePurchaseScalarFieldEnum)[keyof typeof StorePurchaseScalarFieldEnum]
 
 
 export const AccountScalarFieldEnum = {
@@ -150,6 +185,54 @@ export const CasinoAccountScalarFieldEnum = {
 } as const
 
 export type CasinoAccountScalarFieldEnum = (typeof CasinoAccountScalarFieldEnum)[keyof typeof CasinoAccountScalarFieldEnum]
+
+
+export const PointTransactionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  amount: 'amount',
+  reason: 'reason',
+  meta: 'meta',
+  createdAt: 'createdAt'
+} as const
+
+export type PointTransactionScalarFieldEnum = (typeof PointTransactionScalarFieldEnum)[keyof typeof PointTransactionScalarFieldEnum]
+
+
+export const BetMarketScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  type: 'type',
+  deadline: 'deadline',
+  status: 'status',
+  sideA: 'sideA',
+  sideB: 'sideB',
+  oddsA: 'oddsA',
+  oddsB: 'oddsB',
+  winner: 'winner',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  settledAt: 'settledAt'
+} as const
+
+export type BetMarketScalarFieldEnum = (typeof BetMarketScalarFieldEnum)[keyof typeof BetMarketScalarFieldEnum]
+
+
+export const UserBetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  marketId: 'marketId',
+  side: 'side',
+  amount: 'amount',
+  odds: 'odds',
+  potentialPayout: 'potentialPayout',
+  payout: 'payout',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserBetScalarFieldEnum = (typeof UserBetScalarFieldEnum)[keyof typeof UserBetScalarFieldEnum]
 
 
 export const SortOrder = {
