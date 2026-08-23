@@ -4578,15 +4578,36 @@ body::before,
 }
 
 .ticker-item {
+  min-height: 100%;
+  align-items: center;
+  padding: 0 28px;
   color: #ffffff;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-shadow: 2px 2px 0 var(--neo-black);
 }
 
 .ticker-item b {
+  display: inline-grid;
+  min-width: 34px;
+  min-height: 22px;
+  place-items: center;
+  border: 2px solid var(--neo-yellow);
+  background: rgba(217, 255, 58, 0.12);
   color: var(--neo-yellow);
+  line-height: 1;
 }
 
 .ticker-item em {
+  display: inline-grid;
+  min-height: 22px;
+  place-items: center;
+  padding-inline: 8px;
+  border: 2px solid var(--neo-green);
+  background: rgba(217, 255, 58, 0.12);
   color: var(--neo-green);
+  line-height: 1;
 }
 
 .brand > span:last-child > span {
@@ -4756,6 +4777,172 @@ body::before,
   color: var(--neo-black);
 }
 
+.ticker {
+  height: 56px;
+  padding-inline: 12px;
+  border: 4px solid var(--neo-black);
+  transform: none !important;
+}
+
+.ticker-track,
+.ticker-half {
+  min-height: 100%;
+  align-items: center;
+}
+
+.workspace-heading p,
+.workspace-heading > span,
+.action-card small,
+.workspace-list article > span,
+.status-grid span,
+.workspace-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.workspace-heading p {
+  width: max-content;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 3px solid var(--neo-black);
+  background: var(--neo-yellow) !important;
+  color: var(--neo-black) !important;
+  box-shadow: 3px 3px 0 0 var(--neo-black);
+}
+
+.workspace-heading > span {
+  background: var(--neo-white) !important;
+  color: var(--neo-black) !important;
+}
+
+.workspace-heading p svg,
+.workspace-heading > span svg,
+.action-card small svg,
+.workspace-list article > span svg,
+.status-grid span svg,
+.workspace-list a svg {
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.action-card,
+.workspace-list,
+.status-grid div,
+.account-strip,
+.profile-card,
+.admin-panel,
+.connection-card,
+.auth-card,
+.auth-session-card,
+.inventory-panel,
+.bracket-panel,
+.tool-panel,
+.support-form,
+.casino-link-panel {
+  color: var(--neo-black) !important;
+}
+
+.action-card :where(small, p, strong, span, b, em),
+.workspace-list :where(span, p, strong, small, a),
+.status-grid :where(span, strong),
+.account-strip :where(span, strong),
+.profile-card :where(p, small, span, strong),
+.admin-panel :where(p, small, span, strong, label),
+.connection-card :where(p, small, span, strong),
+.auth-card :where(p, small, span, strong, label),
+.auth-session-card :where(small, span, strong),
+.inventory-panel :where(p, small, span, strong),
+.bracket-panel :where(p, small, span, strong),
+.tool-panel :where(p, small, span, strong, label),
+.support-form :where(p, small, span, strong, label),
+.casino-link-panel :where(p, small, span, strong, label) {
+  color: var(--neo-black) !important;
+}
+
+.action-card small,
+.workspace-list article > span,
+.status-grid span {
+  border: 3px solid var(--neo-black);
+  background: var(--neo-white) !important;
+  box-shadow: 3px 3px 0 0 var(--neo-black);
+  width: max-content;
+  max-width: 100%;
+}
+
+.workspace-list article > strong,
+.odds-grid b,
+.podium-copy > b em,
+.xp-cell strong small,
+.auth-session-card small,
+.connection-card small,
+.admin-panel small,
+.bracket-panel small,
+.admin-section-title p {
+  color: var(--neo-black) !important;
+}
+
+.reward-art {
+  background: var(--neo-blue) !important;
+  color: #ffffff !important;
+}
+
+.odds-grid button {
+  color: var(--neo-black) !important;
+}
+
+.button:disabled,
+.action-card button:disabled,
+.tool-panel button:disabled,
+.odds-grid button:disabled {
+  color: var(--neo-black) !important;
+  opacity: 0.72 !important;
+  text-shadow: none !important;
+}
+
+.nav a:hover,
+.nav a.active,
+.button.primary,
+.segment button.active,
+.segment button:hover,
+.refresh:hover,
+.action-card button:hover:not(:disabled),
+.workspace-list button:hover,
+.bracket-panel button:hover,
+.tool-panel button:hover:not(:disabled),
+.connection-card button:hover,
+.casino-link-panel button:hover:not(:disabled),
+.admin-user-manager__bar button:hover:not(:disabled),
+.admin-action-grid button:hover:not(:disabled),
+.rank-row-1 {
+  color: #ffffff !important;
+  text-shadow: 2px 2px 0 var(--neo-black);
+}
+
+.board-metrics > div:nth-child(1) {
+  color: #ffffff !important;
+}
+
+.board-metrics > div:nth-child(1) :where(span, small, strong) {
+  color: #ffffff !important;
+  text-shadow: 2px 2px 0 var(--neo-black);
+}
+
+.watch-console {
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 20px;
+  overflow: visible !important;
+}
+
+.watch-orb {
+  width: min(280px, 100%);
+  justify-self: center;
+}
+
+.watch-actions {
+  min-width: 0;
+}
+
 .board-top-three {
   position: relative;
   z-index: 1;
@@ -4866,6 +5053,16 @@ body::before,
       6px 6px 0 var(--neo-black);
   }
 
+  .watch-console {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .watch-orb {
+    width: min(260px, 100%);
+  }
+
   .board-top-three {
     width: calc(100vw - 24px) !important;
     max-width: calc(100vw - 24px) !important;
@@ -4905,6 +5102,16 @@ body::before,
   .board-top-three .avatar {
     width: 46px;
     height: 46px;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .watch-orb {
+    width: min(230px, 100%);
   }
 }
 

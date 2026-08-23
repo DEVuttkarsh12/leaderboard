@@ -2,6 +2,23 @@
 
 import Link from "next/link";
 import {
+  Activity,
+  ArrowUpRight,
+  BadgeCheck,
+  Coins,
+  Gift,
+  Headphones,
+  LayoutDashboard,
+  PackageCheck,
+  ReceiptText,
+  Shield,
+  Sparkles,
+  Ticket,
+  Trophy,
+  Tv,
+  WalletCards,
+} from "lucide-react";
+import {
   FormEvent,
   useCallback,
   useEffect,
@@ -15,6 +32,7 @@ import { formatNumberCompact } from "@/lib/formatters";
 
 type Provider = "kick" | "discord";
 type Casino = "thrill" | "packdraw" | "shuffle";
+type WorkspaceIcon = typeof Sparkles;
 
 type Account = AuthAccountPayload & {
   handle: string;
@@ -239,6 +257,59 @@ const faq = [
   { q: "Custom bets", a: "Admin settles." },
   { q: "Casino names", a: "Link in profile." },
 ];
+
+const workspaceIcons: Record<string, WorkspaceIcon> = {
+  Admin: LayoutDashboard,
+  Account: Shield,
+  "Bonus Hunts": Sparkles,
+  Challenges: BadgeCheck,
+  "Custom Bets": Ticket,
+  "Help Center": Headphones,
+  Profile: WalletCards,
+  "Reward Store": Gift,
+  Support: Headphones,
+  Tournaments: Trophy,
+  "Wager Raffles": Ticket,
+  "Watch Points": Tv,
+};
+
+const statusIcons: Record<string, WorkspaceIcon> = {
+  API: Activity,
+  Backend: Shield,
+  Badges: BadgeCheck,
+  Board: Trophy,
+  Cache: Activity,
+  Chat: Headphones,
+  Daily: Gift,
+  Discord: Headphones,
+  Entries: Ticket,
+  Entry: Ticket,
+  Gates: Shield,
+  Heat: Activity,
+  Kick: Tv,
+  Lifetime: Coins,
+  Live: Tv,
+  Mode: Shield,
+  Points: Coins,
+  Pool: Trophy,
+  Prize: Gift,
+  Rank: Trophy,
+  Reset: Activity,
+  Role: Shield,
+  State: Activity,
+  Status: Activity,
+  Streak: Activity,
+  Tickets: Ticket,
+  Total: Coins,
+  Users: WalletCards,
+  Verify: BadgeCheck,
+  Winners: Trophy,
+  XP: Sparkles,
+};
+
+function iconForLabel(label: string) {
+  return statusIcons[label] ?? Activity;
+}
 
 function normalizeAccount(value: Partial<Account> | null | undefined): Account {
   return {
@@ -1162,7 +1233,7 @@ function CustomBetsWorkspace({
         )}
         {markets.map((market) => (
           <article className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id}>
-            <small>{market.type} / {market.status} / {market.deadline}</small>
+            <small><Ticket size={13} strokeWidth={3} aria-hidden="true" />{market.type} / {market.status} / {market.deadline}</small>
             <h3>{market.title}</h3>
             <p>{market.winner ? `${market.winner} won` : "Market live"}</p>
             <input
@@ -2443,13 +2514,14 @@ function ConnectionPanel({
 }
 
 function WorkspaceHeader({ overline, title, meta }: { overline: string; title: string; meta: string }) {
+  const Icon = workspaceIcons[overline] ?? Sparkles;
   return (
     <div className="workspace-heading">
       <div>
-        <p>{overline}</p>
+        <p><Icon size={16} strokeWidth={3} aria-hidden="true" />{overline}</p>
         <h2>{title}</h2>
       </div>
-      <span>{meta}</span>
+      <span><Activity size={14} strokeWidth={3} aria-hidden="true" />{meta}</span>
     </div>
   );
 }
@@ -2470,7 +2542,19 @@ function AccountStrip({ account }: { account: Account }) {
 }
 
 function StatusGrid({ items }: { items: [string, string][] }) {
-  return <div className="status-grid">{items.map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>;
+  return (
+    <div className="status-grid">
+      {items.map(([label, value]) => {
+        const Icon = iconForLabel(label);
+        return (
+          <div key={label}>
+            <span><Icon size={13} strokeWidth={3} aria-hidden="true" />{label}</span>
+            <strong>{value}</strong>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function Inventory({ items }: { items: string[] }) {
@@ -2487,9 +2571,9 @@ function PurchaseList({ purchases, onAdvance }: { purchases: Purchase[]; onAdvan
     <div className="workspace-list">
       {purchases.length ? purchases.map((purchase) => (
         <article key={purchase.id}>
-          <span>{purchase.status}</span>
+          <span><PackageCheck size={13} strokeWidth={3} aria-hidden="true" />{purchase.status}</span>
           <div><h3>{purchase.item}</h3><p>{purchase.cost.toLocaleString()} pts / {purchase.createdAt}</p></div>
-          {onAdvance ? <button type="button" onClick={() => onAdvance(purchase)}>Advance</button> : <Link href="/support">Track</Link>}
+          {onAdvance ? <button type="button" onClick={() => onAdvance(purchase)}>Advance</button> : <Link href="/support">Track <ArrowUpRight size={13} strokeWidth={3} aria-hidden="true" /></Link>}
         </article>
       )) : <article><span>EMPTY</span><div><h3>No purchases</h3><p>Store is ready.</p></div></article>}
     </div>
@@ -2501,7 +2585,7 @@ function BetList({ bets }: { bets: Bet[] }) {
     <div className="workspace-list">
       {bets.length ? bets.map((bet) => (
         <article key={bet.id}>
-          <span>{bet.status}</span>
+          <span><ReceiptText size={13} strokeWidth={3} aria-hidden="true" />{bet.status}</span>
           <div><h3>{bet.marketTitle}</h3><p>{bet.side} / {bet.amount.toLocaleString()} @ {bet.odds.toFixed(2)}x</p></div>
           <strong>{bet.status === "Won" ? `+${Math.floor(bet.amount * bet.odds).toLocaleString()}` : bet.createdAt}</strong>
         </article>
