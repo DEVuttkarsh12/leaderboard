@@ -4633,8 +4633,12 @@ body::before,
 
 .hero-copy h1 em {
   color: var(--neo-green);
-  -webkit-text-stroke-color: var(--neo-black);
-  text-shadow: 8px 8px 0 var(--neo-black);
+  -webkit-text-fill-color: var(--neo-green);
+  -webkit-text-stroke: 2px var(--neo-white);
+  paint-order: stroke fill;
+  text-shadow:
+    5px 5px 0 var(--neo-blue),
+    9px 9px 0 var(--neo-black);
 }
 
 .hero-copy::before {
@@ -4853,6 +4857,13 @@ body::before,
     line-height: 0.88;
     letter-spacing: -0.025em;
     text-shadow: 5px 5px 0 var(--neo-blue);
+  }
+
+  .hero-copy h1 em {
+    -webkit-text-stroke-width: 1.5px;
+    text-shadow:
+      3px 3px 0 var(--neo-blue),
+      6px 6px 0 var(--neo-black);
   }
 
   .board-top-three {

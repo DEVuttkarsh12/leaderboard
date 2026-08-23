@@ -275,3 +275,4 @@
 * Fixed account dropdown contrast so menu links no longer black out.
 * Re-applied the final active palette to neon lime `#D9FF3A` and royal blue `#0245ec`.
 * Tightened homepage hero title sizing so `RANK REWARDS` stays readable across desktop, tablet, and phone widths.
+* Improved the `REWARDS` word treatment with solid neon lime fill, light outline, and royal-blue shadow for better readability on the dark background.
