@@ -1,6 +1,17 @@
+export type CasinoAccountDetail = {
+  provider: "thrill" | "packdraw" | "shuffle";
+  username: string;
+  email?: string | null;
+  isVerified: boolean;
+  verificationMethod?: string | null;
+  verificationCode?: string | null;
+  verifiedAt?: string | null;
+};
+
 export type AuthAccountPayload = {
   handle: string;
   image: string;
+  email?: string;
   profileProvider: "kick" | "discord" | "email";
   points: number;
   xp: number;
@@ -23,6 +34,7 @@ export type AuthAccountPayload = {
     packdraw: string;
     shuffle: string;
   };
+  casinoAccounts?: CasinoAccountDetail[];
   lifetimeWager: number;
   watchMinutes: number;
   banned: boolean;

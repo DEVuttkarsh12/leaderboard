@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { cloneElement, useCallback, useEffect, useMemo, useState } from "react";
-import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
 import SiteEntryLoader from "./site-entry-loader";
 import type { AuthAccountPayload, CasinoAccountDetail } from "@/lib/auth/account";
@@ -305,7 +304,6 @@ export default function RankBoardApp({
   const path = route ? `/${route}` : "/";
   return (
     <div className="site-shell">
-      <CustomCursor />
       <SiteEntryLoader />
       <div className="top-chrome">
         <Header path={path} account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
@@ -378,26 +376,6 @@ function Home() {
         <span className="h-prop h-die" />
         <span className="h-prop h-card"><i>A</i><b>♠</b></span>
         <span className="h-prop h-seven">7</span>
-        <span className="h-prop h-card-stack">
-          <i>K</i>
-          <i>Q</i>
-          <i>A</i>
-        </span>
-        <span className="h-prop h-cash-stack">
-          <i />
-          <i />
-          <b>$</b>
-        </span>
-        <span className="h-prop h-chip-trail">
-          <i />
-          <i />
-          <i />
-        </span>
-        <span className="h-prop h-left-card"><i>J</i><b>♦</b></span>
-        <span className="h-prop h-left-cash">
-          <i />
-          <b>$</b>
-        </span>
         <span className="sparkle sp-1">✦</span>
         <span className="sparkle sp-2">✦</span>
         <span className="sparkle sp-3">✦</span>
@@ -477,10 +455,6 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="board-hero page-width">
       <div><p className="kicker"><span>●</span> Season 08</p><h1>The Board</h1></div>
       <div className="round-ticket"><b>{error ? "CHECKING" : "LIVE"}</b><strong>{targetDate ? formatShortDate(targetDate).toUpperCase() : "NOW"}</strong><span>{lastUpdated ? formatLastUpdated(lastUpdated).toUpperCase() : "SYNC"}</span></div>
-    </section>
-    <section className="board-top-three page-width" aria-label="Top three players">
-      <div className="floor-top"><span>Top 3</span><span className="pulse-text">●</span></div>
-      <Podium players={users.slice(0, 3)} />
     </section>
     <section className="stat-strip page-width board-metrics"><div><span>Players</span><strong>{total || users.length}</strong></div><div><span>Wagered</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>Board</span><strong>{error ? "Issue" : isLoading ? "Sync" : "Live"}</strong></div></section>
     <section className="section page-width board-section">

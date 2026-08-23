@@ -9,19 +9,32 @@ export type SyncResult = {
   errors: number;
 };
 
+let lastSyncTimestamp = 0;
+let isSyncing = false;
+const SYNC_DEBOUNCE_MS = 10_000;
+
 /**
  * Matches leaderboard players to registered users by casino username,
  * then syncs their XP score as RankBoard points.
  */
 export async function syncLeaderboardPoints(): Promise<SyncResult> {
-  const result = await getLeaderboardRouteResult();
-  if (result.status !== 200 || "error" in result.body) {
-    throw new Error("Leaderboard API unavailable during sync");
+  const now = Date.now();
+  if (isSyncing || now - lastSyncTimestamp < SYNC_DEBOUNCE_MS) {
+    return { matched: 0, skipped: 0, errors: 0 };
   }
 
-  const body = result.body as { users?: NormalizedLeaderboardUser[] };
-  const players = body.users ?? [];
-  if (!players.length) return { matched: 0, skipped: 0, errors: 0 };
+  isSyncing = true;
+  lastSyncTimestamp = now;
+
+  try {
+    const result = await getLeaderboardRouteResult();
+    if (result.status !== 200 || "error" in result.body) {
+      throw new Error("Leaderboard API unavailable during sync");
+    }
+
+    const body = result.body as { users?: NormalizedLeaderboardUser[] };
+    const players = body.users ?? [];
+    if (!players.length) return { matched: 0, skipped: 0, errors: 0 };
 
   // Build lookup: casinoUsername (lowercase) -> leaderboard score
   const scoreByUsername = new Map<string, number>();
@@ -30,9 +43,10 @@ export async function syncLeaderboardPoints(): Promise<SyncResult> {
     if (player.kickUsername) scoreByUsername.set(player.kickUsername.toLowerCase(), player.score);
   }
 
-  // Find all casino accounts
+  // Find all verified casino accounts
   const casinoAccounts = await prisma.casinoAccount.findMany({
-    select: { userId: true, username: true, provider: true },
+    where: { isVerified: true },
+    select: { userId: true, username: true, provider: true, email: true },
   });
 
   let matched = 0;
@@ -63,4 +77,7 @@ export async function syncLeaderboardPoints(): Promise<SyncResult> {
   }
 
   return { matched, skipped, errors };
+  } finally {
+    isSyncing = false;
+  }
 }

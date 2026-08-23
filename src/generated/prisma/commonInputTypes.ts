@@ -297,6 +297,23 @@ export type EnumBetStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumBetStatusFilter<$PrismaModel>
 }
 
+export type EnumChallengeCadenceFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChallengeCadence | Prisma.EnumChallengeCadenceFieldRefInput<$PrismaModel>
+  in?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChallengeCadenceFilter<$PrismaModel> | $Enums.ChallengeCadence
+}
+
+export type EnumChallengeCadenceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChallengeCadence | Prisma.EnumChallengeCadenceFieldRefInput<$PrismaModel>
+  in?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChallengeCadenceWithAggregatesFilter<$PrismaModel> | $Enums.ChallengeCadence
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChallengeCadenceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChallengeCadenceFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -580,6 +597,23 @@ export type NestedEnumBetStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumBetStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumBetStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumChallengeCadenceFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChallengeCadence | Prisma.EnumChallengeCadenceFieldRefInput<$PrismaModel>
+  in?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChallengeCadenceFilter<$PrismaModel> | $Enums.ChallengeCadence
+}
+
+export type NestedEnumChallengeCadenceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChallengeCadence | Prisma.EnumChallengeCadenceFieldRefInput<$PrismaModel>
+  in?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChallengeCadence[] | Prisma.ListEnumChallengeCadenceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChallengeCadenceWithAggregatesFilter<$PrismaModel> | $Enums.ChallengeCadence
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChallengeCadenceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChallengeCadenceFilter<$PrismaModel>
 }
 
 

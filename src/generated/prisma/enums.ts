@@ -44,3 +44,13 @@ export const BetStatus = {
 } as const
 
 export type BetStatus = (typeof BetStatus)[keyof typeof BetStatus]
+
+
+export const ChallengeCadence = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MILESTONE: 'MILESTONE',
+  SEASONAL: 'SEASONAL'
+} as const
+
+export type ChallengeCadence = (typeof ChallengeCadence)[keyof typeof ChallengeCadence]

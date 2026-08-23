@@ -338,6 +338,7 @@ export type UserWhereInput = {
   storePurchases?: Prisma.StorePurchaseListRelationFilter
   pointTransactions?: Prisma.PointTransactionListRelationFilter
   bets?: Prisma.UserBetListRelationFilter
+  challengeProgress?: Prisma.ChallengeProgressListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -366,6 +367,7 @@ export type UserOrderByWithRelationInput = {
   storePurchases?: Prisma.StorePurchaseOrderByRelationAggregateInput
   pointTransactions?: Prisma.PointTransactionOrderByRelationAggregateInput
   bets?: Prisma.UserBetOrderByRelationAggregateInput
+  challengeProgress?: Prisma.ChallengeProgressOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -397,6 +399,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   storePurchases?: Prisma.StorePurchaseListRelationFilter
   pointTransactions?: Prisma.PointTransactionListRelationFilter
   bets?: Prisma.UserBetListRelationFilter
+  challengeProgress?: Prisma.ChallengeProgressListRelationFilter
 }, "id" | "email" | "discordId" | "kickId">
 
 export type UserOrderByWithAggregationInput = {
@@ -477,6 +480,7 @@ export type UserCreateInput = {
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -505,6 +509,7 @@ export type UserUncheckedCreateInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -533,6 +538,7 @@ export type UserUpdateInput = {
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -561,6 +567,7 @@ export type UserUncheckedUpdateInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -826,6 +833,20 @@ export type UserUpdateOneRequiredWithoutBetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBetsInput, Prisma.UserUpdateWithoutBetsInput>, Prisma.UserUncheckedUpdateWithoutBetsInput>
 }
 
+export type UserCreateNestedOneWithoutChallengeProgressInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChallengeProgressInput, Prisma.UserUncheckedCreateWithoutChallengeProgressInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChallengeProgressInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutChallengeProgressNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutChallengeProgressInput, Prisma.UserUncheckedCreateWithoutChallengeProgressInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutChallengeProgressInput
+  upsert?: Prisma.UserUpsertWithoutChallengeProgressInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChallengeProgressInput, Prisma.UserUpdateWithoutChallengeProgressInput>, Prisma.UserUncheckedUpdateWithoutChallengeProgressInput>
+}
+
 export type UserCreateWithoutStorePurchasesInput = {
   id?: string
   name?: string | null
@@ -851,6 +872,7 @@ export type UserCreateWithoutStorePurchasesInput = {
   casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStorePurchasesInput = {
@@ -878,6 +900,7 @@ export type UserUncheckedCreateWithoutStorePurchasesInput = {
   casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStorePurchasesInput = {
@@ -921,6 +944,7 @@ export type UserUpdateWithoutStorePurchasesInput = {
   casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStorePurchasesInput = {
@@ -948,6 +972,7 @@ export type UserUncheckedUpdateWithoutStorePurchasesInput = {
   casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -975,6 +1000,7 @@ export type UserCreateWithoutAccountsInput = {
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -1002,6 +1028,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -1045,6 +1072,7 @@ export type UserUpdateWithoutAccountsInput = {
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -1072,6 +1100,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -1099,6 +1128,7 @@ export type UserCreateWithoutSessionsInput = {
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1126,6 +1156,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1169,6 +1200,7 @@ export type UserUpdateWithoutSessionsInput = {
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1196,6 +1228,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCasinoAccountsInput = {
@@ -1223,6 +1256,7 @@ export type UserCreateWithoutCasinoAccountsInput = {
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCasinoAccountsInput = {
@@ -1250,6 +1284,7 @@ export type UserUncheckedCreateWithoutCasinoAccountsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCasinoAccountsInput = {
@@ -1293,6 +1328,7 @@ export type UserUpdateWithoutCasinoAccountsInput = {
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCasinoAccountsInput = {
@@ -1320,6 +1356,7 @@ export type UserUncheckedUpdateWithoutCasinoAccountsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPointTransactionsInput = {
@@ -1347,6 +1384,7 @@ export type UserCreateWithoutPointTransactionsInput = {
   casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPointTransactionsInput = {
@@ -1374,6 +1412,7 @@ export type UserUncheckedCreateWithoutPointTransactionsInput = {
   casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPointTransactionsInput = {
@@ -1417,6 +1456,7 @@ export type UserUpdateWithoutPointTransactionsInput = {
   casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPointTransactionsInput = {
@@ -1444,6 +1484,7 @@ export type UserUncheckedUpdateWithoutPointTransactionsInput = {
   casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBetsInput = {
@@ -1471,6 +1512,7 @@ export type UserCreateWithoutBetsInput = {
   casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBetsInput = {
@@ -1498,6 +1540,7 @@ export type UserUncheckedCreateWithoutBetsInput = {
   casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBetsInput = {
@@ -1541,6 +1584,7 @@ export type UserUpdateWithoutBetsInput = {
   casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBetsInput = {
@@ -1568,6 +1612,135 @@ export type UserUncheckedUpdateWithoutBetsInput = {
   casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutChallengeProgressInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutChallengeProgressInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutChallengeProgressInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutChallengeProgressInput, Prisma.UserUncheckedCreateWithoutChallengeProgressInput>
+}
+
+export type UserUpsertWithoutChallengeProgressInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutChallengeProgressInput, Prisma.UserUncheckedUpdateWithoutChallengeProgressInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutChallengeProgressInput, Prisma.UserUncheckedCreateWithoutChallengeProgressInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutChallengeProgressInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutChallengeProgressInput, Prisma.UserUncheckedUpdateWithoutChallengeProgressInput>
+}
+
+export type UserUpdateWithoutChallengeProgressInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutChallengeProgressInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1582,6 +1755,7 @@ export type UserCountOutputType = {
   storePurchases: number
   pointTransactions: number
   bets: number
+  challengeProgress: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1591,6 +1765,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   storePurchases?: boolean | UserCountOutputTypeCountStorePurchasesArgs
   pointTransactions?: boolean | UserCountOutputTypeCountPointTransactionsArgs
   bets?: boolean | UserCountOutputTypeCountBetsArgs
+  challengeProgress?: boolean | UserCountOutputTypeCountChallengeProgressArgs
 }
 
 /**
@@ -1645,6 +1820,13 @@ export type UserCountOutputTypeCountBetsArgs<ExtArgs extends runtime.Types.Exten
   where?: Prisma.UserBetWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountChallengeProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ChallengeProgressWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1672,6 +1854,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   storePurchases?: boolean | Prisma.User$storePurchasesArgs<ExtArgs>
   pointTransactions?: boolean | Prisma.User$pointTransactionsArgs<ExtArgs>
   bets?: boolean | Prisma.User$betsArgs<ExtArgs>
+  challengeProgress?: boolean | Prisma.User$challengeProgressArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1749,6 +1932,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   storePurchases?: boolean | Prisma.User$storePurchasesArgs<ExtArgs>
   pointTransactions?: boolean | Prisma.User$pointTransactionsArgs<ExtArgs>
   bets?: boolean | Prisma.User$betsArgs<ExtArgs>
+  challengeProgress?: boolean | Prisma.User$challengeProgressArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1763,6 +1947,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     storePurchases: Prisma.$StorePurchasePayload<ExtArgs>[]
     pointTransactions: Prisma.$PointTransactionPayload<ExtArgs>[]
     bets: Prisma.$UserBetPayload<ExtArgs>[]
+    challengeProgress: Prisma.$ChallengeProgressPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2184,6 +2369,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   storePurchases<T extends Prisma.User$storePurchasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$storePurchasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StorePurchasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pointTransactions<T extends Prisma.User$pointTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pointTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PointTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bets<T extends Prisma.User$betsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$betsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserBetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  challengeProgress<T extends Prisma.User$challengeProgressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$challengeProgressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2766,6 +2952,30 @@ export type User$betsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   take?: number
   skip?: number
   distinct?: Prisma.UserBetScalarFieldEnum | Prisma.UserBetScalarFieldEnum[]
+}
+
+/**
+ * User.challengeProgress
+ */
+export type User$challengeProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ChallengeProgress
+   */
+  select?: Prisma.ChallengeProgressSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ChallengeProgress
+   */
+  omit?: Prisma.ChallengeProgressOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ChallengeProgressInclude<ExtArgs> | null
+  where?: Prisma.ChallengeProgressWhereInput
+  orderBy?: Prisma.ChallengeProgressOrderByWithRelationInput | Prisma.ChallengeProgressOrderByWithRelationInput[]
+  cursor?: Prisma.ChallengeProgressWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ChallengeProgressScalarFieldEnum | Prisma.ChallengeProgressScalarFieldEnum[]
 }
 
 /**

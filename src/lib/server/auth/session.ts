@@ -3,6 +3,10 @@ import { promisify } from "node:util";
 import type { NextResponse } from "next/server";
 import { prisma } from "@/lib/server/db/prisma";
 import type { AuthAccountPayload } from "@/lib/auth/account";
+import {
+  linkCasinoAccount,
+  unlinkCasinoAccount,
+} from "@/lib/server/casino/verification";
 
 export const SESSION_COOKIE = "rankboard_session";
 
@@ -33,6 +37,11 @@ type SessionUser = {
   casinoAccounts: {
     provider: string;
     username: string;
+    email?: string | null;
+    isVerified: boolean;
+    verificationMethod?: string | null;
+    verificationCode?: string | null;
+    verifiedAt?: Date | null;
   }[];
 };
 
@@ -138,11 +147,22 @@ export function accountFromUser(user: SessionUser): AuthAccountPayload {
     }
   }
 
+  const casinoAccounts = user.casinoAccounts.map((account) => ({
+    provider: account.provider as "thrill" | "packdraw" | "shuffle",
+    username: account.username,
+    email: account.email ?? null,
+    isVerified: Boolean(account.isVerified),
+    verificationMethod: account.verificationMethod ?? null,
+    verificationCode: account.verificationCode ?? null,
+    verifiedAt: account.verifiedAt ? new Date(account.verifiedAt).toISOString() : null,
+  }));
+
   const handle = user.kickUsername ?? user.displayName?.replace(/^@/, "") ?? "guest";
 
   return {
     handle: `@${handle}`,
     image: user.image ?? "",
+    email: user.email ?? undefined,
     profileProvider: profileProviderFrom(user),
     points: user.points,
     xp: user.xp,
@@ -161,6 +181,7 @@ export function accountFromUser(user: SessionUser): AuthAccountPayload {
       },
     },
     casinos,
+    casinoAccounts,
     lifetimeWager: 0,
     watchMinutes: 0,
     banned: user.banned,
@@ -382,37 +403,18 @@ export async function updateUserCasinoAccounts(
     casinoProviders.has(provider)
   ) as [CasinoProvider, string][];
 
-  await prisma.$transaction(
-    updates.map(([provider, rawUsername]) => {
-      const username = normalizeCasinoUsername(String(rawUsername ?? ""));
-
-      if (!username) {
-        return prisma.casinoAccount.deleteMany({
-          where: {
-            userId,
-            provider,
-          },
-        });
-      }
-
-      return prisma.casinoAccount.upsert({
-        where: {
-          userId_provider: {
-            userId,
-            provider,
-          },
-        },
-        create: {
-          userId,
-          provider,
-          username,
-        },
-        update: {
-          username,
-        },
+  for (const [provider, rawUsername] of updates) {
+    const username = normalizeCasinoUsername(String(rawUsername ?? ""));
+    if (!username) {
+      await unlinkCasinoAccount(userId, provider);
+    } else {
+      await linkCasinoAccount({
+        userId,
+        provider,
+        username,
       });
-    })
-  );
+    }
+  }
 
   const account = await getSessionAccount(sessionToken);
 

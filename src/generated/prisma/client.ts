@@ -91,3 +91,13 @@ export type BetMarket = Prisma.BetMarketModel
  * 
  */
 export type UserBet = Prisma.UserBetModel
+/**
+ * Model ChallengeMission
+ * 
+ */
+export type ChallengeMission = Prisma.ChallengeMissionModel
+/**
+ * Model ChallengeProgress
+ * 
+ */
+export type ChallengeProgress = Prisma.ChallengeProgressModel

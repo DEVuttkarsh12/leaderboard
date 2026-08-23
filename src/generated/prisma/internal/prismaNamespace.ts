@@ -406,7 +406,9 @@ export const ModelName = {
   CasinoAccount: 'CasinoAccount',
   PointTransaction: 'PointTransaction',
   BetMarket: 'BetMarket',
-  UserBet: 'UserBet'
+  UserBet: 'UserBet',
+  ChallengeMission: 'ChallengeMission',
+  ChallengeProgress: 'ChallengeProgress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -422,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet"
+    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet" | "challengeMission" | "challengeProgress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1166,6 +1168,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ChallengeMission: {
+      payload: Prisma.$ChallengeMissionPayload<ExtArgs>
+      fields: Prisma.ChallengeMissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChallengeMissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChallengeMissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>
+        }
+        findFirst: {
+          args: Prisma.ChallengeMissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChallengeMissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>
+        }
+        findMany: {
+          args: Prisma.ChallengeMissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>[]
+        }
+        create: {
+          args: Prisma.ChallengeMissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>
+        }
+        createMany: {
+          args: Prisma.ChallengeMissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChallengeMissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>[]
+        }
+        delete: {
+          args: Prisma.ChallengeMissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>
+        }
+        update: {
+          args: Prisma.ChallengeMissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChallengeMissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChallengeMissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChallengeMissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChallengeMissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeMissionPayload>
+        }
+        aggregate: {
+          args: Prisma.ChallengeMissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChallengeMission>
+        }
+        groupBy: {
+          args: Prisma.ChallengeMissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeMissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChallengeMissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeMissionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ChallengeProgress: {
+      payload: Prisma.$ChallengeProgressPayload<ExtArgs>
+      fields: Prisma.ChallengeProgressFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChallengeProgressFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChallengeProgressFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>
+        }
+        findFirst: {
+          args: Prisma.ChallengeProgressFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChallengeProgressFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>
+        }
+        findMany: {
+          args: Prisma.ChallengeProgressFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>[]
+        }
+        create: {
+          args: Prisma.ChallengeProgressCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>
+        }
+        createMany: {
+          args: Prisma.ChallengeProgressCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChallengeProgressCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>[]
+        }
+        delete: {
+          args: Prisma.ChallengeProgressDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>
+        }
+        update: {
+          args: Prisma.ChallengeProgressUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChallengeProgressDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChallengeProgressUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChallengeProgressUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChallengeProgressUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChallengeProgressPayload>
+        }
+        aggregate: {
+          args: Prisma.ChallengeProgressAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChallengeProgress>
+        }
+        groupBy: {
+          args: Prisma.ChallengeProgressGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeProgressGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChallengeProgressCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChallengeProgressCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1306,6 +1456,11 @@ export const CasinoAccountScalarFieldEnum = {
   userId: 'userId',
   provider: 'provider',
   username: 'username',
+  email: 'email',
+  isVerified: 'isVerified',
+  verificationMethod: 'verificationMethod',
+  verificationCode: 'verificationCode',
+  verifiedAt: 'verifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1359,6 +1514,36 @@ export const UserBetScalarFieldEnum = {
 } as const
 
 export type UserBetScalarFieldEnum = (typeof UserBetScalarFieldEnum)[keyof typeof UserBetScalarFieldEnum]
+
+
+export const ChallengeMissionScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  title: 'title',
+  reward: 'reward',
+  goal: 'goal',
+  meta: 'meta',
+  cadence: 'cadence',
+  active: 'active',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeMissionScalarFieldEnum = (typeof ChallengeMissionScalarFieldEnum)[keyof typeof ChallengeMissionScalarFieldEnum]
+
+
+export const ChallengeProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  missionId: 'missionId',
+  progress: 'progress',
+  claimedAt: 'claimedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeProgressScalarFieldEnum = (typeof ChallengeProgressScalarFieldEnum)[keyof typeof ChallengeProgressScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1507,6 +1692,20 @@ export type EnumBetStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'BetStatus[]'
  */
 export type ListEnumBetStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BetStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ChallengeCadence'
+ */
+export type EnumChallengeCadenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChallengeCadence'>
+    
+
+
+/**
+ * Reference to a field of type 'ChallengeCadence[]'
+ */
+export type ListEnumChallengeCadenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChallengeCadence[]'>
     
 
 /**
@@ -1670,6 +1869,8 @@ export type GlobalOmitConfig = {
   pointTransaction?: Prisma.PointTransactionOmit
   betMarket?: Prisma.BetMarketOmit
   userBet?: Prisma.UserBetOmit
+  challengeMission?: Prisma.ChallengeMissionOmit
+  challengeProgress?: Prisma.ChallengeProgressOmit
 }
 
 /* Types for Logging */

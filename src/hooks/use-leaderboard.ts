@@ -17,15 +17,30 @@ type LeaderboardState = {
   error: string | null;
 };
 
+let memoryCache: LeaderboardApiResponse | null = null;
+
 export function useLeaderboard() {
-  const [state, setState] = useState<LeaderboardState>({
-    users: [],
-    total: 0,
-    highestScore: 0,
-    averageScore: 0,
-    lastUpdated: null,
-    isLoading: true,
-    error: null,
+  const [state, setState] = useState<LeaderboardState>(() => {
+    if (memoryCache) {
+      return {
+        users: memoryCache.users,
+        total: memoryCache.total,
+        highestScore: memoryCache.highestScore,
+        averageScore: memoryCache.averageScore,
+        lastUpdated: new Date(memoryCache.lastUpdated),
+        isLoading: false,
+        error: null,
+      };
+    }
+    return {
+      users: [],
+      total: 0,
+      highestScore: 0,
+      averageScore: 0,
+      lastUpdated: null,
+      isLoading: true,
+      error: null,
+    };
   });
 
   const abortRef = useRef<AbortController | null>(null);
@@ -44,6 +59,8 @@ export function useLeaderboard() {
       const data: LeaderboardApiResponse = await fetchLeaderboardFromApi(
         controller.signal
       );
+
+      memoryCache = data;
 
       if (mountedRef.current) {
         setState({
@@ -79,7 +96,7 @@ export function useLeaderboard() {
       if (document.visibilityState === "visible") {
         fetchData.current();
       }
-    }, 60_000);
+    }, 15_000);
 
     return () => {
       mountedRef.current = false;

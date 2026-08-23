@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const geistSans = Instrument_Sans({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "block",
+});
+
+const geistMono = Bricolage_Grotesque({
+  variable: "--font-display",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -21,7 +24,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#08030F",
+    themeColor: "#0b101b",
 };
 
 export default function RootLayout({
@@ -32,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

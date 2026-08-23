@@ -231,21 +231,17 @@ export async function getShuffleLeaderboard(): Promise<LeaderboardRouteResult> {
   if (snapshot) {
     const isStale = isShuffleSnapshotStale(snapshotState.fetchedAt);
     if (isStale && isShuffleUpstreamEnabled() && canPollShuffle()) {
-      try {
-        await ensureShuffleSnapshot();
-      } catch {
-        // Serve the last good snapshot if refresh fails.
-      }
+      // Refresh in background without blocking user response
+      ensureShuffleSnapshot().catch(() => null);
     }
 
-    const latestSnapshot = readShuffleSnapshot();
     markShuffleSnapshotServed();
     return {
       status: 200,
       headers: {
-        "Cache-Control": "no-store",
+        "Cache-Control": "public, s-maxage=10, stale-while-revalidate=30",
       },
-      body: latestSnapshot ?? snapshot,
+      body: snapshot,
     };
   }
 

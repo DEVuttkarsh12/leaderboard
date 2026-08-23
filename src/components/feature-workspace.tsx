@@ -101,6 +101,19 @@ type Bet = {
   createdAt: string;
 };
 
+type ChallengeMission = {
+  id: string;
+  code: string;
+  title: string;
+  reward: number;
+  goal: number;
+  meta: string;
+  cadence: "Daily" | "Weekly" | "Milestone" | "Seasonal";
+  progress: number;
+  claimed: boolean;
+  claimedAt: string | null;
+};
+
 type SiteConfig = {
   announcement: string;
   banner: string;
@@ -134,14 +147,6 @@ const defaultAccount: Account = {
   timeoutUntil: "",
   badges: ["Early", "Season 08"],
 };
-
-const missions = [
-  { id: "daily-spin", title: "Daily Missions", reward: 1200, goal: 100, meta: "Daily" },
-  { id: "weekly-track", title: "Weekly Tracks", reward: 4200, goal: 100, meta: "Weekly" },
-  { id: "milestone", title: "Milestone Goals", reward: 2800, goal: 100, meta: "Milestone" },
-  { id: "seasonal", title: "Seasonal Campaigns", reward: 6500, goal: 100, meta: "Season" },
-  { id: "rank-unlock", title: "Leaderboard Unlocks", reward: 3500, goal: 100, meta: "Rank" },
-];
 
 const hunts = [
   { id: "midnight", title: "Midnight Multiplier", time: "22:30", host: "Vanta", status: "Live", heat: 86 },
@@ -387,47 +392,141 @@ function ChallengesWorkspace({
   account: Account;
   setAccount: (value: Account | ((current: Account) => Account)) => void;
 }) {
-  const [progress, setProgress] = useStoredState<Record<string, number>>("rankboard-mission-progress", {});
-  const [claimed, setClaimed] = useStoredState<string[]>("rankboard-mission-claimed", []);
-  const active = missions.filter((mission) => !claimed.includes(mission.id)).length;
-  const claimable = missions.filter((mission) => (progress[mission.id] ?? 0) >= mission.goal && !claimed.includes(mission.id)).length;
+  const [missionList, setMissionList] = useState<ChallengeMission[]>([]);
+  const [message, setMessage] = useState("Loading missions...");
+  const [pendingMissionId, setPendingMissionId] = useState("");
+  const active = missionList.filter((mission) => !mission.claimed).length;
+  const claimable = missionList.filter((mission) => mission.progress >= mission.goal && !mission.claimed).length;
 
-  function pushProgress(id: string) {
-    setProgress((current) => ({ ...current, [id]: Math.min(100, (current[id] ?? 0) + 25) }));
+  function replaceMission(nextMission: ChallengeMission) {
+    setMissionList((current) =>
+      current.map((mission) => mission.id === nextMission.id ? nextMission : mission)
+    );
   }
 
-  function claimMission(id: string, reward: number) {
-    if (claimed.includes(id)) return;
-    setClaimed((current) => [...current, id]);
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      return { ...safe, points: safe.points + reward, xp: safe.xp + reward };
-    });
+  useEffect(() => {
+    let activeRequest = true;
+
+    async function loadMissions() {
+      try {
+        const response = await fetch("/api/challenges", { cache: "no-store" });
+        const payload = (await response.json()) as {
+          missions?: ChallengeMission[];
+          error?: string;
+        };
+        if (!activeRequest) return;
+        if (!response.ok) {
+          setMessage(payload.error ?? "Could not load missions.");
+          return;
+        }
+        setMissionList(payload.missions ?? []);
+        setMessage("Charge missions and claim rewards.");
+      } catch {
+        if (activeRequest) setMessage("Could not load missions.");
+      }
+    }
+
+    loadMissions();
+    return () => {
+      activeRequest = false;
+    };
+  }, []);
+
+  async function pushProgress(id: string) {
+    setPendingMissionId(id);
+    setMessage("Saving progress...");
+    try {
+      const response = await fetch("/api/challenges/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ missionId: id, amount: 25 }),
+      });
+      const payload = (await response.json()) as {
+        mission?: ChallengeMission;
+        error?: string;
+      };
+      if (!response.ok || !payload.mission) {
+        setMessage(payload.error ?? "Progress failed.");
+        return;
+      }
+      replaceMission(payload.mission);
+      setMessage(payload.mission.progress >= payload.mission.goal ? "Mission ready to claim." : "Progress saved.");
+    } catch {
+      setMessage("Progress failed.");
+    } finally {
+      setPendingMissionId("");
+    }
+  }
+
+  async function claimMission(id: string) {
+    setPendingMissionId(id);
+    setMessage("Claiming reward...");
+    try {
+      const response = await fetch("/api/challenges/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ missionId: id }),
+      });
+      const payload = (await response.json()) as {
+        mission?: ChallengeMission;
+        newPoints?: number;
+        newXp?: number;
+        error?: string;
+      };
+      if (!response.ok || !payload.mission) {
+        setMessage(payload.error ?? "Claim failed.");
+        return;
+      }
+      replaceMission(payload.mission);
+      setAccount((current) => {
+        const safe = normalizeAccount(current);
+        return {
+          ...safe,
+          points: payload.newPoints ?? safe.points,
+          xp: payload.newXp ?? safe.xp,
+        };
+      });
+      setMessage("Reward claimed.");
+    } catch {
+      setMessage("Claim failed.");
+    } finally {
+      setPendingMissionId("");
+    }
   }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="MISSION OPS" title="Progress. Claim. Climb." meta={`${active} active / ${claimable} ready`} />
+      <WorkspaceHeader overline="Missions" title="Daily & weekly missions" meta={`${active} active · ${claimable} ready · ${message}`} />
       <div className="workspace-grid">
-        {missions.map((mission) => {
-          const percent = progress[mission.id] ?? 0;
-          const isClaimed = claimed.includes(mission.id);
-          const ready = percent >= mission.goal && !isClaimed;
+        {missionList.map((mission) => {
+          const percent = mission.goal > 0 ? Math.round((mission.progress / mission.goal) * 100) : 0;
+          const displayPercent = Math.min(100, Math.max(0, percent));
+          const isClaimed = mission.claimed;
+          const ready = mission.progress >= mission.goal && !isClaimed;
+          const isPending = pendingMissionId === mission.id;
           return (
             <article className="action-card" key={mission.id}>
               <small>{mission.meta}</small>
               <h3>{mission.title}</h3>
-              <p>{percent}% charged</p>
-              <ProgressBar value={percent} />
+              <p>{displayPercent}% charged</p>
+              <ProgressBar value={displayPercent} />
               <div className="action-card__footer">
                 <strong>{isClaimed ? "Claimed" : `${mission.reward.toLocaleString()} pts`}</strong>
-                <button type="button" onClick={() => ready ? claimMission(mission.id, mission.reward) : pushProgress(mission.id)} disabled={isClaimed}>
-                  {isClaimed ? "Done" : ready ? "Claim" : "Progress"}
+                <button type="button" onClick={() => ready ? claimMission(mission.id) : pushProgress(mission.id)} disabled={isClaimed || Boolean(pendingMissionId)}>
+                  {isPending ? "Saving" : isClaimed ? "Done" : ready ? "Claim" : "Progress"}
                 </button>
               </div>
             </article>
           );
         })}
+        {!missionList.length && (
+          <article className="action-card">
+            <small>Loading</small>
+            <h3>Missions syncing</h3>
+            <p>Server mission state will appear here.</p>
+            <ProgressBar value={0} />
+          </article>
+        )}
       </div>
       <AccountStrip account={account} />
     </section>
@@ -441,7 +540,7 @@ function HuntsWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="HUNT CONTROL" title="Follow. Save. Vote." meta={`${followed.length} followed / ${savedClips.length} saved`} />
+      <WorkspaceHeader overline="Bonus Hunts" title="Live hunt sessions" meta={`${followed.length} followed · ${savedClips.length} clips saved`} />
       <div className="workspace-grid two">
         {hunts.map((hunt) => {
           const isFollowed = followed.includes(hunt.id);
@@ -489,7 +588,7 @@ function TournamentsWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="BRACKET DESK" title="Enter. Watch. Win." meta={`${registrations.length} entries active`} />
+      <WorkspaceHeader overline="Tournaments" title="Brackets & prize pools" meta={`${registrations.length} entries`} />
       <div className="workspace-grid three">
         {tournaments.map((item) => {
           const isJoined = registrations.includes(item.id);
@@ -534,7 +633,7 @@ function RafflesWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="TICKET FLOOR" title="Wager in. Tickets out." meta={`${tickets} tickets / ${entries} entries`} />
+      <WorkspaceHeader overline="Wager Raffles" title="Turn wagers into tickets" meta={`${tickets} tickets · ${entries} entries`} />
       <div className="tool-panel">
         <label>
           WAGER AMOUNT
@@ -678,7 +777,7 @@ function StoreWorkspace({
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="STORE REGISTER" title="Spend. Claim. Stash." meta={message} />
+      <WorkspaceHeader overline="Reward Store" title="Redeem your points" meta={message} />
       <AccountStrip account={account} />
       {isGuest && (
         <div className="workspace-notice">
@@ -856,9 +955,9 @@ function CustomBetsWorkspace({
   return (
     <section className="section page-width app-workspace">
       <WorkspaceHeader
-        overline="BET FLOOR"
-        title="Pick. Bet. Sweat."
-        meta={message || `${bets.filter((bet) => bet.status === "Open").length} live bets`}
+        overline="Custom Bets"
+        title="Live prediction markets"
+        meta={message || `${bets.filter((bet) => bet.status === "Open").length} open bets`}
       />
       <AccountStrip account={account} />
       {isGuest && (
@@ -958,7 +1057,7 @@ function WatchPointsWorkspace({
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="KICK WATCH" title="Watch. Earn. Spend." meta={account.connected.kick.connected ? "Kick linked" : "Kick needed"} />
+      <WorkspaceHeader overline="Watch Points" title="Earn while you watch" meta={account.connected.kick.connected ? "Kick linked" : "Connect Kick to start earning"} />
       <div className="watch-console">
         <div className="watch-orb"><span>{String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}</span><b>{earned + dailyBonus}</b><small>points ready</small></div>
         <div className="watch-actions">
@@ -1041,7 +1140,7 @@ function ProfileWorkspace({
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="PLAYER PROFILE" title="Linked. Ranked. Paid." meta={profileStatus === "Profile ready" && liveUser ? `Rank #${liveUser.rank}` : profileStatus} />
+      <WorkspaceHeader overline="Profile" title="Your account" meta={profileStatus === "Profile ready" && liveUser ? `Rank #${liveUser.rank}` : profileStatus} />
       <div className="profile-layout">
         <article className="profile-card">
           <AccountImage account={account} className="profile-avatar" />
@@ -1284,7 +1383,7 @@ function AdminWorkspace({
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="ADMIN FLOOR" title="Control. Settle. Ship." meta={adminUserStatus} />
+      <WorkspaceHeader overline="Admin" title="Control room" meta={adminUserStatus} />
       <div className="admin-user-manager">
         <div className="admin-user-manager__bar">
           <label>USER SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Email, handle, Discord, Kick, casino" /></label>
@@ -1366,10 +1465,10 @@ function AdminWorkspace({
         </article>
       </div>
       {/* Store Catalog Management */}
-      <div className="section-heading" style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+      <div className="admin-section-title">
         <div>
-          <p style={{ color: "#eab308", fontWeight: 700, letterSpacing: "0.1em" }}>STORE REWARDS CATALOG</p>
-          <h2>MANAGE STORE ITEMS</h2>
+          <p>Store rewards</p>
+          <h2>Manage store items</h2>
         </div>
       </div>
       <form className="support-form account-form" onSubmit={addItem}>
@@ -1390,10 +1489,10 @@ function AdminWorkspace({
       </div>
 
       {/* Bet Markets & Settlement Section */}
-      <div className="section-heading" style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+      <div className="admin-section-title">
         <div>
-          <p style={{ color: "#f59e0b", fontWeight: 700, letterSpacing: "0.1em" }}>🎲 PREDICTION MARKETS & SETTLEMENT</p>
-          <h2>SETTLE BETS & PAYOUT WINNERS</h2>
+          <p>Prediction markets</p>
+          <h2>Settle bets & pay winners</h2>
         </div>
       </div>
       <form className="support-form account-form" onSubmit={addMarket}>
@@ -1405,7 +1504,7 @@ function AdminWorkspace({
         <button className="button primary" type="submit">Add bet market <span>↗</span></button>
       </form>
       {adminMarketMessage && (
-        <p style={{ margin: "0.75rem 0", padding: "0.75rem 1rem", borderRadius: 8, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", fontSize: "0.9rem", color: "#4ade80", fontWeight: 600 }}>
+        <p style={{ margin: "0.75rem 0", padding: "0.75rem 1rem", borderRadius: 8, background: "rgba(47,213,126,0.1)", border: "1px solid rgba(47,213,126,0.3)", fontSize: "0.9rem", color: "var(--green)", fontWeight: 600 }}>
           {adminMarketMessage}
         </p>
       )}
@@ -1413,38 +1512,16 @@ function AdminWorkspace({
         {markets.map((market) => (
           <article
             key={market.id}
-            style={{
-              background: market.status === "Live" ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.02)",
-              border: market.status === "Live" ? "1px solid rgba(245,158,11,0.3)" : "1px solid rgba(255,255,255,0.08)",
-              borderRadius: 12,
-              padding: "1rem 1.25rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "1.25rem",
-              marginBottom: "0.75rem",
-            }}
+            className={`market-admin-row ${market.status === "Live" ? "live" : ""}`}
           >
-            <span
-              style={{
-                padding: "0.25rem 0.6rem",
-                borderRadius: 6,
-                fontSize: "0.75rem",
-                fontWeight: 800,
-                textTransform: "uppercase",
-                background: market.status === "Live" ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.1)",
-                color: market.status === "Live" ? "#4ade80" : "#a1a1aa",
-                border: market.status === "Live" ? "1px solid rgba(34,197,94,0.4)" : "none",
-              }}
-            >
-              {market.status}
-            </span>
-            <div style={{ flex: 1 }}>
-              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{market.title}</h3>
-              <p style={{ margin: "0.25rem 0 0 0", opacity: 0.7, fontSize: "0.85rem" }}>
-                <strong>{market.sides[0]}</strong> ({market.odds[0]}x) vs <strong>{market.sides[1]}</strong> ({market.odds[1]}x)
+            <span className="status-badge">{market.status}</span>
+            <div className="market-admin-info">
+              <h3>{market.title}</h3>
+              <p>
+                {market.sides[0]} ({market.odds[0]}x) vs {market.sides[1]} ({market.odds[1]}x)
                 {market.winner && (
-                  <span style={{ marginLeft: "0.75rem", color: "#4ade80", fontWeight: 700 }}>
-                    🏆 {market.winner} WON
+                  <span className="market-winner">
+                    · {market.winner} won
                   </span>
                 )}
               </p>
@@ -1453,31 +1530,17 @@ function AdminWorkspace({
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
                   type="button"
-                  style={{
-                    background: "#22c55e",
-                    color: "#000",
-                    fontWeight: 700,
-                    padding: "0.5rem 1rem",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                  }}
+                  className="settle-btn win"
                   onClick={() => settleMarket(market, market.sides[0])}
                 >
-                  SETTLE: {market.sides[0].toUpperCase()}
+                  Settle {market.sides[0]}
                 </button>
                 <button
                   type="button"
-                  style={{
-                    background: "#ef4444",
-                    color: "#fff",
-                    fontWeight: 700,
-                    padding: "0.5rem 1rem",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                  }}
+                  className="settle-btn lose"
                   onClick={() => settleMarket(market, market.sides[1])}
                 >
-                  SETTLE: {market.sides[1].toUpperCase()}
+                  Settle {market.sides[1]}
                 </button>
               </div>
             )}
@@ -1486,10 +1549,10 @@ function AdminWorkspace({
       </div>
 
       {/* Store Claims Fulfillment */}
-      <div className="section-heading" style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+      <div className="admin-section-title">
         <div>
-          <p style={{ color: "#a855f7", fontWeight: 700, letterSpacing: "0.1em" }}>REWARD CLAIMS</p>
-          <h2>FULFILL RECENT PURCHASES</h2>
+          <p>Reward claims</p>
+          <h2>Fulfill recent purchases</h2>
         </div>
       </div>
       <PurchaseList purchases={purchases} onAdvance={(purchase) => setPurchases((current) => current.map((entry) => entry.id === purchase.id ? { ...entry, status: entry.status === "Pending" ? "Completed" : "Pending" } : entry))} />
@@ -1506,7 +1569,7 @@ function HelpWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="HELP INDEX" title="Search. Fix. Go." meta={`${results.length} answers`} />
+      <WorkspaceHeader overline="Help Center" title="Find your answer" meta={`${results.length} answers`} />
       <label className="wide-search">
         <span>SEARCH HELP</span>
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="XP, rewards, bets" />
@@ -1550,7 +1613,7 @@ function SupportWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="SUPPORT DESK" title="Ticket. Track. Done." meta={`${tickets.length} tickets`} />
+      <WorkspaceHeader overline="Support" title="Create a ticket" meta={`${tickets.length} tickets`} />
       <form className="support-form" onSubmit={submit}>
         <label>CATEGORY<select value={category} onChange={(event) => setCategory(event.target.value)}><option>Reward</option><option>Account</option><option>Leaderboard</option><option>Claim</option></select></label>
         <label>SUBJECT<input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="What broke?" /></label>
@@ -1721,7 +1784,7 @@ function LoginWorkspace({
 
   return (
     <section className="section page-width app-workspace auth-workspace">
-      <WorkspaceHeader overline="PLAYER ACCOUNT" title="Secure entry." meta={status} />
+      <WorkspaceHeader overline="Account" title="Sign in to RankBoard" meta={status} />
       <div className="auth-modal-shell" role="dialog" aria-modal="true" aria-labelledby="auth-title">
         <div className="auth-panel">
           <div className="auth-copy">

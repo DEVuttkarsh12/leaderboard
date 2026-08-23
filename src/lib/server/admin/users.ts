@@ -28,6 +28,13 @@ export type AdminUserSummary = {
     packdraw: string;
     shuffle: string;
   };
+  casinoAccounts?: {
+    provider: string;
+    username: string;
+    email?: string | null;
+    isVerified: boolean;
+    verificationMethod?: string | null;
+  }[];
   createdAt: string;
   updatedAt: string;
 };
@@ -51,6 +58,9 @@ type AdminUserRecord = {
   casinoAccounts: {
     provider: string;
     username: string;
+    email?: string | null;
+    isVerified: boolean;
+    verificationMethod?: string | null;
   }[];
   createdAt: Date;
   updatedAt: Date;
@@ -128,6 +138,13 @@ export function adminUserSummary(user: AdminUserRecord): AdminUserSummary {
       },
     },
     casinos,
+    casinoAccounts: user.casinoAccounts.map((c) => ({
+      provider: c.provider,
+      username: c.username,
+      email: c.email ?? null,
+      isVerified: Boolean(c.isVerified),
+      verificationMethod: c.verificationMethod ?? null,
+    })),
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
   };

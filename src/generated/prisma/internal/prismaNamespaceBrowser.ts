@@ -60,7 +60,9 @@ export const ModelName = {
   CasinoAccount: 'CasinoAccount',
   PointTransaction: 'PointTransaction',
   BetMarket: 'BetMarket',
-  UserBet: 'UserBet'
+  UserBet: 'UserBet',
+  ChallengeMission: 'ChallengeMission',
+  ChallengeProgress: 'ChallengeProgress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -180,6 +182,11 @@ export const CasinoAccountScalarFieldEnum = {
   userId: 'userId',
   provider: 'provider',
   username: 'username',
+  email: 'email',
+  isVerified: 'isVerified',
+  verificationMethod: 'verificationMethod',
+  verificationCode: 'verificationCode',
+  verifiedAt: 'verifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -233,6 +240,36 @@ export const UserBetScalarFieldEnum = {
 } as const
 
 export type UserBetScalarFieldEnum = (typeof UserBetScalarFieldEnum)[keyof typeof UserBetScalarFieldEnum]
+
+
+export const ChallengeMissionScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  title: 'title',
+  reward: 'reward',
+  goal: 'goal',
+  meta: 'meta',
+  cadence: 'cadence',
+  active: 'active',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeMissionScalarFieldEnum = (typeof ChallengeMissionScalarFieldEnum)[keyof typeof ChallengeMissionScalarFieldEnum]
+
+
+export const ChallengeProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  missionId: 'missionId',
+  progress: 'progress',
+  claimedAt: 'claimedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChallengeProgressScalarFieldEnum = (typeof ChallengeProgressScalarFieldEnum)[keyof typeof ChallengeProgressScalarFieldEnum]
 
 
 export const SortOrder = {

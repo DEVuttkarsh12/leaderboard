@@ -2,11 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   SESSION_COOKIE,
+  getSessionAccount,
   updateUserCasinoAccounts,
 } from "@/lib/server/auth/session";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+export async function GET(request: NextRequest) {
+  const account = await getSessionAccount(sessionTokenFrom(request));
+  if (!account) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+  return NextResponse.json({
+    account,
+    casinos: account.casinos,
+    casinoAccounts: account.casinoAccounts,
+  });
+}
 
 const profileSchema = z.object({
   casinos: z

@@ -39,6 +39,7 @@ model User {
   storePurchases    StorePurchase[]
   pointTransactions PointTransaction[]
   bets              UserBet[]
+  challengeProgress ChallengeProgress[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -129,10 +130,15 @@ model VerificationToken {
 }
 
 model CasinoAccount {
-  id       String @id @default(cuid())
-  userId   String
-  provider String
-  username String
+  id                 String    @id @default(cuid())
+  userId             String
+  provider           String
+  username           String
+  email              String?
+  isVerified         Boolean   @default(false)
+  verificationMethod String?
+  verificationCode   String?
+  verifiedAt         DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -140,7 +146,9 @@ model CasinoAccount {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, provider])
+  @@unique([provider, username])
   @@index([provider, username])
+  @@index([provider, email])
 }
 
 model PointTransaction {
@@ -210,4 +218,46 @@ model UserBet {
 
   @@index([userId])
   @@index([marketId])
+}
+
+enum ChallengeCadence {
+  DAILY
+  WEEKLY
+  MILESTONE
+  SEASONAL
+}
+
+model ChallengeMission {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  title       String
+  reward      Int
+  goal        Int              @default(100)
+  meta        String
+  cadence     ChallengeCadence @default(DAILY)
+  active      Boolean          @default(true)
+  sortOrder   Int              @default(0)
+
+  progress ChallengeProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChallengeProgress {
+  id        String    @id @default(cuid())
+  userId    String
+  missionId String
+  progress  Int       @default(0)
+  claimedAt DateTime?
+
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission ChallengeMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, missionId])
+  @@index([userId])
+  @@index([missionId])
 }

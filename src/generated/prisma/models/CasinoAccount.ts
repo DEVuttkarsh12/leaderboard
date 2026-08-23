@@ -29,6 +29,11 @@ export type CasinoAccountMinAggregateOutputType = {
   userId: string | null
   provider: string | null
   username: string | null
+  email: string | null
+  isVerified: boolean | null
+  verificationMethod: string | null
+  verificationCode: string | null
+  verifiedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +43,11 @@ export type CasinoAccountMaxAggregateOutputType = {
   userId: string | null
   provider: string | null
   username: string | null
+  email: string | null
+  isVerified: boolean | null
+  verificationMethod: string | null
+  verificationCode: string | null
+  verifiedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,6 +57,11 @@ export type CasinoAccountCountAggregateOutputType = {
   userId: number
   provider: number
   username: number
+  email: number
+  isVerified: number
+  verificationMethod: number
+  verificationCode: number
+  verifiedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -58,6 +73,11 @@ export type CasinoAccountMinAggregateInputType = {
   userId?: true
   provider?: true
   username?: true
+  email?: true
+  isVerified?: true
+  verificationMethod?: true
+  verificationCode?: true
+  verifiedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -67,6 +87,11 @@ export type CasinoAccountMaxAggregateInputType = {
   userId?: true
   provider?: true
   username?: true
+  email?: true
+  isVerified?: true
+  verificationMethod?: true
+  verificationCode?: true
+  verifiedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -76,6 +101,11 @@ export type CasinoAccountCountAggregateInputType = {
   userId?: true
   provider?: true
   username?: true
+  email?: true
+  isVerified?: true
+  verificationMethod?: true
+  verificationCode?: true
+  verifiedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -158,6 +188,11 @@ export type CasinoAccountGroupByOutputType = {
   userId: string
   provider: string
   username: string
+  email: string | null
+  isVerified: boolean
+  verificationMethod: string | null
+  verificationCode: string | null
+  verifiedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: CasinoAccountCountAggregateOutputType | null
@@ -188,6 +223,11 @@ export type CasinoAccountWhereInput = {
   userId?: Prisma.StringFilter<"CasinoAccount"> | string
   provider?: Prisma.StringFilter<"CasinoAccount"> | string
   username?: Prisma.StringFilter<"CasinoAccount"> | string
+  email?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  isVerified?: Prisma.BoolFilter<"CasinoAccount"> | boolean
+  verificationMethod?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  verificationCode?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"CasinoAccount"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"CasinoAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CasinoAccount"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -198,6 +238,11 @@ export type CasinoAccountOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  verificationMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -206,22 +251,33 @@ export type CasinoAccountOrderByWithRelationInput = {
 export type CasinoAccountWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   userId_provider?: Prisma.CasinoAccountUserIdProviderCompoundUniqueInput
+  provider_username?: Prisma.CasinoAccountProviderUsernameCompoundUniqueInput
   AND?: Prisma.CasinoAccountWhereInput | Prisma.CasinoAccountWhereInput[]
   OR?: Prisma.CasinoAccountWhereInput[]
   NOT?: Prisma.CasinoAccountWhereInput | Prisma.CasinoAccountWhereInput[]
   userId?: Prisma.StringFilter<"CasinoAccount"> | string
   provider?: Prisma.StringFilter<"CasinoAccount"> | string
   username?: Prisma.StringFilter<"CasinoAccount"> | string
+  email?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  isVerified?: Prisma.BoolFilter<"CasinoAccount"> | boolean
+  verificationMethod?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  verificationCode?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"CasinoAccount"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"CasinoAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CasinoAccount"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id" | "userId_provider">
+}, "id" | "userId_provider" | "provider_username">
 
 export type CasinoAccountOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  verificationMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  verificationCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CasinoAccountCountOrderByAggregateInput
@@ -237,6 +293,11 @@ export type CasinoAccountScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"CasinoAccount"> | string
   provider?: Prisma.StringWithAggregatesFilter<"CasinoAccount"> | string
   username?: Prisma.StringWithAggregatesFilter<"CasinoAccount"> | string
+  email?: Prisma.StringNullableWithAggregatesFilter<"CasinoAccount"> | string | null
+  isVerified?: Prisma.BoolWithAggregatesFilter<"CasinoAccount"> | boolean
+  verificationMethod?: Prisma.StringNullableWithAggregatesFilter<"CasinoAccount"> | string | null
+  verificationCode?: Prisma.StringNullableWithAggregatesFilter<"CasinoAccount"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CasinoAccount"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CasinoAccount"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"CasinoAccount"> | Date | string
 }
@@ -245,6 +306,11 @@ export type CasinoAccountCreateInput = {
   id?: string
   provider: string
   username: string
+  email?: string | null
+  isVerified?: boolean
+  verificationMethod?: string | null
+  verificationCode?: string | null
+  verifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutCasinoAccountsInput
@@ -255,6 +321,11 @@ export type CasinoAccountUncheckedCreateInput = {
   userId: string
   provider: string
   username: string
+  email?: string | null
+  isVerified?: boolean
+  verificationMethod?: string | null
+  verificationCode?: string | null
+  verifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -263,6 +334,11 @@ export type CasinoAccountUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutCasinoAccountsNestedInput
@@ -273,6 +349,11 @@ export type CasinoAccountUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -282,6 +363,11 @@ export type CasinoAccountCreateManyInput = {
   userId: string
   provider: string
   username: string
+  email?: string | null
+  isVerified?: boolean
+  verificationMethod?: string | null
+  verificationCode?: string | null
+  verifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -290,6 +376,11 @@ export type CasinoAccountUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -299,6 +390,11 @@ export type CasinoAccountUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -318,11 +414,21 @@ export type CasinoAccountUserIdProviderCompoundUniqueInput = {
   provider: string
 }
 
+export type CasinoAccountProviderUsernameCompoundUniqueInput = {
+  provider: string
+  username: string
+}
+
 export type CasinoAccountCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  verificationMethod?: Prisma.SortOrder
+  verificationCode?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -332,6 +438,11 @@ export type CasinoAccountMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  verificationMethod?: Prisma.SortOrder
+  verificationCode?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -341,6 +452,11 @@ export type CasinoAccountMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
   username?: Prisma.SortOrder
+  email?: Prisma.SortOrder
+  isVerified?: Prisma.SortOrder
+  verificationMethod?: Prisma.SortOrder
+  verificationCode?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -391,6 +507,11 @@ export type CasinoAccountCreateWithoutUserInput = {
   id?: string
   provider: string
   username: string
+  email?: string | null
+  isVerified?: boolean
+  verificationMethod?: string | null
+  verificationCode?: string | null
+  verifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -399,6 +520,11 @@ export type CasinoAccountUncheckedCreateWithoutUserInput = {
   id?: string
   provider: string
   username: string
+  email?: string | null
+  isVerified?: boolean
+  verificationMethod?: string | null
+  verificationCode?: string | null
+  verifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -437,6 +563,11 @@ export type CasinoAccountScalarWhereInput = {
   userId?: Prisma.StringFilter<"CasinoAccount"> | string
   provider?: Prisma.StringFilter<"CasinoAccount"> | string
   username?: Prisma.StringFilter<"CasinoAccount"> | string
+  email?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  isVerified?: Prisma.BoolFilter<"CasinoAccount"> | boolean
+  verificationMethod?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  verificationCode?: Prisma.StringNullableFilter<"CasinoAccount"> | string | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"CasinoAccount"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"CasinoAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CasinoAccount"> | Date | string
 }
@@ -445,6 +576,11 @@ export type CasinoAccountCreateManyUserInput = {
   id?: string
   provider: string
   username: string
+  email?: string | null
+  isVerified?: boolean
+  verificationMethod?: string | null
+  verificationCode?: string | null
+  verifiedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -453,6 +589,11 @@ export type CasinoAccountUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -461,6 +602,11 @@ export type CasinoAccountUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -469,6 +615,11 @@ export type CasinoAccountUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verificationMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -480,6 +631,11 @@ export type CasinoAccountSelect<ExtArgs extends runtime.Types.Extensions.Interna
   userId?: boolean
   provider?: boolean
   username?: boolean
+  email?: boolean
+  isVerified?: boolean
+  verificationMethod?: boolean
+  verificationCode?: boolean
+  verifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -490,6 +646,11 @@ export type CasinoAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   userId?: boolean
   provider?: boolean
   username?: boolean
+  email?: boolean
+  isVerified?: boolean
+  verificationMethod?: boolean
+  verificationCode?: boolean
+  verifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -500,6 +661,11 @@ export type CasinoAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   userId?: boolean
   provider?: boolean
   username?: boolean
+  email?: boolean
+  isVerified?: boolean
+  verificationMethod?: boolean
+  verificationCode?: boolean
+  verifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -510,11 +676,16 @@ export type CasinoAccountSelectScalar = {
   userId?: boolean
   provider?: boolean
   username?: boolean
+  email?: boolean
+  isVerified?: boolean
+  verificationMethod?: boolean
+  verificationCode?: boolean
+  verifiedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CasinoAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "username" | "createdAt" | "updatedAt", ExtArgs["result"]["casinoAccount"]>
+export type CasinoAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "username" | "email" | "isVerified" | "verificationMethod" | "verificationCode" | "verifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["casinoAccount"]>
 export type CasinoAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -535,6 +706,11 @@ export type $CasinoAccountPayload<ExtArgs extends runtime.Types.Extensions.Inter
     userId: string
     provider: string
     username: string
+    email: string | null
+    isVerified: boolean
+    verificationMethod: string | null
+    verificationCode: string | null
+    verifiedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["casinoAccount"]>
@@ -965,6 +1141,11 @@ export interface CasinoAccountFieldRefs {
   readonly userId: Prisma.FieldRef<"CasinoAccount", 'String'>
   readonly provider: Prisma.FieldRef<"CasinoAccount", 'String'>
   readonly username: Prisma.FieldRef<"CasinoAccount", 'String'>
+  readonly email: Prisma.FieldRef<"CasinoAccount", 'String'>
+  readonly isVerified: Prisma.FieldRef<"CasinoAccount", 'Boolean'>
+  readonly verificationMethod: Prisma.FieldRef<"CasinoAccount", 'String'>
+  readonly verificationCode: Prisma.FieldRef<"CasinoAccount", 'String'>
+  readonly verifiedAt: Prisma.FieldRef<"CasinoAccount", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"CasinoAccount", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"CasinoAccount", 'DateTime'>
 }
