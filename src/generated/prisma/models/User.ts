@@ -339,6 +339,14 @@ export type UserWhereInput = {
   pointTransactions?: Prisma.PointTransactionListRelationFilter
   bets?: Prisma.UserBetListRelationFilter
   challengeProgress?: Prisma.ChallengeProgressListRelationFilter
+  watchSessions?: Prisma.WatchSessionListRelationFilter
+  raffleAccounts?: Prisma.RaffleAccountListRelationFilter
+  raffleEntries?: Prisma.RaffleEntryListRelationFilter
+  tournamentEntries?: Prisma.TournamentEntryListRelationFilter
+  huntFollows?: Prisma.HuntFollowListRelationFilter
+  huntClipVotes?: Prisma.HuntClipVoteListRelationFilter
+  huntClipSaves?: Prisma.HuntClipSaveListRelationFilter
+  supportTickets?: Prisma.SupportTicketListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -368,6 +376,14 @@ export type UserOrderByWithRelationInput = {
   pointTransactions?: Prisma.PointTransactionOrderByRelationAggregateInput
   bets?: Prisma.UserBetOrderByRelationAggregateInput
   challengeProgress?: Prisma.ChallengeProgressOrderByRelationAggregateInput
+  watchSessions?: Prisma.WatchSessionOrderByRelationAggregateInput
+  raffleAccounts?: Prisma.RaffleAccountOrderByRelationAggregateInput
+  raffleEntries?: Prisma.RaffleEntryOrderByRelationAggregateInput
+  tournamentEntries?: Prisma.TournamentEntryOrderByRelationAggregateInput
+  huntFollows?: Prisma.HuntFollowOrderByRelationAggregateInput
+  huntClipVotes?: Prisma.HuntClipVoteOrderByRelationAggregateInput
+  huntClipSaves?: Prisma.HuntClipSaveOrderByRelationAggregateInput
+  supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -400,6 +416,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   pointTransactions?: Prisma.PointTransactionListRelationFilter
   bets?: Prisma.UserBetListRelationFilter
   challengeProgress?: Prisma.ChallengeProgressListRelationFilter
+  watchSessions?: Prisma.WatchSessionListRelationFilter
+  raffleAccounts?: Prisma.RaffleAccountListRelationFilter
+  raffleEntries?: Prisma.RaffleEntryListRelationFilter
+  tournamentEntries?: Prisma.TournamentEntryListRelationFilter
+  huntFollows?: Prisma.HuntFollowListRelationFilter
+  huntClipVotes?: Prisma.HuntClipVoteListRelationFilter
+  huntClipSaves?: Prisma.HuntClipSaveListRelationFilter
+  supportTickets?: Prisma.SupportTicketListRelationFilter
 }, "id" | "email" | "discordId" | "kickId">
 
 export type UserOrderByWithAggregationInput = {
@@ -481,6 +505,14 @@ export type UserCreateInput = {
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -510,6 +542,14 @@ export type UserUncheckedCreateInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -539,6 +579,14 @@ export type UserUpdateInput = {
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -568,6 +616,14 @@ export type UserUncheckedUpdateInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -717,6 +773,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -847,6 +908,120 @@ export type UserUpdateOneRequiredWithoutChallengeProgressNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutChallengeProgressInput, Prisma.UserUpdateWithoutChallengeProgressInput>, Prisma.UserUncheckedUpdateWithoutChallengeProgressInput>
 }
 
+export type UserCreateNestedOneWithoutWatchSessionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWatchSessionsInput, Prisma.UserUncheckedCreateWithoutWatchSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWatchSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWatchSessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWatchSessionsInput, Prisma.UserUncheckedCreateWithoutWatchSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWatchSessionsInput
+  upsert?: Prisma.UserUpsertWithoutWatchSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWatchSessionsInput, Prisma.UserUpdateWithoutWatchSessionsInput>, Prisma.UserUncheckedUpdateWithoutWatchSessionsInput>
+}
+
+export type UserCreateNestedOneWithoutRaffleAccountsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRaffleAccountsInput, Prisma.UserUncheckedCreateWithoutRaffleAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRaffleAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutRaffleAccountsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRaffleAccountsInput, Prisma.UserUncheckedCreateWithoutRaffleAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRaffleAccountsInput
+  upsert?: Prisma.UserUpsertWithoutRaffleAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRaffleAccountsInput, Prisma.UserUpdateWithoutRaffleAccountsInput>, Prisma.UserUncheckedUpdateWithoutRaffleAccountsInput>
+}
+
+export type UserCreateNestedOneWithoutRaffleEntriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRaffleEntriesInput, Prisma.UserUncheckedCreateWithoutRaffleEntriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRaffleEntriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutRaffleEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRaffleEntriesInput, Prisma.UserUncheckedCreateWithoutRaffleEntriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRaffleEntriesInput
+  upsert?: Prisma.UserUpsertWithoutRaffleEntriesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRaffleEntriesInput, Prisma.UserUpdateWithoutRaffleEntriesInput>, Prisma.UserUncheckedUpdateWithoutRaffleEntriesInput>
+}
+
+export type UserCreateNestedOneWithoutHuntFollowsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHuntFollowsInput, Prisma.UserUncheckedCreateWithoutHuntFollowsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHuntFollowsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutHuntFollowsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHuntFollowsInput, Prisma.UserUncheckedCreateWithoutHuntFollowsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHuntFollowsInput
+  upsert?: Prisma.UserUpsertWithoutHuntFollowsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutHuntFollowsInput, Prisma.UserUpdateWithoutHuntFollowsInput>, Prisma.UserUncheckedUpdateWithoutHuntFollowsInput>
+}
+
+export type UserCreateNestedOneWithoutHuntClipVotesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHuntClipVotesInput, Prisma.UserUncheckedCreateWithoutHuntClipVotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHuntClipVotesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutHuntClipVotesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHuntClipVotesInput, Prisma.UserUncheckedCreateWithoutHuntClipVotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHuntClipVotesInput
+  upsert?: Prisma.UserUpsertWithoutHuntClipVotesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutHuntClipVotesInput, Prisma.UserUpdateWithoutHuntClipVotesInput>, Prisma.UserUncheckedUpdateWithoutHuntClipVotesInput>
+}
+
+export type UserCreateNestedOneWithoutHuntClipSavesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHuntClipSavesInput, Prisma.UserUncheckedCreateWithoutHuntClipSavesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHuntClipSavesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutHuntClipSavesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutHuntClipSavesInput, Prisma.UserUncheckedCreateWithoutHuntClipSavesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutHuntClipSavesInput
+  upsert?: Prisma.UserUpsertWithoutHuntClipSavesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutHuntClipSavesInput, Prisma.UserUpdateWithoutHuntClipSavesInput>, Prisma.UserUncheckedUpdateWithoutHuntClipSavesInput>
+}
+
+export type UserCreateNestedOneWithoutSupportTicketsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutSupportTicketsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsInput
+  upsert?: Prisma.UserUpsertWithoutSupportTicketsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportTicketsInput, Prisma.UserUpdateWithoutSupportTicketsInput>, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+}
+
+export type UserCreateNestedOneWithoutTournamentEntriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTournamentEntriesInput, Prisma.UserUncheckedCreateWithoutTournamentEntriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTournamentEntriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTournamentEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTournamentEntriesInput, Prisma.UserUncheckedCreateWithoutTournamentEntriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTournamentEntriesInput
+  upsert?: Prisma.UserUpsertWithoutTournamentEntriesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTournamentEntriesInput, Prisma.UserUpdateWithoutTournamentEntriesInput>, Prisma.UserUncheckedUpdateWithoutTournamentEntriesInput>
+}
+
 export type UserCreateWithoutStorePurchasesInput = {
   id?: string
   name?: string | null
@@ -873,6 +1048,14 @@ export type UserCreateWithoutStorePurchasesInput = {
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStorePurchasesInput = {
@@ -901,6 +1084,14 @@ export type UserUncheckedCreateWithoutStorePurchasesInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStorePurchasesInput = {
@@ -945,6 +1136,14 @@ export type UserUpdateWithoutStorePurchasesInput = {
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStorePurchasesInput = {
@@ -973,6 +1172,14 @@ export type UserUncheckedUpdateWithoutStorePurchasesInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -1001,6 +1208,14 @@ export type UserCreateWithoutAccountsInput = {
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -1029,6 +1244,14 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -1073,6 +1296,14 @@ export type UserUpdateWithoutAccountsInput = {
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -1101,6 +1332,14 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -1129,6 +1368,14 @@ export type UserCreateWithoutSessionsInput = {
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1157,6 +1404,14 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1201,6 +1456,14 @@ export type UserUpdateWithoutSessionsInput = {
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1229,6 +1492,14 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCasinoAccountsInput = {
@@ -1257,6 +1528,14 @@ export type UserCreateWithoutCasinoAccountsInput = {
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCasinoAccountsInput = {
@@ -1285,6 +1564,14 @@ export type UserUncheckedCreateWithoutCasinoAccountsInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCasinoAccountsInput = {
@@ -1329,6 +1616,14 @@ export type UserUpdateWithoutCasinoAccountsInput = {
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCasinoAccountsInput = {
@@ -1357,6 +1652,14 @@ export type UserUncheckedUpdateWithoutCasinoAccountsInput = {
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPointTransactionsInput = {
@@ -1385,6 +1688,14 @@ export type UserCreateWithoutPointTransactionsInput = {
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPointTransactionsInput = {
@@ -1413,6 +1724,14 @@ export type UserUncheckedCreateWithoutPointTransactionsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPointTransactionsInput = {
@@ -1457,6 +1776,14 @@ export type UserUpdateWithoutPointTransactionsInput = {
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPointTransactionsInput = {
@@ -1485,6 +1812,14 @@ export type UserUncheckedUpdateWithoutPointTransactionsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBetsInput = {
@@ -1513,6 +1848,14 @@ export type UserCreateWithoutBetsInput = {
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBetsInput = {
@@ -1541,6 +1884,14 @@ export type UserUncheckedCreateWithoutBetsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBetsInput = {
@@ -1585,6 +1936,14 @@ export type UserUpdateWithoutBetsInput = {
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBetsInput = {
@@ -1613,6 +1972,14 @@ export type UserUncheckedUpdateWithoutBetsInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChallengeProgressInput = {
@@ -1641,6 +2008,14 @@ export type UserCreateWithoutChallengeProgressInput = {
   storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChallengeProgressInput = {
@@ -1669,6 +2044,14 @@ export type UserUncheckedCreateWithoutChallengeProgressInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
   pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
   bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChallengeProgressInput = {
@@ -1713,6 +2096,14 @@ export type UserUpdateWithoutChallengeProgressInput = {
   storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChallengeProgressInput = {
@@ -1741,6 +2132,1294 @@ export type UserUncheckedUpdateWithoutChallengeProgressInput = {
   storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
   pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
   bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutWatchSessionsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutWatchSessionsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutWatchSessionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWatchSessionsInput, Prisma.UserUncheckedCreateWithoutWatchSessionsInput>
+}
+
+export type UserUpsertWithoutWatchSessionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWatchSessionsInput, Prisma.UserUncheckedUpdateWithoutWatchSessionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWatchSessionsInput, Prisma.UserUncheckedCreateWithoutWatchSessionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWatchSessionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWatchSessionsInput, Prisma.UserUncheckedUpdateWithoutWatchSessionsInput>
+}
+
+export type UserUpdateWithoutWatchSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWatchSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutRaffleAccountsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutRaffleAccountsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutRaffleAccountsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRaffleAccountsInput, Prisma.UserUncheckedCreateWithoutRaffleAccountsInput>
+}
+
+export type UserUpsertWithoutRaffleAccountsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRaffleAccountsInput, Prisma.UserUncheckedUpdateWithoutRaffleAccountsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRaffleAccountsInput, Prisma.UserUncheckedCreateWithoutRaffleAccountsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRaffleAccountsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRaffleAccountsInput, Prisma.UserUncheckedUpdateWithoutRaffleAccountsInput>
+}
+
+export type UserUpdateWithoutRaffleAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRaffleAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutRaffleEntriesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutRaffleEntriesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutRaffleEntriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRaffleEntriesInput, Prisma.UserUncheckedCreateWithoutRaffleEntriesInput>
+}
+
+export type UserUpsertWithoutRaffleEntriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRaffleEntriesInput, Prisma.UserUncheckedUpdateWithoutRaffleEntriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRaffleEntriesInput, Prisma.UserUncheckedCreateWithoutRaffleEntriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRaffleEntriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRaffleEntriesInput, Prisma.UserUncheckedUpdateWithoutRaffleEntriesInput>
+}
+
+export type UserUpdateWithoutRaffleEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRaffleEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutHuntFollowsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutHuntFollowsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutHuntFollowsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutHuntFollowsInput, Prisma.UserUncheckedCreateWithoutHuntFollowsInput>
+}
+
+export type UserUpsertWithoutHuntFollowsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutHuntFollowsInput, Prisma.UserUncheckedUpdateWithoutHuntFollowsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutHuntFollowsInput, Prisma.UserUncheckedCreateWithoutHuntFollowsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutHuntFollowsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutHuntFollowsInput, Prisma.UserUncheckedUpdateWithoutHuntFollowsInput>
+}
+
+export type UserUpdateWithoutHuntFollowsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutHuntFollowsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutHuntClipVotesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutHuntClipVotesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutHuntClipVotesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutHuntClipVotesInput, Prisma.UserUncheckedCreateWithoutHuntClipVotesInput>
+}
+
+export type UserUpsertWithoutHuntClipVotesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutHuntClipVotesInput, Prisma.UserUncheckedUpdateWithoutHuntClipVotesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutHuntClipVotesInput, Prisma.UserUncheckedCreateWithoutHuntClipVotesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutHuntClipVotesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutHuntClipVotesInput, Prisma.UserUncheckedUpdateWithoutHuntClipVotesInput>
+}
+
+export type UserUpdateWithoutHuntClipVotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutHuntClipVotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutHuntClipSavesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutHuntClipSavesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutHuntClipSavesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutHuntClipSavesInput, Prisma.UserUncheckedCreateWithoutHuntClipSavesInput>
+}
+
+export type UserUpsertWithoutHuntClipSavesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutHuntClipSavesInput, Prisma.UserUncheckedUpdateWithoutHuntClipSavesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutHuntClipSavesInput, Prisma.UserUncheckedCreateWithoutHuntClipSavesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutHuntClipSavesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutHuntClipSavesInput, Prisma.UserUncheckedUpdateWithoutHuntClipSavesInput>
+}
+
+export type UserUpdateWithoutHuntClipSavesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutHuntClipSavesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSupportTicketsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSupportTicketsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSupportTicketsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+}
+
+export type UserUpsertWithoutSupportTicketsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSupportTicketsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+}
+
+export type UserUpdateWithoutSupportTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSupportTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  tournamentEntries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTournamentEntriesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTournamentEntriesInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  passwordHash?: string | null
+  image?: string | null
+  displayName?: string | null
+  discordId?: string | null
+  discordUsername?: string | null
+  kickId?: string | null
+  kickUsername?: string | null
+  points?: number
+  xp?: number
+  role?: $Enums.UserRole
+  banned?: boolean
+  bannedReason?: string | null
+  timeoutUntil?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedCreateNestedManyWithoutUserInput
+  storePurchases?: Prisma.StorePurchaseUncheckedCreateNestedManyWithoutUserInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutUserInput
+  bets?: Prisma.UserBetUncheckedCreateNestedManyWithoutUserInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedCreateNestedManyWithoutUserInput
+  watchSessions?: Prisma.WatchSessionUncheckedCreateNestedManyWithoutUserInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedCreateNestedManyWithoutUserInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedCreateNestedManyWithoutUserInput
+  huntFollows?: Prisma.HuntFollowUncheckedCreateNestedManyWithoutUserInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedCreateNestedManyWithoutUserInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTournamentEntriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTournamentEntriesInput, Prisma.UserUncheckedCreateWithoutTournamentEntriesInput>
+}
+
+export type UserUpsertWithoutTournamentEntriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTournamentEntriesInput, Prisma.UserUncheckedUpdateWithoutTournamentEntriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTournamentEntriesInput, Prisma.UserUncheckedCreateWithoutTournamentEntriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTournamentEntriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTournamentEntriesInput, Prisma.UserUncheckedUpdateWithoutTournamentEntriesInput>
+}
+
+export type UserUpdateWithoutTournamentEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTournamentEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discordUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kickUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  xp?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeoutUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  casinoAccounts?: Prisma.CasinoAccountUncheckedUpdateManyWithoutUserNestedInput
+  storePurchases?: Prisma.StorePurchaseUncheckedUpdateManyWithoutUserNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+  bets?: Prisma.UserBetUncheckedUpdateManyWithoutUserNestedInput
+  challengeProgress?: Prisma.ChallengeProgressUncheckedUpdateManyWithoutUserNestedInput
+  watchSessions?: Prisma.WatchSessionUncheckedUpdateManyWithoutUserNestedInput
+  raffleAccounts?: Prisma.RaffleAccountUncheckedUpdateManyWithoutUserNestedInput
+  raffleEntries?: Prisma.RaffleEntryUncheckedUpdateManyWithoutUserNestedInput
+  huntFollows?: Prisma.HuntFollowUncheckedUpdateManyWithoutUserNestedInput
+  huntClipVotes?: Prisma.HuntClipVoteUncheckedUpdateManyWithoutUserNestedInput
+  huntClipSaves?: Prisma.HuntClipSaveUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1756,6 +3435,14 @@ export type UserCountOutputType = {
   pointTransactions: number
   bets: number
   challengeProgress: number
+  watchSessions: number
+  raffleAccounts: number
+  raffleEntries: number
+  tournamentEntries: number
+  huntFollows: number
+  huntClipVotes: number
+  huntClipSaves: number
+  supportTickets: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1766,6 +3453,14 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   pointTransactions?: boolean | UserCountOutputTypeCountPointTransactionsArgs
   bets?: boolean | UserCountOutputTypeCountBetsArgs
   challengeProgress?: boolean | UserCountOutputTypeCountChallengeProgressArgs
+  watchSessions?: boolean | UserCountOutputTypeCountWatchSessionsArgs
+  raffleAccounts?: boolean | UserCountOutputTypeCountRaffleAccountsArgs
+  raffleEntries?: boolean | UserCountOutputTypeCountRaffleEntriesArgs
+  tournamentEntries?: boolean | UserCountOutputTypeCountTournamentEntriesArgs
+  huntFollows?: boolean | UserCountOutputTypeCountHuntFollowsArgs
+  huntClipVotes?: boolean | UserCountOutputTypeCountHuntClipVotesArgs
+  huntClipSaves?: boolean | UserCountOutputTypeCountHuntClipSavesArgs
+  supportTickets?: boolean | UserCountOutputTypeCountSupportTicketsArgs
 }
 
 /**
@@ -1827,6 +3522,62 @@ export type UserCountOutputTypeCountChallengeProgressArgs<ExtArgs extends runtim
   where?: Prisma.ChallengeProgressWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountWatchSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WatchSessionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRaffleAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RaffleAccountWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRaffleEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RaffleEntryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTournamentEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TournamentEntryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountHuntFollowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HuntFollowWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountHuntClipVotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HuntClipVoteWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountHuntClipSavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HuntClipSaveWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSupportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1855,6 +3606,14 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   pointTransactions?: boolean | Prisma.User$pointTransactionsArgs<ExtArgs>
   bets?: boolean | Prisma.User$betsArgs<ExtArgs>
   challengeProgress?: boolean | Prisma.User$challengeProgressArgs<ExtArgs>
+  watchSessions?: boolean | Prisma.User$watchSessionsArgs<ExtArgs>
+  raffleAccounts?: boolean | Prisma.User$raffleAccountsArgs<ExtArgs>
+  raffleEntries?: boolean | Prisma.User$raffleEntriesArgs<ExtArgs>
+  tournamentEntries?: boolean | Prisma.User$tournamentEntriesArgs<ExtArgs>
+  huntFollows?: boolean | Prisma.User$huntFollowsArgs<ExtArgs>
+  huntClipVotes?: boolean | Prisma.User$huntClipVotesArgs<ExtArgs>
+  huntClipSaves?: boolean | Prisma.User$huntClipSavesArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1933,6 +3692,14 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   pointTransactions?: boolean | Prisma.User$pointTransactionsArgs<ExtArgs>
   bets?: boolean | Prisma.User$betsArgs<ExtArgs>
   challengeProgress?: boolean | Prisma.User$challengeProgressArgs<ExtArgs>
+  watchSessions?: boolean | Prisma.User$watchSessionsArgs<ExtArgs>
+  raffleAccounts?: boolean | Prisma.User$raffleAccountsArgs<ExtArgs>
+  raffleEntries?: boolean | Prisma.User$raffleEntriesArgs<ExtArgs>
+  tournamentEntries?: boolean | Prisma.User$tournamentEntriesArgs<ExtArgs>
+  huntFollows?: boolean | Prisma.User$huntFollowsArgs<ExtArgs>
+  huntClipVotes?: boolean | Prisma.User$huntClipVotesArgs<ExtArgs>
+  huntClipSaves?: boolean | Prisma.User$huntClipSavesArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1948,6 +3715,14 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     pointTransactions: Prisma.$PointTransactionPayload<ExtArgs>[]
     bets: Prisma.$UserBetPayload<ExtArgs>[]
     challengeProgress: Prisma.$ChallengeProgressPayload<ExtArgs>[]
+    watchSessions: Prisma.$WatchSessionPayload<ExtArgs>[]
+    raffleAccounts: Prisma.$RaffleAccountPayload<ExtArgs>[]
+    raffleEntries: Prisma.$RaffleEntryPayload<ExtArgs>[]
+    tournamentEntries: Prisma.$TournamentEntryPayload<ExtArgs>[]
+    huntFollows: Prisma.$HuntFollowPayload<ExtArgs>[]
+    huntClipVotes: Prisma.$HuntClipVotePayload<ExtArgs>[]
+    huntClipSaves: Prisma.$HuntClipSavePayload<ExtArgs>[]
+    supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2370,6 +4145,14 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   pointTransactions<T extends Prisma.User$pointTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pointTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PointTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bets<T extends Prisma.User$betsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$betsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserBetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   challengeProgress<T extends Prisma.User$challengeProgressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$challengeProgressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  watchSessions<T extends Prisma.User$watchSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$watchSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WatchSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  raffleAccounts<T extends Prisma.User$raffleAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$raffleAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RaffleAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  raffleEntries<T extends Prisma.User$raffleEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$raffleEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RaffleEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tournamentEntries<T extends Prisma.User$tournamentEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$tournamentEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  huntFollows<T extends Prisma.User$huntFollowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$huntFollowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HuntFollowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  huntClipVotes<T extends Prisma.User$huntClipVotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$huntClipVotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HuntClipVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  huntClipSaves<T extends Prisma.User$huntClipSavesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$huntClipSavesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HuntClipSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportTickets<T extends Prisma.User$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2976,6 +4759,198 @@ export type User$challengeProgressArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.ChallengeProgressScalarFieldEnum | Prisma.ChallengeProgressScalarFieldEnum[]
+}
+
+/**
+ * User.watchSessions
+ */
+export type User$watchSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WatchSession
+   */
+  select?: Prisma.WatchSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WatchSession
+   */
+  omit?: Prisma.WatchSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WatchSessionInclude<ExtArgs> | null
+  where?: Prisma.WatchSessionWhereInput
+  orderBy?: Prisma.WatchSessionOrderByWithRelationInput | Prisma.WatchSessionOrderByWithRelationInput[]
+  cursor?: Prisma.WatchSessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WatchSessionScalarFieldEnum | Prisma.WatchSessionScalarFieldEnum[]
+}
+
+/**
+ * User.raffleAccounts
+ */
+export type User$raffleAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RaffleAccount
+   */
+  select?: Prisma.RaffleAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RaffleAccount
+   */
+  omit?: Prisma.RaffleAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RaffleAccountInclude<ExtArgs> | null
+  where?: Prisma.RaffleAccountWhereInput
+  orderBy?: Prisma.RaffleAccountOrderByWithRelationInput | Prisma.RaffleAccountOrderByWithRelationInput[]
+  cursor?: Prisma.RaffleAccountWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RaffleAccountScalarFieldEnum | Prisma.RaffleAccountScalarFieldEnum[]
+}
+
+/**
+ * User.raffleEntries
+ */
+export type User$raffleEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RaffleEntry
+   */
+  select?: Prisma.RaffleEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RaffleEntry
+   */
+  omit?: Prisma.RaffleEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RaffleEntryInclude<ExtArgs> | null
+  where?: Prisma.RaffleEntryWhereInput
+  orderBy?: Prisma.RaffleEntryOrderByWithRelationInput | Prisma.RaffleEntryOrderByWithRelationInput[]
+  cursor?: Prisma.RaffleEntryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RaffleEntryScalarFieldEnum | Prisma.RaffleEntryScalarFieldEnum[]
+}
+
+/**
+ * User.tournamentEntries
+ */
+export type User$tournamentEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TournamentEntry
+   */
+  select?: Prisma.TournamentEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TournamentEntry
+   */
+  omit?: Prisma.TournamentEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TournamentEntryInclude<ExtArgs> | null
+  where?: Prisma.TournamentEntryWhereInput
+  orderBy?: Prisma.TournamentEntryOrderByWithRelationInput | Prisma.TournamentEntryOrderByWithRelationInput[]
+  cursor?: Prisma.TournamentEntryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TournamentEntryScalarFieldEnum | Prisma.TournamentEntryScalarFieldEnum[]
+}
+
+/**
+ * User.huntFollows
+ */
+export type User$huntFollowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HuntFollow
+   */
+  select?: Prisma.HuntFollowSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HuntFollow
+   */
+  omit?: Prisma.HuntFollowOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HuntFollowInclude<ExtArgs> | null
+  where?: Prisma.HuntFollowWhereInput
+  orderBy?: Prisma.HuntFollowOrderByWithRelationInput | Prisma.HuntFollowOrderByWithRelationInput[]
+  cursor?: Prisma.HuntFollowWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HuntFollowScalarFieldEnum | Prisma.HuntFollowScalarFieldEnum[]
+}
+
+/**
+ * User.huntClipVotes
+ */
+export type User$huntClipVotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HuntClipVote
+   */
+  select?: Prisma.HuntClipVoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HuntClipVote
+   */
+  omit?: Prisma.HuntClipVoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HuntClipVoteInclude<ExtArgs> | null
+  where?: Prisma.HuntClipVoteWhereInput
+  orderBy?: Prisma.HuntClipVoteOrderByWithRelationInput | Prisma.HuntClipVoteOrderByWithRelationInput[]
+  cursor?: Prisma.HuntClipVoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HuntClipVoteScalarFieldEnum | Prisma.HuntClipVoteScalarFieldEnum[]
+}
+
+/**
+ * User.huntClipSaves
+ */
+export type User$huntClipSavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HuntClipSave
+   */
+  select?: Prisma.HuntClipSaveSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HuntClipSave
+   */
+  omit?: Prisma.HuntClipSaveOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HuntClipSaveInclude<ExtArgs> | null
+  where?: Prisma.HuntClipSaveWhereInput
+  orderBy?: Prisma.HuntClipSaveOrderByWithRelationInput | Prisma.HuntClipSaveOrderByWithRelationInput[]
+  cursor?: Prisma.HuntClipSaveWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HuntClipSaveScalarFieldEnum | Prisma.HuntClipSaveScalarFieldEnum[]
+}
+
+/**
+ * User.supportTickets
+ */
+export type User$supportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportTicket
+   */
+  select?: Prisma.SupportTicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportTicket
+   */
+  omit?: Prisma.SupportTicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportTicketInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketWhereInput
+  orderBy?: Prisma.SupportTicketOrderByWithRelationInput | Prisma.SupportTicketOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
 }
 
 /**

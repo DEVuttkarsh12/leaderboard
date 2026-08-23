@@ -101,3 +101,73 @@ export type ChallengeMission = Prisma.ChallengeMissionModel
  * 
  */
 export type ChallengeProgress = Prisma.ChallengeProgressModel
+/**
+ * Model WatchSession
+ * 
+ */
+export type WatchSession = Prisma.WatchSessionModel
+/**
+ * Model KickChatActivity
+ * 
+ */
+export type KickChatActivity = Prisma.KickChatActivityModel
+/**
+ * Model KickStreamStatus
+ * 
+ */
+export type KickStreamStatus = Prisma.KickStreamStatusModel
+/**
+ * Model RaffleRound
+ * 
+ */
+export type RaffleRound = Prisma.RaffleRoundModel
+/**
+ * Model RaffleAccount
+ * 
+ */
+export type RaffleAccount = Prisma.RaffleAccountModel
+/**
+ * Model RaffleEntry
+ * 
+ */
+export type RaffleEntry = Prisma.RaffleEntryModel
+/**
+ * Model BonusHuntSession
+ * 
+ */
+export type BonusHuntSession = Prisma.BonusHuntSessionModel
+/**
+ * Model HuntFollow
+ * 
+ */
+export type HuntFollow = Prisma.HuntFollowModel
+/**
+ * Model HuntClip
+ * 
+ */
+export type HuntClip = Prisma.HuntClipModel
+/**
+ * Model HuntClipVote
+ * 
+ */
+export type HuntClipVote = Prisma.HuntClipVoteModel
+/**
+ * Model HuntClipSave
+ * 
+ */
+export type HuntClipSave = Prisma.HuntClipSaveModel
+/**
+ * Model SupportTicket
+ * 
+ */
+export type SupportTicket = Prisma.SupportTicketModel
+/**
+ * Model Tournament
+ * 
+ */
+export type Tournament = Prisma.TournamentModel
+/**
+ * Model TournamentEntry
+ * 
+ */
+export type TournamentEntry = Prisma.TournamentEntryModel

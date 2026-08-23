@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   createKickPkcePair,
   getKickRedirectUri,
+  KICK_DEFAULT_SCOPE,
   KICK_OAUTH_STATE_COOKIE,
   KICK_OAUTH_VERIFIER_COOKIE,
 } from "@/lib/server/auth/kick";
 
 const KICK_AUTHORIZE_URL = "https://id.kick.com/oauth/authorize";
-const KICK_SCOPE = "user:read";
 
 function redirectToLogin(request: NextRequest, error: string) {
   const url = new URL("/login", request.url);
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   authUrl.searchParams.set("client_id", clientId);
   authUrl.searchParams.set("redirect_uri", getKickRedirectUri(request));
   authUrl.searchParams.set("response_type", "code");
-  authUrl.searchParams.set("scope", KICK_SCOPE);
+  authUrl.searchParams.set("scope", process.env.KICK_OAUTH_SCOPE?.trim() || KICK_DEFAULT_SCOPE);
   authUrl.searchParams.set("state", state);
   authUrl.searchParams.set("code_challenge", codeChallenge);
   authUrl.searchParams.set("code_challenge_method", "S256");

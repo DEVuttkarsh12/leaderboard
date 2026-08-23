@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
+import { requireAdminUser } from "@/lib/server/admin/users";
 
 export type StoreItemPayload = {
   id: string;
@@ -19,6 +20,12 @@ export type StorePurchasePayload = {
   cost: number;
   status: "PENDING" | "COMPLETED" | "REJECTED";
   createdAt: string;
+};
+
+export type AdminStorePurchasePayload = StorePurchasePayload & {
+  userId: string;
+  userHandle: string;
+  userEmail: string;
 };
 
 const DEFAULT_ITEMS = [
@@ -127,4 +134,190 @@ export async function listUserPurchases(
     status: p.status,
     createdAt: p.createdAt.toISOString(),
   }));
+}
+
+function handleFromUser(user: {
+  kickUsername: string | null;
+  discordUsername: string | null;
+  displayName: string | null;
+  email: string | null;
+  name: string | null;
+}) {
+  const handle =
+    user.kickUsername ??
+    user.discordUsername ??
+    user.displayName?.replace(/^@/, "") ??
+    user.email?.split("@")[0] ??
+    user.name ??
+    "player";
+
+  return handle.startsWith("@") ? handle : `@${handle}`;
+}
+
+function storeItemPayload(item: {
+  id: string;
+  title: string;
+  description: string;
+  cost: number;
+  tag: string;
+  stock: number;
+  unlimited: boolean;
+  imageLabel: string;
+}): StoreItemPayload {
+  return {
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    cost: item.cost,
+    tag: item.tag,
+    stock: item.stock,
+    unlimited: item.unlimited,
+    imageLabel: item.imageLabel,
+  };
+}
+
+export async function adminCreateStoreItem(
+  sessionToken: string | undefined,
+  data: {
+    title: string;
+    description?: string;
+    cost: number;
+    tag?: string;
+    stock: number;
+    unlimited?: boolean;
+    imageLabel?: string;
+  }
+): Promise<StoreItemPayload> {
+  await requireAdminUser(sessionToken);
+
+  const title = data.title.trim().slice(0, 80);
+  if (!title) throw new Error("Store item title is required.");
+  if (!Number.isInteger(data.cost) || data.cost < 0 || data.cost > 100_000_000) {
+    throw new Error("Enter a valid item cost.");
+  }
+  if (!Number.isInteger(data.stock) || data.stock < 0 || data.stock > 1_000_000) {
+    throw new Error("Enter a valid item stock.");
+  }
+
+  const item = await prisma.storeItem.create({
+    data: {
+      title,
+      description: data.description?.trim().slice(0, 180) || "Admin reward.",
+      cost: data.cost,
+      tag: data.tag?.trim().slice(0, 32) || "Reward",
+      stock: data.stock,
+      unlimited: Boolean(data.unlimited),
+      imageLabel: data.imageLabel?.trim().slice(0, 12).toUpperCase() || "NEW",
+      active: true,
+    },
+  });
+
+  return storeItemPayload(item);
+}
+
+export async function adminUpdateStoreItem(
+  sessionToken: string | undefined,
+  itemId: string,
+  data: {
+    title?: string;
+    description?: string;
+    cost?: number;
+    tag?: string;
+    stock?: number;
+    unlimited?: boolean;
+    active?: boolean;
+    imageLabel?: string;
+  }
+): Promise<StoreItemPayload> {
+  await requireAdminUser(sessionToken);
+
+  const item = await prisma.storeItem.update({
+    where: { id: itemId },
+    data: {
+      ...(data.title !== undefined ? { title: data.title.trim().slice(0, 80) } : {}),
+      ...(data.description !== undefined ? { description: data.description.trim().slice(0, 180) } : {}),
+      ...(data.cost !== undefined ? { cost: Math.max(0, Math.min(100_000_000, Math.floor(data.cost))) } : {}),
+      ...(data.tag !== undefined ? { tag: data.tag.trim().slice(0, 32) || "Reward" } : {}),
+      ...(data.stock !== undefined ? { stock: Math.max(0, Math.min(1_000_000, Math.floor(data.stock))) } : {}),
+      ...(data.unlimited !== undefined ? { unlimited: data.unlimited } : {}),
+      ...(data.active !== undefined ? { active: data.active } : {}),
+      ...(data.imageLabel !== undefined ? { imageLabel: data.imageLabel.trim().slice(0, 12).toUpperCase() || "NEW" } : {}),
+    },
+  });
+
+  return storeItemPayload(item);
+}
+
+export async function adminListStorePurchases(
+  sessionToken: string | undefined
+): Promise<AdminStorePurchasePayload[]> {
+  await requireAdminUser(sessionToken);
+
+  const purchases = await prisma.storePurchase.findMany({
+    include: {
+      item: { select: { title: true } },
+      user: {
+        select: {
+          id: true,
+          kickUsername: true,
+          discordUsername: true,
+          displayName: true,
+          email: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 100,
+  });
+
+  return purchases.map((purchase) => ({
+    id: purchase.id,
+    itemId: purchase.itemId,
+    itemTitle: purchase.item.title,
+    cost: purchase.cost,
+    status: purchase.status,
+    createdAt: purchase.createdAt.toISOString(),
+    userId: purchase.userId,
+    userHandle: handleFromUser(purchase.user),
+    userEmail: purchase.user.email ?? "",
+  }));
+}
+
+export async function adminUpdateStorePurchaseStatus(
+  sessionToken: string | undefined,
+  purchaseId: string,
+  status: "PENDING" | "COMPLETED" | "REJECTED"
+): Promise<AdminStorePurchasePayload> {
+  await requireAdminUser(sessionToken);
+
+  const purchase = await prisma.storePurchase.update({
+    where: { id: purchaseId },
+    data: { status },
+    include: {
+      item: { select: { title: true } },
+      user: {
+        select: {
+          id: true,
+          kickUsername: true,
+          discordUsername: true,
+          displayName: true,
+          email: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  return {
+    id: purchase.id,
+    itemId: purchase.itemId,
+    itemTitle: purchase.item.title,
+    cost: purchase.cost,
+    status: purchase.status,
+    createdAt: purchase.createdAt.toISOString(),
+    userId: purchase.userId,
+    userHandle: handleFromUser(purchase.user),
+    userEmail: purchase.user.email ?? "",
+  };
 }

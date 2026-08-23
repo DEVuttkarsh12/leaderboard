@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   getKickRedirectUri,
+  KICK_TOKEN_URL,
   KICK_OAUTH_STATE_COOKIE,
   KICK_OAUTH_VERIFIER_COOKIE,
 } from "@/lib/server/auth/kick";
@@ -11,7 +12,6 @@ import {
   setSessionCookie,
 } from "@/lib/server/auth/session";
 
-const KICK_TOKEN_URL = "https://id.kick.com/oauth/token";
 const KICK_USER_URL = "https://api.kick.com/public/v1/users";
 
 const tokenSchema = z.object({

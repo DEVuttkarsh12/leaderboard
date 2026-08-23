@@ -62,7 +62,21 @@ export const ModelName = {
   BetMarket: 'BetMarket',
   UserBet: 'UserBet',
   ChallengeMission: 'ChallengeMission',
-  ChallengeProgress: 'ChallengeProgress'
+  ChallengeProgress: 'ChallengeProgress',
+  WatchSession: 'WatchSession',
+  KickChatActivity: 'KickChatActivity',
+  KickStreamStatus: 'KickStreamStatus',
+  RaffleRound: 'RaffleRound',
+  RaffleAccount: 'RaffleAccount',
+  RaffleEntry: 'RaffleEntry',
+  BonusHuntSession: 'BonusHuntSession',
+  HuntFollow: 'HuntFollow',
+  HuntClip: 'HuntClip',
+  HuntClipVote: 'HuntClipVote',
+  HuntClipSave: 'HuntClipSave',
+  SupportTicket: 'SupportTicket',
+  Tournament: 'Tournament',
+  TournamentEntry: 'TournamentEntry'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -270,6 +284,200 @@ export const ChallengeProgressScalarFieldEnum = {
 } as const
 
 export type ChallengeProgressScalarFieldEnum = (typeof ChallengeProgressScalarFieldEnum)[keyof typeof ChallengeProgressScalarFieldEnum]
+
+
+export const WatchSessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  streamId: 'streamId',
+  status: 'status',
+  totalSeconds: 'totalSeconds',
+  pointsAwarded: 'pointsAwarded',
+  dailyBonusAwarded: 'dailyBonusAwarded',
+  startedAt: 'startedAt',
+  lastHeartbeatAt: 'lastHeartbeatAt',
+  endedAt: 'endedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WatchSessionScalarFieldEnum = (typeof WatchSessionScalarFieldEnum)[keyof typeof WatchSessionScalarFieldEnum]
+
+
+export const KickChatActivityScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  kickUserId: 'kickUserId',
+  username: 'username',
+  channelSlug: 'channelSlug',
+  content: 'content',
+  createdAt: 'createdAt',
+  receivedAt: 'receivedAt'
+} as const
+
+export type KickChatActivityScalarFieldEnum = (typeof KickChatActivityScalarFieldEnum)[keyof typeof KickChatActivityScalarFieldEnum]
+
+
+export const KickStreamStatusScalarFieldEnum = {
+  id: 'id',
+  channelSlug: 'channelSlug',
+  broadcasterKickId: 'broadcasterKickId',
+  broadcasterUsername: 'broadcasterUsername',
+  isLive: 'isLive',
+  title: 'title',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  lastEventAt: 'lastEventAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KickStreamStatusScalarFieldEnum = (typeof KickStreamStatusScalarFieldEnum)[keyof typeof KickStreamStatusScalarFieldEnum]
+
+
+export const RaffleRoundScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  ticketRateWager: 'ticketRateWager',
+  status: 'status',
+  winnerEntryId: 'winnerEntryId',
+  drawnAt: 'drawnAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RaffleRoundScalarFieldEnum = (typeof RaffleRoundScalarFieldEnum)[keyof typeof RaffleRoundScalarFieldEnum]
+
+
+export const RaffleAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roundId: 'roundId',
+  tickets: 'tickets',
+  entries: 'entries',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RaffleAccountScalarFieldEnum = (typeof RaffleAccountScalarFieldEnum)[keyof typeof RaffleAccountScalarFieldEnum]
+
+
+export const RaffleEntryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roundId: 'roundId',
+  ticketCount: 'ticketCount',
+  createdAt: 'createdAt'
+} as const
+
+export type RaffleEntryScalarFieldEnum = (typeof RaffleEntryScalarFieldEnum)[keyof typeof RaffleEntryScalarFieldEnum]
+
+
+export const BonusHuntSessionScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  host: 'host',
+  status: 'status',
+  startBankroll: 'startBankroll',
+  currentBankroll: 'currentBankroll',
+  bonusCount: 'bonusCount',
+  openedCount: 'openedCount',
+  totalPayout: 'totalPayout',
+  bestMultiplier: 'bestMultiplier',
+  startsAt: 'startsAt',
+  active: 'active',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BonusHuntSessionScalarFieldEnum = (typeof BonusHuntSessionScalarFieldEnum)[keyof typeof BonusHuntSessionScalarFieldEnum]
+
+
+export const HuntFollowScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  huntId: 'huntId',
+  createdAt: 'createdAt'
+} as const
+
+export type HuntFollowScalarFieldEnum = (typeof HuntFollowScalarFieldEnum)[keyof typeof HuntFollowScalarFieldEnum]
+
+
+export const HuntClipScalarFieldEnum = {
+  id: 'id',
+  huntId: 'huntId',
+  title: 'title',
+  multiplier: 'multiplier',
+  votes: 'votes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HuntClipScalarFieldEnum = (typeof HuntClipScalarFieldEnum)[keyof typeof HuntClipScalarFieldEnum]
+
+
+export const HuntClipVoteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  clipId: 'clipId',
+  createdAt: 'createdAt'
+} as const
+
+export type HuntClipVoteScalarFieldEnum = (typeof HuntClipVoteScalarFieldEnum)[keyof typeof HuntClipVoteScalarFieldEnum]
+
+
+export const HuntClipSaveScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  clipId: 'clipId',
+  createdAt: 'createdAt'
+} as const
+
+export type HuntClipSaveScalarFieldEnum = (typeof HuntClipSaveScalarFieldEnum)[keyof typeof HuntClipSaveScalarFieldEnum]
+
+
+export const SupportTicketScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  category: 'category',
+  subject: 'subject',
+  message: 'message',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportTicketScalarFieldEnum = (typeof SupportTicketScalarFieldEnum)[keyof typeof SupportTicketScalarFieldEnum]
+
+
+export const TournamentScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  title: 'title',
+  starts: 'starts',
+  prize: 'prize',
+  seats: 'seats',
+  taken: 'taken',
+  status: 'status',
+  active: 'active',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TournamentScalarFieldEnum = (typeof TournamentScalarFieldEnum)[keyof typeof TournamentScalarFieldEnum]
+
+
+export const TournamentEntryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tournamentId: 'tournamentId',
+  createdAt: 'createdAt'
+} as const
+
+export type TournamentEntryScalarFieldEnum = (typeof TournamentEntryScalarFieldEnum)[keyof typeof TournamentEntryScalarFieldEnum]
 
 
 export const SortOrder = {

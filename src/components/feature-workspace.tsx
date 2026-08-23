@@ -56,17 +56,92 @@ type Ticket = {
   message: string;
   status: "Open" | "Waiting" | "Solved";
   createdAt: string;
+  updatedAt?: string;
+  handle?: string;
+  email?: string;
 };
 
-type StoreItem = {
+type WatchSummary = {
+  connected: boolean;
+  running: boolean;
+  verified: boolean;
+  verificationMode: "oauth" | "chat";
+  verificationMessage: string;
+  streamLive: boolean;
+  lastActivityAt: string | null;
+  totalSecondsToday: number;
+  claimablePoints: number;
+  dailyBonusAvailable: boolean;
+  dailyBonus: number;
+  rateLabel: string;
+  points: number;
+  xp: number;
+};
+
+type ApiHunt = {
   id: string;
   title: string;
-  description: string;
-  cost: number;
-  tag: string;
-  stock: number;
-  unlimited: boolean;
-  image: string;
+  time: string;
+  host: string;
+  status: "Live" | "Upcoming" | "Completed";
+  heat: number;
+  followed: boolean;
+  startBankroll: number;
+  currentBankroll: number;
+  bonusCount: number;
+  openedCount: number;
+  totalPayout: number;
+  bestMultiplier: number;
+};
+
+type ApiHuntClip = {
+  id: string;
+  huntId: string;
+  title: string;
+  stat: string;
+  votes: number;
+  saved: boolean;
+  voted: boolean;
+  multiplier: number;
+};
+
+type RafflePayload = {
+  round: {
+    id: string;
+    title: string;
+    ticketRateWager: number;
+    status: "Open" | "Drawing" | "Closed";
+    totalEntries: number;
+    winnerEntryId: string | null;
+    drawnAt: string | null;
+  };
+  account: {
+    tickets: number;
+    entries: number;
+  };
+  entries: {
+    id: string;
+    handle: string;
+    ticketCount: number;
+    createdAt: string;
+  }[];
+  winner?: {
+    id: string;
+    handle: string;
+    ticketCount: number;
+    createdAt: string;
+  };
+};
+
+type ApiTournament = {
+  id: string;
+  title: string;
+  starts: string;
+  prize: string;
+  seats: number;
+  taken: number;
+  joined: boolean;
+  status: "Open" | "Locked" | "Completed";
 };
 
 type Purchase = {
@@ -148,39 +223,6 @@ const defaultAccount: Account = {
   badges: ["Early", "Season 08"],
 };
 
-const hunts = [
-  { id: "midnight", title: "Midnight Multiplier", time: "22:30", host: "Vanta", status: "Live", heat: 86 },
-  { id: "neon", title: "Neon Chase", time: "00:15", host: "Luxe", status: "Upcoming", heat: 72 },
-  { id: "vault", title: "Vault Break", time: "02:00", host: "Midas", status: "Upcoming", heat: 64 },
-];
-
-const clips = [
-  { id: "clip-01", title: "860x reveal", stat: "12.4K" },
-  { id: "clip-02", title: "Last-spin save", stat: "8.1K" },
-  { id: "clip-03", title: "Vault streak", stat: "5.7K" },
-];
-
-const tournaments = [
-  { id: "rush", title: "Friday Rush", starts: "Tonight 21:00", prize: "40K pts", seats: 64, taken: 51 },
-  { id: "duel", title: "Duel Ladder", starts: "Tomorrow 18:30", prize: "25K pts", seats: 32, taken: 18 },
-  { id: "finals", title: "Season Finals", starts: "Sunday 20:00", prize: "120K pts", seats: 16, taken: 12 },
-];
-
-const defaultStoreItems: StoreItem[] = [
-  { id: "cash-tip", title: "Cash Tip", description: "Manual payout.", cost: 12000, tag: "Cash", stock: 8, unlimited: false, image: "TIP" },
-  { id: "discord-role", title: "VIP Role", description: "Discord flex.", cost: 6500, tag: "Role", stock: 999, unlimited: true, image: "VIP" },
-  { id: "bonus-buy", title: "Bonus Buy", description: "Stream buy.", cost: 18000, tag: "Casino", stock: 3, unlimited: false, image: "BUY" },
-  { id: "gift-card", title: "Gift Card", description: "Code drop.", cost: 22000, tag: "Gift", stock: 5, unlimited: false, image: "CARD" },
-  { id: "merch", title: "Merch Entry", description: "Gear draw.", cost: 4000, tag: "Merch", stock: 40, unlimited: false, image: "DROP" },
-  { id: "steam-key", title: "Steam Key", description: "Game key.", cost: 8500, tag: "Key", stock: 12, unlimited: false, image: "KEY" },
-];
-
-const defaultMarkets: BetMarket[] = [
-  { id: "max-win", title: "Max Win Today?", type: "Stream", deadline: "22:00", status: "Live", sides: ["Yes", "No"], odds: [2.4, 1.35], winner: null },
-  { id: "ufc-main", title: "UFC Main Event", type: "UFC", deadline: "23:30", status: "Live", sides: ["Islam", "Conor"], odds: [2, 1.3], winner: null },
-  { id: "level-100", title: "Level 100 Run", type: "Casino", deadline: "01:00", status: "Locked", sides: ["Hits", "Misses"], odds: [1.8, 1.7], winner: null },
-];
-
 const defaultSiteConfig: SiteConfig = {
   announcement: "Double watch points live",
   banner: "Season 08 prize sprint",
@@ -197,19 +239,6 @@ const faq = [
   { q: "Custom bets", a: "Admin settles." },
   { q: "Casino names", a: "Link in profile." },
 ];
-
-function nowStamp() {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  }).format(new Date());
-}
-
-function uid(prefix: string) {
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
 
 function normalizeAccount(value: Partial<Account> | null | undefined): Account {
   return {
@@ -372,7 +401,7 @@ export default function FeatureWorkspace({ route }: { route: string }) {
   if (route === "challenges") return <ChallengesWorkspace account={account} setAccount={setAccount} />;
   if (route === "bonus-hunts") return <HuntsWorkspace />;
   if (route === "tournaments") return <TournamentsWorkspace />;
-  if (route === "wager-raffles") return <RafflesWorkspace />;
+  if (route === "wager-raffles") return <RafflesWorkspace account={account} />;
   if (route === "store") return <StoreWorkspace account={account} setAccount={setAccount} />;
   if (route === "custom-bets") return <CustomBetsWorkspace account={account} setAccount={setAccount} />;
   if (route === "watch-points") return <WatchPointsWorkspace account={account} setAccount={setAccount} />;
@@ -534,113 +563,251 @@ function ChallengesWorkspace({
 }
 
 function HuntsWorkspace() {
-  const [followed, setFollowed] = useStoredState<string[]>("rankboard-followed-hunts", []);
-  const [savedClips, setSavedClips] = useStoredState<string[]>("rankboard-saved-clips", []);
-  const [votes, setVotes] = useStoredState<Record<string, number>>("rankboard-clip-votes", {});
+  const [huntList, setHuntList] = useState<ApiHunt[]>([]);
+  const [clipList, setClipList] = useState<ApiHuntClip[]>([]);
+  const [message, setMessage] = useState("Loading hunts...");
+  const [busyId, setBusyId] = useState("");
+
+  function applyHunts(payload: { hunts?: ApiHunt[]; clips?: ApiHuntClip[] }) {
+    setHuntList(payload.hunts ?? []);
+    setClipList(payload.clips ?? []);
+  }
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/hunts", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: { hunts?: ApiHunt[]; clips?: ApiHuntClip[]; error?: string }) => {
+        if (!active) return;
+        if (payload.hunts && payload.clips) {
+          applyHunts(payload);
+          setMessage("Hunt sessions synced.");
+        } else {
+          setMessage(payload.error ?? "Could not load hunts.");
+        }
+      })
+      .catch(() => { if (active) setMessage("Could not load hunts."); });
+
+    return () => { active = false; };
+  }, []);
+
+  async function postHuntAction(path: string, body: Record<string, string>) {
+    const id = body.huntId ?? body.clipId ?? path;
+    setBusyId(id);
+
+    try {
+      const response = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const payload = (await response.json()) as {
+        hunts?: ApiHunt[];
+        clips?: ApiHuntClip[];
+        error?: string;
+      };
+      if (!response.ok || !payload.hunts || !payload.clips) {
+        throw new Error(payload.error ?? "Action failed.");
+      }
+      applyHunts(payload);
+      setMessage("Hunt state saved.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Action failed.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  const followedCount = huntList.filter((hunt) => hunt.followed).length;
+  const savedCount = clipList.filter((clip) => clip.saved).length;
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Bonus Hunts" title="Live hunt sessions" meta={`${followed.length} followed · ${savedClips.length} clips saved`} />
+      <WorkspaceHeader overline="Bonus Hunts" title="Live hunt sessions" meta={`${followedCount} followed · ${savedCount} clips saved · ${message}`} />
       <div className="workspace-grid two">
-        {hunts.map((hunt) => {
-          const isFollowed = followed.includes(hunt.id);
-          return (
-            <article className="action-card casino-card" key={hunt.id}>
-              <small>{hunt.status} / {hunt.time}</small>
-              <h3>{hunt.title}</h3>
-              <p>{hunt.host} / {hunt.heat}% heat</p>
-              <ProgressBar value={hunt.heat} />
-              <div className="action-card__footer">
-                <strong>{isFollowed ? "Reminder on" : "Reminder off"}</strong>
-                <button type="button" onClick={() => setFollowed((current) => isFollowed ? current.filter((id) => id !== hunt.id) : [...current, hunt.id])}>
-                  {isFollowed ? "Unfollow" : "Follow"}
-                </button>
-              </div>
-            </article>
-          );
-        })}
+        {huntList.map((hunt) => (
+          <article className="action-card casino-card" key={hunt.id}>
+            <small>{hunt.status} / {hunt.time}</small>
+            <h3>{hunt.title}</h3>
+            <p>{hunt.host} / {hunt.heat}% heat / best {hunt.bestMultiplier.toLocaleString()}x</p>
+            <ProgressBar value={hunt.heat} />
+            <div className="action-card__footer">
+              <strong>{hunt.followed ? "Reminder on" : "Reminder off"}</strong>
+              <button type="button" disabled={busyId === hunt.id} onClick={() => postHuntAction("/api/hunts/follow", { huntId: hunt.id })}>
+                {hunt.followed ? "Unfollow" : "Follow"}
+              </button>
+            </div>
+          </article>
+        ))}
       </div>
       <div className="workspace-list">
-        {clips.map((clip) => {
-          const saved = savedClips.includes(clip.id);
-          return (
-            <article key={clip.id}>
-              <span>CLIP</span>
-              <div>
-                <h3>{clip.title}</h3>
-                <p>{votes[clip.id] ?? 0} votes / {saved ? "saved" : clip.stat}</p>
-              </div>
-              <button type="button" onClick={() => setVotes((current) => ({ ...current, [clip.id]: (current[clip.id] ?? 0) + 1 }))}>Vote</button>
-              <button type="button" onClick={() => setSavedClips((current) => saved ? current.filter((id) => id !== clip.id) : [...current, clip.id])}>{saved ? "Saved" : "Save"}</button>
-            </article>
-          );
-        })}
+        {clipList.map((clip) => (
+          <article key={clip.id}>
+            <span>CLIP</span>
+            <div>
+              <h3>{clip.title}</h3>
+              <p>{clip.votes} votes / {clip.saved ? "saved" : clip.stat}</p>
+            </div>
+            <button type="button" disabled={clip.voted || busyId === clip.id} onClick={() => postHuntAction("/api/hunts/clips/vote", { clipId: clip.id })}>{clip.voted ? "Voted" : "Vote"}</button>
+            <button type="button" disabled={busyId === clip.id} onClick={() => postHuntAction("/api/hunts/clips/save", { clipId: clip.id })}>{clip.saved ? "Saved" : "Save"}</button>
+          </article>
+        ))}
+        {!clipList.length && <article><span>EMPTY</span><div><h3>No clips yet</h3><p>Live hunt clips will appear here.</p></div></article>}
       </div>
     </section>
   );
 }
 
 function TournamentsWorkspace() {
-  const [registrations, setRegistrations] = useStoredState<string[]>("rankboard-tournament-registrations", []);
-  const [selected, setSelected] = useState(tournaments[0].id);
-  const tournament = tournaments.find((item) => item.id === selected) ?? tournaments[0];
-  const joined = registrations.includes(tournament.id);
+  const [tournamentList, setTournamentList] = useState<ApiTournament[]>([]);
+  const [selected, setSelected] = useState("");
+  const [message, setMessage] = useState("Loading tournaments...");
+  const tournament = tournamentList.find((item) => item.id === selected) ?? tournamentList[0] ?? null;
+  const registrations = tournamentList.filter((item) => item.joined).length;
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/tournaments", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: { tournaments?: ApiTournament[]; error?: string }) => {
+        if (!active) return;
+        if (payload.tournaments) {
+          setTournamentList(payload.tournaments);
+          setSelected((current) => current || (payload.tournaments?.[0]?.id ?? ""));
+          setMessage("Tournaments synced.");
+        } else {
+          setMessage(payload.error ?? "Could not load tournaments.");
+        }
+      })
+      .catch(() => { if (active) setMessage("Could not load tournaments."); });
+
+    return () => { active = false; };
+  }, []);
+
+  async function toggleEntry() {
+    if (!tournament) return;
+    setMessage(tournament.joined ? "Withdrawing entry..." : "Entering tournament...");
+
+    try {
+      const response = await fetch("/api/tournaments/enter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tournamentId: tournament.id }),
+      });
+      const payload = (await response.json()) as { tournaments?: ApiTournament[]; error?: string };
+      if (!response.ok || !payload.tournaments) {
+        throw new Error(payload.error ?? "Tournament entry failed.");
+      }
+      setTournamentList(payload.tournaments);
+      setMessage("Tournament state saved.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Tournament entry failed.");
+    }
+  }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Tournaments" title="Brackets & prize pools" meta={`${registrations.length} entries`} />
+      <WorkspaceHeader overline="Tournaments" title="Brackets & prize pools" meta={`${registrations} entries · ${message}`} />
       <div className="workspace-grid three">
-        {tournaments.map((item) => {
-          const isJoined = registrations.includes(item.id);
-          return (
-            <article className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id}>
-              <small>{item.starts}</small>
-              <h3>{item.title}</h3>
-              <p>{item.taken + (isJoined ? 1 : 0)} / {item.seats} / {item.prize}</p>
-              <ProgressBar value={((item.taken + (isJoined ? 1 : 0)) / item.seats) * 100} />
-              <div className="action-card__footer">
-                <strong>{isJoined ? "Entered" : "Open"}</strong>
-                <button type="button" onClick={() => setSelected(item.id)}>View</button>
-              </div>
-            </article>
-          );
-        })}
+        {tournamentList.map((item) => (
+          <article className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id}>
+            <small>{item.starts}</small>
+            <h3>{item.title}</h3>
+            <p>{item.taken} / {item.seats} / {item.prize}</p>
+            <ProgressBar value={(item.taken / item.seats) * 100} />
+            <div className="action-card__footer">
+              <strong>{item.joined ? "Entered" : item.status}</strong>
+              <button type="button" onClick={() => setSelected(item.id)}>View</button>
+            </div>
+          </article>
+        ))}
       </div>
-      <div className="bracket-panel">
-        <div>
-          <small>ACTIVE BRACKET</small>
-          <h3>{tournament.title}</h3>
-          <p>{tournament.prize}</p>
+      {tournament ? (
+        <div className="bracket-panel">
+          <div>
+            <small>ACTIVE BRACKET</small>
+            <h3>{tournament.title}</h3>
+            <p>{tournament.prize}</p>
+          </div>
+          <div className="bracket-lanes">
+            {["Qualifiers", "Quarterfinal", "Semifinal", "Final"].map((round, index) => (
+              <span key={round}>{round}<b>{index === 0 ? tournament.taken : Math.max(2, Math.round(tournament.taken / (index + 2)))}</b></span>
+            ))}
+          </div>
+          <button type="button" onClick={toggleEntry} disabled={tournament.status !== "Open"}>
+            {tournament.joined ? "Withdraw" : "Enter"}
+          </button>
         </div>
-        <div className="bracket-lanes">
-          {["Qualifiers", "Quarterfinal", "Semifinal", "Final"].map((round, index) => (
-            <span key={round}>{round}<b>{index === 0 ? tournament.taken : Math.max(2, Math.round(tournament.taken / (index + 2)))}</b></span>
-          ))}
-        </div>
-        <button type="button" onClick={() => setRegistrations((current) => joined ? current.filter((id) => id !== tournament.id) : [...current, tournament.id])}>
-          {joined ? "Withdraw" : "Enter"}
-        </button>
-      </div>
+      ) : null}
     </section>
   );
 }
 
-function RafflesWorkspace() {
-  const [tickets, setTickets] = useStoredState<number>("rankboard-raffle-tickets", 12);
-  const [entries, setEntries] = useStoredState<number>("rankboard-raffle-entries", 0);
+function RafflesWorkspace({ account }: { account: Account }) {
+  const [raffle, setRaffle] = useState<RafflePayload | null>(null);
+  const [message, setMessage] = useState("Loading raffle...");
+  const [busy, setBusy] = useState(false);
   const [wager, setWager] = useState("10000");
-  const generated = Math.max(0, Math.floor(Number(wager || 0) / 10000));
+  const ticketRate = raffle?.round.ticketRateWager ?? 10000;
+  const tickets = raffle?.account.tickets ?? 0;
+  const entries = raffle?.account.entries ?? 0;
+  const generated = Math.max(0, Math.floor(Number(wager || 0) / ticketRate));
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/raffles", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: { raffle?: RafflePayload; error?: string }) => {
+        if (!active) return;
+        if (payload.raffle) {
+          setRaffle(payload.raffle);
+          setMessage("Raffle synced.");
+        } else {
+          setMessage(payload.error ?? "Could not load raffle.");
+        }
+      })
+      .catch(() => { if (active) setMessage("Could not load raffle."); });
+
+    return () => { active = false; };
+  }, []);
+
+  async function postRaffle(path: string, body: Record<string, number | string>) {
+    setBusy(true);
+    try {
+      const response = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const payload = (await response.json()) as {
+        raffle?: RafflePayload;
+        error?: string;
+      };
+      if (!response.ok || !payload.raffle) {
+        throw new Error(payload.error ?? "Raffle action failed.");
+      }
+      setRaffle(payload.raffle);
+      setMessage(payload.raffle.winner ? `Winner: ${payload.raffle.winner.handle}` : "Raffle state saved.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Raffle action failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Wager Raffles" title="Turn wagers into tickets" meta={`${tickets} tickets · ${entries} entries`} />
+      <WorkspaceHeader overline="Wager Raffles" title={raffle?.round.title ?? "Turn wagers into tickets"} meta={`${tickets} tickets · ${entries} entries · ${message}`} />
       <div className="tool-panel">
         <label>
           WAGER AMOUNT
           <input value={wager} inputMode="numeric" onChange={(event) => setWager(event.target.value.replace(/\D/g, ""))} />
         </label>
         <div><small>GENERATES</small><strong>{generated}</strong><span>tickets</span></div>
-        <button type="button" onClick={() => setTickets((current) => current + generated)} disabled={generated === 0}>Convert</button>
+        <button type="button" onClick={() => postRaffle("/api/raffles/convert", { wagerAmount: Number(wager || 0) })} disabled={busy || generated === 0}>Convert</button>
       </div>
       <div className="workspace-grid three">
         {[1, 5, 10].map((amount) => (
@@ -650,12 +817,29 @@ function RafflesWorkspace() {
             <p>{tickets >= amount ? "Ready" : "Locked"}</p>
             <div className="action-card__footer">
               <strong>{tickets >= amount ? "Ready" : "Need tickets"}</strong>
-              <button type="button" disabled={tickets < amount} onClick={() => { setTickets((current) => current - amount); setEntries((current) => current + amount); }}>
+              <button type="button" disabled={busy || tickets < amount} onClick={() => postRaffle("/api/raffles/enter", { ticketCount: amount })}>
                 Enter
               </button>
             </div>
           </article>
         ))}
+      </div>
+      {account.badges.includes("Admin") && raffle?.round.status === "Open" && (
+        <div className="tool-panel" style={{ marginTop: "1rem" }}>
+          <div><small>DRAW TOOL</small><strong>{raffle.round.totalEntries}</strong><span>weighted entries</span></div>
+          <button type="button" disabled={busy || raffle.round.totalEntries <= 0} onClick={() => postRaffle("/api/admin/raffles/draw", { roundId: raffle.round.id })}>Draw winner</button>
+        </div>
+      )}
+      <div className="workspace-list">
+        {raffle?.entries.length ? raffle.entries.map((entry) => (
+          <article key={entry.id}>
+            <span>{entry.ticketCount}x</span>
+            <div>
+              <h3>{entry.handle}</h3>
+              <p>{new Date(entry.createdAt).toLocaleString()}</p>
+            </div>
+          </article>
+        )) : <article><span>EMPTY</span><div><h3>No raffle entries</h3><p>Convert wagers and enter tickets above.</p></div></article>}
       </div>
     </section>
   );
@@ -679,6 +863,12 @@ type ApiPurchase = {
   cost: number;
   status: "PENDING" | "COMPLETED" | "REJECTED";
   createdAt: string;
+};
+
+type AdminApiPurchase = ApiPurchase & {
+  userId: string;
+  userHandle: string;
+  userEmail: string;
 };
 
 function StoreWorkspace({
@@ -1018,8 +1208,12 @@ function WatchPointsWorkspace({
 }) {
   const [running, setRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
-  const earned = Math.floor(seconds / 10) * 25;
-  const dailyBonus = account.connected.kick.connected ? 500 : 0;
+  const [summary, setSummary] = useState<WatchSummary | null>(null);
+  const [message, setMessage] = useState("Loading watch points...");
+  const connected = summary?.connected ?? account.connected.kick.connected;
+  const displayedSeconds = summary?.totalSecondsToday ?? seconds;
+  const earned = summary?.claimablePoints ?? Math.floor(seconds / 10) * 25;
+  const dailyBonus = summary?.dailyBonusAvailable ? summary.dailyBonus : 0;
 
   useEffect(() => {
     if (!running) return;
@@ -1027,44 +1221,106 @@ function WatchPointsWorkspace({
     return () => window.clearInterval(timer);
   }, [running]);
 
-  function claimWatchPoints() {
-    if (earned <= 0) return;
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      return {
-        ...safe,
-        points: safe.points + earned + dailyBonus,
-        xp: safe.xp + earned,
-        watchMinutes: safe.watchMinutes + Math.floor(seconds / 60),
-      };
-    });
-    setRunning(false);
-    setSeconds(0);
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/watch-points", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: { summary?: WatchSummary; error?: string }) => {
+        if (!active) return;
+        if (payload.summary) {
+          setSummary(payload.summary);
+          setRunning(payload.summary.running);
+          setSeconds(payload.summary.totalSecondsToday);
+          setMessage(payload.summary.connected ? "Watch tracker synced." : "Connect Kick to start earning.");
+        } else {
+          setMessage(payload.error ?? "Could not load watch points.");
+        }
+      })
+      .catch(() => { if (active) setMessage("Could not load watch points."); });
+
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!running) return;
+
+    const heartbeat = window.setInterval(() => {
+      fetch("/api/watch-points/heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ running: true }),
+      })
+        .then((response) => response.json())
+        .then((payload: { summary?: WatchSummary }) => {
+          if (payload.summary) {
+            setSummary(payload.summary);
+            setSeconds(payload.summary.totalSecondsToday);
+          }
+        })
+        .catch(() => {});
+    }, 10000);
+
+    return () => window.clearInterval(heartbeat);
+  }, [running]);
+
+  async function sendHeartbeat(nextRunning: boolean) {
+    try {
+      const response = await fetch("/api/watch-points/heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ running: nextRunning }),
+      });
+      const payload = (await response.json()) as { summary?: WatchSummary; error?: string };
+      if (!response.ok || !payload.summary) {
+        throw new Error(payload.error ?? "Watch update failed.");
+      }
+      setSummary(payload.summary);
+      setRunning(payload.summary.running);
+      setSeconds(payload.summary.totalSecondsToday);
+      setMessage(nextRunning ? "Watch session running." : "Watch session paused.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Watch update failed.");
+      setRunning(false);
+    }
   }
 
-  function connectKick() {
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      return {
-        ...safe,
-        connected: {
-          ...safe.connected,
-          kick: { connected: true, username: safe.handle.replace("@", "") || "kick_user", id: uid("kick") },
-        },
-      };
-    });
+  async function claimWatchPoints() {
+    if (earned <= 0) return;
+
+    try {
+      const response = await fetch("/api/watch-points/claim", { method: "POST" });
+      const payload = (await response.json()) as { summary?: WatchSummary; error?: string };
+      if (!response.ok || !payload.summary) {
+        throw new Error(payload.error ?? "Watch claim failed.");
+      }
+      setSummary(payload.summary);
+      setSeconds(payload.summary.totalSecondsToday);
+      setAccount((current) => {
+        const safe = normalizeAccount(current);
+        return {
+          ...safe,
+          points: payload.summary!.points,
+          xp: payload.summary!.xp,
+          watchMinutes: Math.floor(payload.summary!.totalSecondsToday / 60),
+        };
+      });
+      setMessage("Watch points claimed.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Watch claim failed.");
+    }
   }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Watch Points" title="Earn while you watch" meta={account.connected.kick.connected ? "Kick linked" : "Connect Kick to start earning"} />
+      <WorkspaceHeader overline="Watch Points" title="Earn while you watch" meta={message} />
       <div className="watch-console">
-        <div className="watch-orb"><span>{String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}</span><b>{earned + dailyBonus}</b><small>points ready</small></div>
+        <div className="watch-orb"><span>{String(Math.floor(displayedSeconds / 60)).padStart(2, "0")}:{String(displayedSeconds % 60).padStart(2, "0")}</span><b>{earned + dailyBonus}</b><small>points ready</small></div>
         <div className="watch-actions">
-          <StatusGrid items={[["Kick", account.connected.kick.connected ? account.connected.kick.username : "Not linked"], ["Rate", "25 / 10s"], ["Daily", dailyBonus ? "+500" : "Locked"], ["Total", `${account.watchMinutes}m`]]} />
+          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode ?? "OAuth"], ["Daily", dailyBonus ? `+${dailyBonus}` : "Locked"], ["Total", `${Math.floor(displayedSeconds / 60)}m`]]} />
           <div className="button-row">
-            {!account.connected.kick.connected ? <button className="button primary" type="button" onClick={connectKick}>Connect Kick <span>↗</span></button> : null}
-            <button className="button ghost" type="button" onClick={() => setRunning((value) => !value)}>{running ? "Pause bot" : "Start bot"} <span>●</span></button>
+            {!connected ? <a className="button primary" href="/api/auth/kick">Connect Kick <span>↗</span></a> : null}
+            <button className="button ghost" type="button" onClick={() => sendHeartbeat(!running)} disabled={!connected}>{running ? "Pause bot" : "Start bot"} <span>●</span></button>
             <button className="button primary" type="button" onClick={claimWatchPoints} disabled={earned <= 0}>Claim <span>↗</span></button>
           </div>
         </div>
@@ -1172,10 +1428,9 @@ function AdminWorkspace({
   account: Account;
   setAccount: (value: Account | ((current: Account) => Account)) => void;
 }) {
-  const [items, setItems] = useStoredState<StoreItem[]>("rankboard-store-items", defaultStoreItems);
-  const [purchases, setPurchases] = useStoredState<Purchase[]>("rankboard-purchases", []);
+  const [items, setItems] = useState<ApiStoreItem[]>([]);
+  const [purchases, setPurchases] = useState<AdminApiPurchase[]>([]);
   const [markets, setMarkets] = useState<BetMarket[]>([]);
-  const [bets, setBets] = useStoredState<Bet[]>("rankboard-bets", []);
   const [siteConfig, setSiteConfig] = useStoredState<SiteConfig>("rankboard-site-config", defaultSiteConfig);
   const [newItem, setNewItem] = useState({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
   const [newMarket, setNewMarket] = useState({ title: "", type: "Stream", sideA: "Yes", sideB: "No", oddsA: "2.00", oddsB: "1.50", deadline: "23:00" });
@@ -1185,6 +1440,12 @@ function AdminWorkspace({
   const [adminUserStatus, setAdminUserStatus] = useState("Loading users");
   const [adminUsersLoading, setAdminUsersLoading] = useState(false);
   const [adminMarketMessage, setAdminMarketMessage] = useState("");
+  const [adminStoreMessage, setAdminStoreMessage] = useState("Loading store");
+  const [supportTickets, setSupportTickets] = useState<Ticket[]>([]);
+  const [supportStatus, setSupportStatus] = useState("Loading support");
+  const [adminRaffle, setAdminRaffle] = useState<RafflePayload | null>(null);
+  const [adminRaffleStatus, setAdminRaffleStatus] = useState("Loading raffle");
+  const [kickEventStatus, setKickEventStatus] = useState("Webhook subscription idle");
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
     adminUsers[0] ??
@@ -1204,6 +1465,67 @@ function AdminWorkspace({
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    Promise.all([
+      fetch("/api/store/items", { cache: "no-store" }).then((response) => response.json()),
+      fetch("/api/admin/store/purchases", { cache: "no-store" }).then((response) => response.json()),
+    ])
+      .then(([itemsPayload, purchasesPayload]: [
+        { items?: ApiStoreItem[]; error?: string },
+        { purchases?: AdminApiPurchase[]; error?: string },
+      ]) => {
+        if (!active) return;
+        if (itemsPayload.items) setItems(itemsPayload.items);
+        if (purchasesPayload.purchases) setPurchases(purchasesPayload.purchases);
+        setAdminStoreMessage(
+          purchasesPayload.error ??
+          itemsPayload.error ??
+          `${itemsPayload.items?.length ?? 0} items / ${purchasesPayload.purchases?.length ?? 0} purchases`
+        );
+      })
+      .catch(() => {
+        if (active) setAdminStoreMessage("Could not load store admin data");
+      });
+
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    Promise.all([
+      fetch("/api/admin/support/tickets", { cache: "no-store" }).then((response) => response.json()),
+      fetch("/api/raffles", { cache: "no-store" }).then((response) => response.json()),
+    ])
+      .then(([ticketPayload, rafflePayload]: [
+        { tickets?: Ticket[]; error?: string },
+        { raffle?: RafflePayload; error?: string },
+      ]) => {
+        if (!active) return;
+        if (ticketPayload.tickets) {
+          setSupportTickets(ticketPayload.tickets);
+          setSupportStatus(`${ticketPayload.tickets.length} tickets loaded`);
+        } else {
+          setSupportStatus(ticketPayload.error ?? "Could not load support");
+        }
+        if (rafflePayload.raffle) {
+          setAdminRaffle(rafflePayload.raffle);
+          setAdminRaffleStatus("Raffle loaded");
+        } else {
+          setAdminRaffleStatus(rafflePayload.error ?? "Could not load raffle");
+        }
+      })
+      .catch(() => {
+        if (!active) return;
+        setSupportStatus("Could not load support");
+        setAdminRaffleStatus("Could not load raffle");
+      });
+
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -1261,20 +1583,35 @@ function AdminWorkspace({
     });
   }
 
-  function addItem(event: FormEvent<HTMLFormElement>) {
+  async function addItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!newItem.title.trim()) return;
-    setItems((current) => [{
-      id: uid("item"),
-      title: newItem.title.trim(),
-      description: "Admin drop.",
-      cost: Math.max(0, Number(newItem.cost) || 0),
-      tag: newItem.tag,
-      stock: Math.max(0, Number(newItem.stock) || 0),
-      unlimited: false,
-      image: newItem.image || "NEW",
-    }, ...current]);
-    setNewItem({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
+    setAdminStoreMessage("Creating store item...");
+
+    try {
+      const response = await fetch("/api/admin/store/items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newItem.title.trim(),
+          description: "Admin drop.",
+          cost: Math.max(0, Number(newItem.cost) || 0),
+          tag: newItem.tag,
+          stock: Math.max(0, Number(newItem.stock) || 0),
+          unlimited: false,
+          imageLabel: newItem.image || "NEW",
+        }),
+      });
+      const payload = (await response.json()) as { item?: ApiStoreItem; error?: string };
+      if (!response.ok || !payload.item) {
+        throw new Error(payload.error ?? "Store item creation failed");
+      }
+      setItems((current) => [payload.item!, ...current]);
+      setNewItem({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
+      setAdminStoreMessage(`Created ${payload.item.title}`);
+    } catch (error) {
+      setAdminStoreMessage(error instanceof Error ? error.message : "Store item creation failed");
+    }
   }
 
   async function addMarket(event: FormEvent<HTMLFormElement>) {
@@ -1381,6 +1718,121 @@ function AdminWorkspace({
     });
   }
 
+  async function updateStoreItem(item: ApiStoreItem, patch: Partial<ApiStoreItem> & { active?: boolean }) {
+    setAdminStoreMessage(`Updating ${item.title}`);
+
+    try {
+      const response = await fetch(`/api/admin/store/items/${item.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+      const payload = (await response.json()) as { item?: ApiStoreItem; error?: string };
+      if (!response.ok || !payload.item) {
+        throw new Error(payload.error ?? "Store item update failed");
+      }
+      if (patch.active === false) {
+        setItems((current) => current.filter((entry) => entry.id !== item.id));
+      } else {
+        setItems((current) => current.map((entry) => entry.id === item.id ? payload.item! : entry));
+      }
+      setAdminStoreMessage(`${item.title} updated`);
+    } catch (error) {
+      setAdminStoreMessage(error instanceof Error ? error.message : "Store item update failed");
+    }
+  }
+
+  async function updatePurchase(purchase: AdminApiPurchase) {
+    const nextStatus =
+      purchase.status === "PENDING"
+        ? "COMPLETED"
+        : purchase.status === "COMPLETED"
+          ? "PENDING"
+          : "PENDING";
+    setAdminStoreMessage(`Updating ${purchase.itemTitle}`);
+
+    try {
+      const response = await fetch(`/api/admin/store/purchases/${purchase.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const payload = (await response.json()) as { purchase?: AdminApiPurchase; error?: string };
+      if (!response.ok || !payload.purchase) {
+        throw new Error(payload.error ?? "Purchase update failed");
+      }
+      setPurchases((current) => current.map((entry) => entry.id === purchase.id ? payload.purchase! : entry));
+      setAdminStoreMessage(`${purchase.itemTitle} set to ${payload.purchase.status}`);
+    } catch (error) {
+      setAdminStoreMessage(error instanceof Error ? error.message : "Purchase update failed");
+    }
+  }
+
+  async function updateTicket(ticket: Ticket) {
+    const nextStatus = ticket.status === "Open" ? "Waiting" : ticket.status === "Waiting" ? "Solved" : "Open";
+    setSupportStatus(`Updating ${ticket.subject}`);
+
+    try {
+      const response = await fetch(`/api/admin/support/tickets/${ticket.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      const payload = (await response.json()) as { ticket?: Ticket; error?: string };
+      if (!response.ok || !payload.ticket) {
+        throw new Error(payload.error ?? "Ticket update failed");
+      }
+      setSupportTickets((current) => current.map((entry) => entry.id === ticket.id ? payload.ticket! : entry));
+      setSupportStatus(`${payload.ticket.subject} set to ${payload.ticket.status}`);
+    } catch (error) {
+      setSupportStatus(error instanceof Error ? error.message : "Ticket update failed");
+    }
+  }
+
+  async function drawAdminRaffle() {
+    if (!adminRaffle) return;
+    setAdminRaffleStatus("Drawing winner...");
+
+    try {
+      const response = await fetch("/api/admin/raffles/draw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roundId: adminRaffle.round.id }),
+      });
+      const payload = (await response.json()) as { raffle?: RafflePayload; error?: string };
+      if (!response.ok || !payload.raffle) {
+        throw new Error(payload.error ?? "Raffle draw failed");
+      }
+      setAdminRaffle(payload.raffle);
+      setAdminRaffleStatus(payload.raffle.winner ? `Winner: ${payload.raffle.winner.handle}` : "Winner drawn");
+    } catch (error) {
+      setAdminRaffleStatus(error instanceof Error ? error.message : "Raffle draw failed");
+    }
+  }
+
+  async function subscribeKickEvents() {
+    setKickEventStatus("Subscribing Kick events...");
+
+    try {
+      const response = await fetch("/api/admin/kick/events/subscribe", { method: "POST" });
+      const payload = (await response.json()) as {
+        results?: { event: string; ok: boolean; status: number; body: string }[];
+        error?: string;
+      };
+      if (!response.ok || !payload.results) {
+        throw new Error(payload.error ?? "Kick subscription failed");
+      }
+      const failed = payload.results.filter((result) => !result.ok);
+      setKickEventStatus(
+        failed.length
+          ? `${failed.length} Kick event subscription(s) failed`
+          : "Kick chat/live events subscribed"
+      );
+    } catch (error) {
+      setKickEventStatus(error instanceof Error ? error.message : "Kick subscription failed");
+    }
+  }
+
   return (
     <section className="section page-width app-workspace">
       <WorkspaceHeader overline="Admin" title="Control room" meta={adminUserStatus} />
@@ -1463,6 +1915,15 @@ function AdminWorkspace({
           <h3>API / Backend / DB</h3>
           <StatusGrid items={[["API", "GET only"], ["Backend", "Route live"], ["Cache", "No-store"], ["DB adapter", "Ready"]]} />
         </article>
+        <article className="admin-panel">
+          <small>KICK EVENTS</small>
+          <h3>Watch verification</h3>
+          <StatusGrid items={[["Mode", "Webhook"], ["Chat", "Signed"], ["Live", "Status"], ["State", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
+          <div className="button-row">
+            <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
+          </div>
+          <p style={{ color: "var(--faint)", fontSize: "0.8rem", marginTop: "0.75rem" }}>{kickEventStatus}</p>
+        </article>
       </div>
       {/* Store Catalog Management */}
       <div className="admin-section-title">
@@ -1471,6 +1932,7 @@ function AdminWorkspace({
           <h2>Manage store items</h2>
         </div>
       </div>
+      <p style={{ margin: "0 0 0.75rem", color: "var(--faint)", fontWeight: 700 }}>{adminStoreMessage}</p>
       <form className="support-form account-form" onSubmit={addItem}>
         <label>ITEM<input value={newItem.title} onChange={(event) => setNewItem((current) => ({ ...current, title: event.target.value }))} placeholder="Reward name" /></label>
         <label>PRICE<input value={newItem.cost} inputMode="numeric" onChange={(event) => setNewItem((current) => ({ ...current, cost: event.target.value.replace(/\D/g, "") }))} /></label>
@@ -1482,8 +1944,8 @@ function AdminWorkspace({
           <article key={item.id}>
             <span>{item.tag}</span>
             <div><h3>{item.title}</h3><p>{item.cost.toLocaleString()} pts / {item.unlimited ? "unlimited" : `${item.stock} stock`}</p></div>
-            <button type="button" onClick={() => setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, unlimited: !entry.unlimited } : entry))}>{item.unlimited ? "Limit" : "Unlimited"}</button>
-            <button type="button" onClick={() => setItems((current) => current.filter((entry) => entry.id !== item.id))}>Remove</button>
+            <button type="button" onClick={() => updateStoreItem(item, { unlimited: !item.unlimited })}>{item.unlimited ? "Limit" : "Unlimited"}</button>
+            <button type="button" onClick={() => updateStoreItem(item, { active: false })}>Remove</button>
           </article>
         ))}
       </div>
@@ -1548,6 +2010,42 @@ function AdminWorkspace({
         ))}
       </div>
 
+      {/* Raffle Drawing */}
+      <div className="admin-section-title">
+        <div>
+          <p>Wager raffles</p>
+          <h2>Draw weighted winners</h2>
+        </div>
+      </div>
+      <div className="tool-panel">
+        <div>
+          <small>{adminRaffle?.round.status ?? "Raffle"}</small>
+          <strong>{adminRaffle?.round.totalEntries ?? 0}</strong>
+          <span>{adminRaffleStatus}</span>
+        </div>
+        <button type="button" disabled={!adminRaffle || adminRaffle.round.totalEntries <= 0 || adminRaffle.round.status !== "Open"} onClick={drawAdminRaffle}>Draw winner</button>
+      </div>
+
+      {/* Support Inbox */}
+      <div className="admin-section-title">
+        <div>
+          <p>Support inbox</p>
+          <h2>Resolve player tickets</h2>
+        </div>
+      </div>
+      <div className="workspace-list">
+        {supportTickets.length ? supportTickets.map((ticket) => (
+          <article key={ticket.id}>
+            <span>{ticket.status}</span>
+            <div>
+              <h3>{ticket.subject}</h3>
+              <p>{ticket.handle ?? "Guest"} / {ticket.category} / {new Date(ticket.updatedAt ?? ticket.createdAt).toLocaleString()}</p>
+            </div>
+            <button type="button" onClick={() => updateTicket(ticket)}>Advance</button>
+          </article>
+        )) : <article><span>EMPTY</span><div><h3>No support tickets</h3><p>{supportStatus}</p></div></article>}
+      </div>
+
       {/* Store Claims Fulfillment */}
       <div className="admin-section-title">
         <div>
@@ -1555,7 +2053,18 @@ function AdminWorkspace({
           <h2>Fulfill recent purchases</h2>
         </div>
       </div>
-      <PurchaseList purchases={purchases} onAdvance={(purchase) => setPurchases((current) => current.map((entry) => entry.id === purchase.id ? { ...entry, status: entry.status === "Pending" ? "Completed" : "Pending" } : entry))} />
+      <div className="workspace-list">
+        {purchases.length ? purchases.map((purchase) => (
+          <article key={purchase.id}>
+            <span>{purchase.status === "COMPLETED" ? "Done" : purchase.status === "REJECTED" ? "Rejected" : "Pending"}</span>
+            <div>
+              <h3>{purchase.itemTitle}</h3>
+              <p>{purchase.userHandle} / {purchase.cost.toLocaleString()} pts / {new Date(purchase.createdAt).toLocaleString()}</p>
+            </div>
+            <button type="button" onClick={() => updatePurchase(purchase)}>Advance</button>
+          </article>
+        )) : <article><span>EMPTY</span><div><h3>No purchases</h3><p>Recent store redemptions will appear here.</p></div></article>}
+      </div>
     </section>
   );
 }
@@ -1591,29 +2100,58 @@ function HelpWorkspace() {
 }
 
 function SupportWorkspace() {
-  const [tickets, setTickets] = useStoredState<Ticket[]>("rankboard-support-tickets", []);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [category, setCategory] = useState("Reward");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("Loading tickets...");
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/support/tickets", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: { tickets?: Ticket[]; error?: string }) => {
+        if (!active) return;
+        if (payload.tickets) {
+          setTickets(payload.tickets);
+          setStatus(payload.tickets.length ? "Tickets synced." : "No tickets yet.");
+        } else {
+          setStatus(payload.error ?? "Could not load tickets.");
+        }
+      })
+      .catch(() => { if (active) setStatus("Could not load tickets."); });
+
+    return () => { active = false; };
+  }, []);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!subject.trim() || !message.trim()) return;
-    setTickets((current) => [{
-      id: uid("ticket"),
-      subject: subject.trim(),
-      category,
-      message: message.trim(),
-      status: "Open",
-      createdAt: nowStamp(),
-    }, ...current]);
-    setSubject("");
-    setMessage("");
+    setStatus("Creating ticket...");
+
+    try {
+      const response = await fetch("/api/support/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category, subject, message }),
+      });
+      const payload = (await response.json()) as { ticket?: Ticket; error?: string };
+      if (!response.ok || !payload.ticket) {
+        throw new Error(payload.error ?? "Ticket creation failed.");
+      }
+      setTickets((current) => [payload.ticket!, ...current]);
+      setSubject("");
+      setMessage("");
+      setStatus("Ticket created.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Ticket creation failed.");
+    }
   }
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Support" title="Create a ticket" meta={`${tickets.length} tickets`} />
+      <WorkspaceHeader overline="Support" title="Create a ticket" meta={`${tickets.length} tickets · ${status}`} />
       <form className="support-form" onSubmit={submit}>
         <label>CATEGORY<select value={category} onChange={(event) => setCategory(event.target.value)}><option>Reward</option><option>Account</option><option>Leaderboard</option><option>Claim</option></select></label>
         <label>SUBJECT<input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="What broke?" /></label>
@@ -1626,9 +2164,8 @@ function SupportWorkspace() {
             <span>{ticket.status}</span>
             <div>
               <h3>{ticket.subject}</h3>
-              <p>{ticket.category} / {ticket.createdAt}</p>
+              <p>{ticket.category} / {new Date(ticket.createdAt).toLocaleString()}</p>
             </div>
-            <button type="button" onClick={() => setTickets((current) => current.map((item) => item.id === ticket.id ? { ...item, status: item.status === "Open" ? "Waiting" : "Solved" } : item))}>Advance</button>
           </article>
         )) : <article><span>EMPTY</span><div><h3>No tickets</h3><p>Open one above.</p></div></article>}
       </div>

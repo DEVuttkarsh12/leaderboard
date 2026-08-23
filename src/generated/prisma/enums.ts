@@ -54,3 +54,48 @@ export const ChallengeCadence = {
 } as const
 
 export type ChallengeCadence = (typeof ChallengeCadence)[keyof typeof ChallengeCadence]
+
+
+export const WatchSessionStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  CLAIMED: 'CLAIMED'
+} as const
+
+export type WatchSessionStatus = (typeof WatchSessionStatus)[keyof typeof WatchSessionStatus]
+
+
+export const RaffleRoundStatus = {
+  OPEN: 'OPEN',
+  DRAWING: 'DRAWING',
+  CLOSED: 'CLOSED'
+} as const
+
+export type RaffleRoundStatus = (typeof RaffleRoundStatus)[keyof typeof RaffleRoundStatus]
+
+
+export const HuntStatus = {
+  SCHEDULED: 'SCHEDULED',
+  LIVE: 'LIVE',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type HuntStatus = (typeof HuntStatus)[keyof typeof HuntStatus]
+
+
+export const SupportTicketStatus = {
+  OPEN: 'OPEN',
+  WAITING: 'WAITING',
+  SOLVED: 'SOLVED'
+} as const
+
+export type SupportTicketStatus = (typeof SupportTicketStatus)[keyof typeof SupportTicketStatus]
+
+
+export const TournamentStatus = {
+  OPEN: 'OPEN',
+  LOCKED: 'LOCKED',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type TournamentStatus = (typeof TournamentStatus)[keyof typeof TournamentStatus]

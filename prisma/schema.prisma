@@ -40,6 +40,14 @@ model User {
   pointTransactions PointTransaction[]
   bets              UserBet[]
   challengeProgress ChallengeProgress[]
+  watchSessions     WatchSession[]
+  raffleAccounts    RaffleAccount[]
+  raffleEntries     RaffleEntry[]
+  tournamentEntries TournamentEntry[]
+  huntFollows       HuntFollow[]
+  huntClipVotes     HuntClipVote[]
+  huntClipSaves     HuntClipSave[]
+  supportTickets    SupportTicket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -260,4 +268,274 @@ model ChallengeProgress {
   @@unique([userId, missionId])
   @@index([userId])
   @@index([missionId])
+}
+
+enum WatchSessionStatus {
+  ACTIVE
+  PAUSED
+  CLAIMED
+}
+
+model WatchSession {
+  id                 String             @id @default(cuid())
+  userId             String
+  provider           String             @default("kick")
+  streamId           String             @default("default")
+  status             WatchSessionStatus @default(ACTIVE)
+  totalSeconds       Int                @default(0)
+  pointsAwarded      Int                @default(0)
+  dailyBonusAwarded  Boolean            @default(false)
+  startedAt          DateTime           @default(now())
+  lastHeartbeatAt    DateTime           @default(now())
+  endedAt            DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, startedAt])
+}
+
+model KickChatActivity {
+  id          String   @id @default(cuid())
+  messageId   String   @unique
+  kickUserId  String
+  username    String
+  channelSlug String
+  content     String   @db.Text
+  createdAt   DateTime
+  receivedAt  DateTime @default(now())
+
+  @@index([kickUserId, receivedAt])
+  @@index([username, receivedAt])
+  @@index([channelSlug, receivedAt])
+}
+
+model KickStreamStatus {
+  id          String    @id @default(cuid())
+  channelSlug String    @unique
+  broadcasterKickId String?
+  broadcasterUsername String?
+  isLive      Boolean   @default(false)
+  title       String?
+  startedAt   DateTime?
+  endedAt     DateTime?
+  lastEventAt DateTime  @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isLive, lastEventAt])
+}
+
+enum RaffleRoundStatus {
+  OPEN
+  DRAWING
+  CLOSED
+}
+
+model RaffleRound {
+  id               String            @id @default(cuid())
+  title            String
+  ticketRateWager  Int               @default(10000)
+  status           RaffleRoundStatus @default(OPEN)
+  winnerEntryId    String?
+  drawnAt          DateTime?
+
+  accounts RaffleAccount[]
+  entries  RaffleEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model RaffleAccount {
+  id      String @id @default(cuid())
+  userId  String
+  roundId String
+  tickets Int    @default(0)
+  entries Int    @default(0)
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  round RaffleRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, roundId])
+  @@index([roundId])
+}
+
+model RaffleEntry {
+  id          String @id @default(cuid())
+  userId      String
+  roundId     String
+  ticketCount Int
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  round RaffleRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([roundId])
+}
+
+enum HuntStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+}
+
+model BonusHuntSession {
+  id              String     @id @default(cuid())
+  title           String
+  host            String
+  status          HuntStatus @default(SCHEDULED)
+  startBankroll   Int        @default(0)
+  currentBankroll Int        @default(0)
+  bonusCount      Int        @default(0)
+  openedCount     Int        @default(0)
+  totalPayout     Int        @default(0)
+  bestMultiplier  Float      @default(0)
+  startsAt        DateTime?
+  active          Boolean    @default(true)
+  sortOrder       Int        @default(0)
+
+  follows HuntFollow[]
+  clips   HuntClip[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([active, sortOrder])
+}
+
+model HuntFollow {
+  id     String @id @default(cuid())
+  userId String
+  huntId String
+
+  user User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hunt BonusHuntSession @relation(fields: [huntId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, huntId])
+  @@index([huntId])
+}
+
+model HuntClip {
+  id         String @id @default(cuid())
+  huntId     String
+  title      String
+  multiplier Float  @default(0)
+  votes      Int    @default(0)
+
+  hunt  BonusHuntSession @relation(fields: [huntId], references: [id], onDelete: Cascade)
+  voter HuntClipVote[]
+  saves HuntClipSave[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([huntId])
+}
+
+model HuntClipVote {
+  id     String @id @default(cuid())
+  userId String
+  clipId String
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clip HuntClip @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, clipId])
+  @@index([clipId])
+}
+
+model HuntClipSave {
+  id     String @id @default(cuid())
+  userId String
+  clipId String
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clip HuntClip @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, clipId])
+  @@index([clipId])
+}
+
+enum SupportTicketStatus {
+  OPEN
+  WAITING
+  SOLVED
+}
+
+model SupportTicket {
+  id       String              @id @default(cuid())
+  userId   String?
+  category String
+  subject  String
+  message  String              @db.Text
+  status   SupportTicketStatus @default(OPEN)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status, updatedAt])
+}
+
+enum TournamentStatus {
+  OPEN
+  LOCKED
+  COMPLETED
+}
+
+model Tournament {
+  id        String           @id @default(cuid())
+  code      String           @unique
+  title     String
+  starts    String
+  prize     String
+  seats     Int
+  taken     Int              @default(0)
+  status    TournamentStatus @default(OPEN)
+  active    Boolean          @default(true)
+  sortOrder Int              @default(0)
+
+  entries TournamentEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, sortOrder])
+  @@index([status])
+}
+
+model TournamentEntry {
+  id           String @id @default(cuid())
+  userId       String
+  tournamentId String
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, tournamentId])
+  @@index([tournamentId])
 }
