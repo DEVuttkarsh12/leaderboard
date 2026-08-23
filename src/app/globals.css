@@ -3348,43 +3348,43 @@ main {
 }
 
 /* ============================================================
-   NEO-BRUTALISM SYSTEM · FINAL THEME
-   Centralized visual language: cream paper, pure black ink,
+   NEON ROYAL SYSTEM · FINAL THEME
+   Centralized visual language: neon lime, royal blue, black ink,
    hard borders, offset shadows, loud color blocking, sticker
    motion. Backend/data behavior is untouched.
    ============================================================ */
 
 :root {
-  --bg: #eafff4;
-  --bg-deep: #eafff4;
-  --panel: #f2fffb;
-  --panel-2: #8cff66;
-  --panel-3: #b69cff;
+  --bg: #061035;
+  --bg-deep: #020614;
+  --panel: #f5f8ff;
+  --panel-2: #D9FF3A;
+  --panel-3: #b8c9ff;
   --line: #000000;
   --line-strong: #000000;
   --text: #000000;
   --muted: #000000;
   --faint: #000000;
-  --green: #ff6b6b;
-  --green-dim: #8cff66;
-  --gold: #8cff66;
-  --gold-bright: #c8ff4d;
-  --gold-dim: #eafff4;
-  --violet: #b69cff;
-  --violet-dim: #b69cff;
+  --green: #D9FF3A;
+  --green-dim: #eefbb4;
+  --gold: #D9FF3A;
+  --gold-bright: #f0ff8a;
+  --gold-dim: #f5f8ff;
+  --violet: #0245ec;
+  --violet-dim: #b8c9ff;
   --coral: #ff4fb8;
-  --blue: #5de2ff;
+  --blue: #0245ec;
   --radius: 0px;
   --radius-lg: 0px;
   --radius-sm: 0px;
-  --neo-cream: #eafff4;
+  --neo-cream: #f5f8ff;
   --neo-black: #000000;
   --neo-red: #ff4fb8;
-  --neo-yellow: #8cff66;
-  --neo-violet: #b69cff;
-  --neo-blue: #5de2ff;
-  --neo-green: #57ff8a;
-  --neo-white: #f2fffb;
+  --neo-yellow: #D9FF3A;
+  --neo-violet: #b8c9ff;
+  --neo-blue: #0245ec;
+  --neo-green: #D9FF3A;
+  --neo-white: #f5f8ff;
   --shadow-sm: 4px 4px 0 0 #000000;
   --shadow-md: 8px 8px 0 0 #000000;
   --shadow-lg: 12px 12px 0 0 #000000;
@@ -3393,7 +3393,7 @@ main {
 
 html,
 body {
-  background: var(--neo-cream);
+  background: var(--bg-deep);
   color: var(--neo-black);
   font-family: var(--font-geist-sans), "Space Grotesk", Arial, sans-serif;
   font-weight: 700;
@@ -3417,8 +3417,8 @@ body::before,
 
 .site-shell {
   background:
-    linear-gradient(90deg, rgba(93, 226, 255, 0.78) 0 14%, transparent 14% 100%),
-    linear-gradient(180deg, var(--neo-cream), var(--neo-cream));
+    linear-gradient(90deg, rgba(2, 69, 236, 0.42) 0 14%, transparent 14% 100%),
+    linear-gradient(180deg, var(--bg-deep), var(--bg));
   color: var(--neo-black);
 }
 
@@ -4501,50 +4501,50 @@ main {
 }
 
 /* ============================================================
-   ROYAL CASINO COLORWAY
+   NEON LIME + ROYAL BLUE COLORWAY
    Palette-only override: keeps the neo-brutalist layout, borders,
    shadows, rotations, and interactions intact.
    ============================================================ */
 
 :root {
-  --bg: #08030f;
-  --bg-deep: #08030f;
-  --panel: #fff4de;
-  --panel-2: #f9c74f;
-  --panel-3: #c4b5fd;
+  --bg: #061035;
+  --bg-deep: #020614;
+  --panel: #f5f8ff;
+  --panel-2: #D9FF3A;
+  --panel-3: #b8c9ff;
   --text: #000000;
   --muted: #000000;
   --faint: #000000;
-  --green: #35ff86;
-  --green-dim: #b7ffc8;
-  --gold: #f9c74f;
-  --gold-bright: #ffd166;
-  --gold-dim: #fff4de;
-  --violet: #7c3aed;
-  --violet-dim: #c4b5fd;
+  --green: #D9FF3A;
+  --green-dim: #eefbb4;
+  --gold: #D9FF3A;
+  --gold-bright: #f0ff8a;
+  --gold-dim: #f5f8ff;
+  --violet: #0245ec;
+  --violet-dim: #b8c9ff;
   --coral: #ff3d8f;
-  --blue: #5de2ff;
-  --neo-cream: #08030f;
+  --blue: #0245ec;
+  --neo-cream: #f5f8ff;
   --neo-black: #000000;
   --neo-red: #ff3d8f;
-  --neo-yellow: #f9c74f;
-  --neo-violet: #c4b5fd;
-  --neo-blue: #7c3aed;
-  --neo-green: #35ff86;
-  --neo-white: #fff4de;
+  --neo-yellow: #D9FF3A;
+  --neo-violet: #b8c9ff;
+  --neo-blue: #0245ec;
+  --neo-green: #D9FF3A;
+  --neo-white: #f5f8ff;
 }
 
 html,
 body {
-  background: #08030f;
+  background: var(--bg-deep);
 }
 
 .site-shell {
   background:
-    radial-gradient(circle at 16% 8%, rgba(249, 199, 79, 0.34), transparent 20%),
-    radial-gradient(circle at 82% 24%, rgba(124, 58, 237, 0.34), transparent 19%),
-    radial-gradient(circle at 72% 78%, rgba(53, 255, 134, 0.2), transparent 17%),
-    #08030f;
+    radial-gradient(circle at 16% 8%, rgba(217, 255, 58, 0.28), transparent 20%),
+    radial-gradient(circle at 82% 24%, rgba(2, 69, 236, 0.42), transparent 19%),
+    radial-gradient(circle at 72% 78%, rgba(217, 255, 58, 0.16), transparent 17%),
+    var(--bg-deep);
 }
 
 body::before,
@@ -4622,12 +4622,17 @@ body::before,
 }
 
 .hero-copy h1 {
+  max-width: min(100%, 760px);
   color: #ffffff;
+  font-size: clamp(60px, 7vw, 112px);
+  letter-spacing: -0.04em;
+  overflow-wrap: normal;
+  word-break: keep-all;
   text-shadow: 8px 8px 0 var(--neo-blue);
 }
 
 .hero-copy h1 em {
-  color: var(--neo-yellow);
+  color: var(--neo-green);
   -webkit-text-stroke-color: var(--neo-black);
   text-shadow: 8px 8px 0 var(--neo-black);
 }
@@ -4667,6 +4672,28 @@ body::before,
 .player-modal,
 .account-menu {
   background: var(--neo-white) !important;
+}
+
+.account-menu {
+  color: var(--neo-black) !important;
+}
+
+.account-menu__identity strong,
+.account-menu__identity small,
+.account-menu p,
+.account-menu p span {
+  color: var(--neo-black) !important;
+}
+
+.account-menu a,
+.account-menu__logout {
+  background: var(--neo-white) !important;
+  color: var(--neo-black) !important;
+}
+
+.account-menu a span,
+.account-menu__logout span {
+  color: var(--neo-black) !important;
 }
 
 .podium-card.rank-1,
@@ -4797,7 +4824,7 @@ body::before,
 .boot-loader {
   background:
     radial-gradient(#ffffff 1.5px, transparent 1.8px),
-    #08030f;
+    var(--bg-deep);
   background-size: 24px 24px;
 }
 
@@ -4811,9 +4838,9 @@ body::before,
 @media (max-width: 780px) {
   .site-shell {
     background:
-      radial-gradient(circle at 30% 8%, rgba(249, 199, 79, 0.28), transparent 30%),
-      radial-gradient(circle at 82% 24%, rgba(124, 58, 237, 0.52), transparent 32%),
-      #08030f;
+      radial-gradient(circle at 30% 8%, rgba(217, 255, 58, 0.28), transparent 30%),
+      radial-gradient(circle at 82% 24%, rgba(2, 69, 236, 0.52), transparent 32%),
+      var(--bg-deep);
   }
 
   .nav {
@@ -4821,6 +4848,10 @@ body::before,
   }
 
   .hero-copy h1 {
+    max-width: 100%;
+    font-size: clamp(40px, 12vw, 52px);
+    line-height: 0.88;
+    letter-spacing: -0.025em;
     text-shadow: 5px 5px 0 var(--neo-blue);
   }
 
