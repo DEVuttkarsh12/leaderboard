@@ -68,10 +68,10 @@ void main() {
   color += mix(uSecondary, uPrimary, 0.55 + 0.45 * sin(t)) * centerGlow;
   alpha += centerGlow * 0.46;
 
-  for (int i = 0; i < 56; i++) {
+  for (int i = 0; i < 24; i++) {
     float id = float(i);
     float seed = hash(id * 19.91);
-    float lane = (id / 56.0) * 6.28318530718;
+    float lane = (id / 24.0) * 6.28318530718;
     float laneWave = sin(t * (0.28 + seed * 0.4) + seed * 8.0) * 0.12;
     float laneAngle = lane + laneWave + tunnelPulse * (0.25 + seed * 0.25);
     float angularDist = abs(atan(sin(a - laneAngle), cos(a - laneAngle)));
@@ -88,8 +88,8 @@ void main() {
     alpha += streak * (0.42 + seed * 0.4);
   }
 
-  vec2 cell = floor(gl_FragCoord.xy / 2.0);
-  float grain = (hash2(cell + uTime) - 0.5) * 0.035;
+  vec2 cell = floor(gl_FragCoord.xy / 3.0);
+  float grain = (hash2(cell + floor(uTime * 12.0)) - 0.5) * 0.02;
   color += grain;
 
   float vignette = smoothstep(1.25, 0.25, r);
@@ -119,6 +119,8 @@ type LightspeedProps = {
   secondaryColor?: string;
   accentColor?: string;
   interactive?: boolean;
+  maxFps?: number;
+  startDelayMs?: number;
 };
 
 export default function Lightspeed({
@@ -129,6 +131,8 @@ export default function Lightspeed({
   secondaryColor = "#46c7ff",
   accentColor = "#ff4f8b",
   interactive = true,
+  maxFps = 30,
+  startDelayMs = 1100,
 }: LightspeedProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const propsRef = useRef({
@@ -138,6 +142,8 @@ export default function Lightspeed({
     secondaryColor,
     accentColor,
     interactive,
+    maxFps,
+    startDelayMs,
   });
 
   useEffect(() => {
@@ -148,8 +154,10 @@ export default function Lightspeed({
       secondaryColor,
       accentColor,
       interactive,
+      maxFps,
+      startDelayMs,
     };
-  }, [speed, opacity, primaryColor, secondaryColor, accentColor, interactive]);
+  }, [speed, opacity, primaryColor, secondaryColor, accentColor, interactive, maxFps, startDelayMs]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -160,7 +168,8 @@ export default function Lightspeed({
       webgl: 2,
       alpha: true,
       antialias: false,
-      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      dpr: 1,
+      powerPreference: "low-power",
     });
 
     const gl = renderer.gl;
@@ -242,7 +251,9 @@ export default function Lightspeed({
     let raf = 0;
     let visible = true;
     let pageVisible = !document.hidden;
+    let released = false;
     const start = performance.now();
+    let lastRender = 0;
 
     const writeColor = (uniform: Float32Array, hex: string) => {
       const rgb = hexToRgb(hex);
@@ -252,6 +263,13 @@ export default function Lightspeed({
     };
 
     const render = (now: number) => {
+      const frameMs = 1000 / Math.max(24, propsRef.current.maxFps);
+      if (now - lastRender < frameMs) {
+        raf = requestAnimationFrame(render);
+        return;
+      }
+      lastRender = now;
+
       currentPointer[0] += (targetPointer[0] - currentPointer[0]) * 0.06;
       currentPointer[1] += (targetPointer[1] - currentPointer[1]) * 0.06;
 
@@ -271,7 +289,7 @@ export default function Lightspeed({
     };
 
     const startLoop = () => {
-      if (visible && pageVisible && raf === 0) raf = requestAnimationFrame(render);
+      if (released && visible && pageVisible && raf === 0) raf = requestAnimationFrame(render);
     };
 
     const stopLoop = () => {
@@ -295,10 +313,14 @@ export default function Lightspeed({
     };
 
     document.addEventListener("visibilitychange", handleVisibility);
-    startLoop();
+    const releaseTimer = window.setTimeout(() => {
+      released = true;
+      startLoop();
+    }, initialProps.startDelayMs);
 
     return () => {
       stopLoop();
+      window.clearTimeout(releaseTimer);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       window.removeEventListener("resize", setSize);
