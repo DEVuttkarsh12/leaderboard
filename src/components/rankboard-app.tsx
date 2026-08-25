@@ -1,9 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import {
+  ArrowUpRight,
+  Check,
+  Crown,
+  LogOut,
+  RefreshCw,
+  Search,
+  X,
+} from "lucide-react";
 import { cloneElement, useCallback, useEffect, useMemo, useState } from "react";
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
+import Lightspeed from "./lightspeed";
 import SiteEntryLoader from "./site-entry-loader";
 import type { AuthAccountPayload, CasinoAccountDetail } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
@@ -30,12 +40,12 @@ const NAV = [
 ] as const;
 
 const launchpad = [
-  ["Board", "/leaderboard", "01", "lime"],
-  ["Bets", "/custom-bets", "02", "mint"],
-  ["Missions", "/challenges", "03", "violet"],
-  ["Watch", "/watch-points", "04", "blue"],
-  ["Hunts", "/bonus-hunts", "05", "coral"],
-  ["Store", "/store", "06", "yellow"],
+  ["Board", "/leaderboard", "01", "lime", "Live ladder"],
+  ["Bets", "/custom-bets", "02", "mint", "Prediction slips"],
+  ["Missions", "/challenges", "03", "violet", "Reward goals"],
+  ["Watch", "/watch-points", "04", "blue", "Stream earnings"],
+  ["Hunts", "/bonus-hunts", "05", "coral", "Bonus tracker"],
+  ["Store", "/store", "06", "yellow", "Point rewards"],
 ] as const;
 
 const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
@@ -305,6 +315,9 @@ export default function RankBoardApp({
   const path = route ? `/${route}` : "/";
   return (
     <div className="site-shell">
+      <div className="site-tunnel-background" aria-hidden="true">
+        <Lightspeed />
+      </div>
       <CustomCursor />
       <SiteEntryLoader />
       <div className="top-chrome">
@@ -361,7 +374,7 @@ function Header({ path, account, accountOpen, setAccountOpen }: { path: string; 
   return <header className="header">
     <Link className="brand" href="/" aria-label="RankBoard home"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link>
     <nav className="nav" aria-label="Primary navigation">{NAV.map(([label, href]) => <Link key={href} className={path === href ? "active" : ""} href={href}>{label}</Link>)}</nav>
-    <div className="header-actions"><span className="live-pill"><b /> LIVE</span><div className="account-wrap"><button className="avatar-button" onClick={() => setAccountOpen(!accountOpen)} aria-expanded={accountOpen} aria-label={`Open account menu for ${menuName}`}>{account.image ? <img src={account.image} alt="" /> : initials}</button>{accountOpen && <div className="account-menu"><div className="account-menu__identity"><span className="avatar-button">{account.image ? <img src={account.image} alt="" /> : initials}</span><div><strong>{menuName}</strong><small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small></div></div><p>PLAYER <span>{formatNumberCompact(account.xp)} XP</span></p>{menuLinks.map(([n,h]) => <Link key={h} href={h}>{n}<span>↗</span></Link>)}{account.authenticated ? <button className="account-menu__logout" type="button" onClick={signOut}>Logout<span>↻</span></button> : null}</div>}</div></div>
+    <div className="header-actions"><span className="live-pill"><b /> LIVE</span><div className="account-wrap"><button className="avatar-button" onClick={() => setAccountOpen(!accountOpen)} aria-expanded={accountOpen} aria-label={`Open account menu for ${menuName}`}>{account.image ? <img src={account.image} alt="" /> : initials}</button>{accountOpen && <div className="account-menu"><div className="account-menu__identity"><span className="avatar-button">{account.image ? <img src={account.image} alt="" /> : initials}</span><div><strong>{menuName}</strong><small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small></div></div><p>PLAYER <span>{formatNumberCompact(account.xp)} XP</span></p>{menuLinks.map(([n,h]) => <Link key={h} href={h}>{n}<ArrowUpRight size={14} strokeWidth={2.5} aria-hidden="true" /></Link>)}{account.authenticated ? <button className="account-menu__logout" type="button" onClick={signOut}>Logout<LogOut size={14} strokeWidth={2.5} aria-hidden="true" /></button> : null}</div>}</div></div>
   </header>;
 }
 
@@ -415,23 +428,30 @@ function Home() {
       </div>
       <div className="hero-floor">
         <div className="floor-top"><span>Top 3</span><span className="pulse-text">●</span></div>
+        <div className="home-prize-core" aria-hidden="true">
+          <span>Live Pool</span>
+          <strong>{formatNumberCompact(wager || highestScore || 40000)}</strong>
+          <b>PTS</b>
+        </div>
         <Podium players={users.slice(0, 3)} compact />
       </div>
     </section>
     <section className="stat-strip page-width"><div><span>Wager</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>Players</span><strong>{livePlayers}</strong></div><div><span>Top</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>Board</span><strong>{isLoading ? "Sync" : "Live"}</strong></div></section>
-    <section className="section page-width home-zones"><SectionHeading title="Zones" link={["Board", "/leaderboard"]}/><div className="launch-grid">{launchpad.map(([title,href,num,color]) => <Link className={`launch-card ${color}`} href={href} key={href}><span className="launch-num">{num}</span><span className="launch-icon">↗</span><div><h3>{title}</h3></div></Link>)}</div></section>
+    <section className="section page-width home-zones"><SectionHeading title="Zones" link={["Board", "/leaderboard"]}/><div className="launch-grid">{launchpad.map(([title,href,num,color,meta]) => <Link className={`launch-card ${color}`} href={href} key={href}><span className="launch-num">{num}</span><span className="launch-icon"><ArrowUpRight size={20} strokeWidth={2.4} aria-hidden="true" /></span><div><small>{meta}</small><h3>{title}</h3></div></Link>)}</div></section>
   </main>;
 }
 
-function SectionHeading({ title, link }: { title: string; link: [string,string] }) { return <div className="section-heading"><div><h2>{title}</h2></div><Link href={link[1]}>{link[0]} <span>↗</span></Link></div> }
+function SectionHeading({ title, link }: { title: string; link: [string,string] }) { return <div className="section-heading"><div><h2>{title}</h2></div><Link href={link[1]}>{link[0]} <ArrowUpRight size={14} strokeWidth={2.5} aria-hidden="true" /></Link></div> }
 
 function Podium({ players, compact = false }: { players: Player[]; compact?: boolean }) {
+  const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
+
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="avatar"><span>RB</span></div><div className="podium-copy"><strong>Syncing</strong><small>Live board</small><b>0 <em>XP</em></b><span>0 wagered</span></div>{idx === 1 && <div className="crown">♛</div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>RB</span></div><div className="podium-copy"><strong>Syncing</strong><small>Live board</small><b>0 <em>XP</em></b><span>0 wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
-  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i>✓</i>}</div><div className="podium-copy"><strong>{playerName(p)}</strong><small>{playerHandle(p)}</small><b>{fmt(playerScore(p))} <em>XP</em></b><span>{fmt(p.points)} wagered</span></div>{idx === 1 && <div className="crown">♛</div>}</article>)}</div>;
+  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "Prize"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{playerName(p)}</strong><small>{playerHandle(p)}</small><b>{fmt(playerScore(p))} <em>XP</em></b><span>{fmt(p.points)} wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
 }
 
 function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | null }) {
@@ -465,6 +485,8 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
   const visiblePlayers = filtered.slice(0, visible);
   const leaderScore = filtered[0] ? playerScore(filtered[0]) : 0;
   const wager = totalWager(users);
+  const targetWager = Math.max(200000, wager || 200000);
+  const wagerProgress = Math.min(100, Math.round(((wager || 0) / targetWager) * 100));
   const targetDate = countdownTarget ? new Date(countdownTarget) : null;
 
   function refresh(){
@@ -475,17 +497,31 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
 
   return <main>
     <section className="board-hero page-width">
-      <div><p className="kicker"><span>●</span> Season 08</p><h1>The Board</h1></div>
+      <div><p className="kicker"><span>●</span> Live leaderboard</p><h1>Global Leaderboard</h1><p className="hero-desc">Compete for the top spot in the RankBoard rewards sprint.</p></div>
       <div className="round-ticket"><b>{error ? "CHECKING" : "LIVE"}</b><strong>{targetDate ? formatShortDate(targetDate).toUpperCase() : "NOW"}</strong><span>{lastUpdated ? formatLastUpdated(lastUpdated).toUpperCase() : "SYNC"}</span></div>
+    </section>
+    <section className="leaderboard-progress page-width" aria-label="Season wager progress">
+      <div className="progress-medal">$</div>
+      <div>
+        <div className="progress-head"><span>Season prize track</span><strong>{fmt(wager)} / {fmt(targetWager)} wager</strong><b>{wagerProgress}%</b></div>
+        <div className="progress-bar"><i style={{ width: `${wagerProgress}%` }} /></div>
+      </div>
     </section>
     <section className="board-top-three page-width" aria-label="Top three players">
       <div className="floor-top"><span>Top 3</span><span className="pulse-text">●</span></div>
-      <Podium players={users.slice(0, 3)} />
+      <div className="winner-arena">
+        <div className="arena-core" aria-hidden="true">
+          <span>Prize Core</span>
+          <strong>$1,150</strong>
+          <b>Top 3 pool</b>
+        </div>
+        <Podium players={users.slice(0, 3)} />
+      </div>
     </section>
     <section className="stat-strip page-width board-metrics"><div><span>Players</span><strong>{total || users.length}</strong></div><div><span>Wagered</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>Board</span><strong>{error ? "Issue" : isLoading ? "Sync" : "Live"}</strong></div></section>
     <section className="section page-width board-section">
       <div className="standings">
-        <div className="board-controls"><label className="search"><span>⌕</span><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard">↻</button></div>
+        <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
         <div className="table-head"><span>Rank / Player</span><span>Status</span><span>Weighted XP</span><span>Wagered</span><span /></div>
         <div className="player-list" aria-live="polite">
           {error ? (
@@ -495,17 +531,17 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
           ) : visiblePlayers.length ? (
             visiblePlayers.map(p=><PlayerRow key={p.id} player={p} leader={leaderScore} onOpen={()=>setSelected(p)}/>)
           ) : (
-            <div className="empty-state"><span>⌕</span><h3>Nobody here.</h3><button type="button" onClick={()=>setQuery("")}>Clear search</button></div>
+            <div className="empty-state"><span><Search size={34} strokeWidth={1.8} aria-hidden="true" /></span><h3>Nobody here.</h3><button type="button" onClick={()=>setQuery("")}>Clear search</button></div>
           )}
         </div>
         {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
       </div>
     </section>
-    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close">×</button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>Weighted XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Last active</small><strong>{selected.lastActive ?? "Live"}</strong></div></div><Link href="/challenges">View missions <span>↗</span></Link></article></div>}
+    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>Weighted XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Last active</small><strong>{selected.lastActive ?? "Live"}</strong></div></div><Link href="/challenges">View missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
   </main>;
 }
 
-function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i>✓</i>}</strong><small>{playerHandle(player)}</small></span></div><div><span className={player.rank<7?"status hot":"status live"}>{player.rank<7?"HOT":"LIVE"}</span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row">↗</span></button> }
+function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div><span className={player.rank<7?"status hot":"status live"}>{player.rank<7?"HOT":"LIVE"}</span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
   return <main><section className="board-hero page-width"><div><p className="kicker"><span>●</span> Season 08</p><h1>{data.title}</h1><p className="hero-desc">{data.tagline}</p><div className="button-row"><Link className="button ghost" href={data.action[1]}>{data.action[0]}</Link></div></div></section><FeatureWorkspace route={route} /></main>;
