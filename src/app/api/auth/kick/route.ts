@@ -1,6 +1,18 @@
 import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
+  createKickUserSession,
+  SESSION_COOKIE,
+  setSessionCookie,
+} from "@/lib/server/auth/session";
+import {
+  getDevKickProfile,
+  getDevTokenSet,
+  isDevAuthEnabled,
+  promoteDevAuthUser,
+  shouldForceDevAuth,
+} from "@/lib/server/auth/dev";
+import {
   createKickPkcePair,
   getKickRedirectUri,
   KICK_DEFAULT_SCOPE,
@@ -19,7 +31,24 @@ function redirectToLogin(request: NextRequest, error: string) {
 export async function GET(request: NextRequest) {
   const clientId = process.env.KICK_CLIENT_ID?.trim();
 
-  if (!clientId) {
+  if (shouldForceDevAuth() || !clientId) {
+    if (isDevAuthEnabled()) {
+      const profile = getDevKickProfile();
+      const { sessionToken, expires } = await createKickUserSession(
+        profile,
+        getDevTokenSet("kick"),
+        request.cookies.get(SESSION_COOKIE)?.value
+      );
+      await promoteDevAuthUser("kick", String(profile.user_id));
+
+      const url = new URL("/login", request.url);
+      url.searchParams.set("kick", "connected");
+      url.searchParams.set("dev_auth", "kick");
+      const response = NextResponse.redirect(url);
+      setSessionCookie(response, sessionToken, expires);
+      return response;
+    }
+
     return redirectToLogin(request, "kick_config");
   }
 

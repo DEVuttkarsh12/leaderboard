@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -7,6 +8,12 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   display: "block",
+});
+
+const brackoz = localFont({
+  src: "./fonts/Brackoz.ttf",
+  variable: "--font-brackoz",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} antialiased`}
+      className={`${spaceGrotesk.variable} ${brackoz.variable} antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

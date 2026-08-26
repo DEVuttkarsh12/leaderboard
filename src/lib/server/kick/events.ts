@@ -5,6 +5,7 @@ import {
   verifyKickWebhookSignature,
 } from "@/lib/server/auth/kick";
 import { requireAdminUser } from "@/lib/server/admin/users";
+import { isDevAuthEnabled } from "@/lib/server/auth/dev";
 
 const SUPPORTED_EVENTS = new Set([
   "chat.message.sent",
@@ -143,10 +144,33 @@ export async function adminSubscribeKickEvents(sessionToken: string | undefined)
   const webhookUrl = process.env.KICK_WEBHOOK_URL?.trim();
 
   if (!webhookUrl) {
+    if (isDevAuthEnabled()) {
+      return [...SUPPORTED_EVENTS].map((event) => ({
+        event,
+        ok: true,
+        status: 200,
+        body: `Local dev subscription simulated for ${admin.email ?? admin.kickUsername ?? admin.id}.`,
+      }));
+    }
+
     throw new Error("KICK_WEBHOOK_URL is not configured.");
   }
 
-  const accessToken = await getKickUserAccessToken(admin.id);
+  let accessToken: string;
+  try {
+    accessToken = await getKickUserAccessToken(admin.id);
+  } catch (error) {
+    if (isDevAuthEnabled()) {
+      return [...SUPPORTED_EVENTS].map((event) => ({
+        event,
+        ok: true,
+        status: 200,
+        body: "Local dev subscription simulated because no live Kick user token is available.",
+      }));
+    }
+
+    throw error;
+  }
   const results = [];
 
   for (const event of SUPPORTED_EVENTS) {

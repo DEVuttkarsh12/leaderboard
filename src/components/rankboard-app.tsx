@@ -13,8 +13,9 @@ import {
 import { cloneElement, useCallback, useEffect, useMemo, useState } from "react";
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
-import Lightspeed from "./lightspeed";
 import SiteEntryLoader from "./site-entry-loader";
+import StarCloudBackground from "./star-cloud-background";
+import StaggeredMenu from "./staggered-menu";
 import type { AuthAccountPayload, CasinoAccountDetail } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated, formatNumberCompact, formatShortDate } from "@/lib/formatters";
@@ -312,16 +313,15 @@ export default function RankBoardApp({
 }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const account = useHeaderAccount();
-  const path = route ? `/${route}` : "/";
   return (
     <div className="site-shell">
       <div className="site-tunnel-background" aria-hidden="true">
-        <Lightspeed />
+        <StarCloudBackground />
       </div>
       <CustomCursor />
       <SiteEntryLoader />
       <div className="top-chrome">
-        <Header path={path} account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
+        <Header account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
         <Ticker />
       </div>
       {route === "" ? <Home /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : route === "profile" ? <Profile account={account} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
@@ -353,10 +353,9 @@ function Ticker() {
   );
 }
 
-function Header({ path, account, accountOpen, setAccountOpen }: { path: string; account: HeaderAccount; accountOpen: boolean; setAccountOpen: (v: boolean) => void }) {
+function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccount; accountOpen: boolean; setAccountOpen: (v: boolean) => void }) {
   const cleanHandle = account.handle.replace(/^@/, "") || "guest";
   const initials = getInitials(cleanHandle);
-  const menuName = account.profileProvider === "kick" && account.connected.kick.username ? account.connected.kick.username : account.profileProvider === "discord" && account.connected.discord.username ? account.connected.discord.username : account.handle;
   const accountStatus = !account.authenticated ? "Guest" : account.profileProvider === "kick" ? "Kick" : account.profileProvider === "discord" ? "Discord" : "Signed in";
   const menuLinks = account.authenticated
     ? [["Profile", "/profile"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]]
@@ -371,11 +370,48 @@ function Header({ path, account, accountOpen, setAccountOpen }: { path: string; 
     setAccountOpen(false);
   }
 
-  return <header className="header">
-    <Link className="brand" href="/" aria-label="RankBoard home"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link>
-    <nav className="nav" aria-label="Primary navigation">{NAV.map(([label, href]) => <Link key={href} className={path === href ? "active" : ""} href={href}>{label}</Link>)}</nav>
-    <div className="header-actions"><span className="live-pill"><b /> LIVE</span><div className="account-wrap"><button className="avatar-button" onClick={() => setAccountOpen(!accountOpen)} aria-expanded={accountOpen} aria-label={`Open account menu for ${menuName}`}>{account.image ? <img src={account.image} alt="" /> : initials}</button>{accountOpen && <div className="account-menu"><div className="account-menu__identity"><span className="avatar-button">{account.image ? <img src={account.image} alt="" /> : initials}</span><div><strong>{menuName}</strong><small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small></div></div><p>PLAYER <span>{formatNumberCompact(account.xp)} XP</span></p>{menuLinks.map(([n,h]) => <Link key={h} href={h}>{n}<ArrowUpRight size={14} strokeWidth={2.5} aria-hidden="true" /></Link>)}{account.authenticated ? <button className="account-menu__logout" type="button" onClick={signOut}>Logout<LogOut size={14} strokeWidth={2.5} aria-hidden="true" /></button> : null}</div>}</div></div>
-  </header>;
+  const logo = (
+    <div className="menu-logo-lockup">
+      <span className="brand-mark">{account.image ? <img src={account.image} alt="" /> : initials}</span>
+      <span>
+        RANK<span>BOARD</span>
+        <small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small>
+      </span>
+    </div>
+  );
+  const items = NAV.map(([label, href]) => ({
+    label,
+    ariaLabel: `Go to ${label}`,
+    link: href,
+  }));
+  const socialItems = menuLinks.map(([label, link]) => ({ label, link }));
+
+  return (
+    <>
+      <StaggeredMenu
+        position="left"
+        items={items}
+        socialItems={socialItems}
+        displaySocials
+        displayItemNumbering
+        logo={logo}
+        colors={["#D9FF3A", "#0245EC", "#FF4F8B"]}
+        menuButtonColor="#D9FF3A"
+        openMenuButtonColor="#08030F"
+        accentColor="#D9FF3A"
+        onMenuOpen={() => setAccountOpen(true)}
+        onMenuClose={() => setAccountOpen(false)}
+        footer={
+          account.authenticated ? (
+            <button type="button" onClick={signOut}>
+              Logout <LogOut size={14} strokeWidth={2.5} aria-hidden="true" />
+            </button>
+          ) : null
+        }
+      />
+      <span className="sr-only">{accountOpen ? "Menu open" : "Menu closed"}</span>
+    </>
+  );
 }
 
 function Home() {
@@ -418,7 +454,14 @@ function Home() {
       </div>
       <div className="hero-copy">
         <p className="kicker"><span>●</span> Live rewards</p>
-        <h1>Rank<br /><em>Rewards</em></h1>
+        <h1 className="hero-brackoz-title">
+          <span aria-label="Rank Up">
+            {"Rank Up".split("").map((char, index) => <i key={`rank-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
+          </span>
+          <em aria-label="Grab Rewards">
+            {"Grab Rewards".split("").map((char, index) => <i key={`rewards-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
+          </em>
+        </h1>
         <div className="hero-jackpot" aria-label="Live rewards jackpot">
           <span>Pool</span>
           <strong>{formatNumberCompact(wager || highestScore || 40000)}</strong>
@@ -508,13 +551,16 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       </div>
     </section>
     <section className="board-top-three page-width" aria-label="Top three players">
-      <div className="floor-top"><span>Top 3</span><span className="pulse-text">●</span></div>
-      <div className="winner-arena">
-        <div className="arena-core" aria-hidden="true">
-          <span>Prize Core</span>
+      <div className="floor-top">
+        <span>Top 3</span>
+        <div className="live-pool">
+          <small>Live pool</small>
           <strong>$1,150</strong>
-          <b>Top 3 pool</b>
+          <b>Paid to podium</b>
         </div>
+        <span className="pulse-text">●</span>
+      </div>
+      <div className="winner-arena">
         <Podium players={users.slice(0, 3)} />
       </div>
     </section>

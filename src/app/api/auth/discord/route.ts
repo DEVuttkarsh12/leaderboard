@@ -4,6 +4,18 @@ import {
   DISCORD_OAUTH_STATE_COOKIE,
   getDiscordRedirectUri,
 } from "@/lib/server/auth/discord";
+import {
+  createDiscordUserSession,
+  SESSION_COOKIE,
+  setSessionCookie,
+} from "@/lib/server/auth/session";
+import {
+  getDevDiscordProfile,
+  getDevTokenSet,
+  isDevAuthEnabled,
+  promoteDevAuthUser,
+  shouldForceDevAuth,
+} from "@/lib/server/auth/dev";
 
 const DISCORD_AUTHORIZE_URL = "https://discord.com/oauth2/authorize";
 
@@ -16,7 +28,24 @@ function redirectToLogin(request: NextRequest, error: string) {
 export async function GET(request: NextRequest) {
   const clientId = process.env.DISCORD_CLIENT_ID?.trim();
 
-  if (!clientId) {
+  if (shouldForceDevAuth() || !clientId) {
+    if (isDevAuthEnabled()) {
+      const profile = getDevDiscordProfile();
+      const { sessionToken, expires } = await createDiscordUserSession(
+        profile,
+        getDevTokenSet("discord"),
+        request.cookies.get(SESSION_COOKIE)?.value
+      );
+      await promoteDevAuthUser("discord", profile.id);
+
+      const url = new URL("/login", request.url);
+      url.searchParams.set("discord", "connected");
+      url.searchParams.set("dev_auth", "discord");
+      const response = NextResponse.redirect(url);
+      setSessionCookie(response, sessionToken, expires);
+      return response;
+    }
+
     return redirectToLogin(request, "discord_config");
   }
 
