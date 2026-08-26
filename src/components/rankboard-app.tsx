@@ -1,13 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowUpRight,
+  BadgeCheck,
   Check,
+  Coins,
   Crown,
+  Gift,
   LogOut,
   RefreshCw,
   Search,
+  Sparkles,
+  Trophy,
+  Tv,
   X,
 } from "lucide-react";
 import { cloneElement, useCallback, useEffect, useMemo, useState } from "react";
@@ -28,6 +35,7 @@ import {
 import type { NormalizedLeaderboardUser } from "@/types/leaderboard";
 
 type Player = NormalizedLeaderboardUser;
+type ZoneIcon = typeof ArrowUpRight;
 
 const NAV = [
   ["Home", "/"],
@@ -40,13 +48,13 @@ const NAV = [
   ["Admin", "/admin"],
 ] as const;
 
-const launchpad = [
-  ["Board", "/leaderboard", "01", "lime", "Live ladder"],
-  ["Bets", "/custom-bets", "02", "mint", "Prediction slips"],
-  ["Missions", "/challenges", "03", "violet", "Reward goals"],
-  ["Watch", "/watch-points", "04", "blue", "Stream earnings"],
-  ["Hunts", "/bonus-hunts", "05", "coral", "Bonus tracker"],
-  ["Store", "/store", "06", "yellow", "Point rewards"],
+const launchpad: [string, string, string, string, string, ZoneIcon][] = [
+  ["Board", "/leaderboard", "01", "lime", "Live ladder", Trophy],
+  ["Bets", "/custom-bets", "02", "mint", "Prediction slips", Coins],
+  ["Missions", "/challenges", "03", "violet", "Reward goals", BadgeCheck],
+  ["Watch", "/watch-points", "04", "blue", "Stream earnings", Tv],
+  ["Hunts", "/bonus-hunts", "05", "coral", "Bonus tracker", Sparkles],
+  ["Store", "/store", "06", "yellow", "Point rewards", Gift],
 ] as const;
 
 const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
@@ -372,7 +380,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
 
   const logo = (
     <div className="menu-logo-lockup">
-      <span className="brand-mark">{account.image ? <img src={account.image} alt="" /> : initials}</span>
+      <span className="brand-mark">{account.image ? <Image src={account.image} alt="" width={42} height={42} unoptimized /> : initials}</span>
       <span>
         RANK<span>BOARD</span>
         <small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small>
@@ -480,7 +488,7 @@ function Home() {
       </div>
     </section>
     <section className="stat-strip page-width"><div><span>Wager</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>Players</span><strong>{livePlayers}</strong></div><div><span>Top</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>Board</span><strong>{isLoading ? "Sync" : "Live"}</strong></div></section>
-    <section className="section page-width home-zones"><SectionHeading title="Zones" link={["Board", "/leaderboard"]}/><div className="launch-grid">{launchpad.map(([title,href,num,color,meta]) => <Link className={`launch-card ${color}`} href={href} key={href}><span className="launch-num">{num}</span><span className="launch-icon"><ArrowUpRight size={20} strokeWidth={2.4} aria-hidden="true" /></span><div><small>{meta}</small><h3>{title}</h3></div></Link>)}</div></section>
+    <section className="section page-width home-zones"><SectionHeading title="Zones" link={["Board", "/leaderboard"]}/><div className="launch-grid">{launchpad.map(([title,href,num,color,meta,Icon]) => <Link className={`launch-card ${color}`} href={href} key={href}><span className="launch-num">{num}</span><span className="launch-icon"><Icon size={22} strokeWidth={2.4} aria-hidden="true" /></span><div><small>{meta}</small><h3>{title}</h3></div></Link>)}</div></section>
   </main>;
 }
 

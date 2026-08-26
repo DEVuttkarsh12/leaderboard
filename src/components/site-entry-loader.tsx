@@ -7,7 +7,7 @@ type SiteEntryLoaderProps = {
 };
 
 const EXIT_MS = 420;
-const VISIBLE_MS = 1450;
+const VISIBLE_MS = 1650;
 const REDUCED_MOTION_VISIBLE_MS = 260;
 
 export default function SiteEntryLoader({
@@ -48,36 +48,31 @@ export default function SiteEntryLoader({
       aria-live="polite"
       aria-busy="true"
     >
-      <div className="site-loader__halo site-loader__halo--violet" aria-hidden="true" />
-      <div className="site-loader__halo site-loader__halo--gold" aria-hidden="true" />
-
       <div className="site-loader__stage">
         <div className="site-loader__deck" aria-hidden="true">
           <div className="site-loader__shadow" />
-          <div className="site-loader__orbit site-loader__orbit--outer" />
-          <div className="site-loader__orbit site-loader__orbit--inner" />
 
           <div className="site-loader__card site-loader__card--one">
-            <span className="site-loader__card-label">#03</span>
-            <span className="site-loader__card-value">XP</span>
+            <span className="site-loader__card-label">RANK</span>
+            <span className="site-loader__card-value">#01</span>
           </div>
           <div className="site-loader__card site-loader__card--two">
-            <span className="site-loader__card-label">#01</span>
-            <span className="site-loader__card-value">LIVE</span>
+            <span className="site-loader__card-label">POOL</span>
+            <span className="site-loader__card-value">$</span>
           </div>
           <div className="site-loader__card site-loader__card--three">
-            <span className="site-loader__card-label">#02</span>
-            <span className="site-loader__card-value">TOP</span>
+            <span className="site-loader__card-label">XP</span>
+            <span className="site-loader__card-value">7</span>
           </div>
           <div className="site-loader__card site-loader__card--four">
-            <span className="site-loader__card-label">S08</span>
-            <span className="site-loader__card-value">WIN</span>
+            <span className="site-loader__card-label">LIVE</span>
+            <span className="site-loader__card-value">RB</span>
           </div>
         </div>
 
         <div className="site-loader__copy">
           <div className="site-loader__eyebrow">RankBoard</div>
-          <div className="site-loader__label">Shuffling the deck</div>
+          <div className="site-loader__label">Shuffling cards</div>
         </div>
       </div>
     </div>

@@ -277,3 +277,139 @@
 * Tightened homepage hero title sizing so `RANK REWARDS` stays readable across desktop, tablet, and phone widths.
 * Improved the `REWARDS` word treatment with solid neon lime fill, light outline, and royal-blue shadow for better readability on the dark background.
 * Added workspace icons, stronger small-label contrast, fixed ticker clipping/readability, and tightened watch-points panel sizing for desktop and phone layouts.
+
+---
+
+## 🧭 7. Resume Checkpoint: Vercel Env + Final UI Polish
+
+**Timestamp**: 2026-08-26 21:35 IST  
+**Branch**: `main`  
+**Local app**: `http://localhost:3001`
+
+### A. Current Working State
+* Local dev server was started on port `3001` because port `3000` was already occupied.
+* Latest verification:
+  * `npm run lint` passes.
+  * `npm run build` passes.
+* Current uncommitted files from this session:
+  * `eslint.config.mjs`
+  * `src/app/globals.css`
+  * `src/components/feature-workspace.tsx`
+  * `src/components/rankboard-app.tsx`
+  * `src/components/site-entry-loader.tsx`
+  * `src/components/staggered-menu.css`
+
+### B. Latest UI Changes
+* Homepage top-three cards now keep the same visual placement but no longer sit inside a large rounded outer container.
+* Header/menu lockup was simplified:
+  * Avatar/brand pill is slimmer.
+  * Plus/menu control is separated from the avatar so it is less cluttered.
+* Store and workspace cards now use actual `lucide-react` icons:
+  * Store reward cards.
+  * Purchase history rows.
+  * Admin store rows.
+  * Homepage zone cards: Board, Bets, Missions, Watch, Hunts, Store.
+* Loader status:
+  * Replaced the overdone loader with a cleaner centered card-shuffle loader.
+  * Current loader is intentionally simple: four cards shuffle in the center with a small `RankBoard / Shuffling cards` label.
+
+### C. Vercel Env Screenshot Review
+User shared the Vercel Project -> Settings -> Environment Variables tab.
+
+Already visible in Vercel:
+* `DATABASE_URL`
+* `DIRECT_URL`
+* `LEADERBOARD_API_KEY`
+* `LEADERBOARD_API_URL`
+* `DISCORD_CLIENT_ID`
+* `DISCORD_CLIENT_SECRET`
+* `DISCORD_REDIRECT_URI`
+* `KICK_CLIENT_SECRET`
+* `KICK_REDIRECT_URI`
+* `SHUFFLE_LEADERBOARD_END_TIME`
+* `SHUFFLE_LEADERBOARD_START_TIME`
+* `SHUFFLE_SNAPSHOT_STALE_MS`
+* `SHUFFLE_MIN_POLL_INTERVAL_MS`
+* `SHUFFLE_ENABLE_UPSTREAM`
+* `SHUFFLE_AFFILIATE_URL`
+* `LEADERBOARD_PROVIDER`
+
+Potential issue spotted:
+* Screenshot looked like `KICK_CL_ENT_ID` may be present instead of `KICK_CLIENT_ID`.
+* Must verify exact spelling. The app expects exactly `KICK_CLIENT_ID`.
+
+Still missing or not visible in screenshot:
+* `KICK_WEBHOOK_URL=https://<production-domain>/api/webhooks/kick`
+* `KICK_WATCH_CHANNEL_SLUG=<kick-channel-slug>`
+* `KICK_WATCH_VERIFICATION_MODE=chat`
+* `KICK_WATCH_REQUIRE_LIVE=true`
+
+Optional:
+* `KICK_WEBHOOK_PUBLIC_KEY`
+  * If omitted, the app fetches Kick's public key endpoint.
+
+### D. Final Vercel Env Checklist
+Make sure these exist with exact spelling:
+
+```env
+DATABASE_URL=<Supabase pooled transaction URL>
+DIRECT_URL=<Supabase direct database URL>
+LEADERBOARD_PROVIDER=shuffle
+LEADERBOARD_API_KEY=<leaderboard/shuffle API key>
+SHUFFLE_AFFILIATE_URL=<shuffle affiliate leaderboard URL>
+SHUFFLE_ENABLE_UPSTREAM=true
+SHUFFLE_MIN_POLL_INTERVAL_MS=<existing value>
+SHUFFLE_SNAPSHOT_STALE_MS=<existing value>
+SHUFFLE_LEADERBOARD_START_TIME=<existing value>
+SHUFFLE_LEADERBOARD_END_TIME=<existing value>
+DISCORD_CLIENT_ID=<from Discord app>
+DISCORD_CLIENT_SECRET=<from Discord app>
+DISCORD_REDIRECT_URI=https://<production-domain>/api/auth/discord/callback
+KICK_CLIENT_ID=<from Kick dev app>
+KICK_CLIENT_SECRET=<from Kick dev app>
+KICK_REDIRECT_URI=https://<production-domain>/api/auth/kick/callback
+KICK_WEBHOOK_URL=https://<production-domain>/api/webhooks/kick
+KICK_WATCH_CHANNEL_SLUG=<kick-channel-slug>
+KICK_WATCH_VERIFICATION_MODE=chat
+KICK_WATCH_REQUIRE_LIVE=true
+```
+
+Supabase guidance:
+* `DATABASE_URL`: Supabase transaction pooler URL, usually port `6543`.
+* `DIRECT_URL`: Supabase direct database URL, usually port `5432`.
+
+Kick scopes needed:
+* `user:read`
+* `channel:read`
+* `events:subscribe`
+
+### E. Useful Links
+* Vercel dashboard/new deploy: `https://vercel.com/new`
+* Supabase projects: `https://supabase.com/dashboard/projects`
+* Kick developer portal: `https://dev.kick.com`
+* Kick API Swagger: `https://api.kick.com/swagger/index.html`
+* Discord developer portal: `https://discord.com/developers/applications`
+
+### F. Tomorrow Next Steps
+1. Verify Vercel has `KICK_CLIENT_ID` spelled exactly, not `KICK_CL_ENT_ID`.
+2. Add missing Kick webhook/watch env vars in Vercel.
+3. Redeploy latest Vercel deployment after env changes.
+4. Update Kick Developer app URLs:
+   * `https://<production-domain>/api/auth/kick/callback`
+   * `https://<production-domain>/api/webhooks/kick`
+5. Update Discord Developer app redirect:
+   * `https://<production-domain>/api/auth/discord/callback`
+6. Sign in with Kick again after deployment so scopes are refreshed.
+7. Go to `/admin` and click `Subscribe events`.
+8. Live QA:
+   * Kick login.
+   * Discord login.
+   * Casino link/verify.
+   * Admin add points.
+   * Store redeem.
+   * Custom bet and settlement.
+   * Challenge claim.
+   * Tournament enter/withdraw.
+   * Raffle convert/enter/draw.
+   * Support ticket create/admin status update.
+   * Watch-points verification after Kick chat/live event.

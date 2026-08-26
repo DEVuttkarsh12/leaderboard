@@ -36,6 +36,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -70,24 +71,25 @@
 }
 
 .sm-menu-mark {
-  position: absolute;
-  left: 36px;
-  bottom: -2px;
-  width: 18px;
-  height: 18px;
-  flex-basis: 18px;
-  border: 2px solid #050508;
+  position: relative;
+  left: auto;
+  bottom: auto;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1px solid rgba(217, 255, 58, 0.28);
   border-radius: 999px;
-  background: #d9ff3a;
-  color: #050508;
-  box-shadow: 0 0 0 1px rgba(217, 255, 58, 0.45), 0 8px 18px rgba(0, 0, 0, 0.42);
+  background: rgba(4, 4, 9, 0.72);
+  color: #d9ff3a;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
 }
 
 .sm-icon-line {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 9px;
+  width: 12px;
   height: 2px;
   border-radius: 2px;
   background: currentColor;

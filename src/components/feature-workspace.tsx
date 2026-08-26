@@ -1,22 +1,33 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   Activity,
   ArrowUpRight,
   BadgeCheck,
+  Banknote,
+  CheckCircle2,
   Coins,
+  Crown,
+  Dumbbell,
+  Gamepad2,
+  Gem,
   Gift,
   Headphones,
   LayoutDashboard,
   PackageCheck,
+  PackageOpen,
   ReceiptText,
   Shield,
+  Shirt,
+  ShoppingBag,
   Sparkles,
   Ticket,
   Trophy,
   Tv,
   WalletCards,
+  XCircle,
 } from "lucide-react";
 import {
   FormEvent,
@@ -346,7 +357,7 @@ function AccountImage({
 
   return (
     <span className={className}>
-      {account.image ? <img src={account.image} alt="" /> : initials}
+      {account.image ? <Image src={account.image} alt="" width={42} height={42} unoptimized /> : initials}
     </span>
   );
 }
@@ -927,6 +938,28 @@ type ApiStoreItem = {
   imageLabel: string;
 };
 
+function getStoreItemIcon(item: Pick<ApiStoreItem, "title" | "tag" | "imageLabel">): WorkspaceIcon {
+  const value = `${item.title} ${item.tag} ${item.imageLabel}`.toLowerCase();
+
+  if (value.includes("cash") || value.includes("tip") || value.includes("$")) return Banknote;
+  if (value.includes("vip") || value.includes("crown")) return Crown;
+  if (value.includes("merch") || value.includes("shirt") || value.includes("hoodie")) return Shirt;
+  if (value.includes("gift") || value.includes("bonus")) return Gift;
+  if (value.includes("game") || value.includes("spin") || value.includes("slot")) return Gamepad2;
+  if (value.includes("ticket") || value.includes("raffle")) return Ticket;
+  if (value.includes("gem") || value.includes("premium")) return Gem;
+  if (value.includes("boost") || value.includes("challenge")) return Dumbbell;
+  if (value.includes("package") || value.includes("crate")) return PackageOpen;
+
+  return ShoppingBag;
+}
+
+function getPurchaseStatusIcon(status: ApiPurchase["status"]): WorkspaceIcon {
+  if (status === "COMPLETED") return CheckCircle2;
+  if (status === "REJECTED") return XCircle;
+  return PackageCheck;
+}
+
 type ApiPurchase = {
   id: string;
   itemId: string;
@@ -1054,10 +1087,11 @@ function StoreWorkspace({
           const isBusy = busyItemId === item.id;
           const canAfford = account.points >= item.cost;
           const inStock = item.unlimited || item.stock > 0;
+          const StoreIcon = getStoreItemIcon(item);
           return (
             <article className="action-card reward-card" key={item.id}>
               <small>{item.tag} / {item.unlimited ? "Unlimited" : `${item.stock} left`}</small>
-              <div className="reward-art">{item.imageLabel}</div>
+              <div className="reward-art" aria-hidden="true"><StoreIcon size={28} strokeWidth={2.5} /></div>
               <h3>{item.title}</h3>
               <p>{item.cost.toLocaleString()} pts</p>
               <div className="action-card__footer">
@@ -1088,16 +1122,19 @@ function ApiPurchaseList({ purchases }: { purchases: ApiPurchase[] }) {
 
   return (
     <div className="workspace-list">
-      {purchases.length ? purchases.map((p) => (
-        <article key={p.id}>
-          <span>{statusLabel(p.status)}</span>
-          <div>
-            <h3>{p.itemTitle}</h3>
-            <p>{p.cost.toLocaleString()} pts / {new Date(p.createdAt).toLocaleDateString()}</p>
-          </div>
-          <a href="/support">Track</a>
-        </article>
-      )) : (
+      {purchases.length ? purchases.map((p) => {
+        const StatusIcon = getPurchaseStatusIcon(p.status);
+        return (
+          <article key={p.id}>
+            <span className="list-icon" title={statusLabel(p.status)}><StatusIcon size={16} strokeWidth={2.6} aria-hidden="true" /></span>
+            <div>
+              <h3>{p.itemTitle}</h3>
+              <p>{statusLabel(p.status)} / {p.cost.toLocaleString()} pts / {new Date(p.createdAt).toLocaleDateString()}</p>
+            </div>
+            <a href="/support">Track</a>
+          </article>
+        );
+      }) : (
         <article><span>EMPTY</span><div><h3>No purchases yet</h3><p>Redeem from the store above.</p></div></article>
       )}
     </div>
@@ -1916,7 +1953,7 @@ function AdminWorkspace({
           <div className="admin-user-list">
             {adminUsers.length ? adminUsers.map((user) => (
               <button className={selectedAdminUser?.id === user.id ? "selected" : ""} key={user.id} type="button" onClick={() => setSelectedAdminUserId(user.id)}>
-                <span>{user.image ? <img src={user.image} alt="" /> : user.handle.slice(1, 3).toUpperCase()}</span>
+                <span>{user.image ? <Image src={user.image} alt="" width={42} height={42} unoptimized /> : user.handle.slice(1, 3).toUpperCase()}</span>
                 <strong>{user.handle}</strong>
                 <small>{user.role} / {user.banned ? "BANNED" : user.timeoutUntil ? "TIMEOUT" : "ACTIVE"}</small>
               </button>
@@ -1926,7 +1963,7 @@ function AdminWorkspace({
             {selectedAdminUser ? (
               <>
                 <div className="admin-user-detail__head">
-                  <span>{selectedAdminUser.image ? <img src={selectedAdminUser.image} alt="" /> : selectedAdminUser.handle.slice(1, 3).toUpperCase()}</span>
+                  <span>{selectedAdminUser.image ? <Image src={selectedAdminUser.image} alt="" width={42} height={42} unoptimized /> : selectedAdminUser.handle.slice(1, 3).toUpperCase()}</span>
                   <div>
                     <small>{selectedAdminUser.email || "No email"}</small>
                     <h3>{selectedAdminUser.handle}</h3>
@@ -2011,14 +2048,17 @@ function AdminWorkspace({
         <button className="button primary" type="submit">Add item <span>↗</span></button>
       </form>
       <div className="workspace-list">
-        {items.map((item) => (
+        {items.map((item) => {
+          const StoreIcon = getStoreItemIcon(item);
+          return (
           <article key={item.id}>
-            <span>{item.tag}</span>
+            <span className="list-icon" title={item.tag}><StoreIcon size={16} strokeWidth={2.6} aria-hidden="true" /></span>
             <div><h3>{item.title}</h3><p>{item.cost.toLocaleString()} pts / {item.unlimited ? "unlimited" : `${item.stock} stock`}</p></div>
             <button type="button" onClick={() => updateStoreItem(item, { unlimited: !item.unlimited })}>{item.unlimited ? "Limit" : "Unlimited"}</button>
             <button type="button" onClick={() => updateStoreItem(item, { active: false })}>Remove</button>
           </article>
-        ))}
+          );
+        })}
       </div>
 
       {/* Bet Markets & Settlement Section */}
