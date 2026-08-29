@@ -1,18 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk } from "next/font/google";
-import localFont from "next/font/local";
+import { Fredoka, Saira_Condensed, Space_Mono } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-geist-sans",
+const sairaCondensed = Saira_Condensed({
+  variable: "--font-dg-display",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "block",
+  weight: ["500", "700", "900"],
+  display: "swap",
 });
 
-const brackoz = localFont({
-  src: "./fonts/Brackoz.ttf",
-  variable: "--font-brackoz",
+const fredoka = Fredoka({
+  variable: "--font-dg-body",
+  subsets: ["latin"],
+  weight: "variable",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  variable: "--font-dg-label",
+  subsets: ["latin"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -39,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${brackoz.variable} antialiased`}
+      className={`${sairaCondensed.variable} ${fredoka.variable} ${spaceMono.variable} antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

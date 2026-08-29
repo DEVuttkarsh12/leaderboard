@@ -127,7 +127,7 @@ export default function Lightspeed({
   className = "",
   speed = 0.82,
   opacity = 0.9,
-  primaryColor = "#ffe02a",
+  primaryColor = "#ff7a00",
   secondaryColor = "#46c7ff",
   accentColor = "#ff4f8b",
   interactive = true,

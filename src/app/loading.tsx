@@ -15,7 +15,7 @@ export default function Loading() {
           <i>RANK</i>
         </span>
       </div>
-      <span className="boot-loader__label">Shuffling</span>
+      <span className="boot-loader__label">Dealing ranks</span>
     </div>
   );
 }

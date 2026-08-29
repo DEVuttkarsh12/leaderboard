@@ -907,7 +907,7 @@ function RafflesWorkspace({ account }: { account: Account }) {
         ))}
       </div>
       {account.badges.includes("Admin") && raffle?.round.status === "Open" && (
-        <div className="tool-panel" style={{ marginTop: "1rem" }}>
+        <div className="tool-panel tool-panel--offset">
           <div><small>DRAW TOOL</small><strong>{raffle.round.totalEntries}</strong><span>weighted entries</span></div>
           <button type="button" disabled={busy || raffle.round.totalEntries <= 0} onClick={() => postRaffle("/api/admin/raffles/draw", { roundId: raffle.round.id })}>Draw winner</button>
         </div>
@@ -1081,7 +1081,7 @@ function StoreWorkspace({
       )}
       <div className="workspace-grid">
         {items.length === 0 && !isGuest && (
-          <p style={{ opacity: 0.5 }}>Loading items...</p>
+          <p className="workspace-loading">Loading items...</p>
         )}
         {items.map((item) => {
           const isBusy = busyItemId === item.id;
@@ -1266,7 +1266,7 @@ function CustomBetsWorkspace({
       )}
       <div className="workspace-grid">
         {markets.length === 0 && (
-          <p style={{ opacity: 0.5 }}>Loading prediction markets...</p>
+          <p className="workspace-loading">Loading prediction markets...</p>
         )}
         {markets.map((market) => (
           <article className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id}>
@@ -2030,7 +2030,7 @@ function AdminWorkspace({
           <div className="button-row">
             <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
           </div>
-          <p style={{ color: "var(--faint)", fontSize: "0.8rem", marginTop: "0.75rem" }}>{kickEventStatus}</p>
+          <p className="admin-helper-text">{kickEventStatus}</p>
         </article>
       </div>
       {/* Store Catalog Management */}
@@ -2040,7 +2040,7 @@ function AdminWorkspace({
           <h2>Manage store items</h2>
         </div>
       </div>
-      <p style={{ margin: "0 0 0.75rem", color: "var(--faint)", fontWeight: 700 }}>{adminStoreMessage}</p>
+      <p className="admin-note">{adminStoreMessage}</p>
       <form className="support-form account-form" onSubmit={addItem}>
         <label>ITEM<input value={newItem.title} onChange={(event) => setNewItem((current) => ({ ...current, title: event.target.value }))} placeholder="Reward name" /></label>
         <label>PRICE<input value={newItem.cost} inputMode="numeric" onChange={(event) => setNewItem((current) => ({ ...current, cost: event.target.value.replace(/\D/g, "") }))} /></label>
@@ -2077,11 +2077,11 @@ function AdminWorkspace({
         <button className="button primary" type="submit">Add bet market <span>↗</span></button>
       </form>
       {adminMarketMessage && (
-        <p style={{ margin: "0.75rem 0", padding: "0.75rem 1rem", borderRadius: 8, background: "rgba(47,213,126,0.1)", border: "1px solid rgba(47,213,126,0.3)", fontSize: "0.9rem", color: "var(--green)", fontWeight: 600 }}>
+        <p className="admin-success-callout">
           {adminMarketMessage}
         </p>
       )}
-      <div className="workspace-list" style={{ marginTop: "1rem" }}>
+      <div className="workspace-list workspace-list--offset">
         {markets.map((market) => (
           <article
             key={market.id}
@@ -2100,7 +2100,7 @@ function AdminWorkspace({
               </p>
             </div>
             {market.status === "Live" && (
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div className="admin-inline-actions">
                 <button
                   type="button"
                   className="settle-btn win"

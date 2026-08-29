@@ -62,7 +62,7 @@ function makeEmber(index: number, width: number, height: number, resetFromBottom
     vy: -(0.15 + seededUnit(index + 229) * 0.75),
     size: 0.8 + seededUnit(index + 233) * 2.4,
     alpha: 0.16 + seededUnit(index + 239) * 0.46,
-    color: hue > 0.66 ? "255, 79, 139" : hue > 0.38 ? "84, 197, 255" : "217, 255, 58",
+    color: hue > 0.66 ? "255, 79, 139" : hue > 0.38 ? "84, 197, 255" : "255, 95, 31",
   };
 }
 
@@ -105,7 +105,7 @@ export default function StarCloudBackground({ shardCount = 130 }: StarCloudBackg
     const drawShard = (shard: Shard) => {
       const depthScale = 0.45 + shard.z * 1.25;
       const size = shard.size * depthScale;
-      const color = shard.hue > 0.72 ? "255, 92, 162" : shard.hue > 0.42 ? "84, 197, 255" : "255, 233, 64";
+      const color = shard.hue > 0.72 ? "255, 92, 162" : shard.hue > 0.42 ? "84, 197, 255" : "255, 154, 46";
 
       context.save();
       context.translate(shard.x, shard.y);
@@ -140,7 +140,7 @@ export default function StarCloudBackground({ shardCount = 130 }: StarCloudBackg
         const y = seededUnit(index + 409) * height * 0.82;
         const twinkle = 0.12 + (Math.sin(time * 0.001 + index) * 0.5 + 0.5) * 0.36;
         context.globalAlpha = twinkle;
-        context.fillStyle = index % 5 === 0 ? "#D9FF3A" : index % 7 === 0 ? "#46C7FF" : "#FFFFFF";
+        context.fillStyle = index % 5 === 0 ? "#ff7a00" : index % 7 === 0 ? "#46C7FF" : "#FFFFFF";
         context.beginPath();
         context.arc(x, y, 0.55 + seededUnit(index + 419) * 1.1, 0, Math.PI * 2);
         context.fill();
@@ -195,7 +195,7 @@ export default function StarCloudBackground({ shardCount = 130 }: StarCloudBackg
         } else {
           context.save();
           context.globalAlpha = 0.1 + shard.z * 0.18;
-          context.strokeStyle = shard.hue > 0.72 ? "rgba(255, 79, 139, 0.58)" : shard.hue > 0.42 ? "rgba(84, 197, 255, 0.5)" : "rgba(217, 255, 58, 0.5)";
+          context.strokeStyle = shard.hue > 0.72 ? "rgba(255, 79, 139, 0.58)" : shard.hue > 0.42 ? "rgba(84, 197, 255, 0.5)" : "rgba(255, 95, 31, 0.5)";
           context.lineWidth = 1;
           context.beginPath();
           context.moveTo(shard.x - shard.vx * 18, shard.y - shard.vy * 9);

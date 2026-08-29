@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { animate, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -17,12 +19,12 @@ import {
   Tv,
   X,
 } from "lucide-react";
-import { cloneElement, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
 import SiteEntryLoader from "./site-entry-loader";
-import StarCloudBackground from "./star-cloud-background";
 import StaggeredMenu from "./staggered-menu";
+import VolcanoBackground from "./volcano-background";
 import type { AuthAccountPayload, CasinoAccountDetail } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated, formatNumberCompact, formatShortDate } from "@/lib/formatters";
@@ -48,13 +50,22 @@ const NAV = [
   ["Admin", "/admin"],
 ] as const;
 
+const DESKTOP_NAV = [
+  ["Home", "/"],
+  ["Board", "/leaderboard"],
+  ["Missions", "/challenges"],
+  ["Bets", "/custom-bets"],
+  ["Watch", "/watch-points"],
+  ["Store", "/store"],
+] as const;
+
 const launchpad: [string, string, string, string, string, ZoneIcon][] = [
-  ["Board", "/leaderboard", "01", "lime", "Live ladder", Trophy],
+  ["Board", "/leaderboard", "01", "ember", "Live ladder", Trophy],
   ["Bets", "/custom-bets", "02", "mint", "Prediction slips", Coins],
   ["Missions", "/challenges", "03", "violet", "Reward goals", BadgeCheck],
   ["Watch", "/watch-points", "04", "blue", "Stream earnings", Tv],
   ["Hunts", "/bonus-hunts", "05", "coral", "Bonus tracker", Sparkles],
-  ["Store", "/store", "06", "yellow", "Point rewards", Gift],
+  ["Store", "/store", "06", "magma", "Point rewards", Gift],
 ] as const;
 
 const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
@@ -117,6 +128,29 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
 
 function fmt(value: number | null | undefined) {
   return new Intl.NumberFormat("en-US").format(value ?? 0);
+}
+
+function poolFractionDigits(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  const thousandths = Math.round(Math.abs(value % 1) * 1000);
+  if (!thousandths) return 0;
+  return thousandths.toString().padStart(3, "0").replace(/0+$/, "").length;
+}
+
+function formatPoolValue(value: number, fractionDigits = poolFractionDigits(value)) {
+  const safeValue = Number.isFinite(value) ? value : 0;
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(safeValue);
+}
+
+function formatPoolDisplay(value: number, fractionDigits = poolFractionDigits(value)) {
+  const safeValue = Number.isFinite(value) ? value : 0;
+  if (Math.abs(safeValue) >= 100_000) {
+    return formatNumberCompact(safeValue);
+  }
+  return formatPoolValue(safeValue, fractionDigits);
 }
 
 function playerScore(player: Player) {
@@ -324,13 +358,24 @@ export default function RankBoardApp({
   return (
     <div className="site-shell">
       <div className="site-tunnel-background" aria-hidden="true">
-        <StarCloudBackground />
+        <VolcanoBackground
+          skyColorTop="#08030f"
+          skyColorBottom="#26080b"
+          lavaColor="#ff4f00"
+          glowColor="#ff7a00"
+          meteorColor="#ffd166"
+          meteorCount={3}
+          eruptionIntensity={0.38}
+          starCount={36}
+          maxLavaParticles={95}
+          simulationSpeed={0.38}
+          animationStyle="default"
+        />
       </div>
       <CustomCursor />
       <SiteEntryLoader />
       <div className="top-chrome">
         <Header account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
-        <Ticker />
       </div>
       {route === "" ? <Home /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : route === "profile" ? <Profile account={account} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
       <Footer />
@@ -338,30 +383,8 @@ export default function RankBoardApp({
   );
 }
 
-function Ticker() {
-  const { users, error } = useLeaderboard();
-  const group = error || users.length === 0
-    ? [<span className="ticker-item" key="sync"><b>LIVE</b>Season 08 · board syncing<em>●</em></span>, <span className="ticker-item" key="s08"><b>S08</b>Missions · Bets · Raffles · Hunts<em>●</em></span>]
-    : users.slice(0, 8).map((p) => (
-        <span className="ticker-item" key={p.id}>
-          <b>#{p.rank}</b>{playerName(p)}<em>+{fmt(playerScore(p))} XP</em>
-        </span>
-      ));
-
-  return (
-    <div className="ticker" aria-hidden="true">
-      <div className="ticker-track">
-        {[0, 1].map((half) => (
-          <div className="ticker-half" key={half}>
-            {[0, 1, 2].flatMap((rep) => group.map((item, i) => cloneElement(item, { key: `${half}-${rep}-${i}` })))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccount; accountOpen: boolean; setAccountOpen: (v: boolean) => void }) {
+  const pathname = usePathname();
   const cleanHandle = account.handle.replace(/^@/, "") || "guest";
   const initials = getInitials(cleanHandle);
   const accountStatus = !account.authenticated ? "Guest" : account.profileProvider === "kick" ? "Kick" : account.profileProvider === "discord" ? "Discord" : "Signed in";
@@ -381,8 +404,10 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
   const logo = (
     <div className="menu-logo-lockup">
       <span className="brand-mark">{account.image ? <Image src={account.image} alt="" width={42} height={42} unoptimized /> : initials}</span>
-      <span>
-        RANK<span>BOARD</span>
+      <span className="menu-logo-text">
+        <span className="menu-logo-word">
+          RANK<span>BOARD</span>
+        </span>
         <small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small>
       </span>
     </div>
@@ -393,20 +418,44 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
     link: href,
   }));
   const socialItems = menuLinks.map(([label, link]) => ({ label, link }));
+  const isActiveLink = (href: string) => pathname === href || (href !== "/" && pathname.startsWith(href));
 
   return (
     <>
+      <nav className="desktop-nav" aria-label="Primary navigation">
+        <Link className="desktop-nav__brand" href="/" aria-label="RankBoard home">
+          <span className="desktop-nav__mark">R</span>
+          <span className="desktop-nav__word">
+            RANK<span>BOARD</span>
+          </span>
+        </Link>
+        <div className="desktop-nav__links">
+          {DESKTOP_NAV.map(([label, href]) => (
+            <Link className={isActiveLink(href) ? "active" : undefined} href={href} key={href}>
+              {label}
+            </Link>
+          ))}
+        </div>
+        <Link className="desktop-nav__account" href="/profile" aria-label="Open profile">
+          <span className="desktop-nav__avatar">{account.image ? <Image src={account.image} alt="" width={36} height={36} unoptimized /> : initials}</span>
+          <span>
+            <strong>{accountStatus}</strong>
+            <small>{formatNumberCompact(account.points)} PTS</small>
+          </span>
+        </Link>
+      </nav>
       <StaggeredMenu
+        className="mobile-menu-only"
         position="left"
         items={items}
         socialItems={socialItems}
         displaySocials
         displayItemNumbering
         logo={logo}
-        colors={["#D9FF3A", "#0245EC", "#FF4F8B"]}
-        menuButtonColor="#D9FF3A"
+        colors={["#ff7a00", "#8b1e1e", "#ff4f3d"]}
+        menuButtonColor="#ff7a00"
         openMenuButtonColor="#08030F"
-        accentColor="#D9FF3A"
+        accentColor="#ff4f00"
         onMenuOpen={() => setAccountOpen(true)}
         onMenuClose={() => setAccountOpen(false)}
         footer={
@@ -423,9 +472,11 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
 }
 
 function Home() {
-  const { users, total, highestScore, isLoading } = useLeaderboard();
+  const { users, total, highestScore } = useLeaderboard();
   const livePlayers = total || users.length;
   const wager = totalWager(users);
+  const livePool = wager || highestScore || 40000;
+  const livePoolLabel = formatPoolValue(livePool);
 
   return <main>
     <section className="product-hero page-width">
@@ -461,38 +512,192 @@ function Home() {
         <span className="sparkle sp-4">✦</span>
       </div>
       <div className="hero-copy">
-        <p className="kicker"><span>●</span> Live rewards</p>
-        <h1 className="hero-brackoz-title">
-          <span aria-label="Rank Up">
-            {"Rank Up".split("").map((char, index) => <i key={`rank-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
-          </span>
-          <em aria-label="Grab Rewards">
-            {"Grab Rewards".split("").map((char, index) => <i key={`rewards-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
-          </em>
-        </h1>
-        <div className="hero-jackpot" aria-label="Live rewards jackpot">
-          <span>Pool</span>
-          <strong>{formatNumberCompact(wager || highestScore || 40000)}</strong>
-          <b>PTS</b>
-        </div>
-        <div className="button-row"><Link className="button primary" href="/leaderboard">Play</Link><Link className="button ghost" href="/store">Claim</Link></div>
-      </div>
-      <div className="hero-floor">
-        <div className="floor-top"><span>Top 3</span><span className="pulse-text">●</span></div>
-        <div className="home-prize-core" aria-hidden="true">
-          <span>Live Pool</span>
-          <strong>{formatNumberCompact(wager || highestScore || 40000)}</strong>
-          <b>PTS</b>
-        </div>
-        <Podium players={users.slice(0, 3)} compact />
+        <motion.div
+          className="hero-word-block"
+          initial={{ opacity: 0, x: -28, rotate: -1.5 }}
+          animate={{ opacity: 1, x: 0, rotate: 0 }}
+          transition={{ delay: 1.05, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <h1 className="hero-brackoz-title">
+            <span aria-label="Rank Up">
+              {"Rank Up".split("").map((char, index) => <i key={`rank-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
+            </span>
+            <em aria-label="Grab Rewards">
+              {"Grab Rewards".split("").map((char, index) => <i key={`rewards-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
+            </em>
+          </h1>
+          <p className="hero-mini-line">Play. Climb. Claim.</p>
+          <div className="home-prize-core home-prize-core--hero" aria-label={`Live pool ${livePoolLabel} points`}>
+            <span>Live Pool</span>
+            <AnimatedPoolNumber value={livePool} />
+            <b>PTS</b>
+          </div>
+          <div className="button-row">
+            <MagneticLink className="button primary" href="/leaderboard">Play</MagneticLink>
+            <MagneticLink className="button ghost" href="/store">Claim</MagneticLink>
+          </div>
+        </motion.div>
+        <motion.div
+          className="hero-live-panel"
+          initial={{ opacity: 0, x: 42, y: 20, rotate: 5 }}
+          animate={{ opacity: 1, x: 0, y: 0, rotate: -2 }}
+          transition={{ delay: 1.22, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          aria-hidden="true"
+        >
+          <span className="hero-live-badge">Live</span>
+          <span className="hero-panel-chip hero-panel-chip--one">#1</span>
+          <span className="hero-panel-chip hero-panel-chip--two">#2</span>
+          <span className="hero-panel-word">Board</span>
+          <span className="hero-panel-orbit" />
+        </motion.div>
       </div>
     </section>
-    <section className="stat-strip page-width"><div><span>Wager</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>Players</span><strong>{livePlayers}</strong></div><div><span>Top</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>Board</span><strong>{isLoading ? "Sync" : "Live"}</strong></div></section>
-    <section className="section page-width home-zones"><SectionHeading title="Zones" link={["Board", "/leaderboard"]}/><div className="launch-grid">{launchpad.map(([title,href,num,color,meta,Icon]) => <Link className={`launch-card ${color}`} href={href} key={href}><span className="launch-num">{num}</span><span className="launch-icon"><Icon size={22} strokeWidth={2.4} aria-hidden="true" /></span><div><small>{meta}</small><h3>{title}</h3></div></Link>)}</div></section>
+    <HomeBoardPreview users={users} />
+    <section className="home-action-zone page-width" aria-label="RankBoard routes and live stats">
+      <div className="home-signal-row">
+        <div><span>Players</span><strong>{livePlayers}</strong></div>
+        <div><span>Wager</span><strong>{formatNumberCompact(wager)}</strong></div>
+        <div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div>
+        <Link href="/leaderboard">Leaderboard <ArrowUpRight size={14} strokeWidth={2.6} aria-hidden="true" /></Link>
+      </div>
+      <div className="home-route-strip">
+        {launchpad.map(([title, href, num, color, , Icon]) => (
+          <SpotlightRouteCard color={color} href={href} icon={Icon} key={href} num={num} title={title} />
+        ))}
+      </div>
+    </section>
   </main>;
 }
 
-function SectionHeading({ title, link }: { title: string; link: [string,string] }) { return <div className="section-heading"><div><h2>{title}</h2></div><Link href={link[1]}>{link[0]} <ArrowUpRight size={14} strokeWidth={2.5} aria-hidden="true" /></Link></div> }
+function HomeBoardPreview({ users }: { users: Player[] }) {
+  return (
+    <section className="home-board-preview page-width" id="home-board-preview" aria-label="Top three leaderboard players">
+      <div className="home-board-preview__top">
+        <span>Top 3</span>
+        <Link href="/leaderboard">Full Board <ArrowUpRight size={14} strokeWidth={2.6} aria-hidden="true" /></Link>
+      </div>
+      <div className="home-board-preview__stage">
+        <Podium players={users.slice(0, 3)} compact />
+      </div>
+    </section>
+  );
+}
+
+function AnimatedPoolNumber({ value }: { value: number }) {
+  const prefersReducedMotion = useReducedMotion();
+  const fractionDigits = useMemo(() => poolFractionDigits(value), [value]);
+  const formatter = useMemo(
+    () =>
+      new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits,
+      }),
+    [fractionDigits]
+  );
+  const [introDelay, setIntroDelay] = useState(1.55);
+  const count = useMotionValue(0);
+  const display = useTransform(count, (latest) => formatPoolDisplay(latest, fractionDigits));
+  const displayLabel = formatPoolDisplay(value, fractionDigits);
+  const fullLabel = formatter.format(value);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setIntroDelay(0), 3400);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      count.set(value);
+      return undefined;
+    }
+
+    const controls = animate(count, value, {
+      delay: introDelay,
+      duration: introDelay ? 1.9 : 0.85,
+      ease: [0.16, 1, 0.3, 1],
+    });
+
+    return () => controls.stop();
+  }, [count, introDelay, prefersReducedMotion, value]);
+
+  if (prefersReducedMotion) {
+    return <strong aria-label={fullLabel}>{displayLabel}</strong>;
+  }
+
+  return <motion.strong className="pool-count-number" aria-label={fullLabel}>{display}</motion.strong>;
+}
+
+function MagneticLink({ className, href, children }: { className: string; href: string; children: ReactNode }) {
+  const prefersReducedMotion = useReducedMotion();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 180, damping: 18, mass: 0.45 });
+  const springY = useSpring(y, { stiffness: 180, damping: 18, mass: 0.45 });
+
+  const handlePointerMove = useCallback(
+    (event: PointerEvent<HTMLSpanElement>) => {
+      if (prefersReducedMotion) return;
+      const rect = event.currentTarget.getBoundingClientRect();
+      x.set((event.clientX - rect.left - rect.width / 2) * 0.18);
+      y.set((event.clientY - rect.top - rect.height / 2) * 0.24);
+    },
+    [prefersReducedMotion, x, y]
+  );
+
+  const resetPosition = useCallback(() => {
+    x.set(0);
+    y.set(0);
+  }, [x, y]);
+
+  return (
+    <motion.span className="magnetic-link" onPointerLeave={resetPosition} onPointerMove={handlePointerMove} style={{ x: springX, y: springY }}>
+      <Link className={className} href={href}>{children}</Link>
+    </motion.span>
+  );
+}
+
+function SpotlightRouteCard({
+  color,
+  href,
+  icon: Icon,
+  num,
+  title,
+}: {
+  color: string;
+  href: string;
+  icon: ZoneIcon;
+  num: string;
+  title: string;
+}) {
+  const [spotlight, setSpotlight] = useState({ x: 0, y: 0, opacity: 0 });
+
+  const handlePointerMove = useCallback((event: PointerEvent<HTMLAnchorElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setSpotlight({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+      opacity: 1,
+    });
+  }, []);
+
+  return (
+    <Link
+      className={`home-route-card ${color}`}
+      href={href}
+      onPointerLeave={() => setSpotlight((current) => ({ ...current, opacity: 0 }))}
+      onPointerMove={handlePointerMove}
+      style={{
+        "--spotlight-x": `${spotlight.x}px`,
+        "--spotlight-y": `${spotlight.y}px`,
+        "--spotlight-opacity": spotlight.opacity,
+      } as CSSProperties}
+    >
+      <span>{num}</span>
+      <Icon size={20} strokeWidth={2.5} aria-hidden="true" />
+      <strong>{title}</strong>
+    </Link>
+  );
+}
 
 function Podium({ players, compact = false }: { players: Player[]; compact?: boolean }) {
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
@@ -726,104 +931,82 @@ function CasinoCard({
     }
   }
 
+  const cardState = isVerified ? "is-verified" : isPending ? "is-pending" : "is-empty";
+  const statusKey = isVerified ? "verified" : isPending ? "pending" : "empty";
+  const statusLabel = isVerified ? "Verified" : isPending ? "Pending" : "Not linked";
+  const verificationMethodLabel = detail?.verificationMethod === "KICK_OAUTH"
+    ? "Auto-matched with Kick"
+    : detail?.verificationMethod === "EMAIL_MATCH"
+    ? "Matched with verified email"
+    : "Security code verified";
+
   return (
-    <article
-      style={{
-        background: "rgba(255, 255, 255, 0.03)",
-        border: isVerified
-          ? "1px solid rgba(34, 197, 94, 0.35)"
-          : isPending
-          ? "1px solid rgba(234, 179, 8, 0.35)"
-          : "1px solid rgba(255, 255, 255, 0.08)",
-        borderRadius: 12,
-        padding: "1.25rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-        position: "relative",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <article className={`casino-link-card ${cardState}`}>
+      <div className="casino-link-card__head">
         <div>
-          <h3 style={{ textTransform: "capitalize", fontSize: "1.1rem", margin: 0, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <h3>
             <span>{provider}</span>
             {provider === "shuffle" && (
-              <small style={{ opacity: 0.6, fontSize: "0.75rem", fontWeight: 400 }}>(Live Affiliate Wager)</small>
+              <small>Live affiliate wager</small>
             )}
           </h3>
         </div>
-        {isVerified ? (
-          <span style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e", border: "1px solid rgba(34, 197, 94, 0.4)", padding: "0.25rem 0.6rem", borderRadius: 6, fontSize: "0.75rem", fontWeight: 700 }}>
-            VERIFIED ✓
-          </span>
-        ) : isPending ? (
-          <span style={{ background: "rgba(234, 179, 8, 0.15)", color: "#eab308", border: "1px solid rgba(234, 179, 8, 0.4)", padding: "0.25rem 0.6rem", borderRadius: 6, fontSize: "0.75rem", fontWeight: 700 }}>
-            PENDING VERIFICATION ⏳
-          </span>
-        ) : (
-          <span style={{ opacity: 0.5, fontSize: "0.75rem", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "0.25rem 0.6rem", borderRadius: 6 }}>
-            NOT LINKED
-          </span>
-        )}
+        <span className={`casino-status casino-status--${statusKey}`}>{statusLabel}</span>
       </div>
 
       {isVerified ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-          <div style={{ background: "rgba(34, 197, 94, 0.08)", padding: "0.75rem 1rem", borderRadius: 8 }}>
-            <p style={{ margin: 0, fontSize: "0.9rem" }}>
-              Username: <strong style={{ color: "#fff" }}>@{detail.username}</strong>
+        <div className="casino-stack">
+          <div className="casino-proof-box casino-proof-box--verified">
+            <p>
+              Username: <strong>@{detail?.username}</strong>
             </p>
-            {detail.email && (
-              <p style={{ margin: "0.25rem 0 0", fontSize: "0.8rem", opacity: 0.8 }}>
+            {detail?.email && (
+              <p className="casino-muted">
                 Casino Email: {detail.email}
               </p>
             )}
-            <small style={{ display: "block", marginTop: "0.4rem", color: "#22c55e", fontSize: "0.75rem" }}>
-              ● Points sync active ({detail.verificationMethod === "KICK_OAUTH" ? "Auto-matched with Kick" : detail.verificationMethod === "EMAIL_MATCH" ? "Matched with verified email" : "Security Code Verified"})
-            </small>
+            <small>Points sync active - {verificationMethodLabel}</small>
           </div>
           <button
             type="button"
-            className="button ghost"
+            className="button ghost casino-button casino-button--danger"
             onClick={handleUnlink}
             disabled={loading}
-            style={{ alignSelf: "flex-start", fontSize: "0.8rem", padding: "0.4rem 0.8rem", color: "#f87171" }}
           >
             {loading ? "Unlinking..." : "Unlink Account"}
           </button>
         </div>
       ) : isPending ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          <div style={{ background: "rgba(234, 179, 8, 0.08)", padding: "0.75rem 1rem", borderRadius: 8, border: "1px dashed rgba(234, 179, 8, 0.3)" }}>
-            <p style={{ margin: 0, fontSize: "0.9rem" }}>
-              Linked Handle: <strong style={{ color: "#fff" }}>@{detail.username}</strong>
+        <div className="casino-stack">
+          <div className="casino-proof-box casino-proof-box--pending">
+            <p>
+              Linked Handle: <strong>@{detail?.username}</strong>
             </p>
-            {detail.verificationCode && (
-              <div style={{ marginTop: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>Verification Code:</span>
-                <code style={{ background: "rgba(0,0,0,0.4)", color: "#eab308", padding: "0.2rem 0.5rem", borderRadius: 4, fontWeight: "bold", letterSpacing: "0.05em" }}>
+            {detail?.verificationCode && (
+              <div className="casino-code-row">
+                <span>Verification Code</span>
+                <code>
                   {detail.verificationCode}
                 </code>
               </div>
             )}
-            <p style={{ margin: "0.5rem 0 0", fontSize: "0.75rem", opacity: 0.8, lineHeight: 1.4 }}>
+            <p className="casino-muted">
               To ensure players cannot impersonate each other, enter your code below or auto-verify with your Kick OAuth account.
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <div className="casino-inline-form">
             <input
+              className="casino-input"
               value={codeInput}
               onChange={(e) => setCodeInput(e.target.value)}
               placeholder="Enter code (e.g. RANK-1234)"
-              style={{ flex: 1, minWidth: 180, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, padding: "0.5rem 0.75rem", color: "#fff", fontSize: "0.85rem" }}
             />
             <button
               type="button"
-              className="button primary"
+              className="button primary casino-button"
               onClick={handleVerify}
               disabled={loading || !codeInput.trim()}
-              style={{ fontSize: "0.85rem", padding: "0.5rem 0.9rem" }}
             >
               {loading ? "Verifying..." : "Confirm Code"}
             </button>
@@ -832,53 +1015,37 @@ function CasinoCard({
           {account.connected.kick.connected && (
             <button
               type="button"
-              className="button ghost"
+              className="button ghost casino-button casino-button--compact"
               onClick={handleAutoVerify}
               disabled={loading}
-              style={{ alignSelf: "flex-start", fontSize: "0.8rem", padding: "0.4rem 0.8rem" }}
             >
-              ⚡ Auto-Verify with Kick (@{account.connected.kick.username})
+              Auto-Verify with Kick (@{account.connected.kick.username})
             </button>
           )}
 
           <button
             type="button"
-            className="button ghost"
+            className="button ghost casino-button casino-button--quiet"
             onClick={handleUnlink}
             disabled={loading}
-            style={{ alignSelf: "flex-start", fontSize: "0.75rem", opacity: 0.6, padding: "0.2rem 0.4rem" }}
           >
             Change or remove handle
           </button>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          <div style={{ display: "flex", gap: "0.5rem", fontSize: "0.8rem" }}>
+        <div className="casino-stack">
+          <div className="casino-mode-tabs" role="tablist" aria-label={`${provider} link mode`}>
             <button
               type="button"
+              className={mode === "username" ? "active" : ""}
               onClick={() => setMode("username")}
-              style={{
-                background: mode === "username" ? "rgba(255,255,255,0.15)" : "transparent",
-                border: "1px solid rgba(255,255,255,0.1)",
-                color: "#fff",
-                borderRadius: 4,
-                padding: "0.3rem 0.6rem",
-                cursor: "pointer",
-              }}
             >
               By Username
             </button>
             <button
               type="button"
+              className={mode === "email" ? "active" : ""}
               onClick={() => setMode("email")}
-              style={{
-                background: mode === "email" ? "rgba(255,255,255,0.15)" : "transparent",
-                border: "1px solid rgba(255,255,255,0.1)",
-                color: "#fff",
-                borderRadius: 4,
-                padding: "0.3rem 0.6rem",
-                cursor: "pointer",
-              }}
             >
               By Casino Email
             </button>
@@ -886,52 +1053,50 @@ function CasinoCard({
 
           {mode === "username" ? (
             <input
+              className="casino-input"
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               placeholder={`Your ${provider} username`}
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, padding: "0.6rem 0.8rem", color: "#fff", fontSize: "0.85rem", width: "100%", boxSizing: "border-box" }}
             />
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            <div className="casino-stack casino-stack--tight">
               <input
+                className="casino-input"
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
                 placeholder={`Your ${provider} username`}
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, padding: "0.6rem 0.8rem", color: "#fff", fontSize: "0.85rem", width: "100%", boxSizing: "border-box" }}
               />
               <input
+                className="casino-input"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
                 placeholder={`Your ${provider} account email`}
                 type="email"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, padding: "0.6rem 0.8rem", color: "#fff", fontSize: "0.85rem", width: "100%", boxSizing: "border-box" }}
               />
             </div>
           )}
 
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+          <div className="casino-inline-form">
             <button
               type="button"
-              className="button primary"
+              className="button primary casino-button"
               onClick={() => handleLink()}
               disabled={loading || !usernameInput.trim()}
-              style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
             >
-              {loading ? "Linking..." : "Link & Verify"} <span>↗</span>
+              {loading ? "Linking..." : "Link & Verify"}
             </button>
 
             {kickName && (
               <button
                 type="button"
-                className="button ghost"
+                className="button ghost casino-button casino-button--compact"
                 onClick={() => {
                   setUsernameInput(kickName);
                   handleLink(kickName);
                 }}
                 disabled={loading}
-                style={{ fontSize: "0.8rem", padding: "0.45rem 0.8rem" }}
               >
-                ⚡ Auto-Link Kick (@{kickName})
+                Auto-Link Kick (@{kickName})
               </button>
             )}
           </div>
@@ -939,16 +1104,7 @@ function CasinoCard({
       )}
 
       {statusMsg && (
-        <div
-          style={{
-            fontSize: "0.8rem",
-            color: statusMsg.type === "success" ? "#22c55e" : "#f87171",
-            background: statusMsg.type === "success" ? "rgba(34, 197, 94, 0.1)" : "rgba(248, 113, 113, 0.1)",
-            border: statusMsg.type === "success" ? "1px solid rgba(34, 197, 94, 0.2)" : "1px solid rgba(248, 113, 113, 0.2)",
-            padding: "0.5rem 0.75rem",
-            borderRadius: 6,
-          }}
-        >
+        <div className={`casino-status-message ${statusMsg.type}`}>
           {statusMsg.text}
         </div>
       )}
@@ -1039,7 +1195,7 @@ function Profile({ account }: { account: HeaderAccount }) {
           <span>Points only sync to verified accounts to prevent username theft</span>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.25rem" }}>
+        <div className="casino-link-grid">
           <CasinoCard
             provider="shuffle"
             account={account}
@@ -1061,7 +1217,7 @@ function Profile({ account }: { account: HeaderAccount }) {
         </div>
       </section>
 
-      <section className="section page-width" style={{ paddingTop: 0 }}>
+      <section className="section page-width section-tight">
         <div className="workspace-heading">
           <div>
             <p>Ledger</p>
@@ -1074,7 +1230,7 @@ function Profile({ account }: { account: HeaderAccount }) {
         ) : transactions.length === 0 ? (
           <div className="empty-state"><span>◎</span><h3>Nothing yet.</h3><Link href="/store" className="button ghost">Open store</Link></div>
         ) : (
-          <div className="workspace-list" style={{ marginTop: 0 }}>
+          <div className="workspace-list workspace-list--flush">
             {transactions.map((t) => (
               <article key={t.id}>
                 <span>{t.amount > 0 ? "Credit" : "Debit"}</span>
@@ -1082,14 +1238,14 @@ function Profile({ account }: { account: HeaderAccount }) {
                   <h3>{reasonLabel(t.reason)}</h3>
                   <p>{new Date(t.createdAt).toLocaleDateString()}</p>
                 </div>
-                <strong style={{ color: t.amount > 0 ? "var(--green)" : "var(--coral)", fontSize: 13 }}>{t.amount > 0 ? "+" : ""}{fmt(t.amount)} PTS</strong>
+                <strong className={`transaction-delta ${t.amount < 0 ? "negative" : ""}`}>{t.amount > 0 ? "+" : ""}{fmt(t.amount)} PTS</strong>
               </article>
             ))}
           </div>
         )}
       </section>
 
-      <section className="section page-width" style={{ paddingTop: 0 }}>
+      <section className="section page-width section-tight">
         <div className="workspace-heading">
           <div>
             <p>Logins</p>

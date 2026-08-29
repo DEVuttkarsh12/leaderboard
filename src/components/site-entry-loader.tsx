@@ -7,7 +7,7 @@ type SiteEntryLoaderProps = {
 };
 
 const EXIT_MS = 420;
-const VISIBLE_MS = 1650;
+const VISIBLE_MS = 1350;
 const REDUCED_MOTION_VISIBLE_MS = 260;
 
 export default function SiteEntryLoader({
@@ -53,7 +53,7 @@ export default function SiteEntryLoader({
           <div className="site-loader__shadow" />
 
           <div className="site-loader__card site-loader__card--one">
-            <span className="site-loader__card-label">RANK</span>
+            <span className="site-loader__card-label">TOP</span>
             <span className="site-loader__card-value">#01</span>
           </div>
           <div className="site-loader__card site-loader__card--two">
@@ -66,13 +66,13 @@ export default function SiteEntryLoader({
           </div>
           <div className="site-loader__card site-loader__card--four">
             <span className="site-loader__card-label">LIVE</span>
-            <span className="site-loader__card-value">RB</span>
+            <span className="site-loader__card-value">GO</span>
           </div>
         </div>
 
         <div className="site-loader__copy">
           <div className="site-loader__eyebrow">RankBoard</div>
-          <div className="site-loader__label">Shuffling cards</div>
+          <div className="site-loader__label">Dealing ranks</div>
         </div>
       </div>
     </div>
