@@ -546,7 +546,8 @@ main {
 
 .desktop-nav__brand,
 .desktop-nav__links,
-.desktop-nav__account {
+.desktop-nav__account,
+.desktop-nav__account-group {
   min-width: 0;
   display: flex;
   align-items: center;
@@ -632,6 +633,44 @@ main {
   background:
     radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.16), transparent 30%),
     rgba(255, 255, 255, 0.045);
+}
+
+.desktop-nav__account-group {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.desktop-nav__logout {
+  height: 50px;
+  min-width: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 190, 104, 0.13);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.045);
+  color: rgba(255, 248, 240, 0.72);
+  cursor: pointer;
+  padding: 0 14px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.desktop-nav__logout:hover {
+  border-color: rgba(255, 190, 104, 0.24);
+  background: rgba(255, 122, 0, 0.14);
+  color: #fff8f0;
+  transform: translateY(-1px);
+}
+
+.desktop-nav__logout--login {
+  color: var(--gold);
 }
 
 .desktop-nav__avatar {
@@ -2779,6 +2818,22 @@ button:disabled {
   font-weight: 950;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.connection-card button {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.connection-card--session {
+  grid-column: 1 / -1;
+}
+
+.connection-card__danger {
+  color: #ffd8d8;
 }
 
 .action-card button:hover:not(:disabled),

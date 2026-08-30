@@ -289,6 +289,14 @@ function readStoredHeaderAccount(): HeaderAccount {
   }
 }
 
+async function clearRankBoardSession() {
+  await fetch("/api/auth/session", {
+    method: "DELETE",
+  }).catch(() => null);
+  window.localStorage.removeItem("rankboard-account");
+  window.dispatchEvent(new CustomEvent("rankboard-storage"));
+}
+
 function useHeaderAccount() {
   const [account, setAccount] = useState<HeaderAccount>(guestHeaderAccount);
 
@@ -393,11 +401,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
     : [["Profile", "/profile"], ["Login", "/login"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]];
 
   async function signOut() {
-    await fetch("/api/auth/session", {
-      method: "DELETE",
-    }).catch(() => null);
-    window.localStorage.removeItem("rankboard-account");
-    window.dispatchEvent(new CustomEvent("rankboard-storage"));
+    await clearRankBoardSession();
     setAccountOpen(false);
   }
 
@@ -436,13 +440,25 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
             </Link>
           ))}
         </div>
-        <Link className="desktop-nav__account" href="/profile" aria-label="Open profile">
-          <span className="desktop-nav__avatar">{account.image ? <Image src={account.image} alt="" width={36} height={36} unoptimized /> : initials}</span>
-          <span>
-            <strong>{accountStatus}</strong>
-            <small>{formatNumberCompact(account.points)} PTS</small>
-          </span>
-        </Link>
+        <div className="desktop-nav__account-group">
+          <Link className="desktop-nav__account" href="/profile" aria-label="Open profile">
+            <span className="desktop-nav__avatar">{account.image ? <Image src={account.image} alt="" width={36} height={36} unoptimized /> : initials}</span>
+            <span>
+              <strong>{accountStatus}</strong>
+              <small>{formatNumberCompact(account.points)} PTS</small>
+            </span>
+          </Link>
+          {account.authenticated ? (
+            <button className="desktop-nav__logout" type="button" onClick={signOut} aria-label="Logout of RankBoard">
+              <LogOut size={15} strokeWidth={2.6} aria-hidden="true" />
+              <span>Logout</span>
+            </button>
+          ) : (
+            <Link className="desktop-nav__logout desktop-nav__logout--login" href="/login">
+              <span>Login</span>
+            </Link>
+          )}
+        </div>
       </nav>
       <StaggeredMenu
         className="mobile-menu-only"
@@ -1118,6 +1134,7 @@ function CasinoCard({
 function Profile({ account }: { account: HeaderAccount }) {
   const [transactions, setTransactions] = useState<{ id: string; amount: number; reason: string; createdAt: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sessionBusy, setSessionBusy] = useState(false);
   const [casinoAccounts, setCasinoAccounts] = useState<CasinoAccountDetail[]>(account.casinoAccounts ?? []);
 
   const refreshProfileData = useCallback(() => {
@@ -1149,6 +1166,16 @@ function Profile({ account }: { account: HeaderAccount }) {
       admin_grant: "Admin adjustment",
     };
     return map[reason] ?? reason;
+  }
+
+  function connectProvider(provider: "kick" | "discord") {
+    window.location.assign(`/api/auth/${provider}`);
+  }
+
+  async function signOut() {
+    setSessionBusy(true);
+    await clearRankBoardSession();
+    setSessionBusy(false);
   }
 
   if (!account.authenticated) {
@@ -1252,19 +1279,36 @@ function Profile({ account }: { account: HeaderAccount }) {
         <div className="workspace-heading">
           <div>
             <p>Logins</p>
-            <h2>Linked accounts</h2>
+            <h2>Account controls</h2>
           </div>
         </div>
         <div className="connection-grid">
           <div className={`connection-card ${account.connected.kick.connected ? "connected" : ""}`}>
             <small>Kick</small>
             <h3>{account.connected.kick.connected ? account.connected.kick.username : "Not linked"}</h3>
-            <p>{account.connected.kick.connected ? "Connected" : "Connect from the login page"}</p>
+            <p>{account.connected.kick.connected ? "Connected" : "Needed for watch points"}</p>
+            <button type="button" onClick={() => connectProvider("kick")}>
+              <RefreshCw size={14} strokeWidth={2.8} aria-hidden="true" />
+              {account.connected.kick.connected ? "Reconnect Kick" : "Connect Kick"}
+            </button>
           </div>
           <div className={`connection-card ${account.connected.discord.connected ? "connected" : ""}`}>
             <small>Discord</small>
             <h3>{account.connected.discord.connected ? account.connected.discord.username : "Not linked"}</h3>
-            <p>{account.connected.discord.connected ? "Connected" : "Connect from the login page"}</p>
+            <p>{account.connected.discord.connected ? "Connected" : "Optional community login"}</p>
+            <button type="button" onClick={() => connectProvider("discord")}>
+              <RefreshCw size={14} strokeWidth={2.8} aria-hidden="true" />
+              {account.connected.discord.connected ? "Reconnect Discord" : "Connect Discord"}
+            </button>
+          </div>
+          <div className="connection-card connection-card--session">
+            <small>Session</small>
+            <h3>{account.handle}</h3>
+            <p>{account.profileProvider.toUpperCase()} login active</p>
+            <button className="connection-card__danger" type="button" onClick={signOut} disabled={sessionBusy}>
+              <LogOut size={14} strokeWidth={2.8} aria-hidden="true" />
+              {sessionBusy ? "Signing out" : "Logout"}
+            </button>
           </div>
         </div>
       </section>
