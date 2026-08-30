@@ -60,12 +60,12 @@ const DESKTOP_NAV = [
 ] as const;
 
 const launchpad: [string, string, string, string, string, ZoneIcon][] = [
-  ["Board", "/leaderboard", "01", "ember", "Live ladder", Trophy],
-  ["Bets", "/custom-bets", "02", "mint", "Prediction slips", Coins],
-  ["Missions", "/challenges", "03", "violet", "Reward goals", BadgeCheck],
-  ["Watch", "/watch-points", "04", "blue", "Stream earnings", Tv],
-  ["Hunts", "/bonus-hunts", "05", "coral", "Bonus tracker", Sparkles],
-  ["Store", "/store", "06", "magma", "Point rewards", Gift],
+  ["Board", "/leaderboard", "LB", "ember", "View board", Trophy],
+  ["Bets", "/custom-bets", "BET", "mint", "Place slips", Coins],
+  ["Missions", "/challenges", "XP", "violet", "Earn rewards", BadgeCheck],
+  ["Watch", "/watch-points", "GO", "blue", "Watch live", Tv],
+  ["Hunts", "/bonus-hunts", "H", "coral", "Track hunts", Sparkles],
+  ["Store", "/store", "PTS", "magma", "Claim prizes", Gift],
 ] as const;
 
 const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
@@ -561,8 +561,8 @@ function Home() {
         <Link href="/leaderboard">Leaderboard <ArrowUpRight size={14} strokeWidth={2.6} aria-hidden="true" /></Link>
       </div>
       <div className="home-route-strip">
-        {launchpad.map(([title, href, num, color, , Icon]) => (
-          <SpotlightRouteCard color={color} href={href} icon={Icon} key={href} num={num} title={title} />
+        {launchpad.map(([title, href, badge, color, action, Icon]) => (
+          <SpotlightRouteCard action={action} badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
         ))}
       </div>
     </section>
@@ -657,16 +657,18 @@ function MagneticLink({ className, href, children }: { className: string; href: 
 }
 
 function SpotlightRouteCard({
+  action,
+  badge,
   color,
   href,
   icon: Icon,
-  num,
   title,
 }: {
+  action: string;
+  badge: string;
   color: string;
   href: string;
   icon: ZoneIcon;
-  num: string;
   title: string;
 }) {
   const [spotlight, setSpotlight] = useState({ x: 0, y: 0, opacity: 0 });
@@ -692,9 +694,10 @@ function SpotlightRouteCard({
         "--spotlight-opacity": spotlight.opacity,
       } as CSSProperties}
     >
-      <span>{num}</span>
-      <Icon size={20} strokeWidth={2.5} aria-hidden="true" />
+      <span className="home-route-card__badge">{badge}</span>
+      <Icon className="home-route-card__mark" size={62} strokeWidth={1.8} aria-hidden="true" />
       <strong>{title}</strong>
+      <small className="home-route-card__action">{action} ↗</small>
     </Link>
   );
 }

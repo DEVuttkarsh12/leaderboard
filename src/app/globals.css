@@ -48,6 +48,9 @@
   --font-body: var(--font-dg-body), Arial, sans-serif;
   --font-display: var(--font-dg-display), "Arial Narrow", sans-serif;
   --font-label: var(--font-dg-label), "SFMono-Regular", Consolas, monospace;
+  --card-round: 28px 18px 24px 18px;
+  --panel-round: 30px 20px 26px 20px;
+  --control-round: 16px 10px 14px 10px;
 }
 
 * {
@@ -1578,7 +1581,7 @@ button:disabled {
   padding: 18px 26px 18px 18px;
   isolation: isolate;
   border: 1px solid var(--ticket-edge);
-  border-radius: 38px 24px 34px 22px;
+  border-radius: 42px 26px 38px 24px;
   background:
     radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.34), transparent 32%),
     radial-gradient(circle at 78% 22%, rgba(255, 122, 0, 0.2), transparent 32%),
@@ -1590,7 +1593,6 @@ button:disabled {
     0 24px 58px rgba(0, 0, 0, 0.28),
     0 0 38px var(--ticket-glow);
   backdrop-filter: blur(12px) saturate(1.34);
-  clip-path: polygon(34px 0, 100% 0, calc(100% - 30px) 88%, calc(100% - 48px) 100%, 0 100%, 0 34px);
   overflow: hidden;
   pointer-events: auto;
   transform-origin: 50% 50%;
@@ -2187,14 +2189,13 @@ button:disabled {
   gap: 8px;
   padding: 16px;
   border: 1px solid rgba(255, 172, 90, 0.13);
-  border-radius: 0;
+  border-radius: var(--card-round);
   background:
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.036) 0 1px, transparent 1px 14px),
     radial-gradient(circle at 16% 0%, rgba(255, 244, 214, 0.16), transparent 34%),
     radial-gradient(circle at 84% 10%, color-mix(in srgb, currentColor 24%, transparent), transparent 42%),
     linear-gradient(122deg, rgba(255, 122, 0, 0.1), rgba(76, 18, 13, 0.3) 50%, rgba(8, 3, 6, 0.54));
   color: var(--gold);
-  clip-path: polygon(18px 0, 100% 0, calc(100% - 16px) 100%, 0 100%, 0 18px);
   box-shadow:
     7px 7px 0 rgba(255, 122, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
@@ -2301,7 +2302,7 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
 
 .home-signal-row > div,
@@ -2321,12 +2322,13 @@ button:disabled {
 }
 
 .home-signal-row > div {
-  justify-content: flex-start;
-  padding-inline: 4px;
+  justify-content: center;
+  padding-inline: 14px;
   border: 0;
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+  text-align: center;
 }
 
 .home-signal-row span {
@@ -2357,30 +2359,38 @@ button:disabled {
 
 .home-route-strip {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  overflow: visible;
+  padding: 12px 10px 22px;
 }
 
 .home-route-card {
-  min-height: 92px;
+  min-height: clamp(132px, 12vw, 168px);
   position: relative;
   isolation: isolate;
   display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 7px;
-  padding: 14px 12px;
-  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
-  border: 1px solid color-mix(in srgb, currentColor 42%, transparent);
+  align-content: end;
+  gap: 16px;
+  padding: clamp(20px, 2.1vw, 30px);
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
+  border: 1px solid rgba(255, 172, 90, 0.22);
+  border-radius: 0;
   background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.18), transparent 34%),
-    linear-gradient(135deg, color-mix(in srgb, currentColor 22%, transparent), rgba(8, 2, 5, 0.44));
+    radial-gradient(circle at 16% 0%, rgba(255, 239, 198, 0.18), transparent 34%),
+    radial-gradient(circle at 86% 10%, rgba(255, 122, 0, 0.12), transparent 38%),
+    linear-gradient(115deg, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(27, 11, 10, 0.92), rgba(10, 3, 7, 0.98));
   color: var(--gold);
-  text-align: center;
-  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.22), 0 0 28px color-mix(in srgb, currentColor 15%, transparent);
-  backdrop-filter: blur(8px) saturate(1.25);
+  text-align: left;
+  box-shadow:
+    14px 14px 0 rgba(255, 122, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 22px 48px rgba(0, 0, 0, 0.28),
+    0 0 30px rgba(255, 82, 12, 0.08);
   overflow: hidden;
-  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  transform: rotate(-0.65deg);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .home-route-card::before {
@@ -2389,11 +2399,24 @@ button:disabled {
   inset: -1px;
   z-index: 0;
   background:
-    radial-gradient(230px circle at var(--spotlight-x, 50%) var(--spotlight-y, 0%), rgba(255, 236, 196, 0.24), transparent 42%),
-    radial-gradient(140px circle at var(--spotlight-x, 50%) var(--spotlight-y, 0%), color-mix(in srgb, currentColor 34%, transparent), transparent 58%);
+    radial-gradient(240px circle at var(--spotlight-x, 50%) var(--spotlight-y, 0%), rgba(255, 209, 102, 0.24), transparent 44%),
+    linear-gradient(90deg, transparent, rgba(255, 122, 0, 0.1));
   opacity: var(--spotlight-opacity, 0);
   pointer-events: none;
   transition: opacity 0.2s ease;
+}
+
+.home-route-card::after {
+  content: "";
+  position: absolute;
+  right: -86px;
+  bottom: -72px;
+  z-index: 0;
+  width: 172px;
+  height: 172px;
+  border: 34px solid rgba(255, 122, 0, 0.08);
+  border-radius: 999px;
+  pointer-events: none;
 }
 
 .home-route-card > * {
@@ -2401,30 +2424,71 @@ button:disabled {
   z-index: 1;
 }
 
-.home-route-card:hover {
-  transform: translateY(-4px) skewX(-2deg);
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.26), transparent 36%),
-    linear-gradient(135deg, color-mix(in srgb, currentColor 32%, transparent), rgba(8, 2, 5, 0.5));
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.26), 0 0 38px color-mix(in srgb, currentColor 22%, transparent);
+.home-route-card:nth-child(2n) {
+  transform: translateY(7px) rotate(-0.35deg);
 }
 
-.home-route-card span {
+.home-route-card:nth-child(3n) {
+  transform: translateY(3px) rotate(0.45deg);
+}
+
+.home-route-card:hover {
+  transform: translateY(-5px) rotate(0deg);
+  border-color: rgba(255, 172, 90, 0.42);
+  box-shadow:
+    18px 18px 0 rgba(255, 122, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 28px 58px rgba(0, 0, 0, 0.34),
+    0 0 42px rgba(255, 82, 12, 0.12);
+}
+
+.home-route-card__badge {
   position: absolute;
-  left: 12px;
-  top: 10px;
-  color: color-mix(in srgb, currentColor 72%, transparent);
-  font-size: 9px;
+  right: clamp(18px, 1.7vw, 26px);
+  top: clamp(18px, 1.6vw, 24px);
+  width: clamp(34px, 3.8vw, 48px);
+  height: clamp(34px, 3.8vw, 48px);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: #170804;
+  font-family: var(--font-display);
+  font-size: clamp(12px, 1.2vw, 16px);
   font-weight: 950;
+  letter-spacing: 0;
+  transform: rotate(3deg);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.38);
+}
+
+.home-route-card__mark {
+  position: absolute;
+  right: -8px;
+  bottom: 16px;
+  color: rgba(255, 122, 0, 0.12);
+  transform: rotate(-8deg) scale(2.2);
 }
 
 .home-route-card strong {
+  max-width: calc(100% - 28px);
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   font-family: var(--font-display);
-  color: var(--text);
-  font-size: 18px;
+  color: #fffaf0;
+  font-size: clamp(24px, 2.7vw, 42px);
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.94;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.home-route-card__action {
+  display: block;
+  color: #f6f0e4;
+  font-size: clamp(9px, 0.8vw, 12px);
+  font-weight: 950;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .home-board-preview {
@@ -2542,7 +2606,6 @@ button:disabled {
     0 24px 68px rgba(0, 0, 0, 0.32),
     0 0 42px color-mix(in srgb, currentColor 18%, transparent);
   backdrop-filter: blur(14px) saturate(1.34);
-  clip-path: polygon(32px 0, 100% 0, calc(100% - 26px) 100%, 0 100%, 0 32px);
 }
 
 .home-board-preview .podium-card::before {
@@ -2705,12 +2768,11 @@ button:disabled {
 .settle-btn {
   min-height: 40px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: var(--control-round);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 34%),
     rgba(16, 8, 10, 0.9);
   color: var(--text);
-  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%, 0 9px);
   padding: 0 15px;
   cursor: pointer;
   font-size: 11px;
@@ -2763,10 +2825,9 @@ button:disabled {
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  border-radius: 0;
+  border-radius: 18px 12px 16px 12px;
   background: linear-gradient(135deg, var(--gold), var(--gold-bright));
   color: #171104;
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%, 0 12px);
   box-shadow: 0 0 34px rgba(255, 122, 0, 0.2);
   font-size: 11px;
   font-weight: 950;
@@ -2798,14 +2859,13 @@ button:disabled {
 .full-board-panel,
 .board-product-aside {
   border: 1px solid rgba(255, 172, 90, 0.14);
-  border-radius: 0;
+  border-radius: var(--panel-round);
   background:
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 18px),
     linear-gradient(135deg, rgba(255, 255, 255, 0.13), transparent 24%),
     radial-gradient(circle at 82% 10%, rgba(255, 122, 0, 0.12), transparent 36%),
     linear-gradient(145deg, rgba(255, 122, 0, 0.09), rgba(255, 79, 61, 0.04)),
     rgba(8, 3, 6, 0.38);
-  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
   box-shadow:
     9px 9px 0 rgba(255, 122, 0, 0.11),
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
@@ -3157,7 +3217,6 @@ button:disabled {
     0 24px 68px rgba(0, 0, 0, 0.32),
     0 0 42px color-mix(in srgb, currentColor 16%, transparent);
   backdrop-filter: blur(14px) saturate(1.34);
-  clip-path: polygon(32px 0, 100% 0, calc(100% - 26px) 100%, 0 100%, 0 32px);
 }
 
 .winner-arena .rank-1 {
@@ -3251,10 +3310,9 @@ button:disabled {
   align-items: center;
   gap: 10px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: var(--control-round);
   background: rgba(3, 3, 8, 0.75);
   color: var(--muted);
-  clip-path: polygon(11px 0, 100% 0, calc(100% - 11px) 100%, 0 100%, 0 11px);
   padding: 0 15px;
 }
 
@@ -3285,10 +3343,9 @@ button:disabled {
   width: 100%;
   min-height: 44px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: var(--control-round);
   background: rgba(3, 3, 8, 0.72);
   color: var(--text);
-  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%, 0 9px);
   padding: 0 13px;
   outline: 0;
 }
@@ -3327,9 +3384,8 @@ select:focus {
   display: flex;
   gap: 4px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 18px 12px 16px 12px;
   background: rgba(3, 3, 8, 0.75);
-  clip-path: polygon(11px 0, 100% 0, calc(100% - 11px) 100%, 0 100%, 0 11px);
   padding: 4px;
 }
 
@@ -3338,10 +3394,9 @@ select:focus {
 .auth-tabs button {
   min-height: 38px;
   border: 0;
-  border-radius: 0;
+  border-radius: 14px 9px 12px 9px;
   background: transparent;
   color: var(--muted);
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%, 0 8px);
   padding: 0 14px;
   cursor: pointer;
   font-size: 12px;
@@ -3363,9 +3418,8 @@ select:focus {
   display: grid;
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 16px 10px 14px 10px;
   background: rgba(3, 3, 8, 0.75);
-  clip-path: polygon(11px 0, 100% 0, calc(100% - 11px) 100%, 0 100%, 0 11px);
   cursor: pointer;
 }
 
@@ -3417,12 +3471,11 @@ select:focus {
   width: 100%;
   min-height: 76px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 20px 13px 18px 13px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 30%),
     rgba(7, 7, 12, 0.86);
   color: var(--text);
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%, 0 12px);
   padding: 8px 16px;
   text-align: left;
   cursor: pointer;
@@ -3564,10 +3617,9 @@ select:focus {
   min-height: 48px;
   margin-top: 14px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 18px 12px 16px 12px;
   background: rgba(3, 3, 8, 0.75);
   color: var(--text);
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%, 0 12px);
   cursor: pointer;
   font-size: 12px;
   font-weight: 950;
@@ -3589,11 +3641,10 @@ select:focus {
   justify-content: center;
   text-align: center;
   border: 1px dashed rgba(255, 255, 255, 0.16);
-  border-radius: 0;
+  border-radius: var(--panel-round);
   background:
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.026) 0 1px, transparent 1px 14px),
     rgba(255, 255, 255, 0.03);
-  clip-path: polygon(22px 0, 100% 0, calc(100% - 22px) 100%, 0 100%, 0 22px);
   padding: 24px;
 }
 
@@ -3616,10 +3667,9 @@ select:focus {
   min-height: 40px;
   margin-top: 12px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: var(--control-round);
   background: rgba(16, 16, 27, 0.9);
   color: var(--text);
-  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%, 0 9px);
   padding: 0 16px;
   cursor: pointer;
 }
@@ -3731,10 +3781,9 @@ select:focus {
   justify-content: space-between;
   align-items: center;
   margin-top: 18px;
-  border-radius: 0;
+  border-radius: 18px 12px 16px 12px;
   background: linear-gradient(135deg, var(--gold), var(--gold-bright));
   color: #100c04;
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%, 0 12px);
   padding: 0 16px;
   font-size: 12px;
   font-weight: 950;
@@ -3746,8 +3795,7 @@ select:focus {
   margin-bottom: 14px;
   padding: 16px 20px;
   border: 1px solid rgba(255, 122, 0, 0.22);
-  border-radius: 0;
-  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%, 0 18px);
+  border-radius: var(--panel-round);
   background:
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.034) 0 1px, transparent 1px 14px),
     rgba(255, 122, 0, 0.08);
@@ -3795,10 +3843,9 @@ select:focus {
   display: grid;
   place-items: center;
   border: 1px solid rgba(255, 95, 31, 0.18);
-  border-radius: 0;
+  border-radius: 14px 9px 12px 9px;
   background: rgba(255, 95, 31, 0.08);
   color: var(--gold);
-  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%, 0 9px);
   letter-spacing: 0;
 }
 
@@ -3868,8 +3915,7 @@ select:focus {
   padding: 1.25rem;
   overflow: hidden;
   border: 1px solid rgba(255, 172, 90, 0.16);
-  border-radius: 0;
-  clip-path: polygon(24px 0, 100% 0, calc(100% - 22px) 100%, 0 100%, 0 24px);
+  border-radius: var(--panel-round);
   background:
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.036) 0 1px, transparent 1px 14px),
     radial-gradient(circle at 15% 0%, rgba(255, 239, 198, 0.18), transparent 36%),
@@ -3952,9 +3998,9 @@ select:focus {
   justify-content: center;
   padding: 0 10px;
   border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px 9px 12px 9px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%, 0 8px);
   font-family: var(--font-label);
   font-size: 10px;
   font-weight: 950;
@@ -3989,7 +4035,7 @@ select:focus {
 .casino-proof-box {
   padding: 0.85rem 1rem;
   border: 1px dashed rgba(255, 209, 102, 0.3);
-  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%, 0 14px);
+  border-radius: 20px 13px 18px 13px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 32%),
     rgba(255, 209, 102, 0.07);
@@ -4060,8 +4106,7 @@ select:focus {
   width: 100%;
   min-height: 44px;
   border: 1px solid rgba(255, 172, 90, 0.18);
-  border-radius: 0;
-  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%, 0 9px);
+  border-radius: var(--control-round);
   background: rgba(3, 3, 8, 0.72);
   color: var(--text);
   padding: 0 0.8rem;
@@ -4078,10 +4123,9 @@ select:focus {
 .casino-mode-tabs button {
   min-height: 32px;
   border: 1px solid rgba(255, 172, 90, 0.14);
-  border-radius: 0;
+  border-radius: 14px 9px 12px 9px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%, 0 8px);
   padding: 0 0.7rem;
   cursor: pointer;
   font-size: 0.76rem;
@@ -4123,7 +4167,7 @@ select:focus {
 .admin-success-callout {
   padding: 0.62rem 0.8rem;
   border: 1px solid rgba(47, 213, 126, 0.24);
-  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%, 0 10px);
+  border-radius: 16px 10px 14px 10px;
   background: rgba(47, 213, 126, 0.1);
   color: var(--green);
   font-size: 0.82rem;
@@ -4207,10 +4251,9 @@ select:focus {
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 16px 10px 14px 10px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
-  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%, 0 10px);
   padding: 10px;
   font-size: 10px;
   font-weight: 900;
@@ -4237,8 +4280,7 @@ select:focus {
   gap: 0 8px;
   align-content: center;
   border: 1px solid var(--line);
-  border-radius: 0;
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%, 0 12px);
+  border-radius: 18px 12px 16px 12px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 34%),
     rgba(255, 255, 255, 0.04);
@@ -4277,10 +4319,9 @@ select:focus {
   display: grid;
   place-items: center;
   border: 1px solid rgba(255, 122, 0, 0.28);
-  border-radius: 0;
+  border-radius: 18px 12px 16px 12px;
   background: rgba(255, 122, 0, 0.12);
   color: var(--gold);
-  clip-path: polygon(13px 0, 100% 0, calc(100% - 13px) 100%, 0 100%, 0 13px);
   font-size: 14px;
   font-weight: 950;
 }
@@ -4303,10 +4344,9 @@ select:focus {
   align-items: flex-start;
   justify-content: center;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 18px 12px 16px 12px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%, 0 12px);
   padding: 10px 14px;
   cursor: pointer;
 }
@@ -4456,9 +4496,8 @@ select:focus {
 
 .inventory-panel span {
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
-  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%, 0 9px);
   padding: 7px 12px;
   font-size: 12px;
 }
@@ -4498,12 +4537,11 @@ select:focus {
   gap: 3px 10px;
   align-items: center;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 18px 12px 16px 12px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.07), transparent 34%),
     rgba(255, 255, 255, 0.04);
   color: var(--text);
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%, 0 12px);
   padding: 10px;
   text-align: left;
   cursor: pointer;
@@ -4535,8 +4573,7 @@ select:focus {
   flex-direction: column;
   gap: 14px;
   border: 1px solid var(--line);
-  border-radius: 0;
-  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%, 0 18px);
+  border-radius: 22px 14px 20px 14px;
   background:
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.026) 0 1px, transparent 1px 14px),
     rgba(255, 255, 255, 0.04);
@@ -4581,10 +4618,9 @@ select:focus {
 
 .admin-casino-strip span {
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 16px 10px 14px 10px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
-  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%, 0 10px);
   padding: 10px;
   font-size: 10px;
   font-weight: 950;
@@ -4717,8 +4753,7 @@ select:focus {
 .auth-session-card {
   min-height: 88px;
   border: 1px solid var(--line);
-  border-radius: 0;
-  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%, 0 14px);
+  border-radius: 18px 12px 16px 12px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 34%),
     rgba(255, 255, 255, 0.04);
@@ -4970,7 +5005,6 @@ select:focus {
   color: var(--text);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 18px 48px rgba(0, 0, 0, 0.38), 0 0 34px rgba(255, 95, 31, 0.24);
   padding: 10px 13px;
-  clip-path: polygon(13px 0, 100% 0, calc(100% - 14px) 100%, 0 100%, 0 14px);
   transform-origin: 50% 50%;
   will-change: transform, opacity;
 }
@@ -5586,7 +5620,6 @@ select:focus {
     gap: 11px;
     padding: 12px 16px 12px 12px;
     border-radius: 28px 19px 25px 17px;
-    clip-path: polygon(22px 0, 100% 0, calc(100% - 24px) 90%, calc(100% - 34px) 100%, 0 100%, 0 22px);
   }
 
   .home-top-player__rank {
@@ -5874,11 +5907,43 @@ select:focus {
   }
 
   .home-route-strip {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    overflow: visible;
+    padding: 0;
   }
 
   .home-route-card {
-    min-height: 76px;
+    min-height: 132px;
+    padding: 18px 14px;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+
+  .home-route-card,
+  .home-route-card:nth-child(2n),
+  .home-route-card:nth-child(3n),
+  .home-route-card:hover {
+    transform: none;
+  }
+
+  .home-route-card__badge {
+    right: 15px;
+    top: 15px;
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.34);
+  }
+
+  .home-route-card strong {
+    max-width: 100%;
+    font-size: clamp(22px, 7vw, 30px);
+  }
+
+  .home-route-card__action {
+    font-size: 9px;
   }
 
   .board-controls,

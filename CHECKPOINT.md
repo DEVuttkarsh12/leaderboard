@@ -413,3 +413,75 @@ Kick scopes needed:
    * Raffle convert/enter/draw.
    * Support ticket create/admin status update.
    * Watch-points verification after Kick chat/live event.
+
+---
+
+## 🧭 8. Resume Checkpoint: Homepage Route Cards Verified
+
+**Timestamp**: 2026-08-30 13:48 IST  
+**Branch**: `main`  
+**Local app**: `http://localhost:3000`
+
+### A. Current Working State
+* Current uncommitted files:
+  * `CHECKPOINT.md`
+  * `src/app/globals.css`
+  * `src/components/rankboard-app.tsx`
+* `npm run lint` passes.
+* `npm run build` passes.
+* Dev server is running locally on `http://localhost:3000`.
+
+### B. Latest UI Changes
+* Finished the homepage route-card polish that was already in progress.
+* Route cards now use badge/action copy and large lucide background marks.
+* Fixed desktop layout so all six homepage routes are visible in a two-row, three-column grid instead of being hidden in a sideways strip.
+* Mobile remains a two-column grid and was visually checked at `390x1000`.
+
+### C. Visual QA
+* Desktop full-page screenshot checked at `1440x1200`.
+* Mobile full-page screenshot checked at `390x1000`.
+* No text overlap or route-card clipping observed after the final patch.
+
+### D. Remaining Work
+* Vercel environment checklist from section 7 still applies.
+* Production redeploy and live OAuth/Kick webhook QA are still the main remaining integration steps.
+
+---
+
+## 🧭 9. Resume Checkpoint: Localhost ENOSPC Fixed
+
+**Timestamp**: 2026-08-30 14:25 IST  
+**Branch**: `main`  
+**Local app**: `http://localhost:3000`
+
+### A. Localhost Error Root Cause
+* The local `500 Internal Server Error` was caused by the root filesystem being full.
+* Next/Turbopack failed while writing generated cache files under `.next/dev/cache`.
+* The failed Playwright browser download also hit `ENOSPC`, but did not leave a large Playwright browser cache behind.
+
+### B. Cleanup Performed
+* Deleted generated project output: `.next`.
+* Deleted disposable npm cache/log data:
+  * `/home/uttkarsh/.npm/_cacache`
+  * `/home/uttkarsh/.npm/_logs`
+* Deleted disposable browser/pip cache data:
+  * `/home/uttkarsh/.cache/google-chrome`
+  * `/home/uttkarsh/.cache/mozilla`
+  * `/home/uttkarsh/.cache/pip`
+
+### C. Verification After Cleanup
+* Dev server restarted successfully on `http://localhost:3000`.
+* `GET /` returns `200 OK`.
+* `GET /api/leaderboard` returns `200 OK` with live leaderboard data.
+* `GET /api/auth/session` returns `200 OK`.
+* Disk is still tight after cleanup and server restart: about `1.9G` free on `/`.
+
+### D. Env Documentation Update
+* Updated `.env.example` to include supported optional env vars that the code already reads:
+  * `SHUFFLE_LEADERBOARD_WINDOW_SOURCE`
+  * `KICK_OAUTH_SCOPE`
+  * `KICK_WATCH_ACTIVITY_WINDOW_SECONDS`
+
+### E. Still Needed From User
+* Free at least another `2-5GB` of disk space for stable local development and browser QA.
+* For production, confirm the final Vercel domain and exact environment values from section 7.
