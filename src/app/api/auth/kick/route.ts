@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   createKickUserSession,
+  getSessionAccount,
   SESSION_COOKIE,
   setSessionCookie,
 } from "@/lib/server/auth/session";
@@ -34,14 +35,18 @@ export async function GET(request: NextRequest) {
   if (shouldForceDevAuth() || !clientId) {
     if (isDevAuthEnabled()) {
       const profile = getDevKickProfile();
-      const { sessionToken, expires } = await createKickUserSession(
+      const { sessionToken, expires, account } = await createKickUserSession(
         profile,
         getDevTokenSet("kick"),
         request.cookies.get(SESSION_COOKIE)?.value
       );
       await promoteDevAuthUser("kick", String(profile.user_id));
+      const currentAccount = await getSessionAccount(sessionToken);
 
-      const url = new URL("/login", request.url);
+      const url = new URL(
+        (currentAccount ?? account).badges.includes("Admin") ? "/admin" : "/profile",
+        request.url
+      );
       url.searchParams.set("kick", "connected");
       url.searchParams.set("dev_auth", "kick");
       const response = NextResponse.redirect(url);

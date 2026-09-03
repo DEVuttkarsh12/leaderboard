@@ -1,4 +1,9 @@
 import { prisma } from "@/lib/server/db/prisma";
+import {
+  hasConfiguredAdminAllowlist,
+  isConfiguredAdminIdentity,
+  reconcileConfiguredAdminRole,
+} from "@/lib/server/auth/session";
 
 export type AdminUserSummary = {
   id: string;
@@ -82,11 +87,13 @@ export async function requireAdminUser(sessionToken: string | undefined) {
     throw new Error("Admin login required.");
   }
 
-  if (session.user.role !== "ADMIN") {
+  const user = await reconcileConfiguredAdminRole(session.user);
+
+  if (user.role !== "ADMIN") {
     throw new Error("Admin access required.");
   }
 
-  return session.user;
+  return user;
 }
 
 function userHandle(user: AdminUserRecord) {
@@ -173,7 +180,38 @@ export async function listAdminUsers(query: string) {
     take: 30,
   });
 
-  return users.map(adminUserSummary);
+  const reconciledUsers = await Promise.all(
+    users.map((user) => reconcileConfiguredAdminRole(user))
+  );
+
+  return reconciledUsers
+    .filter((user) => user.role === "ADMIN")
+    .map(adminUserSummary);
+}
+
+async function assertPromotableAdminUser(userId: string) {
+  if (!hasConfiguredAdminAllowlist()) {
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      email: true,
+      discordId: true,
+      discordUsername: true,
+      kickId: true,
+      kickUsername: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  if (!isConfiguredAdminIdentity(user)) {
+    throw new Error("Only configured admin accounts can be promoted.");
+  }
 }
 
 export async function updateAdminUser(
@@ -187,6 +225,10 @@ export async function updateAdminUser(
     role?: "PLAYER" | "ADMIN";
   }
 ) {
+  if (data.role === "ADMIN") {
+    await assertPromotableAdminUser(userId);
+  }
+
   const user = await prisma.user.update({
     where: { id: userId },
     data,
@@ -195,5 +237,5 @@ export async function updateAdminUser(
     },
   });
 
-  return adminUserSummary(user);
+  return adminUserSummary(await reconcileConfiguredAdminRole(user));
 }

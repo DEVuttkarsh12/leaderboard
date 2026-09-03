@@ -36,8 +36,12 @@ const profileSchema = z.object({
     .min(1),
 });
 
-function loginRedirect(request: NextRequest, params: Record<string, string>) {
-  const url = new URL("/login", request.url);
+function loginRedirect(
+  request: NextRequest,
+  params: Record<string, string>,
+  pathname = "/login"
+) {
+  const url = new URL(pathname, request.url);
 
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
@@ -116,12 +120,16 @@ export async function GET(request: NextRequest) {
   try {
     const tokens = await exchangeCodeForToken(request, code, codeVerifier);
     const profile = await fetchKickProfile(tokens.access_token);
-    const { sessionToken, expires } = await createKickUserSession(
+    const { sessionToken, expires, account } = await createKickUserSession(
       profile,
       tokens,
       request.cookies.get(SESSION_COOKIE)?.value
     );
-    const response = loginRedirect(request, { kick: "connected" });
+    const response = loginRedirect(
+      request,
+      { kick: "connected" },
+      account.badges.includes("Admin") ? "/admin" : "/profile"
+    );
     setSessionCookie(response, sessionToken, expires);
 
     return response;

@@ -6,6 +6,7 @@ import {
 } from "@/lib/server/auth/discord";
 import {
   createDiscordUserSession,
+  getSessionAccount,
   SESSION_COOKIE,
   setSessionCookie,
 } from "@/lib/server/auth/session";
@@ -31,14 +32,18 @@ export async function GET(request: NextRequest) {
   if (shouldForceDevAuth() || !clientId) {
     if (isDevAuthEnabled()) {
       const profile = getDevDiscordProfile();
-      const { sessionToken, expires } = await createDiscordUserSession(
+      const { sessionToken, expires, account } = await createDiscordUserSession(
         profile,
         getDevTokenSet("discord"),
         request.cookies.get(SESSION_COOKIE)?.value
       );
       await promoteDevAuthUser("discord", profile.id);
+      const currentAccount = await getSessionAccount(sessionToken);
 
-      const url = new URL("/login", request.url);
+      const url = new URL(
+        (currentAccount ?? account).badges.includes("Admin") ? "/admin" : "/profile",
+        request.url
+      );
       url.searchParams.set("discord", "connected");
       url.searchParams.set("dev_auth", "discord");
       const response = NextResponse.redirect(url);

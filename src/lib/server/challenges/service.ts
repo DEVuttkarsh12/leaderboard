@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
+import { requireAdminUser } from "@/lib/server/admin/users";
 
 export type ChallengeMissionPayload = {
   id: string;
@@ -13,6 +14,15 @@ export type ChallengeMissionPayload = {
   claimed: boolean;
   claimedAt: string | null;
 };
+
+export type AdminChallengeMissionPayload = ChallengeMissionPayload & {
+  active: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type ChallengeCadenceValue = "DAILY" | "WEEKLY" | "MILESTONE" | "SEASONAL";
 
 const DEFAULT_MISSIONS = [
   { code: "daily-spin", title: "Daily Missions", reward: 1200, goal: 100, meta: "Daily", cadence: "DAILY" as const, sortOrder: 10 },
@@ -29,7 +39,14 @@ type MissionRow = {
   reward: number;
   goal: number;
   meta: string;
-  cadence: "DAILY" | "WEEKLY" | "MILESTONE" | "SEASONAL";
+  cadence: ChallengeCadenceValue;
+};
+
+type AdminMissionRow = MissionRow & {
+  active: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 type ProgressRow = {
@@ -77,6 +94,139 @@ function toPayload(
     claimed: Boolean(progress?.claimedAt),
     claimedAt: progress?.claimedAt ? progress.claimedAt.toISOString() : null,
   };
+}
+
+function toAdminPayload(mission: AdminMissionRow): AdminChallengeMissionPayload {
+  return {
+    ...toPayload(mission),
+    active: mission.active,
+    sortOrder: mission.sortOrder,
+    createdAt: mission.createdAt.toISOString(),
+    updatedAt: mission.updatedAt.toISOString(),
+  };
+}
+
+const adminMissionSelect = {
+  id: true,
+  code: true,
+  title: true,
+  reward: true,
+  goal: true,
+  meta: true,
+  cadence: true,
+  active: true,
+  sortOrder: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
+function slugPart(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 42);
+}
+
+async function uniqueMissionCode(slotName: string, title: string) {
+  const base =
+    [slugPart(slotName), slugPart(title)].filter(Boolean).join("-").slice(0, 84) ||
+    "mission";
+  let code = base;
+
+  for (let attempt = 2; attempt <= 20; attempt++) {
+    const existing = await prisma.challengeMission.findUnique({
+      where: { code },
+      select: { id: true },
+    });
+    if (!existing) return code;
+    code = `${base}-${attempt}`;
+  }
+
+  return `${base}-${Date.now().toString(36)}`;
+}
+
+export async function listAdminChallengeMissions(
+  sessionToken: string | undefined
+): Promise<AdminChallengeMissionPayload[]> {
+  await requireAdminUser(sessionToken);
+  await seedMissionsIfEmpty();
+
+  const missions = await prisma.challengeMission.findMany({
+    orderBy: [{ active: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+    select: adminMissionSelect,
+  });
+
+  return missions.map(toAdminPayload);
+}
+
+export async function adminCreateChallengeMission(
+  sessionToken: string | undefined,
+  input: {
+    slotName: string;
+    title: string;
+    multiplier: number;
+    reward: number;
+    cadence: ChallengeCadenceValue;
+    active?: boolean;
+  }
+): Promise<AdminChallengeMissionPayload> {
+  await requireAdminUser(sessionToken);
+  await seedMissionsIfEmpty();
+
+  const slotName = input.slotName.trim();
+  const title = input.title.trim();
+  const code = await uniqueMissionCode(slotName, title);
+  const order = await prisma.challengeMission.aggregate({
+    _max: { sortOrder: true },
+  });
+
+  const mission = await prisma.challengeMission.create({
+    data: {
+      code,
+      title,
+      reward: input.reward,
+      goal: input.multiplier,
+      meta: slotName,
+      cadence: input.cadence,
+      active: input.active ?? true,
+      sortOrder: (order._max.sortOrder ?? 0) + 10,
+    },
+    select: adminMissionSelect,
+  });
+
+  return toAdminPayload(mission);
+}
+
+export async function adminUpdateChallengeMission(
+  sessionToken: string | undefined,
+  missionId: string,
+  input: {
+    slotName?: string;
+    title?: string;
+    multiplier?: number;
+    reward?: number;
+    cadence?: ChallengeCadenceValue;
+    active?: boolean;
+  }
+): Promise<AdminChallengeMissionPayload> {
+  await requireAdminUser(sessionToken);
+
+  const mission = await prisma.challengeMission.update({
+    where: { id: missionId },
+    data: {
+      ...(input.slotName !== undefined ? { meta: input.slotName.trim() } : {}),
+      ...(input.title !== undefined ? { title: input.title.trim() } : {}),
+      ...(input.multiplier !== undefined ? { goal: input.multiplier } : {}),
+      ...(input.reward !== undefined ? { reward: input.reward } : {}),
+      ...(input.cadence !== undefined ? { cadence: input.cadence } : {}),
+      ...(input.active !== undefined ? { active: input.active } : {}),
+    },
+    select: adminMissionSelect,
+  });
+
+  return toAdminPayload(mission);
 }
 
 export async function listChallengeMissions(
@@ -213,18 +363,21 @@ export async function claimChallengeMission(
         claimedAt: true,
       },
     });
-    if (!progress || progress.progress < mission.goal) {
-      throw new Error("Mission is not ready to claim.");
-    }
-    if (progress.claimedAt) {
+    if (progress?.claimedAt) {
       throw new Error("Mission already claimed.");
     }
 
     const claimedAt = new Date();
-    await tx.challengeProgress.update({
-      where: { id: progress.id },
-      data: { claimedAt, progress: mission.goal },
-    });
+    if (progress) {
+      await tx.challengeProgress.update({
+        where: { id: progress.id },
+        data: { claimedAt, progress: mission.goal },
+      });
+    } else {
+      await tx.challengeProgress.create({
+        data: { userId, missionId, claimedAt, progress: mission.goal },
+      });
+    }
 
     const updatedUser = await tx.user.update({
       where: { id: userId },

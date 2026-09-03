@@ -11,6 +11,7 @@ export type StoreItemPayload = {
   stock: number;
   unlimited: boolean;
   imageLabel: string;
+  imageUrl: string;
 };
 
 export type StorePurchasePayload = {
@@ -29,12 +30,12 @@ export type AdminStorePurchasePayload = StorePurchasePayload & {
 };
 
 const DEFAULT_ITEMS = [
-  { title: "Cash Tip", description: "Manual payout direct to you.", cost: 12000, tag: "Cash", stock: 8, unlimited: false, imageLabel: "TIP" },
-  { title: "VIP Role", description: "Flex your VIP status on Discord.", cost: 6500, tag: "Role", stock: 999, unlimited: true, imageLabel: "VIP" },
-  { title: "Bonus Buy", description: "We buy a bonus live on stream for you.", cost: 18000, tag: "Casino", stock: 3, unlimited: false, imageLabel: "BUY" },
-  { title: "Gift Card", description: "Digital gift card code drop.", cost: 22000, tag: "Gift", stock: 5, unlimited: false, imageLabel: "CARD" },
-  { title: "Merch Entry", description: "Enter the merch gear draw.", cost: 4000, tag: "Merch", stock: 40, unlimited: false, imageLabel: "DROP" },
-  { title: "Steam Key", description: "Random Steam game key.", cost: 8500, tag: "Key", stock: 12, unlimited: false, imageLabel: "KEY" },
+  { title: "Cash Tip", description: "Manual payout direct to you.", cost: 12000, tag: "Cash", stock: 8, unlimited: false, imageLabel: "TIP", imageUrl: null },
+  { title: "VIP Role", description: "Flex your VIP status on Discord.", cost: 6500, tag: "Role", stock: 999, unlimited: true, imageLabel: "VIP", imageUrl: null },
+  { title: "Bonus Buy", description: "We buy a bonus live on stream for you.", cost: 18000, tag: "Casino", stock: 3, unlimited: false, imageLabel: "BUY", imageUrl: null },
+  { title: "Gift Card", description: "Digital gift card code drop.", cost: 22000, tag: "Gift", stock: 5, unlimited: false, imageLabel: "CARD", imageUrl: null },
+  { title: "Merch Entry", description: "Enter the merch gear draw.", cost: 4000, tag: "Merch", stock: 40, unlimited: false, imageLabel: "DROP", imageUrl: null },
+  { title: "Steam Key", description: "Random Steam game key.", cost: 8500, tag: "Key", stock: 12, unlimited: false, imageLabel: "KEY", imageUrl: null },
 ];
 
 async function seedItemsIfEmpty(): Promise<void> {
@@ -55,6 +56,7 @@ export async function listStoreItems(): Promise<StoreItemPayload[]> {
     stock: item.stock,
     unlimited: item.unlimited,
     imageLabel: item.imageLabel,
+    imageUrl: item.imageUrl ?? "",
   }));
 }
 
@@ -163,6 +165,7 @@ function storeItemPayload(item: {
   stock: number;
   unlimited: boolean;
   imageLabel: string;
+  imageUrl: string | null;
 }): StoreItemPayload {
   return {
     id: item.id,
@@ -173,7 +176,24 @@ function storeItemPayload(item: {
     stock: item.stock,
     unlimited: item.unlimited,
     imageLabel: item.imageLabel,
+    imageUrl: item.imageUrl ?? "",
   };
+}
+
+function cleanImageUrl(value: string | undefined) {
+  const imageUrl = value?.trim() ?? "";
+  if (!imageUrl) return null;
+  if (imageUrl.length > 750_000) {
+    throw new Error("Choose a smaller item image.");
+  }
+  if (
+    !imageUrl.startsWith("https://") &&
+    !imageUrl.startsWith("http://") &&
+    !imageUrl.startsWith("data:image/")
+  ) {
+    throw new Error("Use an image URL or upload an image file.");
+  }
+  return imageUrl;
 }
 
 export async function adminCreateStoreItem(
@@ -186,6 +206,7 @@ export async function adminCreateStoreItem(
     stock: number;
     unlimited?: boolean;
     imageLabel?: string;
+    imageUrl?: string;
   }
 ): Promise<StoreItemPayload> {
   await requireAdminUser(sessionToken);
@@ -208,6 +229,7 @@ export async function adminCreateStoreItem(
       stock: data.stock,
       unlimited: Boolean(data.unlimited),
       imageLabel: data.imageLabel?.trim().slice(0, 12).toUpperCase() || "NEW",
+      imageUrl: cleanImageUrl(data.imageUrl),
       active: true,
     },
   });
@@ -227,6 +249,7 @@ export async function adminUpdateStoreItem(
     unlimited?: boolean;
     active?: boolean;
     imageLabel?: string;
+    imageUrl?: string;
   }
 ): Promise<StoreItemPayload> {
   await requireAdminUser(sessionToken);
@@ -242,6 +265,7 @@ export async function adminUpdateStoreItem(
       ...(data.unlimited !== undefined ? { unlimited: data.unlimited } : {}),
       ...(data.active !== undefined ? { active: data.active } : {}),
       ...(data.imageLabel !== undefined ? { imageLabel: data.imageLabel.trim().slice(0, 12).toUpperCase() || "NEW" } : {}),
+      ...(data.imageUrl !== undefined ? { imageUrl: cleanImageUrl(data.imageUrl) } : {}),
     },
   });
 

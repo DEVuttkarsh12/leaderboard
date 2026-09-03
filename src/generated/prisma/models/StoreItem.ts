@@ -45,6 +45,7 @@ export type StoreItemMinAggregateOutputType = {
   stock: number | null
   unlimited: boolean | null
   imageLabel: string | null
+  imageUrl: string | null
   active: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -59,6 +60,7 @@ export type StoreItemMaxAggregateOutputType = {
   stock: number | null
   unlimited: boolean | null
   imageLabel: string | null
+  imageUrl: string | null
   active: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -73,6 +75,7 @@ export type StoreItemCountAggregateOutputType = {
   stock: number
   unlimited: number
   imageLabel: number
+  imageUrl: number
   active: number
   createdAt: number
   updatedAt: number
@@ -99,6 +102,7 @@ export type StoreItemMinAggregateInputType = {
   stock?: true
   unlimited?: true
   imageLabel?: true
+  imageUrl?: true
   active?: true
   createdAt?: true
   updatedAt?: true
@@ -113,6 +117,7 @@ export type StoreItemMaxAggregateInputType = {
   stock?: true
   unlimited?: true
   imageLabel?: true
+  imageUrl?: true
   active?: true
   createdAt?: true
   updatedAt?: true
@@ -127,6 +132,7 @@ export type StoreItemCountAggregateInputType = {
   stock?: true
   unlimited?: true
   imageLabel?: true
+  imageUrl?: true
   active?: true
   createdAt?: true
   updatedAt?: true
@@ -228,6 +234,7 @@ export type StoreItemGroupByOutputType = {
   stock: number
   unlimited: boolean
   imageLabel: string
+  imageUrl: string | null
   active: boolean
   createdAt: Date
   updatedAt: Date
@@ -265,6 +272,7 @@ export type StoreItemWhereInput = {
   stock?: Prisma.IntFilter<"StoreItem"> | number
   unlimited?: Prisma.BoolFilter<"StoreItem"> | boolean
   imageLabel?: Prisma.StringFilter<"StoreItem"> | string
+  imageUrl?: Prisma.StringNullableFilter<"StoreItem"> | string | null
   active?: Prisma.BoolFilter<"StoreItem"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StoreItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StoreItem"> | Date | string
@@ -280,6 +288,7 @@ export type StoreItemOrderByWithRelationInput = {
   stock?: Prisma.SortOrder
   unlimited?: Prisma.SortOrder
   imageLabel?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -298,6 +307,7 @@ export type StoreItemWhereUniqueInput = Prisma.AtLeast<{
   stock?: Prisma.IntFilter<"StoreItem"> | number
   unlimited?: Prisma.BoolFilter<"StoreItem"> | boolean
   imageLabel?: Prisma.StringFilter<"StoreItem"> | string
+  imageUrl?: Prisma.StringNullableFilter<"StoreItem"> | string | null
   active?: Prisma.BoolFilter<"StoreItem"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StoreItem"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StoreItem"> | Date | string
@@ -313,6 +323,7 @@ export type StoreItemOrderByWithAggregationInput = {
   stock?: Prisma.SortOrder
   unlimited?: Prisma.SortOrder
   imageLabel?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -335,6 +346,7 @@ export type StoreItemScalarWhereWithAggregatesInput = {
   stock?: Prisma.IntWithAggregatesFilter<"StoreItem"> | number
   unlimited?: Prisma.BoolWithAggregatesFilter<"StoreItem"> | boolean
   imageLabel?: Prisma.StringWithAggregatesFilter<"StoreItem"> | string
+  imageUrl?: Prisma.StringNullableWithAggregatesFilter<"StoreItem"> | string | null
   active?: Prisma.BoolWithAggregatesFilter<"StoreItem"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StoreItem"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"StoreItem"> | Date | string
@@ -349,6 +361,7 @@ export type StoreItemCreateInput = {
   stock?: number
   unlimited?: boolean
   imageLabel?: string
+  imageUrl?: string | null
   active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -364,6 +377,7 @@ export type StoreItemUncheckedCreateInput = {
   stock?: number
   unlimited?: boolean
   imageLabel?: string
+  imageUrl?: string | null
   active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -379,6 +393,7 @@ export type StoreItemUpdateInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   unlimited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   imageLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -394,6 +409,7 @@ export type StoreItemUncheckedUpdateInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   unlimited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   imageLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -409,6 +425,7 @@ export type StoreItemCreateManyInput = {
   stock?: number
   unlimited?: boolean
   imageLabel?: string
+  imageUrl?: string | null
   active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -423,6 +440,7 @@ export type StoreItemUpdateManyMutationInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   unlimited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   imageLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -437,6 +455,7 @@ export type StoreItemUncheckedUpdateManyInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   unlimited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   imageLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -451,6 +470,7 @@ export type StoreItemCountOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   unlimited?: Prisma.SortOrder
   imageLabel?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
   active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -470,6 +490,7 @@ export type StoreItemMaxOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   unlimited?: Prisma.SortOrder
   imageLabel?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
   active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -484,6 +505,7 @@ export type StoreItemMinOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   unlimited?: Prisma.SortOrder
   imageLabel?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
   active?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -522,6 +544,7 @@ export type StoreItemCreateWithoutPurchasesInput = {
   stock?: number
   unlimited?: boolean
   imageLabel?: string
+  imageUrl?: string | null
   active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -536,6 +559,7 @@ export type StoreItemUncheckedCreateWithoutPurchasesInput = {
   stock?: number
   unlimited?: boolean
   imageLabel?: string
+  imageUrl?: string | null
   active?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -566,6 +590,7 @@ export type StoreItemUpdateWithoutPurchasesInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   unlimited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   imageLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -580,6 +605,7 @@ export type StoreItemUncheckedUpdateWithoutPurchasesInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   unlimited?: Prisma.BoolFieldUpdateOperationsInput | boolean
   imageLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -625,6 +651,7 @@ export type StoreItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   stock?: boolean
   unlimited?: boolean
   imageLabel?: boolean
+  imageUrl?: boolean
   active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -641,6 +668,7 @@ export type StoreItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   stock?: boolean
   unlimited?: boolean
   imageLabel?: boolean
+  imageUrl?: boolean
   active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -655,6 +683,7 @@ export type StoreItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   stock?: boolean
   unlimited?: boolean
   imageLabel?: boolean
+  imageUrl?: boolean
   active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -669,12 +698,13 @@ export type StoreItemSelectScalar = {
   stock?: boolean
   unlimited?: boolean
   imageLabel?: boolean
+  imageUrl?: boolean
   active?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type StoreItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "cost" | "tag" | "stock" | "unlimited" | "imageLabel" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["storeItem"]>
+export type StoreItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "cost" | "tag" | "stock" | "unlimited" | "imageLabel" | "imageUrl" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["storeItem"]>
 export type StoreItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchases?: boolean | Prisma.StoreItem$purchasesArgs<ExtArgs>
   _count?: boolean | Prisma.StoreItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -696,6 +726,7 @@ export type $StoreItemPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     stock: number
     unlimited: boolean
     imageLabel: string
+    imageUrl: string | null
     active: boolean
     createdAt: Date
     updatedAt: Date
@@ -1131,6 +1162,7 @@ export interface StoreItemFieldRefs {
   readonly stock: Prisma.FieldRef<"StoreItem", 'Int'>
   readonly unlimited: Prisma.FieldRef<"StoreItem", 'Boolean'>
   readonly imageLabel: Prisma.FieldRef<"StoreItem", 'String'>
+  readonly imageUrl: Prisma.FieldRef<"StoreItem", 'String'>
   readonly active: Prisma.FieldRef<"StoreItem", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"StoreItem", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"StoreItem", 'DateTime'>

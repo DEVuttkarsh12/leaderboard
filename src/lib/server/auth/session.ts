@@ -50,6 +50,112 @@ export type CasinoProvider = "thrill" | "packdraw" | "shuffle";
 
 const oauthProviders = new Set<string>(["kick", "discord"]);
 const casinoProviders = new Set<string>(["thrill", "packdraw", "shuffle"]);
+const adminEnvKeys = [
+  "RANKBOARD_ADMIN_EMAILS",
+  "RANKBOARD_ADMIN_KICK_USERNAMES",
+  "RANKBOARD_ADMIN_KICK_IDS",
+  "RANKBOARD_ADMIN_DISCORD_USERNAMES",
+  "RANKBOARD_ADMIN_DISCORD_IDS",
+];
+
+type AdminIdentityUser = {
+  id: string;
+  email?: string | null;
+  discordId?: string | null;
+  discordUsername?: string | null;
+  kickId?: string | null;
+  kickUsername?: string | null;
+  role: "PLAYER" | "ADMIN";
+};
+
+function adminListFromEnv(key: string) {
+  return new Set(
+    (process.env[key] ?? "")
+      .split(/[,\s]+/)
+      .map((value) => value.trim().replace(/^@+/, "").toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+function emailAdminListFromEnv(key: string) {
+  return new Set(
+    (process.env[key] ?? "")
+      .split(/[,\s]+/)
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+export function hasConfiguredAdminAllowlist() {
+  return adminEnvKeys.some((key) => adminListFromEnv(key).size > 0);
+}
+
+export function isConfiguredAdminIdentity(user: {
+  email?: string | null;
+  discordId?: string | null;
+  discordUsername?: string | null;
+  kickId?: string | null;
+  kickUsername?: string | null;
+}) {
+  const email = user.email?.trim().toLowerCase();
+  const discordId = user.discordId?.trim().toLowerCase();
+  const discordUsername = user.discordUsername?.trim().replace(/^@+/, "").toLowerCase();
+  const kickId = user.kickId?.trim().toLowerCase();
+  const kickUsername = user.kickUsername?.trim().replace(/^@+/, "").toLowerCase();
+
+  return Boolean(
+    (email && emailAdminListFromEnv("RANKBOARD_ADMIN_EMAILS").has(email)) ||
+      (discordId && adminListFromEnv("RANKBOARD_ADMIN_DISCORD_IDS").has(discordId)) ||
+      (discordUsername && adminListFromEnv("RANKBOARD_ADMIN_DISCORD_USERNAMES").has(discordUsername)) ||
+      (kickId && adminListFromEnv("RANKBOARD_ADMIN_KICK_IDS").has(kickId)) ||
+      (kickUsername && adminListFromEnv("RANKBOARD_ADMIN_KICK_USERNAMES").has(kickUsername))
+  );
+}
+
+export async function reconcileConfiguredAdminRole<T extends AdminIdentityUser>(
+  user: T
+) {
+  const nextRole = hasConfiguredAdminAllowlist()
+    ? isConfiguredAdminIdentity(user)
+      ? "ADMIN"
+      : "PLAYER"
+    : user.role;
+
+  if (user.role === nextRole) {
+    return user;
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { role: nextRole },
+  });
+
+  return {
+    ...user,
+    role: nextRole,
+  };
+}
+
+async function reconcileConfiguredAdminRoleById(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      discordId: true,
+      discordUsername: true,
+      kickId: true,
+      kickUsername: true,
+      role: true,
+    },
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  return reconcileConfiguredAdminRole(user);
+}
 
 function normalizeHandle(handle: string) {
   const cleaned = handle.trim().replace(/^@+/, "");
@@ -210,10 +316,12 @@ async function createSessionForUser(userId: string) {
     },
   });
 
+  const reconciledUser = await reconcileConfiguredAdminRole(user);
+
   return {
     sessionToken,
     expires,
-    account: accountFromUser(user),
+    account: accountFromUser(reconciledUser),
   };
 }
 
@@ -311,6 +419,7 @@ export async function createEmailPasswordSession({
           select: { id: true },
         });
 
+  await reconcileConfiguredAdminRoleById(user.id);
   return createSessionForUser(user.id);
 }
 
@@ -359,7 +468,7 @@ export async function getSessionAccount(sessionToken: string | undefined) {
     return null;
   }
 
-  return accountFromUser(session.user);
+  return accountFromUser(await reconcileConfiguredAdminRole(session.user));
 }
 
 export async function getSessionUserId(sessionToken: string | undefined) {
@@ -608,6 +717,7 @@ export async function createDiscordUserSession(
     },
   });
 
+  await reconcileConfiguredAdminRoleById(user.id);
   return createSessionForUser(user.id);
 }
 
@@ -689,6 +799,7 @@ export async function createKickUserSession(
     },
   });
 
+  await reconcileConfiguredAdminRoleById(user.id);
   return createSessionForUser(user.id);
 }
 

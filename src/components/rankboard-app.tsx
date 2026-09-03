@@ -15,6 +15,7 @@ import {
   RefreshCw,
   Search,
   Sparkles,
+  Timer,
   Trophy,
   Tv,
   X,
@@ -22,6 +23,7 @@ import {
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
+import LiquidGlass from "./liquid-glass";
 import SiteEntryLoader from "./site-entry-loader";
 import StaggeredMenu from "./staggered-menu";
 import VolcanoBackground from "./volcano-background";
@@ -177,6 +179,7 @@ type HeaderAccount = {
   points: number;
   xp: number;
   authenticated: boolean;
+  badges: string[];
   connected: {
     kick: {
       connected: boolean;
@@ -202,6 +205,7 @@ const guestHeaderAccount: HeaderAccount = {
   points: 18500,
   xp: 4200,
   authenticated: false,
+  badges: ["Season 08"],
   connected: {
     kick: {
       connected: false,
@@ -250,7 +254,20 @@ function normalizeHeaderAccount(value: Partial<HeaderAccount> | null | undefined
       shuffle: value?.casinos?.shuffle ?? "",
     },
     casinoAccounts: value?.casinoAccounts ?? [],
+    badges: Array.isArray(value?.badges) ? value.badges : guestHeaderAccount.badges,
   };
+}
+
+function isAdminHeaderAccount(account: HeaderAccount) {
+  return account.authenticated && account.badges.includes("Admin");
+}
+
+function headerAccountDestination(account: HeaderAccount) {
+  return isAdminHeaderAccount(account) ? "/admin" : "/profile";
+}
+
+function headerAccountDestinationLabel(account: HeaderAccount) {
+  return isAdminHeaderAccount(account) ? "admin panel" : "profile";
 }
 
 function headerAccountFromPayload(payload: AuthAccountPayload): HeaderAccount {
@@ -274,6 +291,7 @@ function headerAccountFromPayload(payload: AuthAccountPayload): HeaderAccount {
     },
     casinos: payload.casinos,
     casinoAccounts: payload.casinoAccounts,
+    badges: payload.badges,
   });
 }
 
@@ -395,10 +413,14 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
   const pathname = usePathname();
   const cleanHandle = account.handle.replace(/^@/, "") || "guest";
   const initials = getInitials(cleanHandle);
-  const accountStatus = !account.authenticated ? "Guest" : account.profileProvider === "kick" ? "Kick" : account.profileProvider === "discord" ? "Discord" : "Signed in";
+  const isAdmin = isAdminHeaderAccount(account);
+  const accountStatus = !account.authenticated ? "Guest" : isAdmin ? "Admin" : account.profileProvider === "kick" ? "Kick" : account.profileProvider === "discord" ? "Discord" : "Signed in";
+  const accountHref = headerAccountDestination(account);
   const menuLinks = account.authenticated
-    ? [["Profile", "/profile"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]]
-    : [["Profile", "/profile"], ["Login", "/login"], ["Custom Bets", "/custom-bets"], ["Admin", "/admin"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]];
+    ? isAdmin
+      ? [["Admin", "/admin"], ["Profile", "/profile"], ["Custom Bets", "/custom-bets"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]]
+      : [["Profile", "/profile"], ["Custom Bets", "/custom-bets"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]]
+    : [["Profile", "/profile"], ["Login", "/login"], ["Custom Bets", "/custom-bets"], ["Support", "/support"], ["Privacy", "/privacy"], ["Terms", "/terms"]];
 
   async function signOut() {
     await clearRankBoardSession();
@@ -416,7 +438,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
       </span>
     </div>
   );
-  const items = NAV.map(([label, href]) => ({
+  const items = NAV.filter(([label]) => isAdmin || label !== "Admin").map(([label, href]) => ({
     label,
     ariaLabel: `Go to ${label}`,
     link: href,
@@ -426,7 +448,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
 
   return (
     <>
-      <nav className="desktop-nav" aria-label="Primary navigation">
+      <LiquidGlass as="nav" className="desktop-nav" depth="clear" tone="violet" aria-label="Primary navigation">
         <Link className="desktop-nav__brand" href="/" aria-label="RankBoard home">
           <span className="desktop-nav__mark">R</span>
           <span className="desktop-nav__word">
@@ -441,7 +463,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
           ))}
         </div>
         <div className="desktop-nav__account-group">
-          <Link className="desktop-nav__account" href="/profile" aria-label="Open profile">
+          <Link className="desktop-nav__account" href={accountHref} aria-label={`Open ${headerAccountDestinationLabel(account)}`}>
             <span className="desktop-nav__avatar">{account.image ? <Image src={account.image} alt="" width={36} height={36} unoptimized /> : initials}</span>
             <span>
               <strong>{accountStatus}</strong>
@@ -459,7 +481,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
             </Link>
           )}
         </div>
-      </nav>
+      </LiquidGlass>
       <StaggeredMenu
         className="mobile-menu-only"
         position="left"
@@ -553,19 +575,7 @@ function Home() {
             <MagneticLink className="button ghost" href="/store">Claim</MagneticLink>
           </div>
         </motion.div>
-        <motion.div
-          className="hero-live-panel"
-          initial={{ opacity: 0, x: 42, y: 20, rotate: 5 }}
-          animate={{ opacity: 1, x: 0, y: 0, rotate: -2 }}
-          transition={{ delay: 1.22, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          aria-hidden="true"
-        >
-          <span className="hero-live-badge">Live</span>
-          <span className="hero-panel-chip hero-panel-chip--one">#1</span>
-          <span className="hero-panel-chip hero-panel-chip--two">#2</span>
-          <span className="hero-panel-word">Board</span>
-          <span className="hero-panel-orbit" />
-        </motion.div>
+        <HeroRankTracker activity={livePool} players={users.slice(0, 3)} />
       </div>
     </section>
     <HomeBoardPreview users={users} />
@@ -583,6 +593,71 @@ function Home() {
       </div>
     </section>
   </main>;
+}
+
+function HeroRankTracker({ activity, players }: { activity: number; players: Player[] }) {
+  const leaderScore = Math.max(1, ...players.map(playerScore));
+  const leader = players[0];
+  const leaderValue = leader ? playerScore(leader) : 0;
+  const prizes = ["$600", "$325", "$225"];
+
+  return (
+    <motion.div
+      className="hero-live-panel-wrap"
+      initial={{ opacity: 0, x: 42, y: 20, rotate: 5 }}
+      animate={{ opacity: 1, x: 0, y: 0, rotate: -2 }}
+      transition={{ delay: 1.22, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <LiquidGlass as="section" className="hero-live-panel hero-rank-tracker" tone="ember" aria-label="Live leaderboard snapshot">
+        <div className="hero-rank-tracker__top">
+          <span className="hero-rank-tracker__live"><i /> Live board</span>
+          <Link href="/leaderboard" aria-label="Open full leaderboard"><ArrowUpRight size={18} strokeWidth={2.5} aria-hidden="true" /></Link>
+        </div>
+        <div className="hero-rank-tracker__title">
+          <span>Race snapshot</span>
+          <strong>Top players</strong>
+        </div>
+        <div className="hero-rank-tracker__leader">
+          <div className="hero-rank-tracker__leader-top">
+            <span className="hero-rank-tracker__crown"><Crown size={16} fill="currentColor" aria-hidden="true" /> #1</span>
+            <span className="hero-rank-tracker__prize">{prizes[0]} reward</span>
+          </div>
+          <div className="hero-rank-tracker__leader-main">
+            <span className="hero-rank-tracker__avatar hero-rank-tracker__avatar--leader">{leader ? getInitials(leader.name) : "RB"}</span>
+            <span className="hero-rank-tracker__identity">
+              <small>Current leader</small>
+              <strong>{leader ? playerName(leader) : "Syncing live data"}</strong>
+              <i><span style={{ width: leader ? "100%" : "8%" }} /></i>
+            </span>
+            <span className="hero-rank-tracker__score hero-rank-tracker__score--leader"><strong>{formatNumberCompact(leaderValue)}</strong><small>Weighted XP</small></span>
+          </div>
+        </div>
+        <div className="hero-rank-tracker__chasers" aria-label="Second and third place players">
+          {[1, 2].map((index) => {
+            const player = players[index];
+            const score = player ? playerScore(player) : 0;
+            const progress = player ? Math.max(8, (score / leaderScore) * 100) : 8;
+
+            return (
+              <article className={`hero-rank-tracker__chaser hero-rank-tracker__chaser--${index + 1}`} key={player?.id ?? `sync-${index + 1}`}>
+                <div className="hero-rank-tracker__chaser-top"><b>#{index + 1}</b><span>{prizes[index]}</span></div>
+                <div className="hero-rank-tracker__chaser-player">
+                  <span className="hero-rank-tracker__avatar">{player ? getInitials(player.name) : "RB"}</span>
+                  <span><small>In pursuit</small><strong>{player ? playerName(player) : "Syncing"}</strong></span>
+                </div>
+                <i className="hero-rank-tracker__chaser-track"><span style={{ width: `${progress}%` }} /></i>
+                <strong className="hero-rank-tracker__chaser-score">{formatNumberCompact(score)} <small>XP</small></strong>
+              </article>
+            );
+          })}
+        </div>
+        <div className="hero-rank-tracker__footer">
+          <span><small>Live activity</small><strong>{formatNumberCompact(activity)} PTS</strong></span>
+          <Link href="/leaderboard">Full ranking <ArrowUpRight size={15} strokeWidth={2.6} aria-hidden="true" /></Link>
+        </div>
+      </LiquidGlass>
+    </motion.div>
+  );
 }
 
 function HomeBoardPreview({ users }: { users: Player[] }) {
@@ -771,17 +846,17 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
   }
 
   return <main>
-    <section className="board-hero page-width">
+    <section className="board-hero board-hero--leaderboard page-width">
       <div><p className="kicker"><span>●</span> Live leaderboard</p><h1>Global Leaderboard</h1><p className="hero-desc">Compete for the top spot in the RankBoard rewards sprint.</p></div>
-      <div className="round-ticket"><b>{error ? "CHECKING" : "LIVE"}</b><strong>{targetDate ? formatShortDate(targetDate).toUpperCase() : "NOW"}</strong><span>{lastUpdated ? formatLastUpdated(lastUpdated).toUpperCase() : "SYNC"}</span></div>
+      <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
-    <section className="leaderboard-progress page-width" aria-label="Season wager progress">
+    <LiquidGlass as="section" className="leaderboard-progress page-width" tone="ember" aria-label="Season wager progress">
       <div className="progress-medal">$</div>
       <div>
         <div className="progress-head"><span>Season prize track</span><strong>{fmt(wager)} / {fmt(targetWager)} wager</strong><b>{wagerProgress}%</b></div>
         <div className="progress-bar"><i style={{ width: `${wagerProgress}%` }} /></div>
       </div>
-    </section>
+    </LiquidGlass>
     <section className="board-top-three page-width" aria-label="Top three players">
       <div className="floor-top">
         <span>Top 3</span>
@@ -798,7 +873,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     </section>
     <section className="stat-strip page-width board-metrics"><div><span>Players</span><strong>{total || users.length}</strong></div><div><span>Wagered</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>Board</span><strong>{error ? "Issue" : isLoading ? "Sync" : "Live"}</strong></div></section>
     <section className="section page-width board-section">
-      <div className="standings">
+      <LiquidGlass className="standings" tone="cyan">
         <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
         <div className="table-head"><span>Rank / Player</span><span>Status</span><span>Weighted XP</span><span>Wagered</span><span /></div>
         <div className="player-list" aria-live="polite">
@@ -813,10 +888,65 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
           )}
         </div>
         {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
-      </div>
+      </LiquidGlass>
     </section>
     {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>Weighted XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Last active</small><strong>{selected.lastActive ?? "Live"}</strong></div></div><Link href="/challenges">View missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
   </main>;
+}
+
+function SeasonClock({
+  error,
+  lastUpdated,
+  targetDate,
+}: {
+  error: boolean;
+  lastUpdated: Date | null;
+  targetDate: Date | null;
+}) {
+  const [now, setNow] = useState<number | null>(null);
+  const validTarget = targetDate && !Number.isNaN(targetDate.getTime()) ? targetDate : null;
+
+  useEffect(() => {
+    if (!validTarget) return undefined;
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [validTarget]);
+
+  const remaining = validTarget && now !== null ? Math.max(0, validTarget.getTime() - now) : null;
+  const countdown = validTarget
+    ? [
+        [remaining === null ? null : Math.floor(remaining / 86_400_000), "Days"],
+        [remaining === null ? null : Math.floor((remaining / 3_600_000) % 24), "Hrs"],
+        [remaining === null ? null : Math.floor((remaining / 60_000) % 60), "Min"],
+        [remaining === null ? null : Math.floor((remaining / 1000) % 60), "Sec"],
+      ] as const
+    : null;
+
+  return (
+    <LiquidGlass as="aside" className="season-clock" depth="clear" tone="violet" aria-label="Leaderboard season status">
+      <div className="season-clock__head">
+        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Season clock</span>
+        <b>{error ? "Checking" : "Live"}</b>
+      </div>
+      <div className={`season-clock__digits ${countdown ? "" : "season-clock__digits--live"}`}>
+        {countdown ? countdown.map(([value, label]) => (
+          <span key={label}><strong>{value === null ? "--" : String(value).padStart(2, "0")}</strong><small>{label}</small></span>
+        )) : (
+          <>
+            <span><strong>NOW</strong><small>Window</small></span>
+            <span><strong>AUTO</strong><small>Updates</small></span>
+          </>
+        )}
+      </div>
+      <small className="season-clock__meta">
+        {validTarget
+          ? `Closes ${formatShortDate(validTarget)}`
+          : lastUpdated
+            ? `Feed ${formatLastUpdated(lastUpdated)}`
+            : "Standings update automatically"}
+      </small>
+    </LiquidGlass>
+  );
 }
 
 function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div><span className={player.rank<7?"status hot":"status live"}>{player.rank<7?"HOT":"LIVE"}</span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
@@ -1136,6 +1266,7 @@ function Profile({ account }: { account: HeaderAccount }) {
   const [loading, setLoading] = useState(true);
   const [sessionBusy, setSessionBusy] = useState(false);
   const [casinoAccounts, setCasinoAccounts] = useState<CasinoAccountDetail[]>(account.casinoAccounts ?? []);
+  const isAdmin = isAdminHeaderAccount(account);
 
   const refreshProfileData = useCallback(() => {
     if (!account.authenticated) return;
@@ -1158,6 +1289,12 @@ function Profile({ account }: { account: HeaderAccount }) {
   useEffect(() => {
     refreshProfileData();
   }, [refreshProfileData]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      window.location.replace("/admin");
+    }
+  }, [isAdmin]);
 
   function reasonLabel(reason: string) {
     const map: Record<string, string> = {
@@ -1189,6 +1326,20 @@ function Profile({ account }: { account: HeaderAccount }) {
             <div className="button-row">
               <Link className="button primary" href="/login">Sign in</Link>
             </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (isAdmin) {
+    return (
+      <main>
+        <section className="board-hero page-width">
+          <div>
+            <p className="kicker"><span>●</span> Admin lane</p>
+            <h1>Opening Admin</h1>
+            <p className="hero-desc">Your admin account is being sent to the control room.</p>
           </div>
         </section>
       </main>

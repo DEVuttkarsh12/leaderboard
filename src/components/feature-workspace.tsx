@@ -30,6 +30,7 @@ import {
   XCircle,
 } from "lucide-react";
 import {
+  ChangeEvent,
   FormEvent,
   useCallback,
   useEffect,
@@ -40,6 +41,7 @@ import {
 import type { AuthAccountPayload } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
+import LiquidGlass from "./liquid-glass";
 
 type Provider = "kick" | "discord";
 type Casino = "thrill" | "packdraw" | "shuffle";
@@ -218,6 +220,22 @@ type ChallengeMission = {
   claimedAt: string | null;
 };
 
+type AdminChallengeCadence = "DAILY" | "WEEKLY" | "MILESTONE" | "SEASONAL";
+
+type AdminChallengeMission = ChallengeMission & {
+  active: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+const adminChallengeCadences: { value: AdminChallengeCadence; label: string }[] = [
+  { value: "DAILY", label: "Daily" },
+  { value: "WEEKLY", label: "Weekly" },
+  { value: "MILESTONE", label: "Milestone" },
+  { value: "SEASONAL", label: "Seasonal" },
+];
+
 type SiteConfig = {
   announcement: string;
   banner: string;
@@ -394,6 +412,18 @@ function accountDisplayName(account: Account) {
   return account.handle;
 }
 
+function isAdminAccount(account: Pick<Account, "badges">) {
+  return account.badges.includes("Admin");
+}
+
+function accountDestination(account: Account) {
+  return isAdminAccount(account) ? "/admin" : "/profile";
+}
+
+function accountDestinationLabel(account: Account) {
+  return isAdminAccount(account) ? "Open admin" : "Open profile";
+}
+
 function subscribeToStorage(callback: () => void) {
   window.addEventListener("storage", callback);
   window.addEventListener("rankboard-storage", callback);
@@ -462,6 +492,10 @@ function useAccountState() {
         if (payload.account) {
           const next = accountFromPayload(payload.account);
           setRawAccount(next);
+        } else {
+          setRawAccount(defaultAccount);
+          window.localStorage.removeItem("rankboard-account");
+          window.dispatchEvent(new CustomEvent("rankboard-storage"));
         }
       } catch {
         // ignore
@@ -543,32 +577,6 @@ function ChallengesWorkspace({
     };
   }, []);
 
-  async function pushProgress(id: string) {
-    setPendingMissionId(id);
-    setMessage("Saving progress...");
-    try {
-      const response = await fetch("/api/challenges/progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ missionId: id, amount: 25 }),
-      });
-      const payload = (await response.json()) as {
-        mission?: ChallengeMission;
-        error?: string;
-      };
-      if (!response.ok || !payload.mission) {
-        setMessage(payload.error ?? "Progress failed.");
-        return;
-      }
-      replaceMission(payload.mission);
-      setMessage(payload.mission.progress >= payload.mission.goal ? "Mission ready to claim." : "Progress saved.");
-    } catch {
-      setMessage("Progress failed.");
-    } finally {
-      setPendingMissionId("");
-    }
-  }
-
   async function claimMission(id: string) {
     setPendingMissionId(id);
     setMessage("Claiming reward...");
@@ -613,30 +621,29 @@ function ChallengesWorkspace({
           const percent = mission.goal > 0 ? Math.round((mission.progress / mission.goal) * 100) : 0;
           const displayPercent = Math.min(100, Math.max(0, percent));
           const isClaimed = mission.claimed;
-          const ready = mission.progress >= mission.goal && !isClaimed;
           const isPending = pendingMissionId === mission.id;
           return (
-            <article className="action-card" key={mission.id}>
-              <small>{mission.meta}</small>
+            <LiquidGlass as="article" className="action-card" key={mission.id} tone="violet">
+              <small>{mission.meta} / {mission.cadence}</small>
               <h3>{mission.title}</h3>
-              <p>{displayPercent}% charged</p>
+              <p>{mission.goal.toLocaleString()}x target / {displayPercent}% complete</p>
               <ProgressBar value={displayPercent} />
               <div className="action-card__footer">
                 <strong>{isClaimed ? "Claimed" : `${mission.reward.toLocaleString()} pts`}</strong>
-                <button type="button" onClick={() => ready ? claimMission(mission.id) : pushProgress(mission.id)} disabled={isClaimed || Boolean(pendingMissionId)}>
-                  {isPending ? "Saving" : isClaimed ? "Done" : ready ? "Claim" : "Progress"}
+                <button type="button" onClick={() => claimMission(mission.id)} disabled={isClaimed || Boolean(pendingMissionId)}>
+                  {isPending ? "Saving" : isClaimed ? "Claimed" : "Claim"}
                 </button>
               </div>
-            </article>
+            </LiquidGlass>
           );
         })}
         {!missionList.length && (
-          <article className="action-card">
+          <LiquidGlass as="article" className="action-card" tone="violet">
             <small>Loading</small>
             <h3>Missions syncing</h3>
             <p>Server mission state will appear here.</p>
             <ProgressBar value={0} />
-          </article>
+          </LiquidGlass>
         )}
       </div>
       <AccountStrip account={account} />
@@ -709,7 +716,7 @@ function HuntsWorkspace() {
       <WorkspaceHeader overline="Bonus Hunts" title="Live hunt sessions" meta={`${followedCount} followed · ${savedCount} clips saved · ${message}`} />
       <div className="workspace-grid two">
         {huntList.map((hunt) => (
-          <article className="action-card casino-card" key={hunt.id}>
+          <LiquidGlass as="article" className="action-card casino-card" key={hunt.id} tone="ember">
             <small>{hunt.status} / {hunt.time}</small>
             <h3>{hunt.title}</h3>
             <p>{hunt.host} / {hunt.heat}% heat / best {hunt.bestMultiplier.toLocaleString()}x</p>
@@ -720,7 +727,7 @@ function HuntsWorkspace() {
                 {hunt.followed ? "Unfollow" : "Follow"}
               </button>
             </div>
-          </article>
+          </LiquidGlass>
         ))}
       </div>
       <div className="workspace-list">
@@ -794,7 +801,7 @@ function TournamentsWorkspace() {
       <WorkspaceHeader overline="Tournaments" title="Brackets & prize pools" meta={`${registrations} entries · ${message}`} />
       <div className="workspace-grid three">
         {tournamentList.map((item) => (
-          <article className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id}>
+          <LiquidGlass as="article" className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id} tone="cyan">
             <small>{item.starts}</small>
             <h3>{item.title}</h3>
             <p>{item.taken} / {item.seats} / {item.prize}</p>
@@ -803,7 +810,7 @@ function TournamentsWorkspace() {
               <strong>{item.joined ? "Entered" : item.status}</strong>
               <button type="button" onClick={() => setSelected(item.id)}>View</button>
             </div>
-          </article>
+          </LiquidGlass>
         ))}
       </div>
       {tournament ? (
@@ -893,7 +900,7 @@ function RafflesWorkspace({ account }: { account: Account }) {
       </div>
       <div className="workspace-grid three">
         {[1, 5, 10].map((amount) => (
-          <article className="action-card" key={amount}>
+          <LiquidGlass as="article" className="action-card" key={amount} tone="success">
             <small>DRAW ENTRY</small>
             <h3>{amount} ticket{amount > 1 ? "s" : ""}</h3>
             <p>{tickets >= amount ? "Ready" : "Locked"}</p>
@@ -903,7 +910,7 @@ function RafflesWorkspace({ account }: { account: Account }) {
                 Enter
               </button>
             </div>
-          </article>
+          </LiquidGlass>
         ))}
       </div>
       {account.badges.includes("Admin") && raffle?.round.status === "Open" && (
@@ -936,7 +943,10 @@ type ApiStoreItem = {
   stock: number;
   unlimited: boolean;
   imageLabel: string;
+  imageUrl: string;
 };
+
+const storeImageMaxBytes = 550_000;
 
 function getStoreItemIcon(item: Pick<ApiStoreItem, "title" | "tag" | "imageLabel">): WorkspaceIcon {
   const value = `${item.title} ${item.tag} ${item.imageLabel}`.toLowerCase();
@@ -952,6 +962,20 @@ function getStoreItemIcon(item: Pick<ApiStoreItem, "title" | "tag" | "imageLabel
   if (value.includes("package") || value.includes("crate")) return PackageOpen;
 
   return ShoppingBag;
+}
+
+function storeImageStyle(imageUrl: string) {
+  const cleanUrl = imageUrl.trim();
+  return cleanUrl ? { backgroundImage: `url(${JSON.stringify(cleanUrl)})` } : undefined;
+}
+
+function readImageFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => resolve(String(reader.result ?? "")), { once: true });
+    reader.addEventListener("error", () => reject(new Error("Could not read image file.")), { once: true });
+    reader.readAsDataURL(file);
+  });
 }
 
 function getPurchaseStatusIcon(status: ApiPurchase["status"]): WorkspaceIcon {
@@ -1089,9 +1113,15 @@ function StoreWorkspace({
           const inStock = item.unlimited || item.stock > 0;
           const StoreIcon = getStoreItemIcon(item);
           return (
-            <article className="action-card reward-card" key={item.id}>
+            <LiquidGlass as="article" className="action-card reward-card" key={item.id} tone="ember">
               <small>{item.tag} / {item.unlimited ? "Unlimited" : `${item.stock} left`}</small>
-              <div className="reward-art" aria-hidden="true"><StoreIcon size={28} strokeWidth={2.5} /></div>
+              <div
+                className={`reward-art ${item.imageUrl ? "reward-art--image" : ""}`}
+                style={storeImageStyle(item.imageUrl)}
+                aria-hidden="true"
+              >
+                {!item.imageUrl && <StoreIcon size={32} strokeWidth={2.5} />}
+              </div>
               <h3>{item.title}</h3>
               <p>{item.cost.toLocaleString()} pts</p>
               <div className="action-card__footer">
@@ -1104,7 +1134,7 @@ function StoreWorkspace({
                   {isBusy ? "Working..." : !inStock ? "Sold Out" : !canAfford ? "Need pts" : "Redeem"}
                 </button>
               </div>
-            </article>
+            </LiquidGlass>
           );
         })}
       </div>
@@ -1269,7 +1299,7 @@ function CustomBetsWorkspace({
           <p className="workspace-loading">Loading prediction markets...</p>
         )}
         {markets.map((market) => (
-          <article className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id}>
+          <LiquidGlass as="article" className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id} tone="cyan">
             <small><Ticket size={13} strokeWidth={3} aria-hidden="true" />{market.type} / {market.status} / {market.deadline}</small>
             <h3>{market.title}</h3>
             <p>{market.winner ? `${market.winner} won` : "Market live"}</p>
@@ -1299,7 +1329,7 @@ function CustomBetsWorkspace({
                 </button>
               ))}
             </div>
-          </article>
+          </LiquidGlass>
         ))}
       </div>
       <BetList bets={bets} />
@@ -1506,12 +1536,12 @@ function ProfileWorkspace({
     <section className="section page-width app-workspace">
       <WorkspaceHeader overline="Profile" title="Your account" meta={profileStatus === "Profile ready" && liveUser ? `Rank #${liveUser.rank}` : profileStatus} />
       <div className="profile-layout">
-        <article className="profile-card">
+        <LiquidGlass as="article" className="profile-card" tone="cyan">
           <AccountImage account={account} className="profile-avatar" />
           <h3>{accountDisplayName(account)}</h3>
           <p>{account.banned ? "Banned" : account.timeoutUntil ? "Timed out" : "Active"}</p>
           <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["Lifetime", formatNumberCompact(lifetimeWager)], ["Rank", liveUser ? `#${liveUser.rank}` : "--"], ["Badges", String(account.badges.length)]]} />
-        </article>
+        </LiquidGlass>
         <div className="profile-panels">
           <ConnectionPanel account={account} setAccount={setAccount} onStatus={setProfileStatus} />
           <div className="casino-link-panel">
@@ -1540,8 +1570,26 @@ function AdminWorkspace({
   const [purchases, setPurchases] = useState<AdminApiPurchase[]>([]);
   const [markets, setMarkets] = useState<BetMarket[]>([]);
   const [siteConfig, setSiteConfig] = useStoredState<SiteConfig>("rankboard-site-config", defaultSiteConfig);
-  const [newItem, setNewItem] = useState({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
+  const [newItem, setNewItem] = useState({
+    title: "",
+    description: "",
+    cost: "5000",
+    stock: "10",
+    tag: "Reward",
+    image: "NEW",
+    imageUrl: "",
+    imageName: "",
+  });
   const [newMarket, setNewMarket] = useState({ title: "", type: "Stream", sideA: "Yes", sideB: "No", oddsA: "2.00", oddsB: "1.50", deadline: "23:00" });
+  const [challengeMissions, setChallengeMissions] = useState<AdminChallengeMission[]>([]);
+  const [newChallenge, setNewChallenge] = useState({
+    slotName: "",
+    title: "",
+    multiplier: "100",
+    reward: "1000",
+    cadence: "MILESTONE" as AdminChallengeCadence,
+  });
+  const [adminChallengeStatus, setAdminChallengeStatus] = useState("Loading missions");
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [adminQuery, setAdminQuery] = useState("");
   const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
@@ -1554,12 +1602,38 @@ function AdminWorkspace({
   const [adminRaffle, setAdminRaffle] = useState<RafflePayload | null>(null);
   const [adminRaffleStatus, setAdminRaffleStatus] = useState("Loading raffle");
   const [kickEventStatus, setKickEventStatus] = useState("Webhook subscription idle");
+  const isAdmin = isAdminAccount(account);
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
     adminUsers[0] ??
     null;
 
   useEffect(() => {
+    if (!isAdmin) return;
+
+    let active = true;
+
+    fetch("/api/admin/challenges", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: { missions?: AdminChallengeMission[]; error?: string }) => {
+        if (!active) return;
+        if (payload.missions) {
+          setChallengeMissions(payload.missions);
+          setAdminChallengeStatus(`${payload.missions.filter((mission) => mission.active).length} published`);
+        } else {
+          setAdminChallengeStatus(payload.error ?? "Could not load missions");
+        }
+      })
+      .catch(() => {
+        if (active) setAdminChallengeStatus("Could not load missions");
+      });
+
+    return () => { active = false; };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
     let active = true;
     fetch("/api/bets/markets", { cache: "no-store" })
       .then((r) => r.json())
@@ -1573,9 +1647,11 @@ function AdminWorkspace({
     return () => {
       active = false;
     };
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
+    if (!isAdmin) return;
+
     let active = true;
 
     Promise.all([
@@ -1600,9 +1676,11 @@ function AdminWorkspace({
       });
 
     return () => { active = false; };
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
+    if (!isAdmin) return;
+
     let active = true;
 
     Promise.all([
@@ -1634,9 +1712,13 @@ function AdminWorkspace({
       });
 
     return () => { active = false; };
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
+
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setAdminUsersLoading(true);
@@ -1666,10 +1748,10 @@ function AdminWorkspace({
           }
           return payload.users?.[0]?.id ?? "";
         });
-        setAdminUserStatus(`${payload.users.length} users loaded`);
+        setAdminUserStatus(`${payload.users.length} admin${payload.users.length === 1 ? "" : "s"} loaded`);
       } catch (error) {
         if (!controller.signal.aborted) {
-          setAdminUserStatus(error instanceof Error ? error.message : "Could not load users");
+          setAdminUserStatus(error instanceof Error ? error.message : "Could not load admins");
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -1682,7 +1764,25 @@ function AdminWorkspace({
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [adminQuery]);
+  }, [account.handle, adminQuery, isAdmin]);
+
+  if (!isAdmin) {
+    return (
+      <section className="section page-width app-workspace">
+        <WorkspaceHeader
+          overline="Admin"
+          title="Admin access only"
+          meta={account.handle === "@guest" ? "Sign in with an admin account" : `${account.handle} is a player account`}
+        />
+        <div className="workspace-notice">
+          <p>Use the Kick admin account for the control room. Player accounts stay on the normal profile and reward pages.</p>
+          <Link className="button primary" href={account.handle === "@guest" ? "/login" : "/profile"}>
+            {account.handle === "@guest" ? "Login" : "Open profile"} <span>↗</span>
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   function givePoints(amount: number) {
     setAccount((current) => {
@@ -1702,12 +1802,13 @@ function AdminWorkspace({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: newItem.title.trim(),
-          description: "Admin drop.",
+          description: newItem.description.trim() || "Admin reward.",
           cost: Math.max(0, Number(newItem.cost) || 0),
-          tag: newItem.tag,
+          tag: newItem.tag.trim() || "Reward",
           stock: Math.max(0, Number(newItem.stock) || 0),
           unlimited: false,
           imageLabel: newItem.image || "NEW",
+          imageUrl: newItem.imageUrl.trim(),
         }),
       });
       const payload = (await response.json()) as { item?: ApiStoreItem; error?: string };
@@ -1715,10 +1816,130 @@ function AdminWorkspace({
         throw new Error(payload.error ?? "Store item creation failed");
       }
       setItems((current) => [payload.item!, ...current]);
-      setNewItem({ title: "", cost: "5000", stock: "10", tag: "Reward", image: "NEW" });
+      setNewItem({
+        title: "",
+        description: "",
+        cost: "5000",
+        stock: "10",
+        tag: "Reward",
+        image: "NEW",
+        imageUrl: "",
+        imageName: "",
+      });
       setAdminStoreMessage(`Created ${payload.item.title}`);
     } catch (error) {
       setAdminStoreMessage(error instanceof Error ? error.message : "Store item creation failed");
+    }
+  }
+
+  async function chooseStoreItemImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setAdminStoreMessage("Choose an image file");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > storeImageMaxBytes) {
+      setAdminStoreMessage("Choose an image under 550 KB");
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      const imageUrl = await readImageFileAsDataUrl(file);
+      setNewItem((current) => ({
+        ...current,
+        imageUrl,
+        imageName: file.name,
+      }));
+      setAdminStoreMessage(`Image ready: ${file.name}`);
+    } catch (error) {
+      setAdminStoreMessage(error instanceof Error ? error.message : "Could not read image file");
+    } finally {
+      event.target.value = "";
+    }
+  }
+
+  async function publishChallenge(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const slotName = newChallenge.slotName.trim();
+    const title = newChallenge.title.trim();
+    const multiplier = Math.max(1, Number(newChallenge.multiplier) || 0);
+    const reward = Math.max(0, Number(newChallenge.reward) || 0);
+
+    if (!slotName || !title) {
+      setAdminChallengeStatus("Add a slot name and challenge name");
+      return;
+    }
+
+    setAdminChallengeStatus("Publishing mission...");
+
+    try {
+      const response = await fetch("/api/admin/challenges", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slotName,
+          title,
+          multiplier,
+          reward,
+          cadence: newChallenge.cadence,
+          active: true,
+        }),
+      });
+      const payload = (await response.json()) as {
+        mission?: AdminChallengeMission;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.mission) {
+        throw new Error(payload.error ?? "Mission publish failed");
+      }
+
+      setChallengeMissions((current) => [payload.mission!, ...current]);
+      setNewChallenge({
+        slotName: "",
+        title: "",
+        multiplier: "100",
+        reward: "1000",
+        cadence: "MILESTONE",
+      });
+      setAdminChallengeStatus(`Published ${payload.mission.title}`);
+    } catch (error) {
+      setAdminChallengeStatus(error instanceof Error ? error.message : "Mission publish failed");
+    }
+  }
+
+  async function updateChallengeMission(
+    mission: AdminChallengeMission,
+    patch: Partial<Pick<AdminChallengeMission, "active">>
+  ) {
+    setAdminChallengeStatus(`Updating ${mission.title}`);
+
+    try {
+      const response = await fetch(`/api/admin/challenges/${mission.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+      const payload = (await response.json()) as {
+        mission?: AdminChallengeMission;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.mission) {
+        throw new Error(payload.error ?? "Mission update failed");
+      }
+
+      setChallengeMissions((current) =>
+        current.map((entry) => entry.id === payload.mission?.id ? payload.mission : entry)
+      );
+      setAdminChallengeStatus(`${payload.mission.title} ${payload.mission.active ? "published" : "hidden"}`);
+    } catch (error) {
+      setAdminChallengeStatus(error instanceof Error ? error.message : "Mission update failed");
     }
   }
 
@@ -1944,9 +2165,9 @@ function AdminWorkspace({
   return (
     <section className="section page-width app-workspace">
       <WorkspaceHeader overline="Admin" title="Control room" meta={adminUserStatus} />
-      <div className="admin-user-manager">
+      <LiquidGlass className="admin-user-manager" tone="violet">
         <div className="admin-user-manager__bar">
-          <label>USER SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Email, handle, Discord, Kick, casino" /></label>
+          <label>ADMIN SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Email, handle, Discord, Kick, casino" /></label>
           <button type="button" onClick={() => setAdminQuery((value) => value.trim())} disabled={adminUsersLoading}>{adminUsersLoading ? "Loading" : "Refresh"}</button>
         </div>
         <div className="admin-user-layout">
@@ -1957,9 +2178,9 @@ function AdminWorkspace({
                 <strong>{user.handle}</strong>
                 <small>{user.role} / {user.banned ? "BANNED" : user.timeoutUntil ? "TIMEOUT" : "ACTIVE"}</small>
               </button>
-            )) : <p>{adminUsersLoading ? "Loading users." : "No users found."}</p>}
+            )) : <p>{adminUsersLoading ? "Loading admins." : "No admins found."}</p>}
           </div>
-          <article className="admin-user-detail">
+          <LiquidGlass as="article" className="admin-user-detail" tone="cyan">
             {selectedAdminUser ? (
               <>
                 <div className="admin-user-detail__head">
@@ -1988,11 +2209,11 @@ function AdminWorkspace({
             ) : (
               <p className="admin-empty-state">Sign in as an admin to manage users.</p>
             )}
-          </article>
+          </LiquidGlass>
         </div>
-      </div>
+      </LiquidGlass>
       <div className="admin-grid">
-        <article className="admin-panel">
+        <LiquidGlass as="article" className="admin-panel" tone="ember">
           <small>USER</small>
           <h3>{account.handle}</h3>
           <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["Kick", account.connected.kick.connected ? "Linked" : "Off"], ["Discord", account.connected.discord.connected ? "Linked" : "Off"], ["State", account.banned ? "Banned" : "Active"]]} />
@@ -2001,8 +2222,8 @@ function AdminWorkspace({
             <button className="button ghost" type="button" onClick={() => givePoints(-1000)}>-1K <span>-</span></button>
             <button className="button ghost" type="button" onClick={() => setAccount((current) => ({ ...normalizeAccount(current), banned: !normalizeAccount(current).banned }))}>{account.banned ? "Unban" : "Ban"} <span>!</span></button>
           </div>
-        </article>
-        <article className="admin-panel">
+        </LiquidGlass>
+        <LiquidGlass as="article" className="admin-panel" tone="success">
           <small>LEADERBOARD</small>
           <h3>{siteConfig.leaderboardMode}</h3>
           <StatusGrid items={[["Status", siteConfig.leaderboardStatus], ["Prize", formatNumberCompact(siteConfig.prizePool)], ["Winners", "Top 3"], ["Reset", "Ready"]]} />
@@ -2010,20 +2231,20 @@ function AdminWorkspace({
             {(["Weekly", "Bi-weekly", "Monthly"] as SiteConfig["leaderboardMode"][]).map((mode) => <button className="button ghost" key={mode} type="button" onClick={() => setSiteConfig((current) => ({ ...current, leaderboardMode: mode }))}>{mode}<span>↗</span></button>)}
             <button className="button primary" type="button" onClick={() => setSiteConfig((current) => ({ ...current, leaderboardStatus: current.leaderboardStatus === "Live" ? "Ended" : "Live" }))}>{siteConfig.leaderboardStatus === "Live" ? "End" : "Start"} <span>●</span></button>
           </div>
-        </article>
-        <article className="admin-panel">
+        </LiquidGlass>
+        <LiquidGlass as="article" className="admin-panel" tone="violet">
           <small>WEBSITE</small>
           <h3>Banners</h3>
           <label>Announcement<input value={siteConfig.announcement} onChange={(event) => setSiteConfig((current) => ({ ...current, announcement: event.target.value }))} /></label>
           <label>Banner<input value={siteConfig.banner} onChange={(event) => setSiteConfig((current) => ({ ...current, banner: event.target.value }))} /></label>
           <label>Promo<input value={siteConfig.promotion} onChange={(event) => setSiteConfig((current) => ({ ...current, promotion: event.target.value }))} /></label>
-        </article>
-        <article className="admin-panel">
+        </LiquidGlass>
+        <LiquidGlass as="article" className="admin-panel" tone="cyan">
           <small>DATA PIPELINE</small>
           <h3>API / Backend / DB</h3>
           <StatusGrid items={[["API", "GET only"], ["Backend", "Route live"], ["Cache", "No-store"], ["DB adapter", "Ready"]]} />
-        </article>
-        <article className="admin-panel">
+        </LiquidGlass>
+        <LiquidGlass as="article" className="admin-panel" tone="success">
           <small>KICK EVENTS</small>
           <h3>Watch verification</h3>
           <StatusGrid items={[["Mode", "Webhook"], ["Chat", "Signed"], ["Live", "Status"], ["State", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
@@ -2031,7 +2252,36 @@ function AdminWorkspace({
             <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
           </div>
           <p className="admin-helper-text">{kickEventStatus}</p>
-        </article>
+        </LiquidGlass>
+      </div>
+      <div className="admin-section-title">
+        <div>
+          <p>Challenge missions</p>
+          <h2>Publish slot challenges</h2>
+        </div>
+      </div>
+      <p className="admin-note">{adminChallengeStatus}</p>
+      <form className="support-form account-form" onSubmit={publishChallenge}>
+        <label>SLOT<input value={newChallenge.slotName} onChange={(event) => setNewChallenge((current) => ({ ...current, slotName: event.target.value }))} placeholder="Sweet Bonanza" /></label>
+        <label>CHALLENGE<input value={newChallenge.title} onChange={(event) => setNewChallenge((current) => ({ ...current, title: event.target.value }))} placeholder="Hit 500x multi" /></label>
+        <label>MULTI<input value={newChallenge.multiplier} inputMode="numeric" onChange={(event) => setNewChallenge((current) => ({ ...current, multiplier: event.target.value.replace(/\D/g, "") }))} placeholder="500" /></label>
+        <label>POINTS<input value={newChallenge.reward} inputMode="numeric" onChange={(event) => setNewChallenge((current) => ({ ...current, reward: event.target.value.replace(/\D/g, "") }))} placeholder="1000" /></label>
+        <label>TYPE<select value={newChallenge.cadence} onChange={(event) => setNewChallenge((current) => ({ ...current, cadence: event.target.value as AdminChallengeCadence }))}>{adminChallengeCadences.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
+        <button className="button primary" type="submit">Publish mission <span>↗</span></button>
+      </form>
+      <div className="workspace-list">
+        {challengeMissions.length ? challengeMissions.map((mission) => (
+          <article key={mission.id}>
+            <span>{mission.active ? "Published" : "Hidden"}</span>
+            <div>
+              <h3>{mission.title}</h3>
+              <p>{mission.meta} / {mission.goal.toLocaleString()}x / {mission.reward.toLocaleString()} pts / {mission.cadence}</p>
+            </div>
+            <button type="button" onClick={() => updateChallengeMission(mission, { active: !mission.active })}>
+              {mission.active ? "Hide" : "Publish"}
+            </button>
+          </article>
+        )) : <article><span>EMPTY</span><div><h3>No missions</h3><p>{adminChallengeStatus}</p></div></article>}
       </div>
       {/* Store Catalog Management */}
       <div className="admin-section-title">
@@ -2043,8 +2293,20 @@ function AdminWorkspace({
       <p className="admin-note">{adminStoreMessage}</p>
       <form className="support-form account-form" onSubmit={addItem}>
         <label>ITEM<input value={newItem.title} onChange={(event) => setNewItem((current) => ({ ...current, title: event.target.value }))} placeholder="Reward name" /></label>
+        <label>DESC<input value={newItem.description} onChange={(event) => setNewItem((current) => ({ ...current, description: event.target.value }))} placeholder="Short item detail" /></label>
         <label>PRICE<input value={newItem.cost} inputMode="numeric" onChange={(event) => setNewItem((current) => ({ ...current, cost: event.target.value.replace(/\D/g, "") }))} /></label>
         <label>STOCK<input value={newItem.stock} inputMode="numeric" onChange={(event) => setNewItem((current) => ({ ...current, stock: event.target.value.replace(/\D/g, "") }))} /></label>
+        <label>TAG<input value={newItem.tag} onChange={(event) => setNewItem((current) => ({ ...current, tag: event.target.value }))} placeholder="Reward" /></label>
+        <label>BADGE<input value={newItem.image} onChange={(event) => setNewItem((current) => ({ ...current, image: event.target.value.toUpperCase().slice(0, 12) }))} placeholder="NEW" /></label>
+        <label>IMAGE URL<input value={newItem.imageUrl.startsWith("data:image/") ? newItem.imageName || "Uploaded image" : newItem.imageUrl} onChange={(event) => setNewItem((current) => ({ ...current, imageUrl: event.target.value, imageName: "" }))} placeholder="https://..." /></label>
+        <label>IMAGE FILE<input type="file" accept="image/*" onChange={chooseStoreItemImage} /></label>
+        {newItem.imageUrl && (
+          <div className="store-image-preview">
+            <span style={storeImageStyle(newItem.imageUrl)} aria-hidden="true" />
+            <p>{newItem.imageName || "Image preview"}</p>
+            <button type="button" onClick={() => setNewItem((current) => ({ ...current, imageUrl: "", imageName: "" }))}>Clear</button>
+          </div>
+        )}
         <button className="button primary" type="submit">Add item <span>↗</span></button>
       </form>
       <div className="workspace-list">
@@ -2052,7 +2314,13 @@ function AdminWorkspace({
           const StoreIcon = getStoreItemIcon(item);
           return (
           <article key={item.id}>
-            <span className="list-icon" title={item.tag}><StoreIcon size={16} strokeWidth={2.6} aria-hidden="true" /></span>
+            <span
+              className={`list-icon store-list-thumb ${item.imageUrl ? "store-list-thumb--image" : ""}`}
+              style={storeImageStyle(item.imageUrl)}
+              title={item.tag}
+            >
+              {!item.imageUrl && <StoreIcon size={16} strokeWidth={2.6} aria-hidden="true" />}
+            </span>
             <div><h3>{item.title}</h3><p>{item.cost.toLocaleString()} pts / {item.unlimited ? "unlimited" : `${item.stock} stock`}</p></div>
             <button type="button" onClick={() => updateStoreItem(item, { unlimited: !item.unlimited })}>{item.unlimited ? "Limit" : "Unlimited"}</button>
             <button type="button" onClick={() => updateStoreItem(item, { active: false })}>Remove</button>
@@ -2393,6 +2661,7 @@ function LoginWorkspace({
       setDisplayName(nextAccount.handle.replace(/^@/, ""));
       setPassword("");
       setStatus("Session active");
+      window.location.assign(accountDestination(nextAccount));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Login failed");
     } finally {
@@ -2452,7 +2721,7 @@ function LoginWorkspace({
                 </div>
                 <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["XP", formatNumberCompact(account.xp)], ["Kick", account.connected.kick.connected ? "Linked" : "Off"], ["Discord", account.connected.discord.connected ? "Linked" : "Off"]]} />
                 <div className="auth-session-actions">
-                  <Link className="button primary" href="/profile">Open profile <span>↗</span></Link>
+                  <Link className="button primary" href={accountDestination(account)}>{accountDestinationLabel(account)} <span>↗</span></Link>
                   <button className="button ghost" type="button" onClick={signOut} disabled={busy}>{busy ? "Working" : "Logout"} <span>↻</span></button>
                 </div>
               </>
@@ -2541,12 +2810,17 @@ function ConnectionPanel({
       {(["kick", "discord"] as Provider[]).map((provider) => {
         const state = account.connected[provider];
         return (
-          <article className={`connection-card ${state.connected ? "connected" : ""}`} key={provider}>
+          <LiquidGlass
+            as="article"
+            className={`connection-card ${state.connected ? "connected" : ""}`}
+            key={provider}
+            tone={provider === "kick" ? "success" : "violet"}
+          >
             <small>{provider.toUpperCase()}</small>
             <h3>{state.connected ? state.username : "Not linked"}</h3>
             <p>{state.connected ? "Connected" : "OAuth ready"}</p>
             <button type="button" onClick={() => toggle(provider)} disabled={busyProvider === provider}>{busyProvider === provider ? "Working" : state.connected ? "Disconnect" : `Login ${provider}`}</button>
-          </article>
+          </LiquidGlass>
         );
       })}
     </div>
@@ -2561,7 +2835,9 @@ function WorkspaceHeader({ overline, title, meta }: { overline: string; title: s
         <p><Icon size={16} strokeWidth={3} aria-hidden="true" />{overline}</p>
         <h2>{title}</h2>
       </div>
-      <span><Activity size={14} strokeWidth={3} aria-hidden="true" />{meta}</span>
+      <LiquidGlass as="span" className="workspace-heading__status" depth="clear" interactive={false} tone="cyan">
+        <Activity size={14} strokeWidth={3} aria-hidden="true" />{meta}
+      </LiquidGlass>
     </div>
   );
 }

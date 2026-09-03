@@ -68,6 +68,7 @@ model StoreItem {
   stock       Int     @default(0)
   unlimited   Boolean @default(false)
   imageLabel  String  @default("NEW")
+  imageUrl    String? @db.Text
   active      Boolean @default(true)
 
   purchases StorePurchase[]

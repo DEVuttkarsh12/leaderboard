@@ -28,8 +28,12 @@ const profileSchema = z.object({
   avatar: z.string().nullable().optional(),
 });
 
-function loginRedirect(request: NextRequest, params: Record<string, string>) {
-  const url = new URL("/login", request.url);
+function loginRedirect(
+  request: NextRequest,
+  params: Record<string, string>,
+  pathname = "/login"
+) {
+  const url = new URL(pathname, request.url);
 
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
@@ -101,12 +105,16 @@ export async function GET(request: NextRequest) {
   try {
     const tokens = await exchangeCodeForToken(request, code);
     const profile = await fetchDiscordProfile(tokens.access_token);
-    const { sessionToken, expires } = await createDiscordUserSession(
+    const { sessionToken, expires, account } = await createDiscordUserSession(
       profile,
       tokens,
       request.cookies.get(SESSION_COOKIE)?.value
     );
-    const response = loginRedirect(request, { discord: "connected" });
+    const response = loginRedirect(
+      request,
+      { discord: "connected" },
+      account.badges.includes("Admin") ? "/admin" : "/profile"
+    );
     setSessionCookie(response, sessionToken, expires);
 
     return response;

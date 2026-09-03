@@ -15,6 +15,7 @@ const schema = z.object({
   unlimited: z.boolean().optional(),
   active: z.boolean().optional(),
   imageLabel: z.string().max(12).optional(),
+  imageUrl: z.string().max(750_000).optional(),
 });
 
 function sessionTokenFrom(request: NextRequest) {

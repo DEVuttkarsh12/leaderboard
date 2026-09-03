@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
     const status =
       message === "Sign in to claim missions." ? 401 :
       message === "Mission not found." ||
-      message === "Mission is not ready to claim." ||
       message === "Mission already claimed." ? 400 :
       500;
     return NextResponse.json({ error: message }, { status });

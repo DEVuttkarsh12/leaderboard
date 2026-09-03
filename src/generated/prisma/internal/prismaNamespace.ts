@@ -2439,6 +2439,7 @@ export const StoreItemScalarFieldEnum = {
   stock: 'stock',
   unlimited: 'unlimited',
   imageLabel: 'imageLabel',
+  imageUrl: 'imageUrl',
   active: 'active',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

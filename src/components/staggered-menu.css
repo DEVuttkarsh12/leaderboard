@@ -237,7 +237,7 @@
 .sm-socials-title {
   margin: 0;
   color: var(--sm-accent, #ff7a00);
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   font-weight: 950;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -289,7 +289,7 @@
   color: #ff7baa;
   padding: 0 16px;
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 950;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -333,7 +333,7 @@
 
   .sm-panel-list[data-numbering] .sm-panel-item::after {
     top: 0.02em;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .sm-socials {
