@@ -490,10 +490,10 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
         displaySocials
         displayItemNumbering
         logo={logo}
-        colors={["#ff7a00", "#8b1e1e", "#ff4f3d"]}
-        menuButtonColor="#ff7a00"
-        openMenuButtonColor="#08030F"
-        accentColor="#ff4f00"
+        colors={["#d8ff3f", "#43e8ff", "#ff4fa2"]}
+        menuButtonColor="#d8ff3f"
+        openMenuButtonColor="#f8faf2"
+        accentColor="#d8ff3f"
         onMenuOpen={() => setAccountOpen(true)}
         onMenuClose={() => setAccountOpen(false)}
         footer={

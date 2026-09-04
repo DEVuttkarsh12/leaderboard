@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #07070d;
-  --bg-deep: #010105;
-  --surface: rgba(12, 12, 22, 0.78);
-  --surface-2: rgba(17, 16, 29, 0.86);
-  --surface-3: rgba(27, 23, 41, 0.94);
-  --line: rgba(255, 255, 255, 0.12);
-  --line-strong: rgba(255, 156, 58, 0.34);
-  --text: #fffaf5;
-  --muted: #ded9e7;
-  --faint: #aaa4b7;
-  --gold: #ff7a00;
-  --gold-bright: #ffd166;
-  --violet: #c264ff;
-  --blue: #53d7ff;
-  --coral: #ff4f87;
-  --success: #4bf0ad;
+  --bg: #06070a;
+  --bg-deep: #010204;
+  --surface: rgba(10, 12, 16, 0.8);
+  --surface-2: rgba(15, 18, 23, 0.88);
+  --surface-3: rgba(23, 27, 34, 0.95);
+  --line: rgba(216, 255, 63, 0.15);
+  --line-strong: rgba(216, 255, 63, 0.42);
+  --text: #f8faf2;
+  --muted: #d9ded4;
+  --faint: #a3aca2;
+  --gold: #d8ff3f;
+  --gold-bright: #fff47a;
+  --violet: #9d70ff;
+  --blue: #43e8ff;
+  --coral: #ff4fa2;
+  --success: #45f2a9;
   --danger: #ff3f3f;
-  --glass-edge: rgba(255, 255, 255, 0.17);
+  --glass-edge: rgba(226, 255, 126, 0.2);
   --glass-shine: rgba(255, 255, 255, 0.2);
   --glass-deep: rgba(4, 4, 11, 0.66);
   --shadow: 0 28px 80px rgba(0, 0, 0, 0.46);
@@ -32,9 +32,9 @@
   --panel-2: var(--surface-2);
   --panel-3: var(--surface-3);
   --green: var(--success);
-  --green-dim: rgba(255, 122, 0, 0.14);
-  --gold-dim: rgba(255, 122, 0, 0.14);
-  --violet-dim: rgba(194, 100, 255, 0.22);
+  --green-dim: rgba(69, 242, 169, 0.14);
+  --gold-dim: rgba(216, 255, 63, 0.14);
+  --violet-dim: rgba(157, 112, 255, 0.22);
   --ink: var(--bg);
   --paper: var(--surface);
   --night: var(--bg);
@@ -44,7 +44,7 @@
   --acid: var(--gold-bright);
   --orange: var(--gold);
   --accent: var(--gold);
-  --primary-deep: #12070a;
+  --primary-deep: #0a1004;
   --text-primary: var(--text);
   --text-secondary: var(--muted);
   --text-dim: var(--faint);
@@ -188,7 +188,7 @@ p {
 }
 
 .liquid-glass[data-liquid-tone="ember"] {
-  --liquid-tint: 255 122 0;
+  --liquid-tint: 216 255 63;
 }
 
 .liquid-glass[data-liquid-tone="cyan"] {
@@ -7279,6 +7279,374 @@ input,
 select,
 textarea {
   font-size: 15px;
+}
+
+/* Broadcast arcade luxe: polished graphite, chromatic signals, fast controls. */
+.volcano-background canvas {
+  filter: hue-rotate(32deg) saturate(1.18) contrast(1.04) brightness(0.92);
+}
+
+.site-tunnel-background::after {
+  background:
+    linear-gradient(112deg, rgba(67, 232, 255, 0.075), transparent 26%, transparent 68%, rgba(255, 79, 162, 0.075)),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.4), transparent 22%, transparent 78%, rgba(0, 0, 0, 0.4)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.48));
+}
+
+.liquid-glass {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.liquid-glass::before {
+  background:
+    linear-gradient(
+      112deg,
+      transparent 10%,
+      rgba(255, 255, 255, 0.035) 28%,
+      rgba(255, 255, 255, 0.3) 42%,
+      rgb(var(--liquid-tint) / 0.16) 49%,
+      rgba(67, 232, 255, 0.07) 56%,
+      transparent 72%
+    );
+  background-position: var(--liquid-x) var(--liquid-y);
+  background-size: 230% 210%;
+}
+
+.desktop-nav {
+  border-color: rgba(226, 255, 126, 0.24);
+  border-radius: 24px 13px 22px 13px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 46%),
+    linear-gradient(108deg, rgba(216, 255, 63, 0.08), rgba(67, 232, 255, 0.055) 48%, rgba(255, 79, 162, 0.065)),
+    rgba(5, 7, 10, 0.76);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 22px 64px rgba(0, 0, 0, 0.4),
+    0 0 38px rgba(216, 255, 63, 0.07),
+    0 0 54px rgba(67, 232, 255, 0.045);
+}
+
+.desktop-nav__mark,
+.desktop-nav__avatar,
+.brand-mark {
+  background: conic-gradient(from 150deg, var(--gold), var(--blue), var(--violet), var(--coral), var(--gold));
+  color: #080b04;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34), 0 0 26px rgba(67, 232, 255, 0.18);
+}
+
+.desktop-nav__word span,
+.menu-logo-word span,
+.brand > span:last-child > span {
+  color: var(--gold);
+}
+
+.desktop-nav__links a {
+  border-radius: 13px 7px 12px 7px;
+  color: rgba(248, 250, 242, 0.78);
+}
+
+.desktop-nav__links a:hover,
+.desktop-nav__links a.active {
+  border-color: rgba(216, 255, 63, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 54%),
+    rgba(216, 255, 63, 0.12);
+  color: #fbffe8;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 22px rgba(216, 255, 63, 0.09);
+}
+
+.desktop-nav__account,
+.desktop-nav__logout {
+  border-radius: 16px 9px 15px 9px;
+  border-color: rgba(255, 255, 255, 0.15);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 50%),
+    rgba(5, 7, 10, 0.58);
+}
+
+.desktop-nav__logout:hover {
+  border-color: rgba(255, 79, 162, 0.36);
+  background: rgba(255, 79, 162, 0.12);
+  color: #fff;
+}
+
+.kicker,
+.product-kicker {
+  border-color: rgba(216, 255, 63, 0.34);
+  border-radius: 11px 6px 10px 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 58%),
+    rgba(216, 255, 63, 0.08);
+  color: var(--gold);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 24px rgba(216, 255, 63, 0.1);
+}
+
+.hero-brackoz-title i {
+  color: #faffdf;
+  -webkit-text-stroke-color: rgba(239, 255, 183, 0.24);
+  text-shadow:
+    0.035em 0.046em 0 rgba(67, 232, 255, 0.84),
+    0.075em 0.09em 0 rgba(255, 79, 162, 0.5),
+    0 0 32px rgba(216, 255, 63, 0.18),
+    0 20px 52px rgba(0, 0, 0, 0.36);
+}
+
+.hero-mini-line,
+.home-prize-core > span,
+.home-prize-core > b {
+  color: rgba(240, 247, 226, 0.86);
+}
+
+.button.primary,
+.primary-button,
+.action-card button:hover:not(:disabled),
+.workspace-list button:hover,
+.bracket-panel button:hover,
+.tool-panel button:hover:not(:disabled),
+.connection-card button:hover,
+.casino-link-panel button:hover:not(:disabled),
+.admin-user-manager__bar button:hover:not(:disabled),
+.admin-action-grid button:hover:not(:disabled),
+.settle-btn:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.54), transparent 46%),
+    linear-gradient(132deg, var(--gold), var(--gold-bright) 66%, #fffbd0);
+  color: #080b04;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.68),
+    inset 0 -2px 0 rgba(61, 79, 0, 0.34),
+    0 12px 30px rgba(216, 255, 63, 0.17),
+    0 0 28px rgba(67, 232, 255, 0.06);
+}
+
+.hero-live-panel {
+  border-color: rgba(226, 255, 126, 0.32);
+  background:
+    linear-gradient(112deg, rgba(255, 255, 255, 0.21), transparent 25%),
+    linear-gradient(126deg, rgba(216, 255, 63, 0.08), rgba(67, 232, 255, 0.055) 48%, rgba(255, 79, 162, 0.075)),
+    rgba(5, 7, 10, 0.8);
+  box-shadow:
+    14px 16px 0 rgba(216, 255, 63, 0.74),
+    -2px -2px 0 rgba(67, 232, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -32px 54px rgba(0, 0, 0, 0.28),
+    0 34px 90px rgba(0, 0, 0, 0.42),
+    0 0 54px rgba(67, 232, 255, 0.08);
+}
+
+.hero-live-panel::after {
+  border-color: rgba(235, 255, 166, 0.34);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 rgba(67, 232, 255, 0.2),
+    inset 0 -28px 44px rgba(157, 112, 255, 0.035);
+}
+
+.hero-rank-tracker__title span,
+.hero-rank-tracker__footer strong,
+.hero-rank-tracker__score,
+.hero-rank-tracker__identity > small {
+  color: var(--gold);
+}
+
+.hero-rank-tracker__title strong {
+  text-shadow: 2px 2px 0 rgba(67, 232, 255, 0.26), -2px -1px 0 rgba(255, 79, 162, 0.18);
+}
+
+.hero-rank-tracker__leader {
+  border-color: rgba(216, 255, 63, 0.34);
+  background:
+    linear-gradient(112deg, rgba(255, 255, 255, 0.2), transparent 28%),
+    linear-gradient(135deg, rgba(216, 255, 63, 0.14), rgba(67, 232, 255, 0.045) 48%, rgba(5, 7, 10, 0.7));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 12px 28px rgba(0, 0, 0, 0.26), 0 0 28px rgba(216, 255, 63, 0.08);
+}
+
+.hero-rank-tracker__crown {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: #070a03;
+}
+
+.hero-rank-tracker__avatar--leader {
+  border-color: rgba(216, 255, 63, 0.58);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.3), transparent 46%),
+    linear-gradient(135deg, var(--gold), var(--blue) 76%);
+  color: #080b04;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 0 24px rgba(67, 232, 255, 0.18);
+}
+
+.hero-rank-tracker__identity > i > span,
+.progress-bar i,
+.workspace-progress i,
+.podium-progress__fill {
+  background: linear-gradient(90deg, var(--gold), var(--blue), var(--violet), var(--coral));
+  box-shadow: 0 0 24px rgba(67, 232, 255, 0.24);
+}
+
+.hero-rank-tracker__chaser {
+  border-color: rgba(67, 232, 255, 0.27);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14), transparent 36%),
+    linear-gradient(128deg, rgba(67, 232, 255, 0.12), rgba(5, 7, 10, 0.72));
+}
+
+.hero-rank-tracker__chaser--3 {
+  border-color: rgba(255, 79, 162, 0.3);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14), transparent 36%),
+    linear-gradient(128deg, rgba(255, 79, 162, 0.13), rgba(5, 7, 10, 0.72));
+}
+
+.home-board-preview .podium-card,
+.winner-arena .podium-card,
+.board-top-three .podium-card {
+  background:
+    linear-gradient(112deg, rgba(255, 255, 255, 0.2), transparent 28%),
+    linear-gradient(128deg, color-mix(in srgb, currentColor 20%, transparent), rgba(67, 232, 255, 0.035) 48%, rgba(5, 7, 10, 0.82)),
+    rgba(5, 7, 10, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -24px 42px rgba(0, 0, 0, 0.28),
+    0 24px 68px rgba(0, 0, 0, 0.38),
+    0 0 38px color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.home-route-card,
+.action-card,
+.workspace-list,
+.bracket-panel,
+.tool-panel,
+.support-form,
+.inventory-panel,
+.admin-user-manager,
+.casino-link-panel,
+.watch-console,
+.market-admin-row,
+.standings,
+.leaderboard-progress {
+  border-color: rgb(var(--liquid-tint, 216 255 63) / 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 30%),
+    linear-gradient(120deg, rgb(var(--liquid-tint, 216 255 63) / 0.055), rgba(67, 232, 255, 0.025) 52%, rgba(255, 79, 162, 0.035)),
+    rgba(5, 7, 10, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -24px 42px rgba(0, 0, 0, 0.2),
+    0 22px 58px rgba(0, 0, 0, 0.33),
+    0 0 32px rgb(var(--liquid-tint, 216 255 63) / 0.055);
+}
+
+.home-route-card {
+  border-color: color-mix(in srgb, currentColor 28%, rgba(255, 255, 255, 0.12));
+}
+
+.home-route-card__badge,
+.rank-badge,
+.progress-medal {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), transparent 46%),
+    linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: #080b04;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.46), 0 0 24px rgba(216, 255, 63, 0.18);
+}
+
+.season-clock {
+  border-color: rgba(157, 112, 255, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent 50%),
+    linear-gradient(120deg, rgba(157, 112, 255, 0.13), rgba(67, 232, 255, 0.07)),
+    rgba(5, 7, 10, 0.78);
+}
+
+.season-clock__digits > span,
+.search,
+.product-search,
+.wide-search,
+.segment,
+.product-segments,
+.auth-tabs,
+.player-row,
+.full-board-row,
+input,
+select,
+textarea {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.085), transparent 50%),
+    rgba(3, 5, 8, 0.82);
+}
+
+.segment button.active,
+.product-segments button.active,
+.auth-tabs button.active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 46%),
+    linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: #080b04;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.54), 0 8px 22px rgba(216, 255, 63, 0.13);
+}
+
+.player-row:hover,
+.full-board-row:hover {
+  border-color: rgba(67, 232, 255, 0.3);
+  background:
+    linear-gradient(110deg, rgba(67, 232, 255, 0.09), transparent 44%),
+    rgba(5, 8, 11, 0.9);
+}
+
+.status,
+.product-movement,
+.status-badge,
+.market-winner {
+  background: rgba(216, 255, 63, 0.1);
+  color: var(--gold);
+}
+
+.footer {
+  border-top-color: rgba(216, 255, 63, 0.2);
+  background:
+    linear-gradient(112deg, rgba(67, 232, 255, 0.05), transparent 32%, rgba(255, 79, 162, 0.045)),
+    rgba(2, 3, 5, 0.92);
+}
+
+.footer-links a:hover {
+  color: var(--gold);
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(67, 232, 255, 0.12), 0 0 28px rgba(67, 232, 255, 0.2);
+}
+
+:where(a, button) {
+  touch-action: manipulation;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .liquid-glass.action-card:hover,
+  .liquid-glass.connection-card:hover,
+  .liquid-glass.profile-card:hover {
+    border-color: rgb(var(--liquid-tint) / 0.4);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 26px 68px rgba(0, 0, 0, 0.38),
+      0 0 38px rgb(var(--liquid-tint) / 0.1);
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --line: rgba(255, 255, 255, 0.32);
+    --muted: #eef2e8;
+    --faint: #c7cec4;
+  }
+
+  .liquid-glass,
+  .player-row,
+  .action-card {
+    border-width: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

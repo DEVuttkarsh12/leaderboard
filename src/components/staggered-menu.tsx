@@ -38,16 +38,16 @@ type StaggeredMenuProps = {
 
 export default function StaggeredMenu({
   position = "left",
-  colors = ["#ff7a00", "#8b1e1e", "#ff4f3d"],
+  colors = ["#d8ff3f", "#43e8ff", "#ff4fa2"],
   items = [],
   socialItems = [],
   displaySocials = true,
   displayItemNumbering = true,
   className,
   logo,
-  menuButtonColor = "#ff7a00",
-  openMenuButtonColor = "#08030F",
-  accentColor = "#ff4f00",
+  menuButtonColor = "#d8ff3f",
+  openMenuButtonColor = "#f8faf2",
+  accentColor = "#d8ff3f",
   changeMenuColorOnOpen = true,
   isFixed = true,
   closeOnClickAway = true,
@@ -254,6 +254,22 @@ export default function StaggeredMenu({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeMenu, closeOnClickAway, open]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeMenu();
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [closeMenu, open]);
 
   return (
     <div
