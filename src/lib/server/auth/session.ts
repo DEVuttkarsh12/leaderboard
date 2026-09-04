@@ -57,6 +57,8 @@ const adminEnvKeys = [
   "RANKBOARD_ADMIN_DISCORD_USERNAMES",
   "RANKBOARD_ADMIN_DISCORD_IDS",
 ];
+const assignedAdminKickUsernames = new Set(["devuttkarsh"]);
+const assignedAdminDiscordUsernames = new Set(["shinra.ae"]);
 
 type AdminIdentityUser = {
   id: string;
@@ -87,7 +89,11 @@ function emailAdminListFromEnv(key: string) {
 }
 
 export function hasConfiguredAdminAllowlist() {
-  return adminEnvKeys.some((key) => adminListFromEnv(key).size > 0);
+  return (
+    assignedAdminKickUsernames.size > 0 ||
+    assignedAdminDiscordUsernames.size > 0 ||
+    adminEnvKeys.some((key) => adminListFromEnv(key).size > 0)
+  );
 }
 
 export function isConfiguredAdminIdentity(user: {
@@ -106,9 +112,13 @@ export function isConfiguredAdminIdentity(user: {
   return Boolean(
     (email && emailAdminListFromEnv("RANKBOARD_ADMIN_EMAILS").has(email)) ||
       (discordId && adminListFromEnv("RANKBOARD_ADMIN_DISCORD_IDS").has(discordId)) ||
-      (discordUsername && adminListFromEnv("RANKBOARD_ADMIN_DISCORD_USERNAMES").has(discordUsername)) ||
+      (discordUsername &&
+        (assignedAdminDiscordUsernames.has(discordUsername) ||
+          adminListFromEnv("RANKBOARD_ADMIN_DISCORD_USERNAMES").has(discordUsername))) ||
       (kickId && adminListFromEnv("RANKBOARD_ADMIN_KICK_IDS").has(kickId)) ||
-      (kickUsername && adminListFromEnv("RANKBOARD_ADMIN_KICK_USERNAMES").has(kickUsername))
+      (kickUsername &&
+        (assignedAdminKickUsernames.has(kickUsername) ||
+          adminListFromEnv("RANKBOARD_ADMIN_KICK_USERNAMES").has(kickUsername)))
   );
 }
 
