@@ -8,9 +8,12 @@ import {
   BadgeCheck,
   Banknote,
   CheckCircle2,
+  CircleUserRound,
+  Clock3,
   Coins,
   Crown,
   Dumbbell,
+  Flame,
   Gamepad2,
   Gem,
   Gift,
@@ -18,12 +21,17 @@ import {
   LayoutDashboard,
   PackageCheck,
   PackageOpen,
+  Pause,
+  Play,
+  Radio,
   ReceiptText,
   Shield,
   Shirt,
   ShoppingBag,
   Sparkles,
   Ticket,
+  Target,
+  TrendingUp,
   Trophy,
   Tv,
   WalletCards,
@@ -292,6 +300,7 @@ const workspaceIcons: Record<string, WorkspaceIcon> = {
   Account: Shield,
   "Bonus Hunts": Sparkles,
   Challenges: BadgeCheck,
+  Missions: BadgeCheck,
   "Custom Bets": Ticket,
   "Help Center": Headphones,
   Profile: WalletCards,
@@ -538,7 +547,7 @@ function ChallengesWorkspace({
   setAccount: (value: Account | ((current: Account) => Account)) => void;
 }) {
   const [missionList, setMissionList] = useState<ChallengeMission[]>([]);
-  const [message, setMessage] = useState("Loading missions...");
+  const [message, setMessage] = useState("Syncing...");
   const [pendingMissionId, setPendingMissionId] = useState("");
   const active = missionList.filter((mission) => !mission.claimed).length;
   const claimable = missionList.filter((mission) => mission.progress >= mission.goal && !mission.claimed).length;
@@ -565,7 +574,7 @@ function ChallengesWorkspace({
           return;
         }
         setMissionList(payload.missions ?? []);
-        setMessage("Charge missions and claim rewards.");
+        setMessage("");
       } catch {
         if (activeRequest) setMessage("Could not load missions.");
       }
@@ -614,23 +623,31 @@ function ChallengesWorkspace({
   }
 
   return (
-    <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Missions" title="Daily & weekly missions" meta={`${active} active · ${claimable} ready · ${message}`} />
+    <section className="section page-width app-workspace workspace--missions">
+      <WorkspaceHeader overline="Missions" title="Daily & weekly missions" meta={message || `${active} active · ${claimable} ready`} />
       <div className="workspace-grid">
         {missionList.map((mission) => {
           const percent = mission.goal > 0 ? Math.round((mission.progress / mission.goal) * 100) : 0;
           const displayPercent = Math.min(100, Math.max(0, percent));
           const isClaimed = mission.claimed;
           const isPending = pendingMissionId === mission.id;
+          const showMissionMeta = mission.meta.trim().toLowerCase() !== mission.cadence.toLowerCase();
           return (
-            <LiquidGlass as="article" className="action-card" key={mission.id} tone="violet">
-              <small>{mission.meta} / {mission.cadence}</small>
+            <LiquidGlass as="article" className="action-card mission-card" key={mission.id} tone="violet">
+              <div className="card-topline">
+                <span><BadgeCheck size={15} strokeWidth={2.8} aria-hidden="true" />{mission.cadence}</span>
+                {showMissionMeta ? <b>{mission.meta}</b> : null}
+              </div>
               <h3>{mission.title}</h3>
-              <p>{mission.goal.toLocaleString()}x target / {displayPercent}% complete</p>
+              <div className="card-progress-line">
+                <span><Target size={16} strokeWidth={2.7} aria-hidden="true" />{mission.goal.toLocaleString()}x</span>
+                <strong>{displayPercent}%</strong>
+              </div>
               <ProgressBar value={displayPercent} />
               <div className="action-card__footer">
-                <strong>{isClaimed ? "Claimed" : `${mission.reward.toLocaleString()} pts`}</strong>
+                <strong>{isClaimed ? <CheckCircle2 size={17} aria-hidden="true" /> : <Coins size={17} aria-hidden="true" />}{isClaimed ? "Claimed" : `${mission.reward.toLocaleString()} pts`}</strong>
                 <button type="button" onClick={() => claimMission(mission.id)} disabled={isClaimed || Boolean(pendingMissionId)}>
+                  <Gift size={15} strokeWidth={2.7} aria-hidden="true" />
                   {isPending ? "Saving" : isClaimed ? "Claimed" : "Claim"}
                 </button>
               </div>
@@ -638,10 +655,9 @@ function ChallengesWorkspace({
           );
         })}
         {!missionList.length && (
-          <LiquidGlass as="article" className="action-card" tone="violet">
-            <small>Loading</small>
+          <LiquidGlass as="article" className="action-card mission-card workspace-empty-card" tone="violet">
+            <BadgeCheck size={24} aria-hidden="true" />
             <h3>Missions syncing</h3>
-            <p>Server mission state will appear here.</p>
             <ProgressBar value={0} />
           </LiquidGlass>
         )}
@@ -1021,7 +1037,7 @@ function StoreWorkspace({
         if (!active) return;
         if (data.items) {
           setItems(data.items);
-          setMessage(isGuest ? "Sign in to redeem rewards." : "Store ready.");
+          setMessage(isGuest ? "Sign in to redeem" : `${data.items.length} rewards`);
         } else {
           setMessage(data.error ?? "Could not load items.");
         }
@@ -1085,7 +1101,7 @@ function StoreWorkspace({
 
       // Prepend the new purchase to history
       setPurchases((current) => [data.purchase!, ...current]);
-      setMessage(`${item.title} redeemed — pending fulfillment.`);
+      setMessage("Redemption queued");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Redemption failed.");
     } finally {
@@ -1094,7 +1110,7 @@ function StoreWorkspace({
   }
 
   return (
-    <section className="section page-width app-workspace">
+    <section className="section page-width app-workspace workspace--store">
       <WorkspaceHeader overline="Reward Store" title="Redeem your points" meta={message} />
       <AccountStrip account={account} />
       {isGuest && (
@@ -1114,7 +1130,10 @@ function StoreWorkspace({
           const StoreIcon = getStoreItemIcon(item);
           return (
             <LiquidGlass as="article" className="action-card reward-card" key={item.id} tone="ember">
-              <small>{item.tag} / {item.unlimited ? "Unlimited" : `${item.stock} left`}</small>
+              <div className="card-topline">
+                <span><StoreIcon size={15} strokeWidth={2.8} aria-hidden="true" />{item.tag}</span>
+                <b><PackageOpen size={14} strokeWidth={2.7} aria-hidden="true" />{item.unlimited ? "Unlimited" : `${item.stock} left`}</b>
+              </div>
               <div
                 className={`reward-art ${item.imageUrl ? "reward-art--image" : ""}`}
                 style={storeImageStyle(item.imageUrl)}
@@ -1122,15 +1141,18 @@ function StoreWorkspace({
               >
                 {!item.imageUrl && <StoreIcon size={32} strokeWidth={2.5} />}
               </div>
-              <h3>{item.title}</h3>
-              <p>{item.cost.toLocaleString()} pts</p>
+              <div className="reward-card__copy">
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
               <div className="action-card__footer">
-                <strong>{item.description}</strong>
+                <strong><Coins size={17} aria-hidden="true" />{item.cost.toLocaleString()} pts</strong>
                 <button
                   type="button"
                   disabled={isBusy || isGuest || !canAfford || !inStock}
                   onClick={() => redeem(item)}
                 >
+                  <ShoppingBag size={15} strokeWidth={2.7} aria-hidden="true" />
                   {isBusy ? "Working..." : !inStock ? "Sold Out" : !canAfford ? "Need pts" : "Redeem"}
                 </button>
               </div>
@@ -1165,7 +1187,7 @@ function ApiPurchaseList({ purchases }: { purchases: ApiPurchase[] }) {
           </article>
         );
       }) : (
-        <article><span>EMPTY</span><div><h3>No purchases yet</h3><p>Redeem from the store above.</p></div></article>
+        <article><span className="list-icon"><PackageOpen size={16} aria-hidden="true" /></span><div><h3>No purchases yet</h3><p>Your redeemed items will appear here.</p></div></article>
       )}
     </div>
   );
@@ -1281,7 +1303,7 @@ function CustomBetsWorkspace({
   }
 
   return (
-    <section className="section page-width app-workspace">
+    <section className="section page-width app-workspace workspace--bets">
       <WorkspaceHeader
         overline="Custom Bets"
         title="Live prediction markets"
@@ -1300,22 +1322,29 @@ function CustomBetsWorkspace({
         )}
         {markets.map((market) => (
           <LiquidGlass as="article" className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id} tone="cyan">
-            <small><Ticket size={13} strokeWidth={3} aria-hidden="true" />{market.type} / {market.status} / {market.deadline}</small>
+            <div className="card-topline">
+              <span><Ticket size={15} strokeWidth={2.8} aria-hidden="true" />{market.type}</span>
+              <b><Radio size={14} strokeWidth={2.8} aria-hidden="true" />{market.status}</b>
+            </div>
             <h3>{market.title}</h3>
-            <p>{market.winner ? `${market.winner} won` : "Market live"}</p>
-            <input
-              className="inline-bet-input"
-              value={amounts[market.id] ?? ""}
-              inputMode="numeric"
-              placeholder="Points"
-              disabled={isGuest || market.status !== "Live" || busyMarketId === market.id}
-              onChange={(event) =>
-                setAmounts((current) => ({
-                  ...current,
-                  [market.id]: event.target.value.replace(/\D/g, ""),
-                }))
-              }
-            />
+            <p className="market-card__deadline"><Clock3 size={15} strokeWidth={2.6} aria-hidden="true" />{market.winner ? `${market.winner} won` : market.deadline}</p>
+            <label className="bet-amount-control">
+              <Coins size={17} strokeWidth={2.6} aria-hidden="true" />
+              <input
+                className="inline-bet-input"
+                value={amounts[market.id] ?? ""}
+                inputMode="numeric"
+                placeholder="Points to bet"
+                aria-label={`Points to bet on ${market.title}`}
+                disabled={isGuest || market.status !== "Live" || busyMarketId === market.id}
+                onChange={(event) =>
+                  setAmounts((current) => ({
+                    ...current,
+                    [market.id]: event.target.value.replace(/\D/g, ""),
+                  }))
+                }
+              />
+            </label>
             <div className="odds-grid">
               {[0, 1].map((index) => (
                 <button
@@ -1324,7 +1353,7 @@ function CustomBetsWorkspace({
                   disabled={isGuest || market.status !== "Live" || busyMarketId === market.id}
                   onClick={() => placeBet(market, index as 0 | 1)}
                 >
-                  <span>{market.sides[index]}</span>
+                  <span><TrendingUp size={14} strokeWidth={2.7} aria-hidden="true" />{market.sides[index]}</span>
                   <b>{market.odds[index].toFixed(2)}x</b>
                 </button>
               ))}
@@ -1347,7 +1376,7 @@ function WatchPointsWorkspace({
   const [running, setRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [summary, setSummary] = useState<WatchSummary | null>(null);
-  const [message, setMessage] = useState("Loading watch points...");
+  const [message, setMessage] = useState("Syncing...");
   const connected = summary?.connected ?? account.connected.kick.connected;
   const displayedSeconds = summary?.totalSecondsToday ?? seconds;
   const earned = summary?.claimablePoints ?? Math.floor(seconds / 10) * 25;
@@ -1370,7 +1399,7 @@ function WatchPointsWorkspace({
           setSummary(payload.summary);
           setRunning(payload.summary.running);
           setSeconds(payload.summary.totalSecondsToday);
-          setMessage(payload.summary.connected ? "Watch tracker synced." : "Connect Kick to start earning.");
+          setMessage(payload.summary.connected ? "Synced" : "Connect Kick");
         } else {
           setMessage(payload.error ?? "Could not load watch points.");
         }
@@ -1450,16 +1479,20 @@ function WatchPointsWorkspace({
   }
 
   return (
-    <section className="section page-width app-workspace">
+    <section className="section page-width app-workspace workspace--watch">
       <WorkspaceHeader overline="Watch Points" title="Earn while you watch" meta={message} />
       <div className="watch-console">
-        <div className="watch-orb"><span>{String(Math.floor(displayedSeconds / 60)).padStart(2, "0")}:{String(displayedSeconds % 60).padStart(2, "0")}</span><b>{earned + dailyBonus}</b><small>points ready</small></div>
+        <div className="watch-orb">
+          <span><Clock3 size={22} strokeWidth={2.6} aria-hidden="true" />{String(Math.floor(displayedSeconds / 60)).padStart(2, "0")}:{String(displayedSeconds % 60).padStart(2, "0")}</span>
+          <b>{earned + dailyBonus}</b>
+          <small>ready</small>
+        </div>
         <div className="watch-actions">
-          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode ?? "OAuth"], ["Daily", dailyBonus ? `+${dailyBonus}` : "Locked"], ["Total", `${Math.floor(displayedSeconds / 60)}m`]]} />
+          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode === "chat" ? "Chat" : "OAuth"], ["Daily", dailyBonus ? `+${dailyBonus}` : "Locked"], ["Total", `${Math.floor(displayedSeconds / 60)}m`]]} />
           <div className="button-row">
-            {!connected ? <a className="button primary" href="/api/auth/kick">Connect Kick <span>↗</span></a> : null}
-            <button className="button ghost" type="button" onClick={() => sendHeartbeat(!running)} disabled={!connected}>{running ? "Pause bot" : "Start bot"} <span>●</span></button>
-            <button className="button primary" type="button" onClick={claimWatchPoints} disabled={earned <= 0}>Claim <span>↗</span></button>
+            {!connected ? <a className="button primary" href="/api/auth/kick"><Tv size={16} aria-hidden="true" />Connect Kick</a> : null}
+            <button className="button ghost" type="button" onClick={() => sendHeartbeat(!running)} disabled={!connected}>{running ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}{running ? "Pause" : "Start"}</button>
+            <button className="button primary" type="button" onClick={claimWatchPoints} disabled={earned <= 0}><Gift size={16} aria-hidden="true" />Claim</button>
           </div>
         </div>
       </div>
@@ -2835,7 +2868,7 @@ function WorkspaceHeader({ overline, title, meta }: { overline: string; title: s
         <p><Icon size={16} strokeWidth={3} aria-hidden="true" />{overline}</p>
         <h2>{title}</h2>
       </div>
-      <LiquidGlass as="span" className="workspace-heading__status" depth="clear" interactive={false} tone="cyan">
+      <LiquidGlass as="span" className="workspace-heading__status" depth="clear" interactive={false} tone="cyan" title={meta}>
         <Activity size={14} strokeWidth={3} aria-hidden="true" />{meta}
       </LiquidGlass>
     </div>
@@ -2847,12 +2880,21 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 function AccountStrip({ account }: { account: Account }) {
+  const stats: { label: string; value: string; icon: WorkspaceIcon }[] = [
+    { label: "Player", value: account.handle, icon: CircleUserRound },
+    { label: "Points", value: account.points.toLocaleString(), icon: Coins },
+    { label: "XP", value: account.xp.toLocaleString(), icon: Sparkles },
+    { label: "Streak", value: `${account.streak} ${account.streak === 1 ? "day" : "days"}`, icon: Flame },
+  ];
+
   return (
-    <div className="account-strip">
-      <div><span>PLAYER</span><strong>{account.handle}</strong></div>
-      <div><span>POINTS</span><strong>{account.points.toLocaleString()}</strong></div>
-      <div><span>XP</span><strong>{account.xp.toLocaleString()}</strong></div>
-      <div><span>STREAK</span><strong>{account.streak} days</strong></div>
+    <div className="account-strip" aria-label="Player summary">
+      {stats.map(({ label, value, icon: Icon }) => (
+        <div key={label}>
+          <span className="account-strip__icon"><Icon size={18} strokeWidth={2.6} aria-hidden="true" /></span>
+          <span className="account-strip__copy"><small>{label}</small><strong>{value}</strong></span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -2905,7 +2947,7 @@ function BetList({ bets }: { bets: Bet[] }) {
           <div><h3>{bet.marketTitle}</h3><p>{bet.side} / {bet.amount.toLocaleString()} @ {bet.odds.toFixed(2)}x</p></div>
           <strong>{bet.status === "Won" ? `+${Math.floor(bet.amount * bet.odds).toLocaleString()}` : bet.createdAt}</strong>
         </article>
-      )) : <article><span>EMPTY</span><div><h3>No bets</h3><p>Pick a market.</p></div></article>}
+      )) : <article><span className="list-icon"><ReceiptText size={16} aria-hidden="true" /></span><div><h3>No bets yet</h3><p>Choose a market above.</p></div></article>}
     </div>
   );
 }

@@ -7659,3 +7659,498 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Roomier, icon-led player workspaces. */
+.feature-page-hero {
+  min-height: 228px;
+  padding-block: 48px 24px;
+}
+
+.feature-page-hero .kicker {
+  margin-bottom: 14px;
+}
+
+.feature-page-hero .hero-desc {
+  margin-top: 14px;
+}
+
+.feature-page-hero .button-row {
+  margin-top: 18px;
+}
+
+.app-workspace {
+  display: grid;
+  gap: clamp(22px, 2vw, 30px);
+  padding-block: 30px 70px;
+}
+
+.app-workspace > * {
+  min-width: 0;
+}
+
+.app-workspace > :is(.workspace-list, .tool-panel, .inventory-panel),
+.app-workspace .workspace-heading {
+  margin-block: 0;
+}
+
+.workspace-heading {
+  align-items: center;
+  gap: 24px;
+}
+
+.workspace-heading > div:first-child {
+  display: grid;
+  gap: 8px;
+}
+
+.workspace-heading p {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.workspace-heading h2 {
+  font-size: clamp(28px, 2.8vw, 38px);
+}
+
+.workspace-heading__status {
+  max-width: min(100%, 360px);
+  min-height: 46px;
+  flex: 0 1 auto;
+  padding-inline: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.workspace-heading__status svg {
+  flex: 0 0 auto;
+}
+
+.workspace-grid,
+.workspace-grid.two,
+.workspace-grid.three {
+  gap: clamp(16px, 1.6vw, 22px);
+}
+
+.action-card.mission-card,
+.action-card.market-card,
+.action-card.reward-card {
+  min-height: 250px;
+  gap: 15px;
+  padding: clamp(20px, 1.8vw, 26px);
+}
+
+.action-card.reward-card {
+  min-height: 390px;
+}
+
+.card-topline,
+.card-topline > span,
+.card-topline > b,
+.card-progress-line,
+.card-progress-line > span,
+.action-card__footer strong,
+.action-card__footer button,
+.market-card__deadline,
+.odds-grid span {
+  display: flex;
+  align-items: center;
+}
+
+.card-topline {
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 30px;
+}
+
+.card-topline > span,
+.card-topline > b {
+  min-width: 0;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.card-topline > span {
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.card-topline > b {
+  justify-content: flex-end;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-topline svg,
+.market-card__deadline svg,
+.card-progress-line svg,
+.action-card__footer svg,
+.odds-grid svg {
+  flex: 0 0 auto;
+}
+
+.action-card.mission-card h3,
+.action-card.market-card h3,
+.action-card.reward-card h3 {
+  font-size: clamp(20px, 1.55vw, 24px);
+  line-height: 1.12;
+}
+
+.card-progress-line {
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.card-progress-line > span {
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.card-progress-line > strong {
+  color: var(--text);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-progress {
+  height: 12px;
+}
+
+.action-card__footer {
+  min-height: 56px;
+  padding-top: 16px;
+}
+
+.action-card__footer strong,
+.action-card__footer button {
+  gap: 8px;
+}
+
+.action-card__footer strong {
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.action-card__footer button {
+  flex: 0 0 auto;
+  justify-content: center;
+  min-width: 104px;
+}
+
+.workspace-empty-card {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.workspace-empty-card > svg {
+  color: var(--gold);
+}
+
+.account-strip {
+  grid-template-columns: minmax(210px, 1.25fr) repeat(3, minmax(150px, 1fr));
+  gap: clamp(12px, 1.3vw, 18px);
+}
+
+.account-strip > div {
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.account-strip > div > span.account-strip__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--control-round);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18), transparent 44%),
+    rgb(var(--liquid-tint, 216 255 63) / 0.08);
+  color: var(--gold);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 20px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0;
+}
+
+.account-strip > div > span.account-strip__copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: inherit;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: none;
+}
+
+.account-strip__copy small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.account-strip > div > .account-strip__copy strong {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: clamp(18px, 1.55vw, 22px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reward-art {
+  height: 158px;
+}
+
+.reward-card__copy {
+  display: grid;
+  gap: 7px;
+}
+
+.reward-card__copy p {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.market-card__deadline {
+  gap: 8px;
+  min-height: 22px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.bet-amount-control {
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--control-round);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 52%),
+    rgba(3, 5, 8, 0.78);
+  color: var(--gold);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.bet-amount-control:focus-within {
+  border-color: rgba(67, 232, 255, 0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.28), 0 0 0 3px rgba(67, 232, 255, 0.1);
+}
+
+.bet-amount-control .inline-bet-input {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.odds-grid {
+  gap: 12px;
+}
+
+.odds-grid button {
+  min-height: 72px;
+  gap: 6px;
+  padding: 12px 14px;
+}
+
+.odds-grid span {
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.odds-grid b {
+  font-size: 22px;
+}
+
+.watch-console {
+  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  gap: clamp(30px, 4vw, 52px);
+  padding: clamp(28px, 3.2vw, 42px);
+}
+
+.watch-orb {
+  width: min(100%, 280px);
+  justify-self: center;
+  gap: 8px;
+}
+
+.watch-orb span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: clamp(24px, 2.4vw, 32px);
+}
+
+.watch-orb b {
+  font-size: clamp(48px, 4.6vw, 64px);
+}
+
+.watch-actions {
+  gap: 22px;
+}
+
+.status-grid {
+  gap: 14px;
+}
+
+.status-grid > div {
+  min-height: 82px;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  padding: 14px 16px;
+}
+
+.status-grid > div > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.status-grid > div > strong {
+  margin: 0;
+  font-size: clamp(20px, 2vw, 26px);
+}
+
+.watch-actions .button-row {
+  gap: 12px;
+}
+
+.watch-actions .button,
+.watch-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.workspace-list article {
+  min-height: 78px;
+  gap: 18px;
+  padding: 16px 20px;
+}
+
+@media (max-width: 1000px) {
+  .account-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .watch-console {
+    grid-template-columns: minmax(210px, 250px) minmax(0, 1fr);
+    gap: 26px;
+  }
+}
+
+@media (max-width: 780px) {
+  .feature-page-hero {
+    min-height: auto;
+    padding-block: 30px 18px;
+  }
+
+  .app-workspace {
+    gap: 20px;
+    padding-block: 28px 56px;
+  }
+
+  .workspace-heading {
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .workspace-heading__status {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .workspace-grid,
+  .workspace-grid.two,
+  .workspace-grid.three {
+    gap: 16px;
+  }
+
+  .action-card.mission-card,
+  .action-card.market-card,
+  .action-card.reward-card {
+    min-height: 0;
+    padding: 20px;
+  }
+
+  .action-card.reward-card {
+    min-height: 370px;
+  }
+
+  .account-strip {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .watch-console {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 22px;
+  }
+
+  .watch-orb {
+    width: min(100%, 240px);
+  }
+
+  .workspace-list article {
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 460px) {
+  .card-topline {
+    align-items: flex-start;
+  }
+
+  .card-topline > b {
+    max-width: 48%;
+  }
+
+  .action-card__footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .action-card__footer button {
+    width: 100%;
+  }
+
+  .odds-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .watch-actions .button-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
