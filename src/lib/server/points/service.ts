@@ -93,6 +93,26 @@ export async function syncPoints(
   });
 }
 
+/**
+ * Mirror a user's rank score without touching spendable points.
+ * Used to keep the tracked casino wager score as XP; spendable
+ * balance is only ever changed by earning/spending flows.
+ */
+export async function syncXp(
+  userId: string,
+  newXp: number
+): Promise<number> {
+  if (newXp < 0) newXp = 0;
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { xp: newXp },
+    select: { xp: true },
+  });
+
+  return updated.xp ?? newXp;
+}
+
 /** Admin: set a user's points to a specific value and log it. */
 export async function adminSetPoints(
   userId: string,

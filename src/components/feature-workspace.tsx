@@ -624,7 +624,7 @@ function ChallengesWorkspace({
 
   return (
     <section className="section page-width app-workspace workspace--missions">
-      <WorkspaceHeader overline="Missions" title="Daily & weekly missions" meta={message || `${active} active · ${claimable} ready`} />
+      <WorkspaceHeader overline="Missions" title="Daily missions" meta={message || `${active} active · ${claimable} ready`} />
       <div className="workspace-grid">
         {missionList.map((mission) => {
           const percent = mission.goal > 0 ? Math.round((mission.progress / mission.goal) * 100) : 0;
@@ -729,7 +729,7 @@ function HuntsWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Bonus Hunts" title="Live hunt sessions" meta={`${followedCount} followed · ${savedCount} clips saved · ${message}`} />
+      <WorkspaceHeader overline="Bonus Hunts" title="Live sessions" meta={`${followedCount} followed · ${savedCount} saved · ${message}`} />
       <div className="workspace-grid two">
         {huntList.map((hunt) => (
           <LiquidGlass as="article" className="action-card casino-card" key={hunt.id} tone="ember">
@@ -758,7 +758,7 @@ function HuntsWorkspace() {
             <button type="button" disabled={busyId === clip.id} onClick={() => postHuntAction("/api/hunts/clips/save", { clipId: clip.id })}>{clip.saved ? "Saved" : "Save"}</button>
           </article>
         ))}
-        {!clipList.length && <article><span>EMPTY</span><div><h3>No clips yet</h3><p>Live hunt clips will appear here.</p></div></article>}
+        {!clipList.length && <article><span>EMPTY</span><div><h3>No clips yet</h3><p>Clips appear when live.</p></div></article>}
       </div>
     </section>
   );
@@ -814,7 +814,7 @@ function TournamentsWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Tournaments" title="Brackets & prize pools" meta={`${registrations} entries · ${message}`} />
+      <WorkspaceHeader overline="Tournaments" title="Brackets & prizes" meta={`${registrations} entries · ${message}`} />
       <div className="workspace-grid three">
         {tournamentList.map((item) => (
           <LiquidGlass as="article" className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id} tone="cyan">
@@ -905,7 +905,7 @@ function RafflesWorkspace({ account }: { account: Account }) {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Wager Raffles" title={raffle?.round.title ?? "Turn wagers into tickets"} meta={`${tickets} tickets · ${entries} entries · ${message}`} />
+      <WorkspaceHeader overline="Wager Raffles" title={raffle?.round.title ?? "Wager → tickets → prizes"} meta={`${tickets} tickets · ${entries} entries · ${message}`} />
       <div className="tool-panel">
         <label>
           WAGER AMOUNT
@@ -944,7 +944,7 @@ function RafflesWorkspace({ account }: { account: Account }) {
               <p>{new Date(entry.createdAt).toLocaleString()}</p>
             </div>
           </article>
-        )) : <article><span>EMPTY</span><div><h3>No raffle entries</h3><p>Convert wagers and enter tickets above.</p></div></article>}
+        )) : <article><span>EMPTY</span><div><h3>No raffle entries</h3><p>Convert wagers above.</p></div></article>}
       </div>
     </section>
   );
@@ -1111,17 +1111,17 @@ function StoreWorkspace({
 
   return (
     <section className="section page-width app-workspace workspace--store">
-      <WorkspaceHeader overline="Reward Store" title="Redeem your points" meta={message} />
+      <WorkspaceHeader overline="Reward Store" title="Redeem points" meta={message} />
       <AccountStrip account={account} />
       {isGuest && (
         <div className="workspace-notice">
-          <p>Sign in to redeem store rewards and track your purchases.</p>
+          <p>Sign in to redeem rewards.</p>
           <a className="button primary" href="/login">Sign in <span>↗</span></a>
         </div>
       )}
       <div className="workspace-grid">
         {items.length === 0 && !isGuest && (
-          <p className="workspace-loading">Loading items...</p>
+          <p className="workspace-loading">Loading...</p>
         )}
         {items.map((item) => {
           const isBusy = busyItemId === item.id;
@@ -1187,7 +1187,7 @@ function ApiPurchaseList({ purchases }: { purchases: ApiPurchase[] }) {
           </article>
         );
       }) : (
-        <article><span className="list-icon"><PackageOpen size={16} aria-hidden="true" /></span><div><h3>No purchases yet</h3><p>Your redeemed items will appear here.</p></div></article>
+        <article><span className="list-icon"><PackageOpen size={16} aria-hidden="true" /></span><div><h3>No purchases yet</h3><p>Your redemptions appear here.</p></div></article>
       )}
     </div>
   );
@@ -1306,19 +1306,19 @@ function CustomBetsWorkspace({
     <section className="section page-width app-workspace workspace--bets">
       <WorkspaceHeader
         overline="Custom Bets"
-        title="Live prediction markets"
+        title="Live markets"
         meta={message || `${bets.filter((bet) => bet.status === "Open").length} open bets`}
       />
       <AccountStrip account={account} />
       {isGuest && (
         <div className="workspace-notice">
-          <p>Sign in to bet real points on live prediction markets and win rewards.</p>
+          <p>Sign in to bet points.</p>
           <a className="button primary" href="/login">Sign in <span>↗</span></a>
         </div>
       )}
       <div className="workspace-grid">
         {markets.length === 0 && (
-          <p className="workspace-loading">Loading prediction markets...</p>
+          <p className="workspace-loading">Loading markets...</p>
         )}
         {markets.map((market) => (
           <LiquidGlass as="article" className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id} tone="cyan">
@@ -1334,7 +1334,7 @@ function CustomBetsWorkspace({
                 className="inline-bet-input"
                 value={amounts[market.id] ?? ""}
                 inputMode="numeric"
-                placeholder="Points to bet"
+                placeholder="Points"
                 aria-label={`Points to bet on ${market.title}`}
                 disabled={isGuest || market.status !== "Live" || busyMarketId === market.id}
                 onChange={(event) =>
@@ -1480,7 +1480,7 @@ function WatchPointsWorkspace({
 
   return (
     <section className="section page-width app-workspace workspace--watch">
-      <WorkspaceHeader overline="Watch Points" title="Earn while you watch" meta={message} />
+      <WorkspaceHeader overline="Watch Points" title="Watch. Earn. Claim." meta={message} />
       <div className="watch-console">
         <div className="watch-orb">
           <span><Clock3 size={22} strokeWidth={2.6} aria-hidden="true" />{String(Math.floor(displayedSeconds / 60)).padStart(2, "0")}:{String(displayedSeconds % 60).padStart(2, "0")}</span>
@@ -1634,7 +1634,7 @@ function AdminWorkspace({
   const [supportStatus, setSupportStatus] = useState("Loading support");
   const [adminRaffle, setAdminRaffle] = useState<RafflePayload | null>(null);
   const [adminRaffleStatus, setAdminRaffleStatus] = useState("Loading raffle");
-  const [kickEventStatus, setKickEventStatus] = useState("Webhook subscription idle");
+  const [kickEventStatus, setKickEventStatus] = useState("Idle");
   const isAdmin = isAdminAccount(account);
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
@@ -1808,7 +1808,7 @@ function AdminWorkspace({
           meta={account.handle === "@guest" ? "Sign in with an admin account" : `${account.handle} is a player account`}
         />
         <div className="workspace-notice">
-          <p>Use the Kick admin account for the control room. Player accounts stay on the normal profile and reward pages.</p>
+          <p>Admin keys required.</p>
           <Link className="button primary" href={account.handle === "@guest" ? "/login" : "/profile"}>
             {account.handle === "@guest" ? "Login" : "Open profile"} <span>↗</span>
           </Link>
@@ -2200,7 +2200,7 @@ function AdminWorkspace({
       <WorkspaceHeader overline="Admin" title="Control room" meta={adminUserStatus} />
       <LiquidGlass className="admin-user-manager" tone="violet">
         <div className="admin-user-manager__bar">
-          <label>ADMIN SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Email, handle, Discord, Kick, casino" /></label>
+          <label>ADMIN SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Search users" /></label>
           <button type="button" onClick={() => setAdminQuery((value) => value.trim())} disabled={adminUsersLoading}>{adminUsersLoading ? "Loading" : "Refresh"}</button>
         </div>
         <div className="admin-user-layout">
@@ -2274,13 +2274,13 @@ function AdminWorkspace({
         </LiquidGlass>
         <LiquidGlass as="article" className="admin-panel" tone="cyan">
           <small>DATA PIPELINE</small>
-          <h3>API / Backend / DB</h3>
-          <StatusGrid items={[["API", "GET only"], ["Backend", "Route live"], ["Cache", "No-store"], ["DB adapter", "Ready"]]} />
+          <h3>Infra</h3>
+          <StatusGrid items={[["API", "Live"], ["Cache", "No-store"], ["DB", "Ready"], ["Backend", "Route live"]]} />
         </LiquidGlass>
         <LiquidGlass as="article" className="admin-panel" tone="success">
           <small>KICK EVENTS</small>
           <h3>Watch verification</h3>
-          <StatusGrid items={[["Mode", "Webhook"], ["Chat", "Signed"], ["Live", "Status"], ["State", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
+          <StatusGrid items={[["Mode", "Webhook"], ["Chat", "Signed"], ["State", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
           <div className="button-row">
             <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
           </div>
@@ -2290,7 +2290,7 @@ function AdminWorkspace({
       <div className="admin-section-title">
         <div>
           <p>Challenge missions</p>
-          <h2>Publish slot challenges</h2>
+          <h2>Publish slots</h2>
         </div>
       </div>
       <p className="admin-note">{adminChallengeStatus}</p>
@@ -2320,7 +2320,7 @@ function AdminWorkspace({
       <div className="admin-section-title">
         <div>
           <p>Store rewards</p>
-          <h2>Manage store items</h2>
+          <h2>Manage items</h2>
         </div>
       </div>
       <p className="admin-note">{adminStoreMessage}</p>
@@ -2366,7 +2366,7 @@ function AdminWorkspace({
       <div className="admin-section-title">
         <div>
           <p>Prediction markets</p>
-          <h2>Settle bets & pay winners</h2>
+          <h2>Settle & pay</h2>
         </div>
       </div>
       <form className="support-form account-form" onSubmit={addMarket}>
@@ -2426,7 +2426,7 @@ function AdminWorkspace({
       <div className="admin-section-title">
         <div>
           <p>Wager raffles</p>
-          <h2>Draw weighted winners</h2>
+          <h2>Draw winners</h2>
         </div>
       </div>
       <div className="tool-panel">
@@ -2442,7 +2442,7 @@ function AdminWorkspace({
       <div className="admin-section-title">
         <div>
           <p>Support inbox</p>
-          <h2>Resolve player tickets</h2>
+          <h2>Resolve tickets</h2>
         </div>
       </div>
       <div className="workspace-list">
@@ -2462,7 +2462,7 @@ function AdminWorkspace({
       <div className="admin-section-title">
         <div>
           <p>Reward claims</p>
-          <h2>Fulfill recent purchases</h2>
+          <h2>Fulfill purchases</h2>
         </div>
       </div>
       <div className="workspace-list">
@@ -2490,7 +2490,7 @@ function HelpWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Help Center" title="Find your answer" meta={`${results.length} answers`} />
+      <WorkspaceHeader overline="Help Center" title="Find answers fast" meta={`${results.length} answers`} />
       <label className="wide-search">
         <span>SEARCH HELP</span>
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="XP, rewards, bets" />
@@ -2563,7 +2563,7 @@ function SupportWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Support" title="Create a ticket" meta={`${tickets.length} tickets · ${status}`} />
+      <WorkspaceHeader overline="Support" title="Open a ticket" meta={`${tickets.length} tickets · ${status}`} />
       <form className="support-form" onSubmit={submit}>
         <label>CATEGORY<select value={category} onChange={(event) => setCategory(event.target.value)}><option>Reward</option><option>Account</option><option>Leaderboard</option><option>Claim</option></select></label>
         <label>SUBJECT<input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="What broke?" /></label>
@@ -2766,8 +2766,8 @@ function LoginWorkspace({
                 </div>
                 <form className="auth-form" onSubmit={submit}>
                   {mode === "signup" ? <label>DISPLAY NAME<input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Player name" autoComplete="name" /></label> : null}
-                  <label>EMAIL<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
-                  <label>PASSWORD<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Minimum 8 characters" autoComplete={mode === "signup" ? "new-password" : "current-password"} required minLength={8} /></label>
+                  <label>EMAIL<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@email.com" autoComplete="email" required /></label>
+                  <label>PASSWORD<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="8+ chars" autoComplete={mode === "signup" ? "new-password" : "current-password"} required minLength={8} /></label>
                   <button className="button primary" type="submit" disabled={busy}>{busy ? "Working" : mode === "signup" ? "Create account" : "Sign in"} <span>↗</span></button>
                 </form>
                 <div className="auth-divider"><span>OR</span></div>
@@ -2933,7 +2933,7 @@ function PurchaseList({ purchases, onAdvance }: { purchases: Purchase[]; onAdvan
           <div><h3>{purchase.item}</h3><p>{purchase.cost.toLocaleString()} pts / {purchase.createdAt}</p></div>
           {onAdvance ? <button type="button" onClick={() => onAdvance(purchase)}>Advance</button> : <Link href="/support">Track <ArrowUpRight size={13} strokeWidth={3} aria-hidden="true" /></Link>}
         </article>
-      )) : <article><span>EMPTY</span><div><h3>No purchases</h3><p>Store is ready.</p></div></article>}
+      )) : <article><span>EMPTY</span><div><h3>No purchases</h3><p>Store ready.</p></div></article>}
     </div>
   );
 }
@@ -2947,7 +2947,7 @@ function BetList({ bets }: { bets: Bet[] }) {
           <div><h3>{bet.marketTitle}</h3><p>{bet.side} / {bet.amount.toLocaleString()} @ {bet.odds.toFixed(2)}x</p></div>
           <strong>{bet.status === "Won" ? `+${Math.floor(bet.amount * bet.odds).toLocaleString()}` : bet.createdAt}</strong>
         </article>
-      )) : <article><span className="list-icon"><ReceiptText size={16} aria-hidden="true" /></span><div><h3>No bets yet</h3><p>Choose a market above.</p></div></article>}
+      )) : <article><span className="list-icon"><ReceiptText size={16} aria-hidden="true" /></span><div><h3>No bets yet</h3><p>Pick a market above.</p></div></article>}
     </div>
   );
 }

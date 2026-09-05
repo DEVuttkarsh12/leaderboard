@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getLeaderboardRouteResult } from "@/lib/server/leaderboard/service";
-import { syncPoints } from "./service";
+import { syncXp } from "./service";
 import type { NormalizedLeaderboardUser } from "@/types/leaderboard";
 
 export type SyncResult = {
@@ -15,7 +15,11 @@ const SYNC_DEBOUNCE_MS = 10_000;
 
 /**
  * Matches leaderboard players to registered users by casino username,
- * then syncs their XP score as RankBoard points.
+ * then syncs their tracked wager rank score as XP.
+ *
+ * Spendable points are NEVER touched by sync — they only change via
+ * earn/spend flows (missions, watch, bets, store). This keeps store
+ * redemptions and bet losses from being silently credited back.
  */
 export async function syncLeaderboardPoints(): Promise<SyncResult> {
   const now = Date.now();
@@ -66,10 +70,7 @@ export async function syncLeaderboardPoints(): Promise<SyncResult> {
     processedUserIds.add(account.userId);
 
     try {
-      await syncPoints(account.userId, score, "leaderboard_sync", {
-        provider: account.provider,
-        username: account.username,
-      });
+      await syncXp(account.userId, score);
       matched++;
     } catch {
       errors++;

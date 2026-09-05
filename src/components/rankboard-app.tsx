@@ -73,58 +73,58 @@ const launchpad: [string, string, string, string, string, ZoneIcon][] = [
 const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
   challenges: {
     title: "Missions",
-    tagline: "Complete goals, earn points, claim rewards.",
-    action: ["View board", "/leaderboard"],
+    tagline: "Earn. Claim. Repeat.",
+    action: ["Board", "/leaderboard"],
   },
   "bonus-hunts": {
     title: "Bonus Hunts",
-    tagline: "Follow live hunt sessions and vote on the best hits.",
-    action: ["Open tournaments", "/tournaments"],
+    tagline: "Track. Vote. Win.",
+    action: ["Tournaments", "/tournaments"],
   },
   tournaments: {
     title: "Tournaments",
-    tagline: "Enter brackets and chase prize pools.",
-    action: ["View board", "/leaderboard"],
+    tagline: "Enter. Compete. Climb.",
+    action: ["Board", "/leaderboard"],
   },
   "wager-raffles": {
     title: "Wager Raffles",
-    tagline: "Turn wagers into tickets for the prize draw.",
-    action: ["View board", "/leaderboard"],
+    tagline: "Wager → Tickets → Prizes.",
+    action: ["Board", "/leaderboard"],
   },
   store: {
     title: "Reward Store",
-    tagline: "Spend your points on real rewards.",
-    action: ["Need help?", "/support"],
+    tagline: "Points. Redemption. Done.",
+    action: ["Help", "/support"],
   },
   "custom-bets": {
     title: "Custom Bets",
-    tagline: "Bet points on live prediction markets.",
-    action: ["Open store", "/store"],
+    tagline: "Predict. Bet. Cash out.",
+    action: ["Store", "/store"],
   },
   "watch-points": {
     title: "Watch Points",
-    tagline: "Earn points while the stream is live.",
-    action: ["Open store", "/store"],
+    tagline: "Watch live. Earn passive.",
+    action: ["Store", "/store"],
   },
   admin: {
     title: "Admin",
-    tagline: "Manage users, markets, and the store.",
-    action: ["Open board", "/leaderboard"],
+    tagline: "Command. Control. Ship.",
+    action: ["Board", "/leaderboard"],
   },
   help: {
     title: "Help Center",
-    tagline: "Quick answers to common questions.",
-    action: ["Contact support", "/support"],
+    tagline: "Answers fast.",
+    action: ["Support", "/support"],
   },
   support: {
     title: "Support",
-    tagline: "Open a ticket and track it here.",
-    action: ["Read FAQ", "/help"],
+    tagline: "Report. Track. Resolve.",
+    action: ["FAQ", "/help"],
   },
   login: {
     title: "Sign in",
-    tagline: "Save your progress and keep your rewards.",
-    action: ["View board", "/leaderboard"],
+    tagline: "Your rewards, saved.",
+    action: ["Board", "/leaderboard"],
   },
 };
 
@@ -614,22 +614,22 @@ function HeroRankTracker({ activity, players }: { activity: number; players: Pla
           <Link href="/leaderboard" aria-label="Open full leaderboard"><ArrowUpRight size={18} strokeWidth={2.5} aria-hidden="true" /></Link>
         </div>
         <div className="hero-rank-tracker__title">
-          <span>Race snapshot</span>
-          <strong>Top players</strong>
+          <span>Live</span>
+          <strong>Top racers</strong>
         </div>
         <div className="hero-rank-tracker__leader">
           <div className="hero-rank-tracker__leader-top">
             <span className="hero-rank-tracker__crown"><Crown size={16} fill="currentColor" aria-hidden="true" /> #1</span>
-            <span className="hero-rank-tracker__prize">{prizes[0]} reward</span>
+            <span className="hero-rank-tracker__prize">{prizes[0]}</span>
           </div>
           <div className="hero-rank-tracker__leader-main">
             <span className="hero-rank-tracker__avatar hero-rank-tracker__avatar--leader">{leader ? getInitials(leader.name) : "RB"}</span>
             <span className="hero-rank-tracker__identity">
-              <small>Current leader</small>
+              <small>Leader</small>
               <strong>{leader ? playerName(leader) : "Syncing live data"}</strong>
               <i><span style={{ width: leader ? "100%" : "8%" }} /></i>
             </span>
-            <span className="hero-rank-tracker__score hero-rank-tracker__score--leader"><strong>{formatNumberCompact(leaderValue)}</strong><small>Weighted XP</small></span>
+            <span className="hero-rank-tracker__score hero-rank-tracker__score--leader"><strong>{formatNumberCompact(leaderValue)}</strong><small>XP</small></span>
           </div>
         </div>
         <div className="hero-rank-tracker__chasers" aria-label="Second and third place players">
@@ -643,7 +643,7 @@ function HeroRankTracker({ activity, players }: { activity: number; players: Pla
                 <div className="hero-rank-tracker__chaser-top"><b>#{index + 1}</b><span>{prizes[index]}</span></div>
                 <div className="hero-rank-tracker__chaser-player">
                   <span className="hero-rank-tracker__avatar">{player ? getInitials(player.name) : "RB"}</span>
-                  <span><small>In pursuit</small><strong>{player ? playerName(player) : "Syncing"}</strong></span>
+                  <span><small>#{index + 2}</small><strong>{player ? playerName(player) : "Syncing"}</strong></span>
                 </div>
                 <i className="hero-rank-tracker__chaser-track"><span style={{ width: `${progress}%` }} /></i>
                 <strong className="hero-rank-tracker__chaser-score">{formatNumberCompact(score)} <small>XP</small></strong>
@@ -797,11 +797,11 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
 
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>RB</span></div><div className="podium-copy"><strong>Syncing</strong><small>Live board</small><b>0 <em>XP</em></b><span>0 wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>RB</span></div><div className="podium-copy"><strong>Syncing</strong><small>Live</small><b>0 <em>XP</em></b><span>0 wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
-  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "Prize"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{playerName(p)}</strong><small>{playerHandle(p)}</small><b>{fmt(playerScore(p))} <em>XP</em></b><span>{fmt(p.points)} wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{playerName(p)}</strong><small>{playerHandle(p)}</small><b>{fmt(playerScore(p))} <em>XP</em></b><span>{fmt(p.points)} wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
 }
 
 function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | null }) {
@@ -847,13 +847,13 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
 
   return <main>
     <section className="board-hero board-hero--leaderboard page-width">
-      <div><p className="kicker"><span>●</span> Live leaderboard</p><h1>Global Leaderboard</h1><p className="hero-desc">Compete for the top spot in the RankBoard rewards sprint.</p></div>
+      <div><p className="kicker"><span>●</span> Live board</p><h1>Global Leaderboard</h1><p className="hero-desc">Chase the top spot.</p></div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
     <LiquidGlass as="section" className="leaderboard-progress page-width" tone="ember" aria-label="Season wager progress">
       <div className="progress-medal">$</div>
       <div>
-        <div className="progress-head"><span>Season prize track</span><strong>{fmt(wager)} / {fmt(targetWager)} wager</strong><b>{wagerProgress}%</b></div>
+        <div className="progress-head"><span>Prize track</span><strong>{fmt(wager)} / {fmt(targetWager)}</strong><b>{wagerProgress}%</b></div>
         <div className="progress-bar"><i style={{ width: `${wagerProgress}%` }} /></div>
       </div>
     </LiquidGlass>
@@ -861,9 +861,8 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       <div className="floor-top">
         <span>Top 3</span>
         <div className="live-pool">
-          <small>Live pool</small>
+          <small>Pool</small>
           <strong>$1,150</strong>
-          <b>Paid to podium</b>
         </div>
         <span className="pulse-text">●</span>
       </div>
@@ -875,7 +874,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="section page-width board-section">
       <LiquidGlass className="standings" tone="cyan">
         <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
-        <div className="table-head"><span>Rank / Player</span><span>Status</span><span>Weighted XP</span><span>Wagered</span><span /></div>
+        <div className="table-head"><span>Rank / Player</span><span>Status</span><span>XP</span><span>Wagered</span><span /></div>
         <div className="player-list" aria-live="polite">
           {error ? (
             <div className="empty-state"><span>!</span><h3>The board blinked.</h3><button type="button" onClick={refresh}>Try again</button></div>
@@ -890,7 +889,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
       </LiquidGlass>
     </section>
-    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>Weighted XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Last active</small><strong>{selected.lastActive ?? "Live"}</strong></div></div><Link href="/challenges">View missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
+    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Active</small><strong>{selected.lastActive ?? "Live"}</strong></div></div><Link href="/challenges">Missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
   </main>;
 }
 
@@ -925,7 +924,7 @@ function SeasonClock({
   return (
     <LiquidGlass as="aside" className="season-clock" depth="clear" tone="violet" aria-label="Leaderboard season status">
       <div className="season-clock__head">
-        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Season clock</span>
+        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Countdown</span>
         <b>{error ? "Checking" : "Live"}</b>
       </div>
       <div className={`season-clock__digits ${countdown ? "" : "season-clock__digits--live"}`}>
@@ -942,8 +941,8 @@ function SeasonClock({
         {validTarget
           ? `Closes ${formatShortDate(validTarget)}`
           : lastUpdated
-            ? `Feed ${formatLastUpdated(lastUpdated)}`
-            : "Standings update automatically"}
+            ? `Updated ${formatLastUpdated(lastUpdated)}`
+            : "Auto-updates"}
       </small>
     </LiquidGlass>
   );
@@ -955,7 +954,7 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
   return <main><section className="board-hero feature-page-hero page-width"><div><p className="kicker"><span>●</span> Season 08</p><h1>{data.title}</h1><p className="hero-desc">{data.tagline}</p><div className="button-row"><Link className="button ghost" href={data.action[1]}>{data.action[0]}</Link></div></div></section><FeatureWorkspace route={route} /></main>;
 }
 
-function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>●</span> RankBoard legal</p><h1>{privacy?"Privacy":"Terms"}<em>.</em></h1><p className="legal-lead">{privacy?"How RankBoard handles player information, session data, and reward activity.":"The ground rules for using RankBoard, joining reward activity, and keeping play fair."}</p><div className="legal-layout"><aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","RankBoard may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using RankBoard","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
+function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>●</span> RankBoard legal</p><h1>{privacy?"Privacy":"Terms"}<em>.</em></h1><p className="legal-lead">{privacy?"How RankBoard handles your data.":"The rules for playing fair."}</p><div className="legal-layout"><aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","RankBoard may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using RankBoard","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
 
 
 function CasinoCard({
@@ -1114,7 +1113,7 @@ function CasinoCard({
                 Casino Email: {detail.email}
               </p>
             )}
-            <small>Points sync active - {verificationMethodLabel}</small>
+            <small>Sync active · {verificationMethodLabel}</small>
           </div>
           <button
             type="button"
@@ -1140,7 +1139,7 @@ function CasinoCard({
               </div>
             )}
             <p className="casino-muted">
-              To ensure players cannot impersonate each other, enter your code below or auto-verify with your Kick OAuth account.
+              Anti-spoof: enter your code or auto-verify with Kick.
             </p>
           </div>
 
@@ -1178,7 +1177,7 @@ function CasinoCard({
             onClick={handleUnlink}
             disabled={loading}
           >
-            Change or remove handle
+            Change handle
           </button>
         </div>
       ) : (
@@ -1205,7 +1204,7 @@ function CasinoCard({
               className="casino-input"
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
-              placeholder={`Your ${provider} username`}
+              placeholder={`${provider} username`}
             />
           ) : (
             <div className="casino-stack casino-stack--tight">
@@ -1213,13 +1212,13 @@ function CasinoCard({
                 className="casino-input"
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
-                placeholder={`Your ${provider} username`}
+                placeholder={`${provider} username`}
               />
               <input
                 className="casino-input"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
-                placeholder={`Your ${provider} account email`}
+                placeholder={`${provider} email`}
                 type="email"
               />
             </div>
@@ -1322,7 +1321,7 @@ function Profile({ account }: { account: HeaderAccount }) {
           <div>
             <p className="kicker"><span>●</span> Player hub</p>
             <h1>Profile</h1>
-            <p className="hero-desc">Sign in to view your points, link casinos, and track your history.</p>
+            <p className="hero-desc">Sign in to see points, links & history.</p>
             <div className="button-row">
               <Link className="button primary" href="/login">Sign in</Link>
             </div>
@@ -1339,7 +1338,7 @@ function Profile({ account }: { account: HeaderAccount }) {
           <div>
             <p className="kicker"><span>●</span> Admin lane</p>
             <h1>Opening Admin</h1>
-            <p className="hero-desc">Your admin account is being sent to the control room.</p>
+            <p className="hero-desc">Redirecting to control room.</p>
           </div>
         </section>
       </main>
@@ -1370,10 +1369,10 @@ function Profile({ account }: { account: HeaderAccount }) {
       <section className="section page-width app-workspace">
         <div className="workspace-heading">
           <div>
-            <p>Protected Casino Links</p>
-            <h2>Verified Casino Accounts</h2>
+            <p>Casino Links</p>
+            <h2>Verified Accounts</h2>
           </div>
-          <span>Points only sync to verified accounts to prevent username theft</span>
+          <span>Verified only. No impersonation.</span>
         </div>
 
         <div className="casino-link-grid">
@@ -1430,26 +1429,26 @@ function Profile({ account }: { account: HeaderAccount }) {
         <div className="workspace-heading">
           <div>
             <p>Logins</p>
-            <h2>Account controls</h2>
+            <h2>Connections</h2>
           </div>
         </div>
         <div className="connection-grid">
           <div className={`connection-card ${account.connected.kick.connected ? "connected" : ""}`}>
             <small>Kick</small>
             <h3>{account.connected.kick.connected ? account.connected.kick.username : "Not linked"}</h3>
-            <p>{account.connected.kick.connected ? "Connected" : "Needed for watch points"}</p>
+            <p>{account.connected.kick.connected ? "Connected" : "For watch points"}</p>
             <button type="button" onClick={() => connectProvider("kick")}>
               <RefreshCw size={14} strokeWidth={2.8} aria-hidden="true" />
-              {account.connected.kick.connected ? "Reconnect Kick" : "Connect Kick"}
+              {account.connected.kick.connected ? "Reconnect" : "Connect"}
             </button>
           </div>
           <div className={`connection-card ${account.connected.discord.connected ? "connected" : ""}`}>
             <small>Discord</small>
             <h3>{account.connected.discord.connected ? account.connected.discord.username : "Not linked"}</h3>
-            <p>{account.connected.discord.connected ? "Connected" : "Optional community login"}</p>
+            <p>{account.connected.discord.connected ? "Connected" : "Optional"}</p>
             <button type="button" onClick={() => connectProvider("discord")}>
               <RefreshCw size={14} strokeWidth={2.8} aria-hidden="true" />
-              {account.connected.discord.connected ? "Reconnect Discord" : "Connect Discord"}
+              {account.connected.discord.connected ? "Reconnect" : "Connect"}
             </button>
           </div>
           <div className="connection-card connection-card--session">
@@ -1467,4 +1466,4 @@ function Profile({ account }: { account: HeaderAccount }) {
   );
 }
 
-function Footer(){return <footer className="footer"><div className="footer-top page-width"><div><Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link><p>Live rankings, missions, and rewards.<br/>Play responsibly · 18+</p></div><div className="footer-links">{[["Live Board","/leaderboard"],["Custom Bets","/custom-bets"],["Store","/store"],["Watch Points","/watch-points"],["Missions","/challenges"],["Profile","/profile"],["Support","/support"],["Privacy","/privacy"],["Terms","/terms"]].map(([n,h])=><Link key={h} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>THE BOARD IS LIVE <b>●</b></span><span>PLAY RESPONSIBLY · 18+</span></div></footer>}
+function Footer(){return <footer className="footer"><div className="footer-top page-width"><div><Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link><p>Live rankings & rewards.<br/>Play responsibly · 18+</p></div><div className="footer-links">{[["Board","/leaderboard"],["Bets","/custom-bets"],["Store","/store"],["Watch","/watch-points"],["Missions","/challenges"],["Profile","/profile"],["Support","/support"],["Privacy","/privacy"],["Terms","/terms"]].map(([n,h])=><Link key={h} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>LIVE <b>●</b></span><span>18+ ONLY</span></div></footer>}

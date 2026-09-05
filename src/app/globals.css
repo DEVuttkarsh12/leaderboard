@@ -8154,3 +8154,244 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   CODESHIB-STYLE FUNK LAYER
+   Organic cants lifted from codeshib.com: ±1-2° on panels,
+   ±3-6° on chips/stickers, straighten + lift on hover.
+   In-place only — no placement changes. Wrapped in :where()
+   so every existing, higher-value rule keeps winning over us.
+   ───────────────────────────────────────────────────────────── */
+
+.hero-live-panel-wrap {
+  transform: rotate(-1.15deg);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-live-panel-wrap:hover {
+  transform: rotate(0deg) translateY(-3px);
+}
+
+.home-route-card {
+  transform: rotate(-1.2deg);
+}
+
+.home-route-card:nth-child(2n) {
+  transform: translateY(6px) rotate(1.1deg);
+}
+
+.home-route-card:nth-child(3n) {
+  transform: translateY(3px) rotate(-0.75deg);
+}
+
+.home-route-card:hover {
+  transform: translateY(-6px) rotate(0deg) scale(1.01);
+}
+
+.home-route-card__badge {
+  transform: rotate(5deg);
+}
+
+:where(.kicker) {
+  transform: rotate(-1.3deg);
+}
+
+:where(.route-pill:not(.floating-live):not(.floating-logout)) {
+  transform: translateX(-50%) rotate(-0.7deg);
+}
+
+.floating-live {
+  transform: translateX(-50%) rotate(2.6deg);
+}
+
+.floating-logout {
+  transform: rotate(-2.6deg);
+}
+
+:where(.launch-card, .action-card, .design-card, .feature-launchpad-card, .connection-card, .profile-card, .auth-card, .you-position-card, .board-pulse-card) {
+  transform: rotate(-0.55deg);
+}
+
+:where(.launch-card:nth-child(2n), .action-card:nth-child(2n), .design-card:nth-child(2n), .feature-launchpad-card:nth-child(2n), .connection-card:nth-child(2n), .profile-card:nth-child(2n), .auth-card:nth-child(2n), .you-position-card:nth-child(2n), .board-pulse-card:nth-child(2n)) {
+  transform: rotate(0.7deg);
+}
+
+:where(.launch-card:nth-child(3n), .action-card:nth-child(3n), .design-card:nth-child(3n), .feature-launchpad-card:nth-child(3n), .connection-card:nth-child(3n), .profile-card:nth-child(3n), .auth-card:nth-child(3n), .you-position-card:nth-child(3n), .board-pulse-card:nth-child(3n)) {
+  transform: rotate(-1deg);
+}
+
+:where(.launch-card, .action-card, .design-card, .feature-launchpad-card, .connection-card, .profile-card, .auth-card, .you-position-card, .board-pulse-card):hover {
+  transform: translateY(-6px) rotate(0deg) scale(1.015);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:where(.stat-strip > div:nth-child(2n)) {
+  transform: rotate(1deg);
+}
+
+:where(.stat-strip > div:nth-child(3n)) {
+  transform: rotate(-0.8deg);
+}
+
+:where(.workspace-heading > span) {
+  transform: rotate(-0.8deg);
+}
+
+.season-clock {
+  transform: rotate(0.9deg);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.season-clock:hover {
+  transform: rotate(0deg);
+}
+
+:where(.bracket-panel) {
+  transform: rotate(-0.7deg);
+}
+
+:where(.tool-panel) {
+  transform: rotate(-0.55deg);
+}
+
+:where(.casino-link-panel) {
+  transform: rotate(0.8deg);
+}
+
+:where(.support-form) {
+  transform: rotate(0.65deg);
+}
+
+:where(.inventory-panel) {
+  transform: rotate(-0.6deg);
+}
+
+:where(.admin-user-manager) {
+  transform: rotate(0.55deg);
+}
+
+:where(.bracket-panel, .tool-panel, .casino-link-panel, .support-form, .inventory-panel, .admin-user-manager):hover {
+  transform: rotate(0deg) translateY(-3px);
+}
+
+:where(.podium-card .rank-badge) {
+  transform: rotate(-2deg);
+}
+
+:where(.podium-card .prize-ribbon) {
+  transform: rotate(2deg);
+}
+
+:where(.podium-card .crown) {
+  transform: rotate(7deg);
+}
+
+:where(.workspace-list article > span.list-icon) {
+  transform: rotate(-4deg);
+}
+
+:where(.live-pool) {
+  transform: rotate(-2deg);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ADMIN ROOM — breathing space layer
+   Un-cramps the control-room containers: more padding, airier
+   gaps, stacked field labels with room to breathe.
+   ───────────────────────────────────────────────────────────── */
+
+.admin-user-manager {
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.admin-user-manager__bar {
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.admin-user-layout {
+  gap: 18px;
+}
+
+.admin-user-list {
+  gap: 12px;
+}
+
+.admin-user-list button {
+  min-height: 72px;
+  padding: 12px;
+  gap: 4px 12px;
+}
+
+.admin-user-detail {
+  gap: 18px;
+  padding: 22px;
+}
+
+.admin-user-detail__head {
+  gap: 14px;
+}
+
+.admin-action-grid {
+  gap: 10px;
+}
+
+.admin-casino-strip {
+  gap: 10px;
+}
+
+.admin-grid {
+  gap: 14px;
+}
+
+.admin-panel {
+  gap: 12px;
+  padding: 20px;
+}
+
+.admin-panel h3 {
+  margin: 2px 0 4px;
+  line-height: 1.15;
+}
+
+.admin-panel p,
+.admin-helper-text {
+  margin: 4px 0 0;
+}
+
+.admin-section-title {
+  margin-bottom: 18px;
+}
+
+.admin-note {
+  margin: 0 0 12px;
+}
+
+.bracket-panel label,
+.tool-panel label,
+.support-form label,
+.casino-link-panel label,
+.admin-panel label {
+  display: grid;
+  gap: 7px;
+}
+
+.workspace-list article {
+  padding: 16px 22px;
+  gap: 16px;
+}
+
+.market-admin-row {
+  gap: 16px;
+  padding: 16px 22px;
+  margin-bottom: 12px;
+}
+
+.admin-inline-actions {
+  gap: 0.75rem;
+}
+
+.admin-success-callout {
+  padding: 0.85rem 1.05rem;
+}
