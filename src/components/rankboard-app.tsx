@@ -27,7 +27,6 @@ import LiquidGlass from "./liquid-glass";
 import { PrizeDropField, RevealBlock } from "./showcase-motion";
 import SiteEntryLoader from "./site-entry-loader";
 import StaggeredMenu from "./staggered-menu";
-import VolcanoBackground from "./volcano-background";
 import type { AuthAccountPayload, CasinoAccountDetail } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated, formatNumberCompact, formatShortDate } from "@/lib/formatters";
@@ -398,20 +397,12 @@ export default function RankBoardApp({
   const account = useHeaderAccount();
   return (
     <div className="site-shell">
-      <div className="site-tunnel-background" aria-hidden="true">
-        <VolcanoBackground
-          skyColorTop="#020609"
-          skyColorBottom="#10031a"
-          lavaColor="#d8ff3f"
-          glowColor="#43e8ff"
-          meteorColor="#ff4fa2"
-          meteorCount={3}
-          eruptionIntensity={0.3}
-          starCount={32}
-          maxLavaParticles={74}
-          simulationSpeed={0.34}
-          animationStyle="default"
-        />
+      <div className="site-tunnel-background" aria-hidden="true" />
+      <div className="site-floating-rewards" aria-hidden="true">
+        <span className="site-floating-reward site-floating-reward--crown"><Crown size={20} strokeWidth={2.4} /></span>
+        <span className="site-floating-reward site-floating-reward--coins"><Coins size={20} strokeWidth={2.4} /></span>
+        <span className="site-floating-reward site-floating-reward--gift"><Gift size={19} strokeWidth={2.5} /></span>
+        <span className="site-floating-reward site-floating-reward--spark"><Sparkles size={19} strokeWidth={2.5} /></span>
       </div>
       <CustomCursor />
       <SiteEntryLoader />
@@ -444,10 +435,10 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
 
   const logo = (
     <div className="menu-logo-lockup">
-      <span className="brand-mark">{account.image ? <Image src={account.image} alt="" width={42} height={42} unoptimized /> : initials}</span>
+      <span className="brand-mark">A</span>
       <span className="menu-logo-text">
         <span className="menu-logo-word">
-          RANK<span>BOARD</span>
+          ARTZ<span>REWARDS</span>
         </span>
         <small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small>
       </span>
@@ -464,10 +455,10 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
   return (
     <>
       <LiquidGlass as="nav" className="desktop-nav" depth="clear" tone="violet" aria-label="Primary navigation">
-        <Link className="desktop-nav__brand" href="/" aria-label="RankBoard home">
-          <span className="desktop-nav__mark">R</span>
+        <Link className="desktop-nav__brand" href="/" aria-label="ARTZ Rewards home">
+          <span className="desktop-nav__mark">A</span>
           <span className="desktop-nav__word">
-            RANK<span>BOARD</span>
+            ARTZ<span>REWARDS</span>
           </span>
         </Link>
         <div className="desktop-nav__links">
@@ -486,7 +477,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
             </span>
           </Link>
           {account.authenticated ? (
-            <button className="desktop-nav__logout" type="button" onClick={signOut} aria-label="Logout of RankBoard">
+            <button className="desktop-nav__logout" type="button" onClick={signOut} aria-label="Logout of ARTZ Rewards">
               <LogOut size={15} strokeWidth={2.6} aria-hidden="true" />
               <span>Logout</span>
             </button>
@@ -505,10 +496,10 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
         displaySocials
         displayItemNumbering
         logo={logo}
-        colors={["#d8ff3f", "#43e8ff", "#ff4fa2"]}
-        menuButtonColor="#d8ff3f"
+        colors={["#ff3cac", "#a148ff", "#d7ff3f"]}
+        menuButtonColor="#ff4fac"
         openMenuButtonColor="#f8faf2"
-        accentColor="#d8ff3f"
+        accentColor="#ff4fac"
         onMenuOpen={() => setAccountOpen(true)}
         onMenuClose={() => setAccountOpen(false)}
         footer={
@@ -530,8 +521,8 @@ function Home() {
   const livePool = wager || highestScore || 40000;
   const livePoolLabel = formatPoolValue(livePool);
 
-  return <main>
-    <section className="product-hero product-hero--centered page-width">
+  return <main className="artz-home">
+    <section className="product-hero product-hero--centered">
       <PrizeDropField className="hero-prize-drops" />
       <motion.div
         className="home-center-stage"
@@ -539,26 +530,80 @@ function Home() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.38, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
       >
-        <h1 className="sr-only">RankBoard live leaderboard</h1>
-        <span className="home-live-label"><i /> Live pool</span>
-        <div className="home-prize-core home-prize-core--centered" aria-label={`Live pool ${livePoolLabel} points`}>
-          <AnimatedPoolNumber value={livePool} />
-          <b>Points</b>
+        <span className="home-welcome">Welcome to</span>
+        <h1 className="home-artz-title"><span>ARTZ</span><strong>REWARDS</strong></h1>
+        <p className="home-artz-subtitle">Play. Climb. Get rewarded.</p>
+        <div className="home-hero-actions">
+          <MagneticLink className="button secondary home-rewards-cta" href="/store">
+            <Gift size={17} strokeWidth={2.7} aria-hidden="true" />
+            View rewards
+            <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
+          </MagneticLink>
+          <MagneticLink className="button primary home-board-cta" href="/leaderboard">
+            <Trophy size={17} strokeWidth={2.7} aria-hidden="true" />
+            View leaderboard
+            <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
+          </MagneticLink>
         </div>
-        <HeroPodium players={users.slice(0, 3)} />
-        <MagneticLink className="button primary home-board-cta" href="/leaderboard">
-          <Trophy size={17} strokeWidth={2.7} aria-hidden="true" />
-          View board
-          <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
-        </MagneticLink>
+        <div className="home-live-stat" aria-label={`Live pool ${livePoolLabel} points`}>
+          <span><i /> Live pool</span>
+          <AnimatedPoolNumber value={livePool} />
+          <small>points</small>
+        </div>
       </motion.div>
     </section>
-    <section className="home-action-zone page-width" aria-label="RankBoard destinations">
+    <section className="home-signal-dock" aria-label="Live ARTZ reward signals">
+      <RevealBlock className="home-signal-dock__inner">
+        <article className="home-signal home-signal--players">
+          <span><Trophy size={19} strokeWidth={2.5} aria-hidden="true" /></span>
+          <div><small>Players</small><strong>{users.length ? formatNumberCompact(users.length) : "Live"}</strong></div>
+          <i aria-hidden="true" />
+        </article>
+        <article className="home-signal home-signal--earn">
+          <span><Tv size={19} strokeWidth={2.5} aria-hidden="true" /></span>
+          <div><small>Auto earn</small><strong>25 / 10s</strong></div>
+          <i aria-hidden="true" />
+        </article>
+        <article className="home-signal home-signal--season">
+          <span><Gift size={19} strokeWidth={2.5} aria-hidden="true" /></span>
+          <div><small>Season</small><strong>08</strong></div>
+          <i aria-hidden="true" />
+        </article>
+      </RevealBlock>
+    </section>
+    <section className="home-action-zone" aria-label="ARTZ Rewards destinations">
       <RevealBlock className="home-action-zone__inner">
+        <div className="home-section-heading">
+          <span>Rewards hub</span>
+          <h2>Rewards <em>&amp;</em> Perks</h2>
+          <p>Everything you need. Nothing you don&apos;t.</p>
+        </div>
         <div className="home-route-strip">
           {launchpad.map(([title, href, badge, color, Icon]) => (
             <SpotlightRouteCard badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
           ))}
+        </div>
+      </RevealBlock>
+    </section>
+    <section className="home-board-showcase" aria-label="ARTZ leaderboard preview">
+      <RevealBlock className="home-board-showcase__inner">
+        <div className="home-section-heading">
+          <span>Live rankings</span>
+          <h2>Leader <em>Boards</em></h2>
+          <p>Three spots. One crown.</p>
+        </div>
+        <div className="home-board-showcase__arena">
+          <div className="home-board-showcase__pool">
+            <span><i /> Live pool</span>
+            <strong>{formatPoolDisplay(livePool)}</strong>
+            <small>points</small>
+          </div>
+          <HeroPodium players={users.slice(0, 3)} />
+          <MagneticLink className="button primary home-board-cta" href="/leaderboard">
+            <Trophy size={17} strokeWidth={2.7} aria-hidden="true" />
+            Open leaderboard
+            <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
+          </MagneticLink>
         </div>
       </RevealBlock>
     </section>
@@ -700,7 +745,7 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
 
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>RB</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Live</small>}<b>0 <em>XP</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Live</small>}<b>0 <em>XP</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
@@ -872,7 +917,7 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
   </main>;
 }
 
-function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>●</span> RankBoard legal</p><h1>{privacy?"Privacy":"Terms"}<em>.</em></h1><p className="legal-lead">{privacy?"How RankBoard handles your data.":"The rules for playing fair."}</p><div className="legal-layout"><aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","RankBoard may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using RankBoard","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
+function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>●</span> ARTZ Rewards legal</p><h1>{privacy?"Privacy":"Terms"}<em>.</em></h1><p className="legal-lead">{privacy?"How ARTZ Rewards handles your data.":"The rules for playing fair."}</p><div className="legal-layout"><aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","ARTZ Rewards may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using ARTZ Rewards","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
 
 
 function CasinoCard({
@@ -1401,8 +1446,8 @@ function Footer() {
     <footer className="footer">
       <div className="footer-top page-width">
         <div>
-          <Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link>
-          <p>Live rewards. Play responsibly · 18+</p>
+          <Link className="brand" href="/"><span className="brand-mark">A</span><span>ARTZ<span>REWARDS</span></span></Link>
+          <p>Live rewards by ARTZ. Play responsibly · 18+</p>
         </div>
         <div className="footer-links">
           {links.map(([name, href]) => (
@@ -1410,7 +1455,7 @@ function Footer() {
           ))}
         </div>
       </div>
-      <div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>LIVE <b>●</b></span></div>
+      <div className="footer-bottom"><span>© 2026 ARTZ REWARDS</span><span>LIVE <b>●</b></span></div>
     </footer>
   );
 }

@@ -1,31 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Fredoka, Saira_Condensed, Space_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const sairaCondensed = Saira_Condensed({
-  variable: "--font-dg-display",
-  subsets: ["latin"],
-  weight: ["500", "700", "900"],
+const artzBody = localFont({
+  variable: "--font-artz-body",
+  src: [
+    { path: "./fonts/Inter-Regular.otf", weight: "400", style: "normal" },
+    { path: "./fonts/Inter-SemiBold.otf", weight: "600", style: "normal" },
+  ],
   display: "swap",
 });
 
-const fredoka = Fredoka({
-  variable: "--font-dg-body",
-  subsets: ["latin"],
-  weight: "variable",
-  display: "swap",
-});
-
-const spaceMono = Space_Mono({
-  variable: "--font-dg-label",
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const artzDisplay = localFont({
+  variable: "--font-artz-display",
+  src: [
+    { path: "./fonts/InterDisplay-Bold.otf", weight: "700", style: "normal" },
+    { path: "./fonts/InterDisplay-BlackItalic.otf", weight: "900", style: "italic" },
+  ],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "RankBoard",
-  description: "Live gaming rewards, leaderboard rankings, missions, and prize drops.",
+  title: "ARTZ Rewards",
+  description: "ARTZ live rewards, leaderboard rankings, missions, and prize drops.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -35,7 +32,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#08030F",
+  themeColor: "#050b13",
 };
 
 export default function RootLayout({
@@ -46,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sairaCondensed.variable} ${fredoka.variable} ${spaceMono.variable} antialiased`}
+      className={`${artzBody.variable} ${artzDisplay.variable} antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

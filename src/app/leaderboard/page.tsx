@@ -3,7 +3,7 @@ import RankBoardApp from "@/components/rankboard-app";
 import { getShuffleLeaderboardWindow } from "@/lib/server/leaderboard/shuffle-window";
 
 export const metadata: Metadata = {
-  title: "Leaderboard | RankBoard",
+  title: "Leaderboard | ARTZ Rewards",
   description: "Live leaderboard standings.",
 };
 

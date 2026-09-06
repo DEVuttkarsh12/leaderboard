@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import RankBoardApp from "@/components/rankboard-app";
 
 export const metadata: Metadata = {
-  title: "Custom Bets | RankBoard",
-  description: "Prediction market UI for RankBoard point betting.",
+  title: "Custom Bets | ARTZ Rewards",
+  description: "Prediction market UI for ARTZ Rewards point betting.",
 };
 
 export default function CustomBetsPage() {

@@ -109,7 +109,7 @@ export default function SiteHeader() {
               }}
             >
               <span className="mini-player tone-coral">
-                RB
+                AR
                 <i />
               </span>
               <span>
@@ -122,11 +122,11 @@ export default function SiteHeader() {
               <div className="account-menu" role="menu">
                 <div>
                   <span className="mini-player tone-coral">
-                    RB
+                    AR
                     <i />
                   </span>
                   <p>
-                    <strong>RankBoard</strong>
+                    <strong>ARTZ Rewards</strong>
                     <small>VIP lane</small>
                   </p>
                 </div>

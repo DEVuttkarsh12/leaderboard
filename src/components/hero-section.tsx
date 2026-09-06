@@ -117,7 +117,7 @@ export default function HeroSection({
                         </div>
                       ) : null}
                       <div className="rivl-avatar">
-                        <span>RB</span>
+                        <span>AR</span>
                         <i className="status-dot" />
                       </div>
                       <div className="rivl-podium-player">

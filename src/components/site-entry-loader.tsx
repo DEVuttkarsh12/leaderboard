@@ -1,14 +1,14 @@
 "use client";
 
-import { CircleDollarSign, Coins, Crown, Sparkles, Trophy, Zap } from "lucide-react";
+import { Coins, Crown, Sparkles, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type SiteEntryLoaderProps = {
   embedded?: boolean;
 };
 
-const EXIT_MS = 260;
-const VISIBLE_MS = 860;
+const EXIT_MS = 320;
+const VISIBLE_MS = 1120;
 const REDUCED_MOTION_VISIBLE_MS = 120;
 
 export default function SiteEntryLoader({
@@ -51,32 +51,37 @@ export default function SiteEntryLoader({
       aria-live="polite"
       aria-busy="true"
     >
-      <div className="site-loader__stage" aria-label="Loading RankBoard">
-        <div className="site-loader__podium-scene" aria-hidden="true">
-          <span className="site-loader__scene-chip site-loader__scene-chip--spark"><Sparkles size={19} strokeWidth={2.5} /></span>
-          <span className="site-loader__scene-chip site-loader__scene-chip--cash"><CircleDollarSign size={20} strokeWidth={2.5} /></span>
-          <span className="site-loader__scene-chip site-loader__scene-chip--trophy"><Trophy size={19} strokeWidth={2.6} /></span>
+      <div className="site-loader__stage" aria-label="Loading ARTZ Rewards">
+        <div className="site-loader__reward-lock" aria-hidden="true">
+          <div className="site-loader__card-stack">
+            <span className="site-loader__shuffle-card site-loader__shuffle-card--left">
+              <Sparkles size={22} strokeWidth={2.5} />
+              <em>XP</em>
+            </span>
+            <span className="site-loader__shuffle-card site-loader__shuffle-card--right">
+              <Coins size={23} strokeWidth={2.5} />
+              <em>PTS</em>
+            </span>
+            <span className="site-loader__shuffle-card site-loader__shuffle-card--center">
+              <Crown size={21} strokeWidth={2.6} />
+              <b>A</b>
+              <em>ARTZ</em>
+            </span>
 
-          <span className="site-loader__monogram">R</span>
-          <div className="site-loader__mini-podium">
-            <div className="site-loader__podium-step site-loader__podium-step--2">
-              <span>02</span>
-              <Coins size={22} strokeWidth={2.5} />
-            </div>
-            <div className="site-loader__podium-step site-loader__podium-step--1">
-              <Crown size={25} strokeWidth={2.5} fill="currentColor" />
-              <span>01</span>
-            </div>
-            <div className="site-loader__podium-step site-loader__podium-step--3">
-              <span>03</span>
-              <Zap size={21} strokeWidth={2.7} />
-            </div>
+            <span className="site-loader__coin-stack">
+              <i /><i /><i />
+              <b><Trophy size={17} strokeWidth={2.7} /></b>
+            </span>
           </div>
-          <strong>RANK<span>BOARD</span></strong>
-          <span className="site-loader__scene-pulse"><i /><i /><i /></span>
         </div>
-        <div className="site-loader__meter" aria-hidden="true">
-          <i /><i /><i /><i /><i />
+
+        <div className="site-loader__lock-copy">
+          <strong>ARTZ <span>REWARDS</span></strong>
+          <small><Sparkles size={13} /> Shuffling rewards</small>
+        </div>
+
+        <div className="site-loader__lock-track" aria-hidden="true">
+          <i /><i /><i /><i /><i /><i /><i />
         </div>
       </div>
     </div>

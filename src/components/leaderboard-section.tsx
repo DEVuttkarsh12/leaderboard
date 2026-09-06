@@ -171,7 +171,7 @@ export default function LeaderboardSection({
           </div>
           <div className="podium-float float-move">
             <span className={`product-avatar small tone-${getToneByIndex(3)}`}>
-              {topPlayer ? getInitials(topPlayer.name) : "RB"}
+              {topPlayer ? getInitials(topPlayer.name) : "AR"}
               <i />
             </span>
             <span>
@@ -336,7 +336,7 @@ export default function LeaderboardSection({
               </strong>
               <div className="you-player">
                 <span className={`product-avatar medium tone-${getToneByIndex(0)}`}>
-                  {topPlayer ? getInitials(topPlayer.name) : "RB"}
+                  {topPlayer ? getInitials(topPlayer.name) : "AR"}
                   <i />
                 </span>
                 <p>

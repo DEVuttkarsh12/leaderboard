@@ -78,7 +78,7 @@ export default function FeatureLaunchpad() {
         </div>
       </div>
 
-      <div className="feature-launchpad" aria-label="RankBoard feature routes">
+      <div className="feature-launchpad" aria-label="ARTZ Rewards feature routes">
         {features.map((feature, index) => {
           const Icon = feature.icon;
 

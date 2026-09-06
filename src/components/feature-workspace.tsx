@@ -382,7 +382,7 @@ function AccountImage({
   account: Account;
   className: string;
 }) {
-  const initials = account.handle.slice(1, 3).toUpperCase() || "RB";
+  const initials = account.handle.slice(1, 3).toUpperCase() || "AR";
 
   return (
     <span className={className}>
@@ -2727,12 +2727,12 @@ function LoginWorkspace({
 
   return (
     <section className="section page-width app-workspace auth-workspace">
-      <WorkspaceHeader overline="Account" title="Sign in to RankBoard" meta={status} />
+      <WorkspaceHeader overline="Account" title="Sign in to ARTZ Rewards" meta={status} />
       <div className="auth-modal-shell" role="dialog" aria-modal="true" aria-labelledby="auth-title">
         <div className="auth-panel">
           <div className="auth-copy">
             <p>ACCOUNT ACCESS</p>
-            <h3 id="auth-title">{signedIn ? "Account active" : "Login to RankBoard"}</h3>
+            <h3 id="auth-title">{signedIn ? "Account active" : "Login to ARTZ Rewards"}</h3>
             <span>{account.handle}</span>
           </div>
           <div className="auth-card">

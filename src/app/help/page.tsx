@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import RankBoardApp from "@/components/rankboard-app";
 
 export const metadata: Metadata = {
-  title: "Help | RankBoard",
+  title: "Help | ARTZ Rewards",
   description: "Help center pages for the rewards hub.",
 };
 

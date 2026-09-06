@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import RankBoardApp from "@/components/rankboard-app";
 
 export const metadata: Metadata = {
-  title: "Wager Raffles | RankBoard",
+  title: "Wager Raffles | ARTZ Rewards",
   description: "Raffle and ticket UI for the rewards hub.",
 };
 

@@ -5,8 +5,8 @@ import RankBoardApp from "@/components/rankboard-app";
 import { getSessionAccount, SESSION_COOKIE } from "@/lib/server/auth/session";
 
 export const metadata: Metadata = {
-  title: "Admin | RankBoard",
-  description: "Admin control room for RankBoard.",
+  title: "Admin | ARTZ Rewards",
+  description: "Admin control room for ARTZ Rewards.",
 };
 
 export const dynamic = "force-dynamic";
