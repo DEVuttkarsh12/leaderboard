@@ -525,51 +525,36 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
 }
 
 function Home() {
-  const { users, total, highestScore } = useLeaderboard();
-  const livePlayers = total || users.length;
+  const { users, highestScore } = useLeaderboard();
   const wager = totalWager(users);
   const livePool = wager || highestScore || 40000;
   const livePoolLabel = formatPoolValue(livePool);
 
   return <main>
-    <section className="product-hero page-width">
+    <section className="product-hero product-hero--centered page-width">
       <PrizeDropField className="hero-prize-drops" />
-      <div className="hero-copy">
-        <motion.div
-          className="hero-word-block"
-          initial={{ opacity: 0, x: -28, rotate: -1.5 }}
-          animate={{ opacity: 1, x: 0, rotate: 0 }}
-          transition={{ delay: 0.52, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <h1 className="hero-brackoz-title">
-            <span aria-label="Rank Up">
-              {"Rank Up".split("").map((char, index) => <i key={`rank-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
-            </span>
-            <em aria-label="Grab Rewards">
-              {"Grab Rewards".split("").map((char, index) => <i key={`rewards-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
-            </em>
-          </h1>
-          <div className="home-prize-core home-prize-core--hero" aria-label={`Live pool ${livePoolLabel} points`}>
-            <span>Live Pool</span>
-            <AnimatedPoolNumber value={livePool} />
-            <b>PTS</b>
-          </div>
-          <div className="button-row">
-            <MagneticLink className="button primary" href="/leaderboard"><Trophy size={16} strokeWidth={2.7} aria-hidden="true" />Board</MagneticLink>
-            <MagneticLink className="button ghost" href="/store"><Gift size={16} strokeWidth={2.7} aria-hidden="true" />Store</MagneticLink>
-          </div>
-        </motion.div>
-        <HeroRankTracker activity={livePool} players={users.slice(0, 3)} />
-      </div>
-    </section>
-    <section className="home-action-zone page-width" aria-label="RankBoard routes and live stats">
-      <RevealBlock className="home-action-zone__inner">
-        <div className="home-signal-row">
-          <div><span>Players</span><strong>{livePlayers}</strong></div>
-          <div><span>Wager</span><strong>{formatNumberCompact(wager)}</strong></div>
-          <div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div>
-          <Link href="/leaderboard" aria-label="Open leaderboard" title="Leaderboard"><Trophy size={20} strokeWidth={2.5} aria-hidden="true" /><ArrowUpRight size={14} strokeWidth={2.6} aria-hidden="true" /></Link>
+      <motion.div
+        className="home-center-stage"
+        initial={{ opacity: 0, y: 26, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.38, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <h1 className="sr-only">RankBoard live leaderboard</h1>
+        <span className="home-live-label"><i /> Live pool</span>
+        <div className="home-prize-core home-prize-core--centered" aria-label={`Live pool ${livePoolLabel} points`}>
+          <AnimatedPoolNumber value={livePool} />
+          <b>Points</b>
         </div>
+        <HeroPodium players={users.slice(0, 3)} />
+        <MagneticLink className="button primary home-board-cta" href="/leaderboard">
+          <Trophy size={17} strokeWidth={2.7} aria-hidden="true" />
+          View board
+          <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
+        </MagneticLink>
+      </motion.div>
+    </section>
+    <section className="home-action-zone page-width" aria-label="RankBoard destinations">
+      <RevealBlock className="home-action-zone__inner">
         <div className="home-route-strip">
           {launchpad.map(([title, href, badge, color, Icon]) => (
             <SpotlightRouteCard badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
@@ -580,62 +565,16 @@ function Home() {
   </main>;
 }
 
-function HeroRankTracker({ activity, players }: { activity: number; players: Player[] }) {
-  const leaderScore = Math.max(1, ...players.map(playerScore));
-  const leader = players[0];
-  const leaderValue = leader ? playerScore(leader) : 0;
-  const prizes = ["$600", "$325", "$225"];
-
+function HeroPodium({ players }: { players: Player[] }) {
   return (
     <motion.div
-      className="hero-live-panel-wrap"
-      initial={{ opacity: 0, x: 42, y: 20, rotate: 5 }}
-      animate={{ opacity: 1, x: 0, y: 0, rotate: -2 }}
-      transition={{ delay: 0.64, duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
+      className="home-hero-podium"
+      initial={{ opacity: 0, y: 38, scale: 0.92 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: 0.56, duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
     >
-      <LiquidGlass as="section" className="hero-live-panel hero-rank-tracker" tone="ember" aria-label="Live leaderboard snapshot">
-        <div className="hero-rank-tracker__top">
-          <span className="hero-rank-tracker__live"><i /> Live</span>
-          <Link href="/leaderboard" aria-label="Open full leaderboard"><ArrowUpRight size={18} strokeWidth={2.5} aria-hidden="true" /></Link>
-        </div>
-        <div className="hero-rank-tracker__leader">
-          <div className="hero-rank-tracker__leader-top">
-            <span className="hero-rank-tracker__crown"><Crown size={16} fill="currentColor" aria-hidden="true" /> #1</span>
-            <span className="hero-rank-tracker__prize">{prizes[0]}</span>
-          </div>
-          <div className="hero-rank-tracker__leader-main">
-            <span className="hero-rank-tracker__avatar hero-rank-tracker__avatar--leader">{leader ? getInitials(leader.name) : "RB"}</span>
-            <span className="hero-rank-tracker__identity">
-              <strong>{leader ? playerName(leader) : "Syncing live data"}</strong>
-              <i><span style={{ width: leader ? "100%" : "8%" }} /></i>
-            </span>
-            <span className="hero-rank-tracker__score hero-rank-tracker__score--leader"><strong>{formatNumberCompact(leaderValue)}</strong><small>XP</small></span>
-          </div>
-        </div>
-        <div className="hero-rank-tracker__chasers" aria-label="Second and third place players">
-          {[1, 2].map((index) => {
-            const player = players[index];
-            const score = player ? playerScore(player) : 0;
-            const progress = player ? Math.max(8, (score / leaderScore) * 100) : 8;
-
-            return (
-              <article className={`hero-rank-tracker__chaser hero-rank-tracker__chaser--${index + 1}`} key={player?.id ?? `sync-${index + 1}`}>
-                <div className="hero-rank-tracker__chaser-top"><b>#{index + 1}</b><span>{prizes[index]}</span></div>
-                <div className="hero-rank-tracker__chaser-player">
-                  <span className="hero-rank-tracker__avatar">{player ? getInitials(player.name) : "RB"}</span>
-                  <span><strong>{player ? playerName(player) : "Syncing"}</strong></span>
-                </div>
-                <i className="hero-rank-tracker__chaser-track"><span style={{ width: `${progress}%` }} /></i>
-                <strong className="hero-rank-tracker__chaser-score">{formatNumberCompact(score)} <small>XP</small></strong>
-              </article>
-            );
-          })}
-        </div>
-        <div className="hero-rank-tracker__footer">
-          <span><strong>{formatNumberCompact(activity)}</strong><small>PTS</small></span>
-          <Link href="/leaderboard" aria-label="Open full ranking" title="Full ranking"><Trophy size={16} strokeWidth={2.6} aria-hidden="true" /><ArrowUpRight size={15} strokeWidth={2.6} aria-hidden="true" /></Link>
-        </div>
-      </LiquidGlass>
+      <h2 className="sr-only">Live top three</h2>
+      <Podium players={players} compact />
     </motion.div>
   );
 }
@@ -761,11 +700,11 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
 
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>RB</span></div><div className="podium-copy"><strong>Syncing</strong><small>Live</small><b>0 <em>XP</em></b><span>0 wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>RB</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Live</small>}<b>0 <em>XP</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
-  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{playerName(p)}</strong><small>{playerHandle(p)}</small><b>{fmt(playerScore(p))} <em>XP</em></b><span>{fmt(p.points)} wagered</span></div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{compact ? playerHandle(p) : playerName(p)}</strong>{!compact && <small>{playerHandle(p)}</small>}<b>{fmt(playerScore(p))} <em>XP</em></b>{!compact && <span>{fmt(p.points)} wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
 }
 
 function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | null }) {
