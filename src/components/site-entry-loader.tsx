@@ -1,14 +1,15 @@
 "use client";
 
+import { CircleDollarSign, Coins, Crown, Sparkles, Trophy, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type SiteEntryLoaderProps = {
   embedded?: boolean;
 };
 
-const EXIT_MS = 420;
-const VISIBLE_MS = 1350;
-const REDUCED_MOTION_VISIBLE_MS = 260;
+const EXIT_MS = 240;
+const VISIBLE_MS = 650;
+const REDUCED_MOTION_VISIBLE_MS = 120;
 
 export default function SiteEntryLoader({
   embedded = false,
@@ -18,6 +19,8 @@ export default function SiteEntryLoader({
   );
 
   useEffect(() => {
+    if (embedded) return undefined;
+
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
@@ -48,31 +51,27 @@ export default function SiteEntryLoader({
       aria-live="polite"
       aria-busy="true"
     >
-      <div className="site-loader__stage">
-        <div className="site-loader__deck" aria-hidden="true">
-          <div className="site-loader__shadow" />
+      <div className="site-loader__stage" aria-label="Loading RankBoard">
+        <div className="site-loader__rank-deck" aria-hidden="true">
+          <span className="site-loader__prize-chip site-loader__prize-chip--coins"><Coins size={20} strokeWidth={2.5} /></span>
+          <span className="site-loader__prize-chip site-loader__prize-chip--cash"><CircleDollarSign size={21} strokeWidth={2.5} /></span>
+          <span className="site-loader__prize-chip site-loader__prize-chip--spark"><Zap size={19} strokeWidth={2.7} /></span>
 
-          <div className="site-loader__card site-loader__card--one">
-            <span className="site-loader__card-label">TOP</span>
-            <span className="site-loader__card-value">#01</span>
+          <div className="site-loader__rank-card site-loader__rank-card--cyan">
+            <Trophy size={34} strokeWidth={2.2} />
           </div>
-          <div className="site-loader__card site-loader__card--two">
-            <span className="site-loader__card-label">POOL</span>
-            <span className="site-loader__card-value">$</span>
+          <div className="site-loader__rank-card site-loader__rank-card--pink">
+            <Sparkles size={34} strokeWidth={2.2} />
           </div>
-          <div className="site-loader__card site-loader__card--three">
-            <span className="site-loader__card-label">XP</span>
-            <span className="site-loader__card-value">7</span>
-          </div>
-          <div className="site-loader__card site-loader__card--four">
-            <span className="site-loader__card-label">LIVE</span>
-            <span className="site-loader__card-value">GO</span>
+          <div className="site-loader__rank-card site-loader__rank-card--front">
+            <span className="site-loader__rank-number"><Crown size={19} fill="currentColor" />01</span>
+            <span className="site-loader__brand-mark">R</span>
+            <strong>RANK<span>BOARD</span></strong>
+            <span className="site-loader__card-pulse"><i /><i /><i /></span>
           </div>
         </div>
-
-        <div className="site-loader__copy">
-          <div className="site-loader__eyebrow">RankBoard</div>
-          <div className="site-loader__label">Dealing ranks</div>
+        <div className="site-loader__meter" aria-hidden="true">
+          <i /><i /><i /><i /><i />
         </div>
       </div>
     </div>

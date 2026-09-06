@@ -39,6 +39,10 @@ export default function LiquidGlass({
       const y = ((event.clientY - bounds.top) / Math.max(1, bounds.height)) * 100;
       event.currentTarget.style.setProperty("--liquid-x", `${Math.max(0, Math.min(100, x))}%`);
       event.currentTarget.style.setProperty("--liquid-y", `${Math.max(0, Math.min(100, y))}%`);
+      if (event.pointerType !== "touch") {
+        event.currentTarget.style.setProperty("--liquid-tilt-x", `${(50 - y) * 0.045}deg`);
+        event.currentTarget.style.setProperty("--liquid-tilt-y", `${(x - 50) * 0.055}deg`);
+      }
     }
     onPointerMove?.(event);
   }
@@ -47,6 +51,8 @@ export default function LiquidGlass({
     if (interactive) {
       event.currentTarget.style.setProperty("--liquid-x", "50%");
       event.currentTarget.style.setProperty("--liquid-y", "0%");
+      event.currentTarget.style.setProperty("--liquid-tilt-x", "0deg");
+      event.currentTarget.style.setProperty("--liquid-tilt-y", "0deg");
     }
     onPointerLeave?.(event);
   }
@@ -54,6 +60,8 @@ export default function LiquidGlass({
   const liquidStyle = {
     "--liquid-x": "50%",
     "--liquid-y": "0%",
+    "--liquid-tilt-x": "0deg",
+    "--liquid-tilt-y": "0deg",
     ...style,
   } as CSSProperties;
 

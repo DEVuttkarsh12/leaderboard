@@ -45,12 +45,8 @@ export function useLeaderboard() {
 
   const abortRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(true);
-  const fetchingRef = useRef(false);
 
   const fetchData = useRef(async () => {
-    if (fetchingRef.current) return;
-    fetchingRef.current = true;
-
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -84,7 +80,9 @@ export function useLeaderboard() {
         }));
       }
     } finally {
-      fetchingRef.current = false;
+      if (abortRef.current === controller) {
+        abortRef.current = null;
+      }
     }
   });
 

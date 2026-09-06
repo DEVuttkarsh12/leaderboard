@@ -50,6 +50,7 @@ import type { AuthAccountPayload } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
 import LiquidGlass from "./liquid-glass";
+import SignalChip from "./signal-chip";
 
 type Provider = "kick" | "discord";
 type Casino = "thrill" | "packdraw" | "shuffle";
@@ -109,6 +110,7 @@ type WatchSummary = {
   streamLive: boolean;
   lastActivityAt: string | null;
   totalSecondsToday: number;
+  earnedPointsToday: number;
   claimablePoints: number;
   dailyBonusAvailable: boolean;
   dailyBonus: number;
@@ -635,8 +637,8 @@ function ChallengesWorkspace({
           return (
             <LiquidGlass as="article" className="action-card mission-card" key={mission.id} tone="violet">
               <div className="card-topline">
-                <span><BadgeCheck size={15} strokeWidth={2.8} aria-hidden="true" />{mission.cadence}</span>
-                {showMissionMeta ? <b>{mission.meta}</b> : null}
+                <SignalChip icon={BadgeCheck} label={`Cadence: ${mission.cadence}`} value={mission.cadence} tone="acid" />
+                {showMissionMeta ? <SignalChip icon={Target} label={`Slot: ${mission.meta}`} value={mission.meta} tone="cyan" /> : null}
               </div>
               <h3>{mission.title}</h3>
               <div className="card-progress-line">
@@ -1131,8 +1133,13 @@ function StoreWorkspace({
           return (
             <LiquidGlass as="article" className="action-card reward-card" key={item.id} tone="ember">
               <div className="card-topline">
-                <span><StoreIcon size={15} strokeWidth={2.8} aria-hidden="true" />{item.tag}</span>
-                <b><PackageOpen size={14} strokeWidth={2.7} aria-hidden="true" />{item.unlimited ? "Unlimited" : `${item.stock} left`}</b>
+                <SignalChip icon={StoreIcon} label={`Category: ${item.tag}`} value={item.tag} tone="acid" />
+                <SignalChip
+                  icon={PackageOpen}
+                  label={item.unlimited ? "Unlimited stock" : `${item.stock} in stock`}
+                  value={item.unlimited ? undefined : item.stock}
+                  tone="cyan"
+                />
               </div>
               <div
                 className={`reward-art ${item.imageUrl ? "reward-art--image" : ""}`}
@@ -1187,7 +1194,7 @@ function ApiPurchaseList({ purchases }: { purchases: ApiPurchase[] }) {
           </article>
         );
       }) : (
-        <article><span className="list-icon"><PackageOpen size={16} aria-hidden="true" /></span><div><h3>No purchases yet</h3><p>Your redemptions appear here.</p></div></article>
+        <article><span className="list-icon"><PackageOpen size={16} aria-hidden="true" /></span><div><h3>No purchases</h3></div></article>
       )}
     </div>
   );
@@ -1323,11 +1330,17 @@ function CustomBetsWorkspace({
         {markets.map((market) => (
           <LiquidGlass as="article" className={`action-card market-card ${market.status.toLowerCase()}`} key={market.id} tone="cyan">
             <div className="card-topline">
-              <span><Ticket size={15} strokeWidth={2.8} aria-hidden="true" />{market.type}</span>
-              <b><Radio size={14} strokeWidth={2.8} aria-hidden="true" />{market.status}</b>
+              <SignalChip icon={Ticket} label={`Market: ${market.type}`} value={market.type} tone="cyan" />
+              <SignalChip icon={Radio} label={`Status: ${market.status}`} value={market.status} tone={market.status === "Live" ? "acid" : "neutral"} active={market.status === "Live"} />
             </div>
             <h3>{market.title}</h3>
-            <p className="market-card__deadline"><Clock3 size={15} strokeWidth={2.6} aria-hidden="true" />{market.winner ? `${market.winner} won` : market.deadline}</p>
+            <SignalChip
+              icon={Clock3}
+              label={market.winner ? "Winning side" : "Market deadline"}
+              value={market.winner ? `${market.winner} won` : market.deadline}
+              tone="pink"
+              className="market-card__deadline"
+            />
             <label className="bet-amount-control">
               <Coins size={17} strokeWidth={2.6} aria-hidden="true" />
               <input
@@ -1378,9 +1391,23 @@ function WatchPointsWorkspace({
   const [summary, setSummary] = useState<WatchSummary | null>(null);
   const [message, setMessage] = useState("Syncing...");
   const connected = summary?.connected ?? account.connected.kick.connected;
-  const displayedSeconds = summary?.totalSecondsToday ?? seconds;
-  const earned = summary?.claimablePoints ?? Math.floor(seconds / 10) * 25;
-  const dailyBonus = summary?.dailyBonusAvailable ? summary.dailyBonus : 0;
+  const displayedSeconds = seconds;
+  const earnedToday = summary?.earnedPointsToday ?? 0;
+
+  const applyWatchSummary = useCallback((nextSummary: WatchSummary) => {
+    setSummary(nextSummary);
+    setRunning(nextSummary.running);
+    setSeconds(nextSummary.totalSecondsToday);
+    setAccount((current) => {
+      const safe = normalizeAccount(current);
+      return {
+        ...safe,
+        points: nextSummary.points,
+        xp: nextSummary.xp,
+        watchMinutes: Math.floor(nextSummary.totalSecondsToday / 60),
+      };
+    });
+  }, [setAccount]);
 
   useEffect(() => {
     if (!running) return;
@@ -1396,10 +1423,8 @@ function WatchPointsWorkspace({
       .then((payload: { summary?: WatchSummary; error?: string }) => {
         if (!active) return;
         if (payload.summary) {
-          setSummary(payload.summary);
-          setRunning(payload.summary.running);
-          setSeconds(payload.summary.totalSecondsToday);
-          setMessage(payload.summary.connected ? "Synced" : "Connect Kick");
+          applyWatchSummary(payload.summary);
+          setMessage(payload.summary.connected ? payload.summary.running ? "Auto earning" : "Ready" : "Connect Kick");
         } else {
           setMessage(payload.error ?? "Could not load watch points.");
         }
@@ -1407,31 +1432,9 @@ function WatchPointsWorkspace({
       .catch(() => { if (active) setMessage("Could not load watch points."); });
 
     return () => { active = false; };
-  }, []);
+  }, [applyWatchSummary]);
 
-  useEffect(() => {
-    if (!running) return;
-
-    const heartbeat = window.setInterval(() => {
-      fetch("/api/watch-points/heartbeat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ running: true }),
-      })
-        .then((response) => response.json())
-        .then((payload: { summary?: WatchSummary }) => {
-          if (payload.summary) {
-            setSummary(payload.summary);
-            setSeconds(payload.summary.totalSecondsToday);
-          }
-        })
-        .catch(() => {});
-    }, 10000);
-
-    return () => window.clearInterval(heartbeat);
-  }, [running]);
-
-  async function sendHeartbeat(nextRunning: boolean) {
+  const sendHeartbeat = useCallback(async (nextRunning: boolean, quiet = false) => {
     try {
       const response = await fetch("/api/watch-points/heartbeat", {
         method: "POST",
@@ -1442,57 +1445,47 @@ function WatchPointsWorkspace({
       if (!response.ok || !payload.summary) {
         throw new Error(payload.error ?? "Watch update failed.");
       }
-      setSummary(payload.summary);
-      setRunning(payload.summary.running);
-      setSeconds(payload.summary.totalSecondsToday);
-      setMessage(nextRunning ? "Watch session running." : "Watch session paused.");
+      applyWatchSummary(payload.summary);
+      setMessage(quiet ? "Auto earning" : nextRunning ? "Auto earning" : "Paused");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Watch update failed.");
       setRunning(false);
     }
-  }
+  }, [applyWatchSummary]);
 
-  async function claimWatchPoints() {
-    if (earned <= 0) return;
+  useEffect(() => {
+    if (!running) return;
 
-    try {
-      const response = await fetch("/api/watch-points/claim", { method: "POST" });
-      const payload = (await response.json()) as { summary?: WatchSummary; error?: string };
-      if (!response.ok || !payload.summary) {
-        throw new Error(payload.error ?? "Watch claim failed.");
-      }
-      setSummary(payload.summary);
-      setSeconds(payload.summary.totalSecondsToday);
-      setAccount((current) => {
-        const safe = normalizeAccount(current);
-        return {
-          ...safe,
-          points: payload.summary!.points,
-          xp: payload.summary!.xp,
-          watchMinutes: Math.floor(payload.summary!.totalSecondsToday / 60),
-        };
-      });
-      setMessage("Watch points claimed.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Watch claim failed.");
-    }
-  }
+    const heartbeat = window.setInterval(() => {
+      void sendHeartbeat(true, true);
+    }, 10000);
+
+    return () => window.clearInterval(heartbeat);
+  }, [running, sendHeartbeat]);
 
   return (
     <section className="section page-width app-workspace workspace--watch">
-      <WorkspaceHeader overline="Watch Points" title="Watch. Earn. Claim." meta={message} />
+      <WorkspaceHeader overline="Watch Points" title="Watch & earn" meta={message} />
       <div className="watch-console">
         <div className="watch-orb">
           <span><Clock3 size={22} strokeWidth={2.6} aria-hidden="true" />{String(Math.floor(displayedSeconds / 60)).padStart(2, "0")}:{String(displayedSeconds % 60).padStart(2, "0")}</span>
-          <b>{earned + dailyBonus}</b>
-          <small>ready</small>
+          <b>{earnedToday.toLocaleString()}</b>
+          <small>earned</small>
         </div>
         <div className="watch-actions">
-          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode === "chat" ? "Chat" : "OAuth"], ["Daily", dailyBonus ? `+${dailyBonus}` : "Locked"], ["Total", `${Math.floor(displayedSeconds / 60)}m`]]} />
+          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode === "chat" ? "Chat" : "OAuth"], ["Rate", summary?.rateLabel ?? "25 / 10s"], ["Today", `${earnedToday.toLocaleString()} pts`]]} />
+          <div className="watch-credit-row">
+            <SignalChip
+              icon={Activity}
+              label="Watch points credit automatically"
+              value={running ? "Auto earning" : "Auto credit"}
+              tone={running ? "acid" : "cyan"}
+              active={running}
+            />
+          </div>
           <div className="button-row">
             {!connected ? <a className="button primary" href="/api/auth/kick"><Tv size={16} aria-hidden="true" />Connect Kick</a> : null}
             <button className="button ghost" type="button" onClick={() => sendHeartbeat(!running)} disabled={!connected}>{running ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}{running ? "Pause" : "Start"}</button>
-            <button className="button primary" type="button" onClick={claimWatchPoints} disabled={earned <= 0}><Gift size={16} aria-hidden="true" />Claim</button>
           </div>
         </div>
       </div>
@@ -2864,8 +2857,8 @@ function WorkspaceHeader({ overline, title, meta }: { overline: string; title: s
   const Icon = workspaceIcons[overline] ?? Sparkles;
   return (
     <div className="workspace-heading">
-      <div>
-        <p><Icon size={16} strokeWidth={3} aria-hidden="true" />{overline}</p>
+      <div className="workspace-heading__title">
+        <span className="workspace-heading__icon" title={overline}><Icon size={19} strokeWidth={2.8} aria-hidden="true" /><span className="sr-only">{overline}</span></span>
         <h2>{title}</h2>
       </div>
       <LiquidGlass as="span" className="workspace-heading__status" depth="clear" interactive={false} tone="cyan" title={meta}>
@@ -2947,7 +2940,7 @@ function BetList({ bets }: { bets: Bet[] }) {
           <div><h3>{bet.marketTitle}</h3><p>{bet.side} / {bet.amount.toLocaleString()} @ {bet.odds.toFixed(2)}x</p></div>
           <strong>{bet.status === "Won" ? `+${Math.floor(bet.amount * bet.odds).toLocaleString()}` : bet.createdAt}</strong>
         </article>
-      )) : <article><span className="list-icon"><ReceiptText size={16} aria-hidden="true" /></span><div><h3>No bets yet</h3><p>Pick a market above.</p></div></article>}
+      )) : <article><span className="list-icon"><ReceiptText size={16} aria-hidden="true" /></span><div><h3>No bets</h3></div></article>}
     </div>
   );
 }

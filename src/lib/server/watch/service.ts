@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
+import type { Prisma } from "@/generated/prisma/client";
 
 const POINTS_PER_SLICE = 25;
 const SLICE_SECONDS = 10;
@@ -15,6 +16,7 @@ export type WatchSummaryPayload = {
   streamLive: boolean;
   lastActivityAt: string | null;
   totalSecondsToday: number;
+  earnedPointsToday: number;
   claimablePoints: number;
   dailyBonusAvailable: boolean;
   dailyBonus: number;
@@ -122,30 +124,63 @@ async function verifyWatchActivity(user: {
   };
 }
 
-async function activeSessionFor(userId: string) {
-  return prisma.watchSession.findFirst({
-    where: { userId, status: "ACTIVE" },
-    orderBy: { startedAt: "desc" },
+async function settleTodayWatchPoints(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  now: Date
+) {
+  const sessions = await tx.watchSession.findMany({
+    where: { userId, startedAt: { gte: startOfToday() } },
+    orderBy: { startedAt: "asc" },
   });
-}
 
-async function accrueActiveSession(userId: string, now: Date) {
-  const active = await activeSessionFor(userId);
-  if (!active) return null;
+  let baseAward = 0;
+  for (const session of sessions) {
+    const earnedForSession =
+      Math.floor(session.totalSeconds / SLICE_SECONDS) * POINTS_PER_SLICE;
+    const pending = Math.max(0, earnedForSession - session.pointsAwarded);
+    if (pending <= 0) continue;
 
-  const delta = Math.min(
-    MAX_HEARTBEAT_SECONDS,
-    elapsedSeconds(active.lastHeartbeatAt, now)
-  );
-  if (delta <= 0) {
-    return active;
+    const update = await tx.watchSession.updateMany({
+      where: { id: session.id, pointsAwarded: session.pointsAwarded },
+      data: { pointsAwarded: earnedForSession },
+    });
+    if (update.count === 1) baseAward += pending;
   }
 
-  return prisma.watchSession.update({
-    where: { id: active.id },
+  let dailyBonus = 0;
+  const latestSession = sessions.at(-1);
+  if (baseAward > 0 && latestSession && !sessions.some((session) => session.dailyBonusAwarded)) {
+    const update = await tx.watchSession.updateMany({
+      where: { id: latestSession.id, dailyBonusAwarded: false },
+      data: { dailyBonusAwarded: true },
+    });
+    if (update.count === 1) dailyBonus = DAILY_KICK_BONUS;
+  }
+
+  const totalAward = baseAward + dailyBonus;
+  if (totalAward <= 0) return;
+
+  await tx.user.update({
+    where: { id: userId },
     data: {
-      totalSeconds: { increment: delta },
-      lastHeartbeatAt: now,
+      points: { increment: totalAward },
+      xp: { increment: baseAward },
+    },
+  });
+
+  await tx.pointTransaction.create({
+    data: {
+      userId,
+      amount: totalAward,
+      reason: "watch_points",
+      meta: JSON.stringify({
+        baseAward,
+        dailyBonus,
+        automatic: true,
+        creditedAt: now.toISOString(),
+        totalSeconds: sessions.reduce((sum, session) => sum + session.totalSeconds, 0),
+      }),
     },
   });
 }
@@ -161,10 +196,6 @@ export async function getWatchSummary(
     select: { id: true, kickId: true, kickUsername: true, points: true, xp: true },
   });
   if (!user) throw new Error("Session expired.");
-
-  if (user.kickUsername) {
-    await accrueActiveSession(user.id, new Date());
-  }
 
   const [sessions, running] = await Promise.all([
     prisma.watchSession.findMany({
@@ -183,6 +214,10 @@ export async function getWatchSummary(
     (sum, session) => sum + claimableFor(session.totalSeconds, session.pointsAwarded),
     0
   );
+  const earnedPointsToday = sessions.reduce(
+    (sum, session) => sum + session.pointsAwarded,
+    sessions.some((session) => session.dailyBonusAwarded) ? DAILY_KICK_BONUS : 0
+  );
   const dailyBonusAvailable =
     Boolean(user.kickUsername) && !sessions.some((session) => session.dailyBonusAwarded);
   const verification = user.kickUsername
@@ -200,6 +235,7 @@ export async function getWatchSummary(
     running: running > 0,
     ...verification,
     totalSecondsToday,
+    earnedPointsToday,
     claimablePoints,
     dailyBonusAvailable,
     dailyBonus: DAILY_KICK_BONUS,
@@ -218,6 +254,10 @@ export async function recordWatchHeartbeat(
   const verification = await verifyWatchActivity(user);
 
   if (running && !verification.verified) {
+    await prisma.watchSession.updateMany({
+      where: { userId: user.id, status: "ACTIVE" },
+      data: { status: "PAUSED", endedAt: now, lastHeartbeatAt: now },
+    });
     throw new Error(verification.verificationMessage);
   }
 
@@ -238,23 +278,39 @@ export async function recordWatchHeartbeat(
           lastHeartbeatAt: now,
         },
       });
+      await settleTodayWatchPoints(tx, user.id, now);
       return;
     }
 
-    if (!active) return;
+    if (!active) {
+      if (verification.verified) await settleTodayWatchPoints(tx, user.id, now);
+      return;
+    }
 
-    const delta = Math.min(
-      MAX_HEARTBEAT_SECONDS,
-      elapsedSeconds(active.lastHeartbeatAt, now)
-    );
-    await tx.watchSession.update({
-      where: { id: active.id },
+    const delta = verification.verified
+      ? Math.min(MAX_HEARTBEAT_SECONDS, elapsedSeconds(active.lastHeartbeatAt, now))
+      : 0;
+    const heartbeatUpdate = await tx.watchSession.updateMany({
+      where: {
+        id: active.id,
+        status: "ACTIVE",
+        lastHeartbeatAt: active.lastHeartbeatAt,
+      },
       data: {
         totalSeconds: { increment: delta },
         lastHeartbeatAt: now,
         ...(running ? {} : { status: "PAUSED" as const, endedAt: now }),
       },
     });
+
+    if (!running && heartbeatUpdate.count === 0) {
+      await tx.watchSession.updateMany({
+        where: { id: active.id, status: "ACTIVE" },
+        data: { status: "PAUSED", endedAt: now, lastHeartbeatAt: now },
+      });
+    }
+
+    if (verification.verified) await settleTodayWatchPoints(tx, user.id, now);
   });
 
   return getWatchSummary(sessionToken);
@@ -269,7 +325,6 @@ export async function claimWatchPoints(
     throw new Error(verification.verificationMessage);
   }
 
-  const today = startOfToday();
   const now = new Date();
 
   await prisma.$transaction(async (tx) => {
@@ -283,8 +338,12 @@ export async function claimWatchPoints(
         MAX_HEARTBEAT_SECONDS,
         elapsedSeconds(active.lastHeartbeatAt, now)
       );
-      await tx.watchSession.update({
-        where: { id: active.id },
+      await tx.watchSession.updateMany({
+        where: {
+          id: active.id,
+          status: "ACTIVE",
+          lastHeartbeatAt: active.lastHeartbeatAt,
+        },
         data: {
           totalSeconds: { increment: delta },
           lastHeartbeatAt: now,
@@ -292,61 +351,7 @@ export async function claimWatchPoints(
       });
     }
 
-    const sessions = await tx.watchSession.findMany({
-      where: { userId: user.id, startedAt: { gte: today } },
-      orderBy: { startedAt: "asc" },
-    });
-
-    const baseAward = sessions.reduce(
-      (sum, session) => sum + claimableFor(session.totalSeconds, session.pointsAwarded),
-      0
-    );
-    if (baseAward <= 0) {
-      throw new Error("No watch points are ready to claim.");
-    }
-
-    const bonusAlreadyAwarded = sessions.some((session) => session.dailyBonusAwarded);
-    const bonus = bonusAlreadyAwarded ? 0 : DAILY_KICK_BONUS;
-    const latestSession = sessions.at(-1);
-
-    for (const session of sessions) {
-      const earnedForSession =
-        Math.floor(session.totalSeconds / SLICE_SECONDS) * POINTS_PER_SLICE;
-      if (earnedForSession > session.pointsAwarded) {
-        await tx.watchSession.update({
-          where: { id: session.id },
-          data: { pointsAwarded: earnedForSession },
-        });
-      }
-    }
-
-    if (bonus > 0 && latestSession) {
-      await tx.watchSession.update({
-        where: { id: latestSession.id },
-        data: { dailyBonusAwarded: true },
-      });
-    }
-
-    await tx.user.update({
-      where: { id: user.id },
-      data: {
-        points: { increment: baseAward + bonus },
-        xp: { increment: baseAward },
-      },
-    });
-
-    await tx.pointTransaction.create({
-      data: {
-        userId: user.id,
-        amount: baseAward + bonus,
-        reason: "watch_points",
-        meta: JSON.stringify({
-          baseAward,
-          dailyBonus: bonus,
-          totalSeconds: sessions.reduce((sum, session) => sum + session.totalSeconds, 0),
-        }),
-      },
-    });
+    await settleTodayWatchPoints(tx, user.id, now);
   });
 
   return getWatchSummary(sessionToken);

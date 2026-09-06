@@ -24,6 +24,7 @@ import { useCallback, useEffect, useMemo, useState, type CSSProperties, type Poi
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
 import LiquidGlass from "./liquid-glass";
+import { PrizeDropField, RevealBlock } from "./showcase-motion";
 import SiteEntryLoader from "./site-entry-loader";
 import StaggeredMenu from "./staggered-menu";
 import VolcanoBackground from "./volcano-background";
@@ -61,14 +62,28 @@ const DESKTOP_NAV = [
   ["Store", "/store"],
 ] as const;
 
-const launchpad: [string, string, string, string, string, ZoneIcon][] = [
-  ["Board", "/leaderboard", "LB", "ember", "View board", Trophy],
-  ["Bets", "/custom-bets", "BET", "mint", "Place slips", Coins],
-  ["Missions", "/challenges", "XP", "violet", "Earn rewards", BadgeCheck],
-  ["Watch", "/watch-points", "GO", "blue", "Watch live", Tv],
-  ["Hunts", "/bonus-hunts", "H", "coral", "Track hunts", Sparkles],
-  ["Store", "/store", "PTS", "magma", "Claim prizes", Gift],
+const launchpad: [string, string, string, string, ZoneIcon][] = [
+  ["Board", "/leaderboard", "LB", "ember", Trophy],
+  ["Bets", "/custom-bets", "BET", "mint", Coins],
+  ["Missions", "/challenges", "XP", "violet", BadgeCheck],
+  ["Watch", "/watch-points", "GO", "blue", Tv],
+  ["Hunts", "/bonus-hunts", "H", "coral", Sparkles],
+  ["Store", "/store", "PTS", "magma", Gift],
 ] as const;
+
+const featurePageIcons: Record<string, ZoneIcon> = {
+  challenges: BadgeCheck,
+  "bonus-hunts": Sparkles,
+  tournaments: Trophy,
+  "wager-raffles": Gift,
+  store: Gift,
+  "custom-bets": Coins,
+  "watch-points": Tv,
+  admin: Crown,
+  help: Search,
+  support: BadgeCheck,
+  login: BadgeCheck,
+};
 
 const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
   challenges: {
@@ -385,16 +400,16 @@ export default function RankBoardApp({
     <div className="site-shell">
       <div className="site-tunnel-background" aria-hidden="true">
         <VolcanoBackground
-          skyColorTop="#08030f"
-          skyColorBottom="#26080b"
-          lavaColor="#ff4f00"
-          glowColor="#ff7a00"
-          meteorColor="#ffd166"
+          skyColorTop="#020609"
+          skyColorBottom="#10031a"
+          lavaColor="#d8ff3f"
+          glowColor="#43e8ff"
+          meteorColor="#ff4fa2"
           meteorCount={3}
-          eruptionIntensity={0.38}
-          starCount={36}
-          maxLavaParticles={95}
-          simulationSpeed={0.38}
+          eruptionIntensity={0.3}
+          starCount={32}
+          maxLavaParticles={74}
+          simulationSpeed={0.34}
           animationStyle="default"
         />
       </div>
@@ -518,43 +533,13 @@ function Home() {
 
   return <main>
     <section className="product-hero page-width">
-      <div className="hero-props" aria-hidden="true">
-        <span className="h-prop h-coin">$</span>
-        <span className="h-prop h-chip" />
-        <span className="h-prop h-die" />
-        <span className="h-prop h-card"><i>A</i><b>♠</b></span>
-        <span className="h-prop h-seven">7</span>
-        <span className="h-prop h-card-stack">
-          <i>K</i>
-          <i>Q</i>
-          <i>A</i>
-        </span>
-        <span className="h-prop h-cash-stack">
-          <i />
-          <i />
-          <b>$</b>
-        </span>
-        <span className="h-prop h-chip-trail">
-          <i />
-          <i />
-          <i />
-        </span>
-        <span className="h-prop h-left-card"><i>J</i><b>♦</b></span>
-        <span className="h-prop h-left-cash">
-          <i />
-          <b>$</b>
-        </span>
-        <span className="sparkle sp-1">✦</span>
-        <span className="sparkle sp-2">✦</span>
-        <span className="sparkle sp-3">✦</span>
-        <span className="sparkle sp-4">✦</span>
-      </div>
+      <PrizeDropField className="hero-prize-drops" />
       <div className="hero-copy">
         <motion.div
           className="hero-word-block"
           initial={{ opacity: 0, x: -28, rotate: -1.5 }}
           animate={{ opacity: 1, x: 0, rotate: 0 }}
-          transition={{ delay: 1.05, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.52, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
         >
           <h1 className="hero-brackoz-title">
             <span aria-label="Rank Up">
@@ -564,33 +549,33 @@ function Home() {
               {"Grab Rewards".split("").map((char, index) => <i key={`rewards-${index}`} className={char === " " ? "hero-title-space" : undefined}>{char}</i>)}
             </em>
           </h1>
-          <p className="hero-mini-line">Play. Climb. Claim.</p>
           <div className="home-prize-core home-prize-core--hero" aria-label={`Live pool ${livePoolLabel} points`}>
             <span>Live Pool</span>
             <AnimatedPoolNumber value={livePool} />
             <b>PTS</b>
           </div>
           <div className="button-row">
-            <MagneticLink className="button primary" href="/leaderboard">Play</MagneticLink>
-            <MagneticLink className="button ghost" href="/store">Claim</MagneticLink>
+            <MagneticLink className="button primary" href="/leaderboard"><Trophy size={16} strokeWidth={2.7} aria-hidden="true" />Board</MagneticLink>
+            <MagneticLink className="button ghost" href="/store"><Gift size={16} strokeWidth={2.7} aria-hidden="true" />Store</MagneticLink>
           </div>
         </motion.div>
         <HeroRankTracker activity={livePool} players={users.slice(0, 3)} />
       </div>
     </section>
-    <HomeBoardPreview users={users} />
     <section className="home-action-zone page-width" aria-label="RankBoard routes and live stats">
-      <div className="home-signal-row">
-        <div><span>Players</span><strong>{livePlayers}</strong></div>
-        <div><span>Wager</span><strong>{formatNumberCompact(wager)}</strong></div>
-        <div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div>
-        <Link href="/leaderboard">Leaderboard <ArrowUpRight size={14} strokeWidth={2.6} aria-hidden="true" /></Link>
-      </div>
-      <div className="home-route-strip">
-        {launchpad.map(([title, href, badge, color, action, Icon]) => (
-          <SpotlightRouteCard action={action} badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
-        ))}
-      </div>
+      <RevealBlock className="home-action-zone__inner">
+        <div className="home-signal-row">
+          <div><span>Players</span><strong>{livePlayers}</strong></div>
+          <div><span>Wager</span><strong>{formatNumberCompact(wager)}</strong></div>
+          <div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div>
+          <Link href="/leaderboard" aria-label="Open leaderboard" title="Leaderboard"><Trophy size={20} strokeWidth={2.5} aria-hidden="true" /><ArrowUpRight size={14} strokeWidth={2.6} aria-hidden="true" /></Link>
+        </div>
+        <div className="home-route-strip">
+          {launchpad.map(([title, href, badge, color, Icon]) => (
+            <SpotlightRouteCard badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
+          ))}
+        </div>
+      </RevealBlock>
     </section>
   </main>;
 }
@@ -606,16 +591,12 @@ function HeroRankTracker({ activity, players }: { activity: number; players: Pla
       className="hero-live-panel-wrap"
       initial={{ opacity: 0, x: 42, y: 20, rotate: 5 }}
       animate={{ opacity: 1, x: 0, y: 0, rotate: -2 }}
-      transition={{ delay: 1.22, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.64, duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
     >
       <LiquidGlass as="section" className="hero-live-panel hero-rank-tracker" tone="ember" aria-label="Live leaderboard snapshot">
         <div className="hero-rank-tracker__top">
-          <span className="hero-rank-tracker__live"><i /> Live board</span>
+          <span className="hero-rank-tracker__live"><i /> Live</span>
           <Link href="/leaderboard" aria-label="Open full leaderboard"><ArrowUpRight size={18} strokeWidth={2.5} aria-hidden="true" /></Link>
-        </div>
-        <div className="hero-rank-tracker__title">
-          <span>Live</span>
-          <strong>Top racers</strong>
         </div>
         <div className="hero-rank-tracker__leader">
           <div className="hero-rank-tracker__leader-top">
@@ -625,7 +606,6 @@ function HeroRankTracker({ activity, players }: { activity: number; players: Pla
           <div className="hero-rank-tracker__leader-main">
             <span className="hero-rank-tracker__avatar hero-rank-tracker__avatar--leader">{leader ? getInitials(leader.name) : "RB"}</span>
             <span className="hero-rank-tracker__identity">
-              <small>Leader</small>
               <strong>{leader ? playerName(leader) : "Syncing live data"}</strong>
               <i><span style={{ width: leader ? "100%" : "8%" }} /></i>
             </span>
@@ -643,7 +623,7 @@ function HeroRankTracker({ activity, players }: { activity: number; players: Pla
                 <div className="hero-rank-tracker__chaser-top"><b>#{index + 1}</b><span>{prizes[index]}</span></div>
                 <div className="hero-rank-tracker__chaser-player">
                   <span className="hero-rank-tracker__avatar">{player ? getInitials(player.name) : "RB"}</span>
-                  <span><small>#{index + 2}</small><strong>{player ? playerName(player) : "Syncing"}</strong></span>
+                  <span><strong>{player ? playerName(player) : "Syncing"}</strong></span>
                 </div>
                 <i className="hero-rank-tracker__chaser-track"><span style={{ width: `${progress}%` }} /></i>
                 <strong className="hero-rank-tracker__chaser-score">{formatNumberCompact(score)} <small>XP</small></strong>
@@ -652,25 +632,11 @@ function HeroRankTracker({ activity, players }: { activity: number; players: Pla
           })}
         </div>
         <div className="hero-rank-tracker__footer">
-          <span><small>Live activity</small><strong>{formatNumberCompact(activity)} PTS</strong></span>
-          <Link href="/leaderboard">Full ranking <ArrowUpRight size={15} strokeWidth={2.6} aria-hidden="true" /></Link>
+          <span><strong>{formatNumberCompact(activity)}</strong><small>PTS</small></span>
+          <Link href="/leaderboard" aria-label="Open full ranking" title="Full ranking"><Trophy size={16} strokeWidth={2.6} aria-hidden="true" /><ArrowUpRight size={15} strokeWidth={2.6} aria-hidden="true" /></Link>
         </div>
       </LiquidGlass>
     </motion.div>
-  );
-}
-
-function HomeBoardPreview({ users }: { users: Player[] }) {
-  return (
-    <section className="home-board-preview page-width" id="home-board-preview" aria-label="Top three leaderboard players">
-      <div className="home-board-preview__top">
-        <span>Top 3</span>
-        <Link href="/leaderboard">Full Board <ArrowUpRight size={14} strokeWidth={2.6} aria-hidden="true" /></Link>
-      </div>
-      <div className="home-board-preview__stage">
-        <Podium players={users.slice(0, 3)} compact />
-      </div>
-    </section>
   );
 }
 
@@ -685,14 +651,14 @@ function AnimatedPoolNumber({ value }: { value: number }) {
       }),
     [fractionDigits]
   );
-  const [introDelay, setIntroDelay] = useState(1.55);
+  const [introDelay, setIntroDelay] = useState(0.78);
   const count = useMotionValue(0);
   const display = useTransform(count, (latest) => formatPoolDisplay(latest, fractionDigits));
   const displayLabel = formatPoolDisplay(value, fractionDigits);
   const fullLabel = formatter.format(value);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setIntroDelay(0), 3400);
+    const timeout = window.setTimeout(() => setIntroDelay(0), 2400);
     return () => window.clearTimeout(timeout);
   }, []);
 
@@ -704,7 +670,7 @@ function AnimatedPoolNumber({ value }: { value: number }) {
 
     const controls = animate(count, value, {
       delay: introDelay,
-      duration: introDelay ? 1.9 : 0.85,
+      duration: introDelay ? 1.45 : 0.85,
       ease: [0.16, 1, 0.3, 1],
     });
 
@@ -748,14 +714,12 @@ function MagneticLink({ className, href, children }: { className: string; href: 
 }
 
 function SpotlightRouteCard({
-  action,
   badge,
   color,
   href,
   icon: Icon,
   title,
 }: {
-  action: string;
   badge: string;
   color: string;
   href: string;
@@ -788,7 +752,7 @@ function SpotlightRouteCard({
       <span className="home-route-card__badge">{badge}</span>
       <Icon className="home-route-card__mark" size={62} strokeWidth={1.8} aria-hidden="true" />
       <strong>{title}</strong>
-      <small className="home-route-card__action">{action} ↗</small>
+      <ArrowUpRight className="home-route-card__arrow" size={19} strokeWidth={2.7} aria-hidden="true" />
     </Link>
   );
 }
@@ -807,8 +771,6 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
 function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | null }) {
   const {
     users,
-    total,
-    highestScore,
     lastUpdated,
     isLoading,
     error,
@@ -835,7 +797,8 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
   const visiblePlayers = filtered.slice(0, visible);
   const leaderScore = filtered[0] ? playerScore(filtered[0]) : 0;
   const wager = totalWager(users);
-  const targetWager = Math.max(200000, wager || 200000);
+  const wagerStep = 500_000;
+  const targetWager = Math.max(wagerStep, (Math.floor(wager / wagerStep) + 1) * wagerStep);
   const wagerProgress = Math.min(100, Math.round(((wager || 0) / targetWager) * 100));
   const targetDate = countdownTarget ? new Date(countdownTarget) : null;
 
@@ -847,13 +810,14 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
 
   return <main>
     <section className="board-hero board-hero--leaderboard page-width">
-      <div><p className="kicker"><span>●</span> Live board</p><h1>Global Leaderboard</h1><p className="hero-desc">Chase the top spot.</p></div>
+      <PrizeDropField compact />
+      <div><p className="kicker"><span>●</span> Live</p><h1>Leaderboard</h1></div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
     <LiquidGlass as="section" className="leaderboard-progress page-width" tone="ember" aria-label="Season wager progress">
-      <div className="progress-medal">$</div>
+      <div className="progress-medal"><Trophy size={23} strokeWidth={2.7} aria-hidden="true" /></div>
       <div>
-        <div className="progress-head"><span>Prize track</span><strong>{fmt(wager)} / {fmt(targetWager)}</strong><b>{wagerProgress}%</b></div>
+        <div className="progress-head"><span>Next drop</span><strong>{fmt(wager)} / {fmt(targetWager)}</strong><b>{wagerProgress}%</b></div>
         <div className="progress-bar"><i style={{ width: `${wagerProgress}%` }} /></div>
       </div>
     </LiquidGlass>
@@ -870,7 +834,6 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         <Podium players={users.slice(0, 3)} />
       </div>
     </section>
-    <section className="stat-strip page-width board-metrics"><div><span>Players</span><strong>{total || users.length}</strong></div><div><span>Wagered</span><strong>{formatNumberCompact(wager)}</strong></div><div><span>Top XP</span><strong>{formatNumberCompact(highestScore)}</strong></div><div className="round-block"><span>Board</span><strong>{error ? "Issue" : isLoading ? "Sync" : "Live"}</strong></div></section>
     <section className="section page-width board-section">
       <LiquidGlass className="standings" tone="cyan">
         <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
@@ -951,7 +914,23 @@ function SeasonClock({
 function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div><span className={player.rank<7?"status hot":"status live"}>{player.rank<7?"HOT":"LIVE"}</span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
-  return <main><section className="board-hero feature-page-hero page-width"><div><p className="kicker"><span>●</span> Season 08</p><h1>{data.title}</h1><p className="hero-desc">{data.tagline}</p><div className="button-row"><Link className="button ghost" href={data.action[1]}>{data.action[0]}</Link></div></div></section><FeatureWorkspace route={route} /></main>;
+  const Icon = featurePageIcons[route] ?? Sparkles;
+  return <main>
+    <section className="board-hero feature-page-hero page-width">
+      <PrizeDropField compact />
+      <motion.div
+        className="feature-page-hero__inner"
+        initial={{ opacity: 0, y: 18, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.42, duration: 0.52, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <span className="feature-page-hero__icon"><Icon size={28} strokeWidth={2.6} aria-hidden="true" /></span>
+        <div><p className="kicker"><span>●</span> Season 08</p><h1>{data.title}</h1></div>
+        <Link className="feature-page-hero__action" href={data.action[1]} title={data.action[0]}><span>{data.action[0]}</span><ArrowUpRight size={18} strokeWidth={2.7} aria-hidden="true" /></Link>
+      </motion.div>
+    </section>
+    <FeatureWorkspace route={route} />
+  </main>;
 }
 
 function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>●</span> RankBoard legal</p><h1>{privacy?"Privacy":"Terms"}<em>.</em></h1><p className="legal-lead">{privacy?"How RankBoard handles your data.":"The rules for playing fair."}</p><div className="legal-layout"><aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","RankBoard may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using RankBoard","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
@@ -1466,4 +1445,33 @@ function Profile({ account }: { account: HeaderAccount }) {
   );
 }
 
-function Footer(){return <footer className="footer"><div className="footer-top page-width"><div><Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link><p>Live rankings & rewards.<br/>Play responsibly · 18+</p></div><div className="footer-links">{[["Board","/leaderboard"],["Bets","/custom-bets"],["Store","/store"],["Watch","/watch-points"],["Missions","/challenges"],["Profile","/profile"],["Support","/support"],["Privacy","/privacy"],["Terms","/terms"]].map(([n,h])=><Link key={h} href={h}>{n}<span>↗</span></Link>)}</div></div><div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>LIVE <b>●</b></span><span>18+ ONLY</span></div></footer>}
+function Footer() {
+  const links = [
+    ["Board", "/leaderboard"],
+    ["Bets", "/custom-bets"],
+    ["Store", "/store"],
+    ["Watch", "/watch-points"],
+    ["Missions", "/challenges"],
+    ["Profile", "/profile"],
+    ["Support", "/support"],
+    ["Privacy", "/privacy"],
+    ["Terms", "/terms"],
+  ];
+
+  return (
+    <footer className="footer">
+      <div className="footer-top page-width">
+        <div>
+          <Link className="brand" href="/"><span className="brand-mark">R</span><span>RANK<span>BOARD</span></span></Link>
+          <p>Live rewards. Play responsibly · 18+</p>
+        </div>
+        <div className="footer-links">
+          {links.map(([name, href]) => (
+            <Link key={href} href={href}>{name}<ArrowUpRight size={13} strokeWidth={2.6} aria-hidden="true" /></Link>
+          ))}
+        </div>
+      </div>
+      <div className="footer-bottom"><span>© 2026 RANKBOARD</span><span>LIVE <b>●</b></span></div>
+    </footer>
+  );
+}
