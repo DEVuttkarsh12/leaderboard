@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 
 type AnimationStyle = "default" | "vortex" | "explosive" | "wave";
@@ -107,6 +107,7 @@ export default function VolcanoBackground({
 }: VolcanoBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -120,7 +121,7 @@ export default function VolcanoBackground({
     let intersectionObserver: IntersectionObserver | null = null;
     let isVisible = true;
     let lastTime = performance.now();
-    let dpr = window.devicePixelRatio || 1;
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.75);
     let lavaAccumulator = 0;
     let emberAccumulator = 0;
 
@@ -137,7 +138,7 @@ export default function VolcanoBackground({
       const width = rect.width > 0 ? rect.width : 800;
       const height = rect.height > 0 ? rect.height : 450;
 
-      dpr = window.devicePixelRatio || 1;
+      dpr = Math.min(window.devicePixelRatio || 1, 1.75);
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -202,7 +203,7 @@ export default function VolcanoBackground({
       const height = logicalHeight();
 
       if (width === 0 || height === 0) {
-        if (isVisible) animationFrameId = requestAnimationFrame(render);
+        if (isVisible && !prefersReducedMotion) animationFrameId = requestAnimationFrame(render);
         return;
       }
 
@@ -425,7 +426,7 @@ export default function VolcanoBackground({
 
       context.restore();
 
-      if (isVisible) {
+      if (isVisible && !prefersReducedMotion) {
         animationFrameId = requestAnimationFrame(render);
       } else {
         animationFrameId = undefined;
@@ -477,7 +478,7 @@ export default function VolcanoBackground({
           return;
         }
 
-        if (isVisible && animationFrameId === undefined) {
+        if (isVisible && !prefersReducedMotion && animationFrameId === undefined) {
           lastTime = performance.now();
           animationFrameId = requestAnimationFrame(render);
         }
@@ -505,6 +506,7 @@ export default function VolcanoBackground({
     maxLavaParticles,
     meteorColor,
     meteorCount,
+    prefersReducedMotion,
     simulationSpeed,
     skyColorBottom,
     skyColorTop,

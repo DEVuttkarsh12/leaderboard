@@ -1,22 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
+import {
+  Bricolage_Grotesque,
+  Instrument_Sans,
+  Sedgwick_Ave,
+} from "next/font/google";
 import "./globals.css";
+import "./artz-polish.css";
+import "./casino-stage.css";
 
-const artzBody = localFont({
+const artzBody = Instrument_Sans({
   variable: "--font-artz-body",
-  src: [
-    { path: "./fonts/Inter-Regular.otf", weight: "400", style: "normal" },
-    { path: "./fonts/Inter-SemiBold.otf", weight: "600", style: "normal" },
-  ],
+  subsets: ["latin"],
   display: "swap",
 });
 
-const artzDisplay = localFont({
+const artzDisplay = Bricolage_Grotesque({
   variable: "--font-artz-display",
-  src: [
-    { path: "./fonts/InterDisplay-Bold.otf", weight: "700", style: "normal" },
-    { path: "./fonts/InterDisplay-BlackItalic.otf", weight: "900", style: "italic" },
-  ],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const artzLogo = Sedgwick_Ave({
+  variable: "--font-artz-logo",
+  weight: "400",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -32,7 +39,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#050b13",
+  themeColor: "#0a0312",
 };
 
 export default function RootLayout({
@@ -43,7 +50,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${artzBody.variable} ${artzDisplay.variable} antialiased`}
+      className={`${artzBody.variable} ${artzDisplay.variable} ${artzLogo.variable} antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

@@ -21,8 +21,6 @@ import {
   LayoutDashboard,
   PackageCheck,
   PackageOpen,
-  Pause,
-  Play,
   Radio,
   ReceiptText,
   Shield,
@@ -43,6 +41,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
 } from "react";
@@ -111,7 +110,6 @@ type WatchSummary = {
   lastActivityAt: string | null;
   totalSecondsToday: number;
   earnedPointsToday: number;
-  claimablePoints: number;
   dailyBonusAvailable: boolean;
   dailyBonus: number;
   rateLabel: string;
@@ -260,9 +258,9 @@ const defaultAccount: Account = {
   image: "",
   profileProvider: "email",
   accessKey: "",
-  points: 18500,
-  xp: 4200,
-  streak: 3,
+  points: 0,
+  xp: 0,
+  streak: 0,
   inventory: [],
   connected: {
     kick: { connected: false, username: "", id: "" },
@@ -277,7 +275,7 @@ const defaultAccount: Account = {
   watchMinutes: 0,
   banned: false,
   timeoutUntil: "",
-  badges: ["Early", "Season 08"],
+  badges: [],
 };
 
 const defaultSiteConfig: SiteConfig = {
@@ -291,7 +289,7 @@ const defaultSiteConfig: SiteConfig = {
 
 const faq = [
   { q: "Weighted XP", a: "Live API. Read-only." },
-  { q: "Kick points", a: "Watch. Claim. Spend." },
+  { q: "Kick points", a: "Watch. Earn. Spend." },
   { q: "Store rewards", a: "Pending to fulfilled." },
   { q: "Custom bets", a: "Admin settles." },
   { q: "Casino names", a: "Link in profile." },
@@ -352,7 +350,7 @@ function iconForLabel(label: string) {
 }
 
 function normalizeAccount(value: Partial<Account> | null | undefined): Account {
-  return {
+  const normalized = {
     ...defaultAccount,
     ...value,
     inventory: Array.isArray(value?.inventory) ? value.inventory : [],
@@ -366,6 +364,8 @@ function normalizeAccount(value: Partial<Account> | null | undefined): Account {
     },
     badges: Array.isArray(value?.badges) ? value.badges : defaultAccount.badges,
   };
+
+  return normalized.handle === "@guest" ? defaultAccount : normalized;
 }
 
 function accountFromPayload(payload: AuthAccountPayload): Account {
@@ -1390,6 +1390,7 @@ function WatchPointsWorkspace({
   const [seconds, setSeconds] = useState(0);
   const [summary, setSummary] = useState<WatchSummary | null>(null);
   const [message, setMessage] = useState("Syncing...");
+  const autoStartAttempted = useRef(false);
   const connected = summary?.connected ?? account.connected.kick.connected;
   const displayedSeconds = seconds;
   const earnedToday = summary?.earnedPointsToday ?? 0;
@@ -1415,53 +1416,76 @@ function WatchPointsWorkspace({
     return () => window.clearInterval(timer);
   }, [running]);
 
-  useEffect(() => {
-    let active = true;
-
-    fetch("/api/watch-points", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((payload: { summary?: WatchSummary; error?: string }) => {
-        if (!active) return;
-        if (payload.summary) {
-          applyWatchSummary(payload.summary);
-          setMessage(payload.summary.connected ? payload.summary.running ? "Auto earning" : "Ready" : "Connect Kick");
-        } else {
-          setMessage(payload.error ?? "Could not load watch points.");
-        }
-      })
-      .catch(() => { if (active) setMessage("Could not load watch points."); });
-
-    return () => { active = false; };
-  }, [applyWatchSummary]);
-
-  const sendHeartbeat = useCallback(async (nextRunning: boolean, quiet = false) => {
+  const sendHeartbeat = useCallback(async (quiet = false) => {
     try {
       const response = await fetch("/api/watch-points/heartbeat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ running: nextRunning }),
+        body: JSON.stringify({ running: true }),
       });
       const payload = (await response.json()) as { summary?: WatchSummary; error?: string };
       if (!response.ok || !payload.summary) {
         throw new Error(payload.error ?? "Watch update failed.");
       }
       applyWatchSummary(payload.summary);
-      setMessage(quiet ? "Auto earning" : nextRunning ? "Auto earning" : "Paused");
+      setMessage("Auto earning");
+      return payload.summary;
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Watch update failed.");
+      if (!quiet) {
+        setMessage(error instanceof Error ? error.message : "Watch update failed.");
+      }
       setRunning(false);
+      return null;
     }
   }, [applyWatchSummary]);
 
   useEffect(() => {
-    if (!running) return;
+    let active = true;
+
+    async function startAutoEarning() {
+      try {
+        const response = await fetch("/api/watch-points", { cache: "no-store" });
+        const payload = (await response.json()) as { summary?: WatchSummary; error?: string };
+        if (!active) return;
+
+        if (!payload.summary) {
+          setMessage(payload.error ?? "Could not load watch points.");
+          return;
+        }
+
+        applyWatchSummary(payload.summary);
+        if (!payload.summary.connected) {
+          setMessage("Connect Kick");
+          return;
+        }
+        if (!payload.summary.verified) {
+          setMessage(payload.summary.verificationMessage);
+          return;
+        }
+
+        setMessage("Starting auto earn...");
+        if (!autoStartAttempted.current) {
+          autoStartAttempted.current = true;
+          await sendHeartbeat();
+        }
+      } catch {
+        if (active) setMessage("Could not load watch points.");
+      }
+    }
+
+    void startAutoEarning();
+    return () => { active = false; };
+  }, [applyWatchSummary, sendHeartbeat]);
+
+  useEffect(() => {
+    if (!connected) return;
 
     const heartbeat = window.setInterval(() => {
-      void sendHeartbeat(true, true);
+      void sendHeartbeat(true);
     }, 10000);
 
     return () => window.clearInterval(heartbeat);
-  }, [running, sendHeartbeat]);
+  }, [connected, sendHeartbeat]);
 
   return (
     <section className="section page-width app-workspace workspace--watch">
@@ -1478,15 +1502,12 @@ function WatchPointsWorkspace({
             <SignalChip
               icon={Activity}
               label="Watch points credit automatically"
-              value={running ? "Auto earning" : "Auto credit"}
+              value={running ? "Earning now" : connected ? "Waiting for stream" : "Connect Kick"}
               tone={running ? "acid" : "cyan"}
               active={running}
             />
           </div>
-          <div className="button-row">
-            {!connected ? <a className="button primary" href="/api/auth/kick"><Tv size={16} aria-hidden="true" />Connect Kick</a> : null}
-            <button className="button ghost" type="button" onClick={() => sendHeartbeat(!running)} disabled={!connected}>{running ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}{running ? "Pause" : "Start"}</button>
-          </div>
+          {!connected ? <div className="button-row"><a className="button primary" href="/api/auth/kick"><Tv size={16} aria-hidden="true" />Connect Kick</a></div> : null}
         </div>
       </div>
       <AccountStrip account={account} />

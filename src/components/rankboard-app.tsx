@@ -27,6 +27,7 @@ import LiquidGlass from "./liquid-glass";
 import { PrizeDropField, RevealBlock } from "./showcase-motion";
 import SiteEntryLoader from "./site-entry-loader";
 import StaggeredMenu from "./staggered-menu";
+import ArtzStageBackground from "./artz-stage-background";
 import type { AuthAccountPayload, CasinoAccountDetail } from "@/lib/auth/account";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated, formatNumberCompact, formatShortDate } from "@/lib/formatters";
@@ -216,10 +217,10 @@ const guestHeaderAccount: HeaderAccount = {
   handle: "@guest",
   image: "",
   profileProvider: "email",
-  points: 18500,
-  xp: 4200,
+  points: 0,
+  xp: 0,
   authenticated: false,
-  badges: ["Season 08"],
+  badges: [],
   connected: {
     kick: {
       connected: false,
@@ -247,6 +248,10 @@ function normalizeHeaderAccount(value: Partial<HeaderAccount> | null | undefined
           value?.connected?.discord?.connected ||
           (value?.handle && value.handle !== "@guest")
         );
+
+  if (!isAuth) {
+    return guestHeaderAccount;
+  }
 
   return {
     ...guestHeaderAccount,
@@ -397,7 +402,9 @@ export default function RankBoardApp({
   const account = useHeaderAccount();
   return (
     <div className="site-shell">
-      <div className="site-tunnel-background" aria-hidden="true" />
+      <div className="site-tunnel-background" aria-hidden="true">
+        <ArtzStageBackground />
+      </div>
       <div className="site-floating-rewards" aria-hidden="true">
         <span className="site-floating-reward site-floating-reward--crown"><Crown size={20} strokeWidth={2.4} /></span>
         <span className="site-floating-reward site-floating-reward--coins"><Coins size={20} strokeWidth={2.4} /></span>
@@ -454,7 +461,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
 
   return (
     <>
-      <LiquidGlass as="nav" className="desktop-nav" depth="clear" tone="violet" aria-label="Primary navigation">
+      <LiquidGlass as="nav" className="desktop-nav" depth="clear" interactive={false} tone="violet" aria-label="Primary navigation">
         <Link className="desktop-nav__brand" href="/" aria-label="ARTZ Rewards home">
           <span className="desktop-nav__mark">A</span>
           <span className="desktop-nav__word">
@@ -472,14 +479,13 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
           <Link className="desktop-nav__account" href={accountHref} aria-label={`Open ${headerAccountDestinationLabel(account)}`}>
             <span className="desktop-nav__avatar">{account.image ? <Image src={account.image} alt="" width={36} height={36} unoptimized /> : initials}</span>
             <span>
-              <strong>{accountStatus}</strong>
-              <small>{formatNumberCompact(account.points)} PTS</small>
+              <strong>{account.authenticated ? cleanHandle : "Guest"}</strong>
+              <small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small>
             </span>
           </Link>
           {account.authenticated ? (
-            <button className="desktop-nav__logout" type="button" onClick={signOut} aria-label="Logout of ARTZ Rewards">
+            <button className="desktop-nav__logout" type="button" onClick={signOut} aria-label="Logout of ARTZ Rewards" title="Logout">
               <LogOut size={15} strokeWidth={2.6} aria-hidden="true" />
-              <span>Logout</span>
             </button>
           ) : (
             <Link className="desktop-nav__logout desktop-nav__logout--login" href="/login">
@@ -524,19 +530,41 @@ function Home() {
   return <main className="artz-home">
     <section className="product-hero product-hero--centered">
       <PrizeDropField className="hero-prize-drops" />
+      <div className="hero-casino-props" aria-hidden="true">
+        <motion.figure
+          className="hero-casino-prop hero-casino-prop--left"
+          initial={{ opacity: 0, x: -46, rotate: -16, scale: 0.8 }}
+          animate={{ opacity: 1, x: 0, rotate: -8, scale: 1 }}
+          transition={{ delay: 0.62, duration: 0.86, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Image src="/artz-casino-stack.webp" alt="" width={720} height={768} priority sizes="(max-width: 760px) 150px, 300px" />
+        </motion.figure>
+        <motion.figure
+          className="hero-casino-prop hero-casino-prop--right"
+          initial={{ opacity: 0, x: 46, rotate: 18, scale: 0.8 }}
+          animate={{ opacity: 1, x: 0, rotate: 9, scale: 1 }}
+          transition={{ delay: 0.72, duration: 0.86, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Image src="/artz-roulette-capsule.webp" alt="" width={720} height={743} priority sizes="(max-width: 760px) 150px, 300px" />
+        </motion.figure>
+      </div>
       <motion.div
         className="home-center-stage"
         initial={{ opacity: 0, y: 26, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.38, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
       >
-        <span className="home-welcome">Welcome to</span>
-        <h1 className="home-artz-title"><span>ARTZ</span><strong>REWARDS</strong></h1>
-        <p className="home-artz-subtitle">Play. Climb. Get rewarded.</p>
+        <span className="home-hero-emblem" aria-hidden="true"><Crown size={22} strokeWidth={2.5} /><b>A</b></span>
+        <span className="home-welcome">ARTZ presents</span>
+        <h1 className="home-artz-title" aria-label="ARTZ Rewards">
+          <PlayfulWord text="ARTZ" />
+          <PlayfulWord accent text="Rewards" />
+        </h1>
+        <p className="home-artz-subtitle">Watch. Play. Win.</p>
         <div className="home-hero-actions">
-          <MagneticLink className="button secondary home-rewards-cta" href="/store">
-            <Gift size={17} strokeWidth={2.7} aria-hidden="true" />
-            View rewards
+          <MagneticLink className="button secondary home-rewards-cta" href="/watch-points">
+            <Tv size={17} strokeWidth={2.7} aria-hidden="true" />
+            Watch &amp; earn
             <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
           </MagneticLink>
           <MagneticLink className="button primary home-board-cta" href="/leaderboard">
@@ -608,6 +636,16 @@ function Home() {
       </RevealBlock>
     </section>
   </main>;
+}
+
+function PlayfulWord({ accent = false, text }: { accent?: boolean; text: string }) {
+  return (
+    <span className={`playful-word${accent ? " playful-word--accent" : ""}`} aria-hidden="true">
+      {[...text].map((character, index) => (
+        <i key={`${character}-${index}`}>{character}</i>
+      ))}
+    </span>
+  );
 }
 
 function HeroPodium({ players }: { players: Player[] }) {
@@ -745,7 +783,7 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
 
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Live</small>}<b>0 <em>XP</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Ranking</small>}<b>0 <em>XP</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
@@ -795,7 +833,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
   return <main>
     <section className="board-hero board-hero--leaderboard page-width">
       <PrizeDropField compact />
-      <div><p className="kicker"><span>●</span> Live</p><h1>Leaderboard</h1></div>
+      <div><p className="kicker"><span>●</span> Season 08</p><h1>Leaderboard</h1></div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
     <LiquidGlass as="section" className="leaderboard-progress page-width" tone="ember" aria-label="Season wager progress">
@@ -821,7 +859,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="section page-width board-section">
       <LiquidGlass className="standings" tone="cyan">
         <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
-        <div className="table-head"><span>Rank / Player</span><span>Status</span><span>XP</span><span>Wagered</span><span /></div>
+        <div className="table-head"><span>Rank / Player</span><span>XP</span><span>Wagered</span><span /></div>
         <div className="player-list" aria-live="polite">
           {error ? (
             <div className="empty-state"><span>!</span><h3>The board blinked.</h3><button type="button" onClick={refresh}>Try again</button></div>
@@ -836,7 +874,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
       </LiquidGlass>
     </section>
-    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Active</small><strong>{selected.lastActive ?? "Live"}</strong></div></div><Link href="/challenges">Missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
+    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Updated</small><strong>{selected.lastActive ?? "Recently"}</strong></div></div><Link href="/challenges">Missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
   </main>;
 }
 
@@ -872,7 +910,6 @@ function SeasonClock({
     <LiquidGlass as="aside" className="season-clock" depth="clear" tone="violet" aria-label="Leaderboard season status">
       <div className="season-clock__head">
         <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Countdown</span>
-        <b>{error ? "Checking" : "Live"}</b>
       </div>
       <div className={`season-clock__digits ${countdown ? "" : "season-clock__digits--live"}`}>
         {countdown ? countdown.map(([value, label]) => (
@@ -885,7 +922,9 @@ function SeasonClock({
         )}
       </div>
       <small className="season-clock__meta">
-        {validTarget
+        {error
+          ? "Syncing season data"
+          : validTarget
           ? `Closes ${formatShortDate(validTarget)}`
           : lastUpdated
             ? `Updated ${formatLastUpdated(lastUpdated)}`
@@ -895,7 +934,7 @@ function SeasonClock({
   );
 }
 
-function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div><span className={player.rank<7?"status hot":"status live"}>{player.rank<7?"HOT":"LIVE"}</span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
+function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
   const Icon = featurePageIcons[route] ?? Sparkles;

@@ -112,7 +112,7 @@
 * Added endpoints:
   * `GET /api/watch-points`
   * `POST /api/watch-points/heartbeat`
-  * `POST /api/watch-points/claim`
+  * `POST /api/watch-points/heartbeat` automatically credits verified watch time
 * Updated frontend to use real Kick OAuth link and server claim state.
 
 ### B. Wager Raffles (`/wager-raffles`)

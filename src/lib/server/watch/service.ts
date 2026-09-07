@@ -5,7 +5,7 @@ import type { Prisma } from "@/generated/prisma/client";
 const POINTS_PER_SLICE = 25;
 const SLICE_SECONDS = 10;
 const DAILY_KICK_BONUS = 500;
-const MAX_HEARTBEAT_SECONDS = 120;
+const HEARTBEAT_GRACE_SECONDS = 30;
 
 export type WatchSummaryPayload = {
   connected: boolean;
@@ -17,7 +17,6 @@ export type WatchSummaryPayload = {
   lastActivityAt: string | null;
   totalSecondsToday: number;
   earnedPointsToday: number;
-  claimablePoints: number;
   dailyBonusAvailable: boolean;
   dailyBonus: number;
   rateLabel: string;
@@ -32,11 +31,6 @@ function startOfToday() {
 
 function elapsedSeconds(from: Date, to: Date) {
   return Math.max(0, Math.floor((to.getTime() - from.getTime()) / 1000));
-}
-
-function claimableFor(totalSeconds: number, pointsAwarded: number) {
-  const earned = Math.floor(totalSeconds / SLICE_SECONDS) * POINTS_PER_SLICE;
-  return Math.max(0, earned - pointsAwarded);
 }
 
 async function requireKickUser(sessionToken: string | undefined) {
@@ -210,10 +204,6 @@ export async function getWatchSummary(
   ]);
 
   const totalSecondsToday = sessions.reduce((sum, session) => sum + session.totalSeconds, 0);
-  const claimablePoints = sessions.reduce(
-    (sum, session) => sum + claimableFor(session.totalSeconds, session.pointsAwarded),
-    0
-  );
   const earnedPointsToday = sessions.reduce(
     (sum, session) => sum + session.pointsAwarded,
     sessions.some((session) => session.dailyBonusAwarded) ? DAILY_KICK_BONUS : 0
@@ -236,7 +226,6 @@ export async function getWatchSummary(
     ...verification,
     totalSecondsToday,
     earnedPointsToday,
-    claimablePoints,
     dailyBonusAvailable,
     dailyBonus: DAILY_KICK_BONUS,
     rateLabel: `${POINTS_PER_SLICE} / ${SLICE_SECONDS}s`,
@@ -287,8 +276,9 @@ export async function recordWatchHeartbeat(
       return;
     }
 
-    const delta = verification.verified
-      ? Math.min(MAX_HEARTBEAT_SECONDS, elapsedSeconds(active.lastHeartbeatAt, now))
+    const heartbeatGap = elapsedSeconds(active.lastHeartbeatAt, now);
+    const delta = verification.verified && heartbeatGap <= HEARTBEAT_GRACE_SECONDS
+      ? heartbeatGap
       : 0;
     const heartbeatUpdate = await tx.watchSession.updateMany({
       where: {
@@ -311,47 +301,6 @@ export async function recordWatchHeartbeat(
     }
 
     if (verification.verified) await settleTodayWatchPoints(tx, user.id, now);
-  });
-
-  return getWatchSummary(sessionToken);
-}
-
-export async function claimWatchPoints(
-  sessionToken: string | undefined
-): Promise<WatchSummaryPayload> {
-  const user = await requireKickUser(sessionToken);
-  const verification = await verifyWatchActivity(user);
-  if (!verification.verified) {
-    throw new Error(verification.verificationMessage);
-  }
-
-  const now = new Date();
-
-  await prisma.$transaction(async (tx) => {
-    const active = await tx.watchSession.findFirst({
-      where: { userId: user.id, status: "ACTIVE" },
-      orderBy: { startedAt: "desc" },
-    });
-
-    if (active) {
-      const delta = Math.min(
-        MAX_HEARTBEAT_SECONDS,
-        elapsedSeconds(active.lastHeartbeatAt, now)
-      );
-      await tx.watchSession.updateMany({
-        where: {
-          id: active.id,
-          status: "ACTIVE",
-          lastHeartbeatAt: active.lastHeartbeatAt,
-        },
-        data: {
-          totalSeconds: { increment: delta },
-          lastHeartbeatAt: now,
-        },
-      });
-    }
-
-    await settleTodayWatchPoints(tx, user.id, now);
   });
 
   return getWatchSummary(sessionToken);
