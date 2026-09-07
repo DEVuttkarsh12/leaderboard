@@ -117,6 +117,14 @@ type WatchSummary = {
   xp: number;
 };
 
+type AdminKickStream = {
+  channelSlug: string;
+  isLive: boolean;
+  startedAt: string | null;
+  endedAt: string | null;
+  lastEventAt: string | null;
+};
+
 type ApiHunt = {
   id: string;
   title: string;
@@ -489,7 +497,11 @@ function useStoredState<T>(key: string, fallback: T) {
 
 function useAccountState() {
   const [rawAccount, setRawAccount] = useStoredState<Account>("rankboard-account", defaultAccount);
-  const account = useMemo(() => normalizeAccount(rawAccount), [rawAccount]);
+  const [sessionValidated, setSessionValidated] = useState(false);
+  const account = useMemo(
+    () => sessionValidated ? normalizeAccount(rawAccount) : defaultAccount,
+    [rawAccount, sessionValidated]
+  );
 
   useEffect(() => {
     let active = true;
@@ -497,6 +509,9 @@ function useAccountState() {
     async function syncSession() {
       try {
         const res = await fetch("/api/auth/session", { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("Session check failed.");
+        }
         const payload = (await res.json()) as { account: AuthAccountPayload | null };
         if (!active) return;
 
@@ -509,11 +524,19 @@ function useAccountState() {
           window.dispatchEvent(new CustomEvent("rankboard-storage"));
         }
       } catch {
-        // ignore
+        if (active) {
+          setRawAccount(defaultAccount);
+          window.localStorage.removeItem("rankboard-account");
+          window.dispatchEvent(new CustomEvent("rankboard-storage"));
+        }
+      } finally {
+        if (active) {
+          setSessionValidated(true);
+        }
       }
     }
 
-    syncSession();
+    void syncSession();
     return () => {
       active = false;
     };
@@ -1649,6 +1672,8 @@ function AdminWorkspace({
   const [adminRaffle, setAdminRaffle] = useState<RafflePayload | null>(null);
   const [adminRaffleStatus, setAdminRaffleStatus] = useState("Loading raffle");
   const [kickEventStatus, setKickEventStatus] = useState("Idle");
+  const [kickStream, setKickStream] = useState<AdminKickStream | null>(null);
+  const [kickStreamBusy, setKickStreamBusy] = useState(false);
   const isAdmin = isAdminAccount(account);
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
@@ -1673,6 +1698,28 @@ function AdminWorkspace({
       })
       .catch(() => {
         if (active) setAdminChallengeStatus("Could not load missions");
+      });
+
+    return () => { active = false; };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    let active = true;
+    fetch("/api/admin/kick/stream", { cache: "no-store" })
+      .then((response) => response.json().then((payload) => ({ response, payload })))
+      .then(({ response, payload }: { response: Response; payload: { stream?: AdminKickStream; error?: string } }) => {
+        if (!active) return;
+        if (!response.ok || !payload.stream) {
+          throw new Error(payload.error ?? "Could not load Kick stream state");
+        }
+        setKickStream(payload.stream);
+      })
+      .catch((error) => {
+        if (active) {
+          setKickEventStatus(error instanceof Error ? error.message : "Could not load Kick stream state");
+        }
       });
 
     return () => { active = false; };
@@ -2209,6 +2256,29 @@ function AdminWorkspace({
     }
   }
 
+  async function setKickStreamLive(isLive: boolean) {
+    setKickStreamBusy(true);
+    setKickEventStatus(isLive ? "Opening watch earning..." : "Closing watch earning...");
+
+    try {
+      const response = await fetch("/api/admin/kick/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isLive }),
+      });
+      const payload = (await response.json()) as { stream?: AdminKickStream; error?: string };
+      if (!response.ok || !payload.stream) {
+        throw new Error(payload.error ?? "Kick stream update failed");
+      }
+      setKickStream(payload.stream);
+      setKickEventStatus(isLive ? "Watch earning is live" : "Watch earning is closed");
+    } catch (error) {
+      setKickEventStatus(error instanceof Error ? error.message : "Kick stream update failed");
+    } finally {
+      setKickStreamBusy(false);
+    }
+  }
+
   return (
     <section className="section page-width app-workspace">
       <WorkspaceHeader overline="Admin" title="Control room" meta={adminUserStatus} />
@@ -2294,9 +2364,12 @@ function AdminWorkspace({
         <LiquidGlass as="article" className="admin-panel" tone="success">
           <small>KICK EVENTS</small>
           <h3>Watch verification</h3>
-          <StatusGrid items={[["Mode", "Webhook"], ["Chat", "Signed"], ["State", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
+          <StatusGrid items={[["Mode", "Webhook"], ["Live", kickStream?.isLive ? "On" : "Off"], ["State", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
           <div className="button-row">
             <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
+            <button className={kickStream?.isLive ? "button ghost" : "button primary"} type="button" onClick={() => setKickStreamLive(!kickStream?.isLive)} disabled={kickStreamBusy}>
+              {kickStreamBusy ? "Updating" : kickStream?.isLive ? "End live" : "Go live"} <span>●</span>
+            </button>
           </div>
           <p className="admin-helper-text">{kickEventStatus}</p>
         </LiquidGlass>

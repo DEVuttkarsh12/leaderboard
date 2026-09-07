@@ -50,8 +50,8 @@ async function requireKickUser(sessionToken: string | undefined) {
 function verificationMode(): "oauth" | "chat" {
   const configured = process.env.KICK_WATCH_VERIFICATION_MODE?.trim().toLowerCase();
   if (configured === "chat") return "chat";
-  if (configured === "oauth") return "oauth";
-  return process.env.KICK_WATCH_CHANNEL_SLUG?.trim() ? "chat" : "oauth";
+  if (configured === "oauth" && process.env.NODE_ENV !== "production") return "oauth";
+  return "chat";
 }
 
 function activityWindowMs() {
@@ -69,7 +69,7 @@ async function verifyWatchActivity(user: {
     return {
       verified: Boolean(user.kickUsername),
       verificationMode: mode,
-      verificationMessage: "Kick OAuth linked.",
+      verificationMessage: "Kick OAuth linked for local preview.",
       streamLive: true,
       lastActivityAt: null as string | null,
     };

@@ -371,12 +371,27 @@ h4,
   color: #fff8ed;
   font: inherit;
   font-style: normal;
-  -webkit-text-fill-color: currentColor;
+  background: linear-gradient(180deg, #ffffff 0%, #fff8ed 42%, #e9c7ff 70%, #ffffff 100%);
+  background-size: 100% 180%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1.35px rgba(255, 225, 247, 0.94);
+  paint-order: stroke fill;
+  filter: drop-shadow(3px 4px 0 rgba(255, 58, 168, 0.72)) drop-shadow(6px 7px 0 rgba(100, 33, 150, 0.62));
+  animation: artz-title-shine 4.2s ease-in-out infinite alternate;
 }
 
 .playful-word--accent i {
   color: #ff67b8;
-  text-shadow: 5px 7px 0 rgba(104, 36, 151, 0.5), 0 0 30px rgba(255, 76, 165, 0.16);
+  background-image: linear-gradient(180deg, #ffd8ed 0%, #ff67b8 38%, #ef3ba9 62%, #b84cff 100%);
+  -webkit-text-stroke-color: rgba(255, 194, 230, 0.96);
+  filter: drop-shadow(3px 4px 0 rgba(121, 34, 164, 0.78)) drop-shadow(6px 7px 0 rgba(48, 11, 79, 0.7)) drop-shadow(0 0 18px rgba(255, 76, 165, 0.32));
+}
+
+@keyframes artz-title-shine {
+  0%, 24% { background-position: 50% 0%; }
+  76%, 100% { background-position: 50% 100%; }
 }
 
 .playful-word i:nth-child(1) { transform: translateY(2px) rotate(-3deg); }
@@ -1263,6 +1278,7 @@ textarea:focus {
   .home-hero-emblem::before,
   .progress-bar i,
   .workspace-progress i,
+  .playful-word i,
   .home-signal > i {
     animation: none;
   }

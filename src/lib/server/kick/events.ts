@@ -36,6 +36,14 @@ type KickLivestreamPayload = {
   created_at?: string | null;
 };
 
+export type AdminKickStreamPayload = {
+  channelSlug: string;
+  isLive: boolean;
+  startedAt: string | null;
+  endedAt: string | null;
+  lastEventAt: string | null;
+};
+
 function cleanUsername(value: string | null | undefined) {
   return value?.trim().replace(/^@+/, "").toLowerCase() ?? "";
 }
@@ -51,6 +59,30 @@ function channelSlugFrom(payload: {
   channel_slug?: string | null;
 }) {
   return cleanUsername(payload.broadcaster?.channel_slug ?? payload.channel_slug);
+}
+
+function configuredWatchChannelSlug() {
+  const channelSlug = cleanUsername(process.env.KICK_WATCH_CHANNEL_SLUG);
+  if (!channelSlug) {
+    throw new Error("KICK_WATCH_CHANNEL_SLUG is not configured.");
+  }
+  return channelSlug;
+}
+
+function adminStreamPayload(stream: {
+  channelSlug: string;
+  isLive: boolean;
+  startedAt: Date | null;
+  endedAt: Date | null;
+  lastEventAt: Date;
+}): AdminKickStreamPayload {
+  return {
+    channelSlug: stream.channelSlug,
+    isLive: stream.isLive,
+    startedAt: stream.startedAt?.toISOString() ?? null,
+    endedAt: stream.endedAt?.toISOString() ?? null,
+    lastEventAt: stream.lastEventAt.toISOString(),
+  };
 }
 
 async function storeChatMessage(payload: KickChatPayload) {
@@ -196,4 +228,54 @@ export async function adminSubscribeKickEvents(sessionToken: string | undefined)
   }
 
   return results;
+}
+
+export async function getAdminKickStream(sessionToken: string | undefined) {
+  await requireAdminUser(sessionToken);
+  const channelSlug = configuredWatchChannelSlug();
+  const stream = await prisma.kickStreamStatus.findUnique({ where: { channelSlug } });
+
+  if (!stream) {
+    return {
+      channelSlug,
+      isLive: false,
+      startedAt: null,
+      endedAt: null,
+      lastEventAt: null,
+    } satisfies AdminKickStreamPayload;
+  }
+
+  return adminStreamPayload(stream);
+}
+
+export async function setAdminKickStream(
+  sessionToken: string | undefined,
+  isLive: boolean
+) {
+  const admin = await requireAdminUser(sessionToken);
+  const channelSlug = configuredWatchChannelSlug();
+  const now = new Date();
+  const current = await prisma.kickStreamStatus.findUnique({ where: { channelSlug } });
+  const stream = await prisma.kickStreamStatus.upsert({
+    where: { channelSlug },
+    create: {
+      channelSlug,
+      broadcasterKickId: admin.kickId,
+      broadcasterUsername: admin.kickUsername ?? channelSlug,
+      isLive,
+      startedAt: isLive ? now : null,
+      endedAt: isLive ? null : now,
+      lastEventAt: now,
+    },
+    update: {
+      broadcasterKickId: admin.kickId ?? undefined,
+      broadcasterUsername: admin.kickUsername ?? undefined,
+      isLive,
+      startedAt: isLive ? current?.startedAt ?? now : current?.startedAt ?? null,
+      endedAt: isLive ? null : now,
+      lastEventAt: now,
+    },
+  });
+
+  return adminStreamPayload(stream);
 }

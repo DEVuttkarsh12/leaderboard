@@ -314,18 +314,6 @@ function headerAccountFromPayload(payload: AuthAccountPayload): HeaderAccount {
   });
 }
 
-function readStoredHeaderAccount(): HeaderAccount {
-  const stored = window.localStorage.getItem("rankboard-account");
-  if (!stored) return guestHeaderAccount;
-
-  try {
-    return normalizeHeaderAccount(JSON.parse(stored) as Partial<HeaderAccount>);
-  } catch {
-    window.localStorage.removeItem("rankboard-account");
-    return guestHeaderAccount;
-  }
-}
-
 async function clearRankBoardSession() {
   await fetch("/api/auth/session", {
     method: "DELETE",
@@ -340,17 +328,14 @@ function useHeaderAccount() {
   useEffect(() => {
     let active = true;
 
-    function syncFromStorage() {
-      setAccount(readStoredHeaderAccount());
-    }
-
     async function syncFromSession() {
-      syncFromStorage();
-
       try {
         const response = await fetch("/api/auth/session", {
           cache: "no-store",
         });
+        if (!response.ok) {
+          throw new Error("Session check failed.");
+        }
         const payload = (await response.json()) as {
           account: AuthAccountPayload | null;
         };
@@ -364,27 +349,30 @@ function useHeaderAccount() {
             "rankboard-account",
             JSON.stringify({ ...payload.account, accessKey: "" })
           );
-          window.dispatchEvent(new CustomEvent("rankboard-storage"));
         } else {
           setAccount(guestHeaderAccount);
           window.localStorage.removeItem("rankboard-account");
-          window.dispatchEvent(new CustomEvent("rankboard-storage"));
         }
       } catch {
         if (active) {
-          syncFromStorage();
+          setAccount(guestHeaderAccount);
+          window.localStorage.removeItem("rankboard-account");
         }
       }
     }
 
-    syncFromSession();
-    window.addEventListener("storage", syncFromStorage);
-    window.addEventListener("rankboard-storage", syncFromStorage);
+    function refreshFromSession() {
+      void syncFromSession();
+    }
+
+    void syncFromSession();
+    window.addEventListener("storage", refreshFromSession);
+    window.addEventListener("rankboard-storage", refreshFromSession);
 
     return () => {
       active = false;
-      window.removeEventListener("storage", syncFromStorage);
-      window.removeEventListener("rankboard-storage", syncFromStorage);
+      window.removeEventListener("storage", refreshFromSession);
+      window.removeEventListener("rankboard-storage", refreshFromSession);
     };
   }, []);
 
