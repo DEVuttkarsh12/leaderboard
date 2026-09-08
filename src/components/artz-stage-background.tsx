@@ -24,6 +24,16 @@ type AmbientBloom = {
   edge: string;
 };
 
+type Glint = {
+  x: number;
+  y: number;
+  size: number;
+  speed: number;
+  phase: number;
+  opacity: number;
+  tone: "gold" | "pink" | "violet";
+};
+
 const TAU = Math.PI * 2;
 
 const AMBIENT_BLOOMS: AmbientBloom[] = [
@@ -34,8 +44,8 @@ const AMBIENT_BLOOMS: AmbientBloom[] = [
     phase: 0.4,
     speed: 0.13,
     drift: 0.052,
-    core: "rgba(255, 52, 169, 0.15)",
-    edge: "rgba(133, 40, 197, 0.035)",
+    core: "rgba(255, 52, 169, 0.19)",
+    edge: "rgba(133, 40, 197, 0.045)",
   },
   {
     x: 0.82,
@@ -44,8 +54,8 @@ const AMBIENT_BLOOMS: AmbientBloom[] = [
     phase: 2.1,
     speed: 0.1,
     drift: 0.045,
-    core: "rgba(141, 67, 255, 0.14)",
-    edge: "rgba(255, 71, 177, 0.03)",
+    core: "rgba(141, 67, 255, 0.18)",
+    edge: "rgba(255, 71, 177, 0.04)",
   },
   {
     x: 0.54,
@@ -54,8 +64,8 @@ const AMBIENT_BLOOMS: AmbientBloom[] = [
     phase: 4.3,
     speed: 0.08,
     drift: 0.035,
-    core: "rgba(255, 136, 57, 0.09)",
-    edge: "rgba(166, 59, 222, 0.025)",
+    core: "rgba(255, 136, 57, 0.12)",
+    edge: "rgba(166, 59, 222, 0.035)",
   },
 ];
 
@@ -71,6 +81,20 @@ function createEmbers(width: number, height: number) {
     phase: ((index * 47) % 360) * (Math.PI / 180),
     opacity: 0.18 + ((index * 13) % 35) / 100,
     tone: index % 7 === 0 ? "pink" : index % 5 === 0 ? "violet" : "gold",
+  }));
+}
+
+function createGlints(width: number, height: number) {
+  const count = Math.max(13, Math.min(28, Math.round(width / 58)));
+
+  return Array.from({ length: count }, (_, index): Glint => ({
+    x: ((index * 149 + 67) % 983) / 983 * width,
+    y: ((index * 211 + 101) % 977) / 977 * height,
+    size: 1.8 + ((index * 19) % 34) / 10,
+    speed: 1.2 + ((index * 23) % 30) / 10,
+    phase: ((index * 71) % 360) * (Math.PI / 180),
+    opacity: 0.18 + ((index * 11) % 28) / 100,
+    tone: index % 6 === 0 ? "gold" : index % 3 === 0 ? "pink" : "violet",
   }));
 }
 
@@ -210,6 +234,41 @@ function drawAuroraVeil(
   context.restore();
 }
 
+function drawGlint(
+  context: CanvasRenderingContext2D,
+  glint: Glint,
+  time: number
+) {
+  const twinkle = Math.pow(Math.max(0, Math.sin(time * 0.72 + glint.phase)), 5);
+  const alpha = glint.opacity * (0.32 + twinkle * 0.9);
+  const size = glint.size * (0.82 + twinkle * 0.42);
+  const color = glint.tone === "gold"
+    ? "rgba(255, 199, 99, 0.96)"
+    : glint.tone === "pink"
+      ? "rgba(255, 92, 190, 0.95)"
+      : "rgba(197, 132, 255, 0.9)";
+
+  context.save();
+  context.translate(glint.x, glint.y);
+  context.globalCompositeOperation = "screen";
+  context.globalAlpha = alpha;
+  context.strokeStyle = color;
+  context.fillStyle = color;
+  context.shadowColor = color;
+  context.shadowBlur = 11 + size * 2.2;
+  context.lineCap = "round";
+  context.lineWidth = 0.72;
+  context.beginPath();
+  context.moveTo(-size * 1.55, 0);
+  context.lineTo(size * 1.55, 0);
+  context.moveTo(0, -size * 2.35);
+  context.lineTo(0, size * 2.35);
+  context.stroke();
+  context.rotate(Math.PI / 4);
+  context.fillRect(-size * 0.43, -size * 0.43, size * 0.86, size * 0.86);
+  context.restore();
+}
+
 export default function ArtzStageBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -227,6 +286,7 @@ export default function ArtzStageBackground() {
     let animationFrame = 0;
     let lastTime = window.performance.now();
     let embers: Ember[] = [];
+    let glints: Glint[] = [];
     const pointer = { x: 0, y: 0 };
     const pointerTarget = { x: 0, y: 0 };
 
@@ -240,6 +300,7 @@ export default function ArtzStageBackground() {
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       embers = createEmbers(width, height);
+      glints = createGlints(width, height);
     };
 
     const draw = (now: number) => {
@@ -265,8 +326,8 @@ export default function ArtzStageBackground() {
         height * 0.48,
         Math.max(width, height) * 0.54 * centerGlowPulse
       );
-      centerGlow.addColorStop(0, "rgba(131, 34, 162, 0.24)");
-      centerGlow.addColorStop(0.48, "rgba(76, 9, 98, 0.1)");
+      centerGlow.addColorStop(0, "rgba(150, 38, 181, 0.29)");
+      centerGlow.addColorStop(0.48, "rgba(87, 12, 111, 0.13)");
       centerGlow.addColorStop(1, "rgba(4, 0, 10, 0)");
       context.fillStyle = centerGlow;
       context.fillRect(0, 0, width, height);
@@ -290,6 +351,17 @@ export default function ArtzStageBackground() {
         highlight: "rgba(177, 61, 224, 0.11)",
         reverse: true,
       });
+
+      for (const glint of glints) {
+        if (!reduceMotion) {
+          glint.y -= glint.speed * delta;
+          glint.x += Math.sin(time * 0.16 + glint.phase) * delta * 0.4;
+          if (glint.y < -16) {
+            glint.y = height + 16;
+          }
+        }
+        drawGlint(context, glint, time);
+      }
 
       for (const ember of embers) {
         if (!reduceMotion) {

@@ -594,6 +594,17 @@ function Home() {
           <h2>Rewards <em>&amp;</em> Perks</h2>
           <p>Everything you need. Nothing you don&apos;t.</p>
         </div>
+        <motion.figure
+          className="home-lucky-slot"
+          aria-hidden="true"
+          initial={{ opacity: 0, y: 30, rotate: 15, scale: 0.78 }}
+          whileInView={{ opacity: 1, y: 0, rotate: 7, scale: 1 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.82, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Image src="/artz-lucky-slot.webp" alt="" width={1310} height={1201} sizes="(max-width: 780px) 132px, 220px" />
+          <span><Sparkles size={18} strokeWidth={2.4} /></span>
+        </motion.figure>
         <div className="home-route-strip">
           {launchpad.map(([title, href, badge, color, Icon]) => (
             <SpotlightRouteCard badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
