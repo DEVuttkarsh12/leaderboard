@@ -738,12 +738,60 @@ h4,
 .home-route-card:nth-child(6):hover { transform: translateY(-11px) rotate(1deg) scale(1.02); }
 
 .home-board-showcase__arena {
+  position: relative;
   width: min(1040px, 100%);
   margin-inline: auto;
   padding: 0;
   border: 0;
   background: transparent;
   box-shadow: none;
+}
+
+.home-board-trophy {
+  position: absolute;
+  z-index: 3;
+  left: clamp(-118px, -8vw, -70px);
+  top: 112px;
+  width: clamp(190px, 18vw, 238px);
+  margin: 0;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 28px 34px rgba(4, 0, 10, 0.56))
+    drop-shadow(0 0 34px rgba(255, 84, 184, 0.22));
+}
+
+.home-board-trophy img {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: artz-trophy-hover 6.1s ease-in-out infinite alternate;
+}
+
+.home-board-trophy > span,
+.feature-prize-capsule > span {
+  position: absolute;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(255, 213, 112, 0.62);
+  border-radius: 50%;
+  background: rgba(48, 5, 60, 0.88);
+  color: #ffd570;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 24px rgba(255, 80, 180, 0.36);
+  animation: artz-slot-spark 2.8s ease-in-out infinite alternate;
+}
+
+.home-board-trophy > span {
+  right: 4%;
+  top: 15%;
+}
+
+.home-board-showcase__pool,
+.home-board-showcase .home-hero-podium,
+.home-board-cta {
+  position: relative;
+  z-index: 4;
 }
 
 .home-board-showcase__pool {
@@ -874,6 +922,49 @@ h4,
 .feature-page-hero__inner {
   border: 0;
   background: transparent;
+}
+
+.feature-prize-capsule {
+  position: absolute;
+  z-index: 2;
+  right: clamp(18px, 5vw, 78px);
+  top: 50%;
+  width: clamp(138px, 14vw, 184px);
+  margin: 0;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 22px 28px rgba(4, 0, 10, 0.5))
+    drop-shadow(0 0 28px rgba(178, 74, 255, 0.22));
+}
+
+.feature-prize-capsule img {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: artz-prize-hover 5.8s ease-in-out infinite alternate;
+}
+
+.feature-prize-capsule > span {
+  right: 2%;
+  bottom: 13%;
+  width: 30px;
+  height: 30px;
+  color: #ff76c5;
+}
+
+.feature-page-hero__inner {
+  position: relative;
+  z-index: 3;
+}
+
+@keyframes artz-trophy-hover {
+  from { transform: translate3d(0, -5px, 0) rotate(-1.5deg); }
+  to { transform: translate3d(8px, 10px, 0) rotate(2deg); }
+}
+
+@keyframes artz-prize-hover {
+  from { transform: translate3d(0, -5px, 0) rotate(1deg); }
+  to { transform: translate3d(-7px, 8px, 0) rotate(-2deg); }
 }
 
 .board-hero h1,
@@ -1224,6 +1315,20 @@ textarea:focus {
     margin: -34px auto 2px;
   }
 
+  .home-board-trophy {
+    left: -12px;
+    top: 126px;
+    width: 154px;
+    opacity: 0.88;
+  }
+
+  .feature-prize-capsule {
+    right: 8px;
+    top: 56%;
+    width: 118px;
+    opacity: 0.82;
+  }
+
   .home-section-heading h2 {
     font-size: 48px;
   }
@@ -1311,6 +1416,21 @@ textarea:focus {
     font-size: 13px;
   }
 
+  .home-board-trophy {
+    position: relative;
+    inset: auto;
+    width: 124px;
+    margin: -30px auto -18px;
+    opacity: 1;
+  }
+
+  .feature-prize-capsule {
+    right: 4px;
+    top: 67%;
+    width: 86px;
+    opacity: 0.72;
+  }
+
   .home-route-card strong {
     font-size: 24px;
   }
@@ -1349,6 +1469,10 @@ textarea:focus {
   .hero-casino-prop img,
   .home-lucky-slot img,
   .home-lucky-slot > span,
+  .home-board-trophy img,
+  .home-board-trophy > span,
+  .feature-prize-capsule img,
+  .feature-prize-capsule > span,
   .site-floating-reward,
   .home-hero-emblem::before,
   .progress-bar i,

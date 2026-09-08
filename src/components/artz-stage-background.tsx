@@ -240,8 +240,8 @@ function drawGlint(
   time: number
 ) {
   const twinkle = Math.pow(Math.max(0, Math.sin(time * 0.72 + glint.phase)), 5);
-  const alpha = glint.opacity * (0.32 + twinkle * 0.9);
-  const size = glint.size * (0.82 + twinkle * 0.42);
+  const alpha = glint.opacity * (0.42 + twinkle * 1.08);
+  const size = glint.size * (0.88 + twinkle * 0.52);
   const color = glint.tone === "gold"
     ? "rgba(255, 199, 99, 0.96)"
     : glint.tone === "pink"
@@ -255,7 +255,7 @@ function drawGlint(
   context.strokeStyle = color;
   context.fillStyle = color;
   context.shadowColor = color;
-  context.shadowBlur = 11 + size * 2.2;
+  context.shadowBlur = 16 + size * 3.1;
   context.lineCap = "round";
   context.lineWidth = 0.72;
   context.beginPath();
@@ -264,7 +264,14 @@ function drawGlint(
   context.moveTo(0, -size * 2.35);
   context.lineTo(0, size * 2.35);
   context.stroke();
+  context.globalAlpha = alpha * 0.42;
   context.rotate(Math.PI / 4);
+  context.beginPath();
+  context.moveTo(-size * 0.9, 0);
+  context.lineTo(size * 0.9, 0);
+  context.moveTo(0, -size * 0.9);
+  context.lineTo(0, size * 0.9);
+  context.stroke();
   context.fillRect(-size * 0.43, -size * 0.43, size * 0.86, size * 0.86);
   context.restore();
 }

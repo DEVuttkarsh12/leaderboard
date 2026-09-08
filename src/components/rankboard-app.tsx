@@ -620,6 +620,17 @@ function Home() {
           <p>Three spots. One crown.</p>
         </div>
         <div className="home-board-showcase__arena">
+          <motion.figure
+            className="home-board-trophy"
+            aria-hidden="true"
+            initial={{ opacity: 0, x: -34, y: 28, rotate: -20, scale: 0.78 }}
+            whileInView={{ opacity: 1, x: 0, y: 0, rotate: -9, scale: 1 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.88, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Image src="/artz-trophy-crown.webp" alt="" width={980} height={980} sizes="(max-width: 780px) 124px, 236px" />
+            <span><Crown size={17} strokeWidth={2.5} /></span>
+          </motion.figure>
           <div className="home-board-showcase__pool">
             <span><i /> Live pool</span>
             <strong>{formatPoolDisplay(livePool)}</strong>
@@ -940,6 +951,16 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
   return <main>
     <section className="board-hero feature-page-hero page-width">
       <PrizeDropField compact />
+      <motion.figure
+        className="feature-prize-capsule"
+        aria-hidden="true"
+        initial={{ opacity: 0, x: 32, y: 18, rotate: 8, scale: 0.76 }}
+        animate={{ opacity: 1, x: 0, y: 0, rotate: 5, scale: 1 }}
+        transition={{ delay: 0.48, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <Image src="/artz-prize-capsule.webp" alt="" width={900} height={900} sizes="(max-width: 780px) 92px, 178px" />
+        <span><Gift size={15} strokeWidth={2.6} /></span>
+      </motion.figure>
       <motion.div
         className="feature-page-hero__inner"
         initial={{ opacity: 0, y: 18, scale: 0.985 }}
