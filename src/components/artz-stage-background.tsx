@@ -13,7 +13,51 @@ type Ember = {
   tone: "gold" | "pink" | "violet";
 };
 
+type AmbientBloom = {
+  x: number;
+  y: number;
+  radius: number;
+  phase: number;
+  speed: number;
+  drift: number;
+  core: string;
+  edge: string;
+};
+
 const TAU = Math.PI * 2;
+
+const AMBIENT_BLOOMS: AmbientBloom[] = [
+  {
+    x: 0.18,
+    y: 0.28,
+    radius: 0.38,
+    phase: 0.4,
+    speed: 0.13,
+    drift: 0.052,
+    core: "rgba(255, 52, 169, 0.15)",
+    edge: "rgba(133, 40, 197, 0.035)",
+  },
+  {
+    x: 0.82,
+    y: 0.42,
+    radius: 0.42,
+    phase: 2.1,
+    speed: 0.1,
+    drift: 0.045,
+    core: "rgba(141, 67, 255, 0.14)",
+    edge: "rgba(255, 71, 177, 0.03)",
+  },
+  {
+    x: 0.54,
+    y: 0.78,
+    radius: 0.48,
+    phase: 4.3,
+    speed: 0.08,
+    drift: 0.035,
+    core: "rgba(255, 136, 57, 0.09)",
+    edge: "rgba(166, 59, 222, 0.025)",
+  },
+];
 
 function createEmbers(width: number, height: number) {
   const count = Math.max(24, Math.min(58, Math.round(width / 30)));
@@ -47,7 +91,8 @@ function drawWave(
     glow: string;
   }
 ) {
-  const baseline = height * options.baseline;
+  const baseline = height * options.baseline
+    + Math.sin(time * 0.22 + options.offset) * Math.max(3, height * 0.007);
   const gradient = context.createLinearGradient(0, baseline - options.amplitude, 0, height);
   gradient.addColorStop(0, options.top);
   gradient.addColorStop(1, options.bottom);
@@ -76,6 +121,91 @@ function drawWave(
   context.strokeStyle = options.glow;
   context.globalAlpha = 0.3;
   context.lineWidth = 1.25;
+  context.stroke();
+  context.restore();
+}
+
+function drawAmbientBloom(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  time: number,
+  pointerX: number,
+  pointerY: number,
+  bloom: AmbientBloom
+) {
+  const minDimension = Math.min(width, height);
+  const breath = 0.94 + Math.sin(time * bloom.speed * 2.2 + bloom.phase) * 0.08;
+  const radius = Math.max(minDimension * bloom.radius, 220) * breath;
+  const x = width * (
+    bloom.x
+    + Math.sin(time * bloom.speed + bloom.phase) * bloom.drift
+    + pointerX * 0.025
+  );
+  const y = height * (
+    bloom.y
+    + Math.cos(time * bloom.speed * 0.82 + bloom.phase) * bloom.drift * 0.72
+    + pointerY * 0.016
+  );
+  const glow = context.createRadialGradient(x, y, 0, x, y, radius);
+  glow.addColorStop(0, bloom.core);
+  glow.addColorStop(0.46, bloom.edge);
+  glow.addColorStop(1, "rgba(5, 0, 12, 0)");
+
+  context.save();
+  context.globalCompositeOperation = "screen";
+  context.fillStyle = glow;
+  context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  context.restore();
+}
+
+function drawAuroraVeil(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  time: number,
+  pointerX: number,
+  options: {
+    y: number;
+    phase: number;
+    speed: number;
+    color: string;
+    highlight: string;
+    reverse?: boolean;
+  }
+) {
+  const direction = options.reverse ? -1 : 1;
+  const drift = Math.sin(time * options.speed + options.phase) * height * 0.035;
+  const y = height * options.y + drift;
+  const gradient = context.createLinearGradient(0, y, width, y + height * 0.08);
+  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
+  gradient.addColorStop(0.28, options.color);
+  gradient.addColorStop(0.58, options.highlight);
+  gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+  context.save();
+  context.globalCompositeOperation = "screen";
+  context.strokeStyle = gradient;
+  context.lineCap = "round";
+  context.lineWidth = Math.max(28, Math.min(width, height) * 0.055);
+  context.globalAlpha = 0.2;
+  context.shadowColor = options.highlight;
+  context.shadowBlur = 52;
+  context.beginPath();
+  context.moveTo(-width * 0.12, y + direction * height * 0.08);
+  context.bezierCurveTo(
+    width * 0.2,
+    y - direction * height * 0.12 + pointerX * 22,
+    width * 0.66,
+    y + direction * height * 0.11 - pointerX * 18,
+    width * 1.12,
+    y - direction * height * 0.04
+  );
+  context.stroke();
+
+  context.globalAlpha = 0.3;
+  context.shadowBlur = 24;
+  context.lineWidth = 1.15;
   context.stroke();
   context.restore();
 }
@@ -126,19 +256,40 @@ export default function ArtzStageBackground() {
       context.fillStyle = sky;
       context.fillRect(0, 0, width, height);
 
+      const centerGlowPulse = 0.96 + Math.sin(time * 0.28) * 0.055;
       const centerGlow = context.createRadialGradient(
         width * (0.5 + pointer.x * 0.018),
-        height * 0.43,
+        height * (0.43 + pointer.y * 0.012),
         0,
         width * 0.5,
         height * 0.48,
-        Math.max(width, height) * 0.54
+        Math.max(width, height) * 0.54 * centerGlowPulse
       );
-      centerGlow.addColorStop(0, "rgba(102, 30, 141, 0.2)");
-      centerGlow.addColorStop(0.48, "rgba(69, 8, 85, 0.08)");
+      centerGlow.addColorStop(0, "rgba(131, 34, 162, 0.24)");
+      centerGlow.addColorStop(0.48, "rgba(76, 9, 98, 0.1)");
       centerGlow.addColorStop(1, "rgba(4, 0, 10, 0)");
       context.fillStyle = centerGlow;
       context.fillRect(0, 0, width, height);
+
+      for (const bloom of AMBIENT_BLOOMS) {
+        drawAmbientBloom(context, width, height, time, pointer.x, pointer.y, bloom);
+      }
+
+      drawAuroraVeil(context, width, height, time, pointer.x, {
+        y: 0.26,
+        phase: 0.7,
+        speed: 0.09,
+        color: "rgba(149, 61, 231, 0.11)",
+        highlight: "rgba(255, 63, 172, 0.13)",
+      });
+      drawAuroraVeil(context, width, height, time, pointer.x, {
+        y: 0.62,
+        phase: 3.2,
+        speed: 0.075,
+        color: "rgba(255, 119, 48, 0.075)",
+        highlight: "rgba(177, 61, 224, 0.11)",
+        reverse: true,
+      });
 
       for (const ember of embers) {
         if (!reduceMotion) {
@@ -159,8 +310,21 @@ export default function ArtzStageBackground() {
         context.arc(ember.x, ember.y, ember.radius * pulse, 0, TAU);
         context.fillStyle = color;
         context.shadowColor = color;
-        context.shadowBlur = ember.radius * 6;
+        context.shadowBlur = ember.radius * 8;
         context.fill();
+
+        if (ember.radius > 1.55) {
+          context.save();
+          context.globalAlpha = 0.24 * pulse;
+          context.strokeStyle = color;
+          context.lineWidth = Math.max(0.7, ember.radius * 0.48);
+          context.lineCap = "round";
+          context.beginPath();
+          context.moveTo(ember.x, ember.y + ember.radius * 2);
+          context.lineTo(ember.x, ember.y + ember.radius * 7);
+          context.stroke();
+          context.restore();
+        }
       }
 
       context.shadowBlur = 0;
