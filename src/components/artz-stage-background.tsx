@@ -36,6 +36,11 @@ type Glint = {
 
 const TAU = Math.PI * 2;
 
+type StageWorkerSession = {
+  dispose: () => void;
+  teardownTimer: number | null;
+};
+
 const AMBIENT_BLOOMS: AmbientBloom[] = [
   {
     x: 0.18,
@@ -344,15 +349,118 @@ function drawGlint(
 
 export default function ArtzStageBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const workerSessionRef = useRef<StageWorkerSession | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
 
+    const existingSession = workerSessionRef.current;
+    if (existingSession) {
+      if (existingSession.teardownTimer !== null) {
+        window.clearTimeout(existingSession.teardownTimer);
+        existingSession.teardownTimer = null;
+      }
+      return () => {
+        existingSession.teardownTimer = window.setTimeout(() => {
+          existingSession.dispose();
+          if (workerSessionRef.current === existingSession) workerSessionRef.current = null;
+        }, 0);
+      };
+    }
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    const getRenderSettings = () => {
+      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+      const lowPower = window.innerWidth <= 780 || navigator.hardwareConcurrency <= 4 || memory <= 4;
+      const densityCap = lowPower ? 1 : 1.1;
+      const renderScale = lowPower ? 0.48 : 0.62;
+      return {
+        fps: lowPower ? 15 : 20,
+        ratio: Math.min(window.devicePixelRatio || 1, densityCap) * renderScale,
+      };
+    };
+
+    if (typeof Worker !== "undefined" && "transferControlToOffscreen" in canvas) {
+      let worker: Worker | null = null;
+      let pointerFrame = 0;
+      let pendingPointer = { x: 0, y: 0 };
+
+      try {
+        worker = new Worker("/artz-stage-worker.js");
+        const offscreen = canvas.transferControlToOffscreen();
+
+        const sendResize = () => {
+          const width = Math.max(1, window.innerWidth);
+          const height = Math.max(1, window.innerHeight);
+          const settings = getRenderSettings();
+          canvas.style.width = `${width}px`;
+          canvas.style.height = `${height}px`;
+          canvas.dataset.renderer = "worker";
+          canvas.dataset.renderFps = String(settings.fps);
+          worker?.postMessage({ type: "resize", width, height, ...settings });
+        };
+
+        const handlePointerMove = (event: PointerEvent) => {
+          pendingPointer = {
+            x: event.clientX / Math.max(1, window.innerWidth) - 0.5,
+            y: event.clientY / Math.max(1, window.innerHeight) - 0.5,
+          };
+          if (pointerFrame) return;
+          pointerFrame = window.requestAnimationFrame(() => {
+            worker?.postMessage({ type: "pointer", ...pendingPointer });
+            pointerFrame = 0;
+          });
+        };
+
+        const handleVisibilityChange = () => {
+          worker?.postMessage({ type: "visibility", visible: !document.hidden && !reduceMotion });
+        };
+
+        const width = Math.max(1, window.innerWidth);
+        const height = Math.max(1, window.innerHeight);
+        const settings = getRenderSettings();
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        canvas.dataset.renderer = "worker";
+        canvas.dataset.renderFps = String(settings.fps);
+        worker.postMessage(
+          { type: "init", canvas: offscreen, width, height, ...settings },
+          [offscreen]
+        );
+        if (reduceMotion) worker.postMessage({ type: "visibility", visible: false });
+
+        window.addEventListener("resize", sendResize, { passive: true });
+        if (finePointer) window.addEventListener("pointermove", handlePointerMove, { passive: true });
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        const session: StageWorkerSession = {
+          teardownTimer: null,
+          dispose: () => {
+          window.removeEventListener("resize", sendResize);
+          if (finePointer) window.removeEventListener("pointermove", handlePointerMove);
+          document.removeEventListener("visibilitychange", handleVisibilityChange);
+          if (pointerFrame) window.cancelAnimationFrame(pointerFrame);
+          worker?.terminate();
+          },
+        };
+        workerSessionRef.current = session;
+
+        return () => {
+          session.teardownTimer = window.setTimeout(() => {
+            session.dispose();
+            if (workerSessionRef.current === session) workerSessionRef.current = null;
+          }, 0);
+        };
+      } catch {
+        worker?.terminate();
+      }
+    }
+
     const context = canvas.getContext("2d", { alpha: false });
     if (!context) return undefined;
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let width = 0;
     let height = 0;
     let dpr = 1;
@@ -370,10 +478,9 @@ export default function ArtzStageBackground() {
     const resize = () => {
       width = Math.max(1, window.innerWidth);
       height = Math.max(1, window.innerHeight);
-      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
-      const lowPower = width <= 780 || navigator.hardwareConcurrency <= 4 || memory <= 4;
-      frameInterval = 1000 / (lowPower ? 24 : 30);
-      dpr = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.2);
+      const settings = getRenderSettings();
+      frameInterval = 1000 / settings.fps;
+      dpr = settings.ratio;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       canvas.style.width = `${width}px`;
@@ -563,7 +670,6 @@ export default function ArtzStageBackground() {
     resize();
     draw(lastTime);
     window.addEventListener("resize", resize, { passive: true });
-    const finePointer = window.matchMedia("(pointer: fine)").matches;
     if (finePointer) window.addEventListener("pointermove", handlePointerMove, { passive: true });
     document.addEventListener("visibilitychange", handleVisibilityChange);
 

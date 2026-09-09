@@ -1877,3 +1877,77 @@ textarea:focus {
     animation: none;
   }
 }
+
+/* Performance layer: preserve the glossy art direction without live backdrop sampling. */
+.site-shell :where(*) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.artz-stage-background {
+  contain: strict;
+  transform: translateZ(0);
+}
+
+.liquid-glass::before {
+  mix-blend-mode: normal;
+  background-position: 50% 0%;
+  transition: opacity 0.2s ease;
+}
+
+.hero-casino-prop,
+.home-lucky-slot,
+.casino-ornament,
+.home-board-slots,
+.feature-slot-reels,
+.feature-casino-ornament {
+  filter: none !important;
+}
+
+.hero-casino-prop::before,
+.home-lucky-slot::before,
+.casino-ornament::before,
+.home-board-slots::before,
+.feature-slot-reels::before,
+.feature-casino-ornament::before {
+  content: "";
+  position: absolute;
+  inset: 26% 18% 18%;
+  z-index: -1;
+  border-radius: 50%;
+  background: rgba(255, 75, 182, 0.12);
+  box-shadow: 0 12px 38px rgba(4, 0, 10, 0.5), 0 0 34px rgba(181, 81, 246, 0.2);
+  pointer-events: none;
+}
+
+.hero-casino-prop img,
+.home-lucky-slot img,
+.casino-ornament img,
+.home-board-slots img,
+.feature-slot-reels img,
+.feature-casino-ornament img {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.winner-arena .rank-1 {
+  animation: none;
+}
+
+/* Let the browser skip paint/layout work for full sections below the viewport. */
+.home-action-zone,
+.home-board-showcase,
+.board-top-three,
+.board-section,
+.stat-strip,
+.app-workspace,
+.legal article,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 760px;
+}
+
+.home-signal-dock {
+  contain: layout paint;
+}

@@ -11893,8 +11893,11 @@ textarea:focus {
   background-image: url("/artz-rewards-arena.png");
   background-position: center;
   background-size: cover;
+  filter: brightness(1.01) saturate(1.02);
   opacity: 0.8;
   animation: artz-hero-breathe 9s ease-in-out infinite alternate;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .home-hero-art::after {
@@ -11907,8 +11910,8 @@ textarea:focus {
 }
 
 @keyframes artz-hero-breathe {
-  from { transform: scale(1.01); filter: brightness(0.9) saturate(0.95); }
-  to { transform: scale(1.045); filter: brightness(1.08) saturate(1.08); }
+  from { transform: translate3d(0, 0, 0) scale(1.01); }
+  to { transform: translate3d(0, -0.35%, 0) scale(1.035); }
 }
 
 .artz-home .hero-prize-drops {

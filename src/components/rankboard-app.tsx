@@ -20,7 +20,7 @@ import {
   Tv,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type PointerEvent, type ReactNode } from "react";
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
 import LiquidGlass from "./liquid-glass";
@@ -835,28 +835,19 @@ function SpotlightRouteCard({
   icon: ZoneIcon;
   title: string;
 }) {
-  const [spotlight, setSpotlight] = useState({ x: 0, y: 0, opacity: 0 });
-
   const handlePointerMove = useCallback((event: PointerEvent<HTMLAnchorElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    setSpotlight({
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-      opacity: 1,
-    });
+    event.currentTarget.style.setProperty("--spotlight-x", `${event.clientX - rect.left}px`);
+    event.currentTarget.style.setProperty("--spotlight-y", `${event.clientY - rect.top}px`);
+    event.currentTarget.style.setProperty("--spotlight-opacity", "1");
   }, []);
 
   return (
     <Link
       className={`home-route-card ${color}`}
       href={href}
-      onPointerLeave={() => setSpotlight((current) => ({ ...current, opacity: 0 }))}
+      onPointerLeave={(event) => event.currentTarget.style.setProperty("--spotlight-opacity", "0")}
       onPointerMove={handlePointerMove}
-      style={{
-        "--spotlight-x": `${spotlight.x}px`,
-        "--spotlight-y": `${spotlight.y}px`,
-        "--spotlight-opacity": spotlight.opacity,
-      } as CSSProperties}
     >
       <span className="home-route-card__badge">{badge}</span>
       <Icon className="home-route-card__mark" size={62} strokeWidth={1.8} aria-hidden="true" />

@@ -18,6 +18,28 @@ type LeaderboardState = {
 };
 
 let memoryCache: LeaderboardApiResponse | null = null;
+let lastFetchAt = 0;
+let inFlightRequest: Promise<LeaderboardApiResponse> | null = null;
+
+function loadLeaderboard(force = false) {
+  if (!force && memoryCache && Date.now() - lastFetchAt < 20_000) {
+    return Promise.resolve(memoryCache);
+  }
+
+  if (!inFlightRequest) {
+    inFlightRequest = fetchLeaderboardFromApi()
+      .then((data) => {
+        memoryCache = data;
+        lastFetchAt = Date.now();
+        return data;
+      })
+      .finally(() => {
+        inFlightRequest = null;
+      });
+  }
+
+  return inFlightRequest;
+}
 
 export function useLeaderboard() {
   const [state, setState] = useState<LeaderboardState>(() => {
@@ -43,20 +65,11 @@ export function useLeaderboard() {
     };
   });
 
-  const abortRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(true);
 
-  const fetchData = useRef(async () => {
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-
+  const fetchData = useRef(async (force = false) => {
     try {
-      const data: LeaderboardApiResponse = await fetchLeaderboardFromApi(
-        controller.signal
-      );
-
-      memoryCache = data;
+      const data = await loadLeaderboard(force);
 
       if (mountedRef.current) {
         setState({
@@ -79,29 +92,34 @@ export function useLeaderboard() {
             error instanceof Error ? error.message : "The leaderboard could not be loaded.",
         }));
       }
-    } finally {
-      if (abortRef.current === controller) {
-        abortRef.current = null;
-      }
     }
   });
 
   useEffect(() => {
     mountedRef.current = true;
     fetchData.current();
+    let idleTimer: number | null = null;
 
-    const interval = setInterval(() => {
-      if (document.visibilityState === "visible") {
+    const scheduleRefresh = () => {
+      if (document.visibilityState !== "visible" || !document.hasFocus()) return;
+      if (Date.now() - lastFetchAt < 20_000) return;
+      if (idleTimer !== null) window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        idleTimer = null;
         fetchData.current();
-      }
-    }, 15_000);
+      }, 250);
+    };
+
+    const interval = window.setInterval(scheduleRefresh, 30_000);
+    window.addEventListener("focus", scheduleRefresh);
 
     return () => {
       mountedRef.current = false;
-      clearInterval(interval);
-      abortRef.current?.abort();
+      window.clearInterval(interval);
+      window.removeEventListener("focus", scheduleRefresh);
+      if (idleTimer !== null) window.clearTimeout(idleTimer);
     };
   }, []);
 
-  return { ...state, retry: () => fetchData.current() };
+  return { ...state, retry: () => fetchData.current(true) };
 }
