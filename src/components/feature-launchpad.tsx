@@ -12,7 +12,7 @@ import {
 
 const features = [
   {
-    title: "Live Board",
+    title: "Leaderboard",
     label: "Ranks",
     href: "/leaderboard",
     icon: Trophy,

@@ -103,7 +103,7 @@ function PodiumCard({ user, rank, delay, leaderScore }: PodiumCardProps) {
 
       <div className="relative mt-6 flex items-end justify-between gap-4 border-t border-white/8 pt-5">
         <div className="podium-meta">
-          <span className="podium-meta__label">Board status</span>
+          <span className="podium-meta__label">Leaderboard status</span>
           <span className="podium-meta__value">
             {rank === 1 ? "Front runner" : `Chasing #${rank - 1}`}
           </span>

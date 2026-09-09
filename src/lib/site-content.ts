@@ -89,7 +89,7 @@ export const footerMenus = [
 
 export const routeHubCards = [
   {
-    eyebrow: "♠ Live Board",
+    eyebrow: "♠ Live Leaderboard",
     title: "Leaderboard",
     href: "/leaderboard",
     description: "Chase top 3.",
@@ -104,7 +104,7 @@ export const routeHubCards = [
     eyebrow: "♣ Stream",
     title: "Bonus Hunts",
     href: "/bonus-hunts",
-    description: "Watch heat.",
+    description: "Clip heat.",
   },
   {
     eyebrow: "777 Utility",

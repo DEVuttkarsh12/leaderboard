@@ -8,7 +8,7 @@ import ProductLogo from "./product-logo";
 
 const primaryLinks = [
   { label: "Home", href: "/" },
-  { label: "Board", href: "/leaderboard" },
+  { label: "Leaderboard", href: "/leaderboard" },
   { label: "Missions", href: "/challenges" },
   { label: "Hunts", href: "/bonus-hunts" },
   { label: "Store", href: "/store" },

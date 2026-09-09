@@ -44,10 +44,9 @@ type ZoneIcon = typeof ArrowUpRight;
 
 const NAV = [
   ["Home", "/"],
-  ["Board", "/leaderboard"],
+  ["Leaderboard", "/leaderboard"],
   ["Missions", "/challenges"],
   ["Bets", "/custom-bets"],
-  ["Watch", "/watch-points"],
   ["Hunts", "/bonus-hunts"],
   ["Store", "/store"],
   ["Admin", "/admin"],
@@ -55,18 +54,17 @@ const NAV = [
 
 const DESKTOP_NAV = [
   ["Home", "/"],
-  ["Board", "/leaderboard"],
+  ["Leaderboard", "/leaderboard"],
   ["Missions", "/challenges"],
   ["Bets", "/custom-bets"],
-  ["Watch", "/watch-points"],
   ["Store", "/store"],
 ] as const;
 
 const launchpad: [string, string, string, string, ZoneIcon][] = [
-  ["Board", "/leaderboard", "LB", "ember", Trophy],
+  ["Leaderboard", "/leaderboard", "LB", "ember", Trophy],
   ["Bets", "/custom-bets", "BET", "mint", Coins],
   ["Missions", "/challenges", "XP", "violet", BadgeCheck],
-  ["Watch", "/watch-points", "GO", "blue", Tv],
+  ["Raffles", "/wager-raffles", "TIX", "blue", Gift],
   ["Hunts", "/bonus-hunts", "H", "coral", Sparkles],
   ["Store", "/store", "PTS", "magma", Gift],
 ] as const;
@@ -89,7 +87,7 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
   challenges: {
     title: "Missions",
     tagline: "Earn. Claim. Repeat.",
-    action: ["Board", "/leaderboard"],
+    action: ["Leaderboard", "/leaderboard"],
   },
   "bonus-hunts": {
     title: "Bonus Hunts",
@@ -99,12 +97,12 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
   tournaments: {
     title: "Tournaments",
     tagline: "Enter. Compete. Climb.",
-    action: ["Board", "/leaderboard"],
+    action: ["Leaderboard", "/leaderboard"],
   },
   "wager-raffles": {
     title: "Wager Raffles",
     tagline: "Wager → Tickets → Prizes.",
-    action: ["Board", "/leaderboard"],
+    action: ["Leaderboard", "/leaderboard"],
   },
   store: {
     title: "Reward Store",
@@ -124,7 +122,7 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
   admin: {
     title: "Admin",
     tagline: "Command. Control. Ship.",
-    action: ["Board", "/leaderboard"],
+    action: ["Leaderboard", "/leaderboard"],
   },
   help: {
     title: "Help Center",
@@ -139,7 +137,7 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
   login: {
     title: "Sign in",
     tagline: "Your rewards, saved.",
-    action: ["Board", "/leaderboard"],
+    action: ["Leaderboard", "/leaderboard"],
   },
 };
 
@@ -548,11 +546,11 @@ function Home() {
           <PlayfulWord text="ARTZ" />
           <PlayfulWord accent text="Rewards" />
         </h1>
-        <p className="home-artz-subtitle">Watch. Play. Win.</p>
+        <p className="home-artz-subtitle">Play. Climb. Win.</p>
         <div className="home-hero-actions">
-          <MagneticLink className="button secondary home-rewards-cta" href="/watch-points">
-            <Tv size={17} strokeWidth={2.7} aria-hidden="true" />
-            Watch &amp; earn
+          <MagneticLink className="button secondary home-rewards-cta" href="/store">
+            <Gift size={17} strokeWidth={2.7} aria-hidden="true" />
+            View rewards
             <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
           </MagneticLink>
           <MagneticLink className="button primary home-board-cta" href="/leaderboard">
@@ -576,8 +574,8 @@ function Home() {
           <i aria-hidden="true" />
         </article>
         <article className="home-signal home-signal--earn">
-          <span><Tv size={19} strokeWidth={2.5} aria-hidden="true" /></span>
-          <div><small>Auto earn</small><strong>25 / 10s</strong></div>
+          <span><Sparkles size={19} strokeWidth={2.5} aria-hidden="true" /></span>
+          <div><small>Missions</small><strong>Ready</strong></div>
           <i aria-hidden="true" />
         </article>
         <article className="home-signal home-signal--season">
@@ -621,15 +619,15 @@ function Home() {
         </div>
         <div className="home-board-showcase__arena">
           <motion.figure
-            className="home-board-trophy"
+            className="home-board-slots"
             aria-hidden="true"
             initial={{ opacity: 0, x: -34, y: 28, rotate: -20, scale: 0.78 }}
             whileInView={{ opacity: 1, x: 0, y: 0, rotate: -9, scale: 1 }}
             viewport={{ once: true, amount: 0.35 }}
             transition={{ duration: 0.88, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Image src="/artz-trophy-crown.webp" alt="" width={980} height={980} sizes="(max-width: 780px) 124px, 236px" />
-            <span><Crown size={17} strokeWidth={2.5} /></span>
+            <Image src="/artz-slot-elements.webp" alt="" width={980} height={980} sizes="(max-width: 780px) 124px, 236px" />
+            <span><Sparkles size={17} strokeWidth={2.5} /></span>
           </motion.figure>
           <div className="home-board-showcase__pool">
             <span><i /> Live pool</span>
@@ -872,7 +870,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         <div className="table-head"><span>Rank / Player</span><span>XP</span><span>Wagered</span><span /></div>
         <div className="player-list" aria-live="polite">
           {error ? (
-            <div className="empty-state"><span>!</span><h3>The board blinked.</h3><button type="button" onClick={refresh}>Try again</button></div>
+            <div className="empty-state"><span>!</span><h3>The leaderboard blinked.</h3><button type="button" onClick={refresh}>Try again</button></div>
           ) : isLoading && users.length === 0 ? (
             Array.from({ length: 8 }).map((_, index) => <div className="skeleton-row" key={index}><i/><span><i/><i/></span></div>)
           ) : visiblePlayers.length ? (
@@ -952,14 +950,14 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
     <section className="board-hero feature-page-hero page-width">
       <PrizeDropField compact />
       <motion.figure
-        className="feature-prize-capsule"
+        className="feature-slot-reels"
         aria-hidden="true"
         initial={{ opacity: 0, x: 32, y: 18, rotate: 8, scale: 0.76 }}
         animate={{ opacity: 1, x: 0, y: 0, rotate: 5, scale: 1 }}
         transition={{ delay: 0.48, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
       >
-        <Image src="/artz-prize-capsule.webp" alt="" width={900} height={900} sizes="(max-width: 780px) 92px, 178px" />
-        <span><Gift size={15} strokeWidth={2.6} /></span>
+        <Image src="/artz-slot-reels.webp" alt="" width={900} height={900} sizes="(max-width: 780px) 92px, 178px" />
+        <span><Sparkles size={15} strokeWidth={2.6} /></span>
       </motion.figure>
       <motion.div
         className="feature-page-hero__inner"
@@ -1490,10 +1488,9 @@ function Profile({ account }: { account: HeaderAccount }) {
 
 function Footer() {
   const links = [
-    ["Board", "/leaderboard"],
+    ["Leaderboard", "/leaderboard"],
     ["Bets", "/custom-bets"],
     ["Store", "/store"],
-    ["Watch", "/watch-points"],
     ["Missions", "/challenges"],
     ["Profile", "/profile"],
     ["Support", "/support"],
