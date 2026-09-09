@@ -84,22 +84,34 @@ const featurePageIcons: Record<string, ZoneIcon> = {
 };
 
 const featurePageOrnaments: Record<string, CasinoOrnamentVariant> = {
-  challenges: "gold-bars",
-  "bonus-hunts": "dice-chips",
-  tournaments: "dice-chips",
-  "wager-raffles": "dice-chips",
-  store: "gold-bars",
-  "custom-bets": "dice-chips",
-  "watch-points": "vault",
+  challenges: "candy-tumble",
+  "bonus-hunts": "neon-city",
+  tournaments: "olympus-scatter",
+  "wager-raffles": "holiday-drop",
+  store: "holiday-drop",
+  "custom-bets": "neon-city",
+  "watch-points": "candy-tumble",
   admin: "vault",
   help: "vault",
   support: "vault",
   login: "vault",
 };
 
-type CasinoOrnamentVariant = "gold-bars" | "dice-chips" | "vault" | "slot-reels";
+type CasinoOrnamentVariant =
+  | "candy-tumble"
+  | "holiday-drop"
+  | "neon-city"
+  | "olympus-scatter"
+  | "gold-bars"
+  | "dice-chips"
+  | "vault"
+  | "slot-reels";
 
 const casinoOrnamentImages: Record<CasinoOrnamentVariant, string> = {
+  "candy-tumble": "/artz-candy-tumble.webp",
+  "holiday-drop": "/artz-holiday-drop.webp",
+  "neon-city": "/artz-neon-city.webp",
+  "olympus-scatter": "/artz-olympus-scatter.webp",
   "gold-bars": "/artz-gold-bars.webp",
   "dice-chips": "/artz-dice-chips.webp",
   vault: "/artz-vault-jackpot.webp",
@@ -546,7 +558,7 @@ function Home() {
           animate={{ opacity: 1, x: 0, rotate: -8, scale: 1 }}
           transition={{ delay: 0.62, duration: 0.86, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Image src="/artz-casino-stack.webp" alt="" width={720} height={768} priority sizes="(max-width: 760px) 150px, 300px" />
+          <Image src="/artz-candy-tumble.webp" alt="" width={768} height={768} priority sizes="(max-width: 760px) 150px, 300px" />
         </motion.figure>
         <motion.figure
           className="hero-casino-prop hero-casino-prop--right"
@@ -554,7 +566,7 @@ function Home() {
           animate={{ opacity: 1, x: 0, rotate: 9, scale: 1 }}
           transition={{ delay: 0.72, duration: 0.86, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Image src="/artz-roulette-capsule.webp" alt="" width={720} height={743} priority sizes="(max-width: 760px) 150px, 300px" />
+          <Image src="/artz-olympus-scatter.webp" alt="" width={768} height={768} priority sizes="(max-width: 760px) 150px, 300px" />
         </motion.figure>
       </div>
       <motion.div
@@ -623,7 +635,7 @@ function Home() {
           viewport={{ once: true, amount: 0.35 }}
           transition={{ duration: 0.82, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Image src="/artz-lucky-slot.webp" alt="" width={1310} height={1201} sizes="(max-width: 780px) 132px, 220px" />
+          <Image src="/artz-holiday-drop.webp" alt="" width={768} height={768} sizes="(max-width: 780px) 132px, 220px" />
           <span><Sparkles size={18} strokeWidth={2.4} /></span>
         </motion.figure>
         <CasinoOrnament className="home-gold-bars" variant="gold-bars" reveal delay={0.12} />
@@ -650,7 +662,7 @@ function Home() {
             viewport={{ once: true, amount: 0.35 }}
             transition={{ duration: 0.88, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Image src="/artz-slot-elements.webp" alt="" width={980} height={980} sizes="(max-width: 780px) 124px, 236px" />
+            <Image src="/artz-neon-city.webp" alt="" width={768} height={768} sizes="(max-width: 780px) 124px, 236px" />
             <span><Sparkles size={17} strokeWidth={2.5} /></span>
           </motion.figure>
           <CasinoOrnament className="home-dice-chips" variant="dice-chips" reveal delay={0.18} />
@@ -919,7 +931,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       </div>
     </LiquidGlass>
     <section className="board-top-three page-width" aria-label="Top three players">
-      <CasinoOrnament className="leaderboard-gold-bars" variant="gold-bars" reveal delay={0.08} />
+      <CasinoOrnament className="leaderboard-gold-bars" variant="olympus-scatter" reveal delay={0.08} />
       <div className="floor-top">
         <span>Top 3</span>
         <div className="live-pool">

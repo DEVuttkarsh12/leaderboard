@@ -125,7 +125,7 @@ function drawWave(
   context.beginPath();
   context.moveTo(-80, height + 80);
 
-  for (let x = -80; x <= width + 80; x += 18) {
+  for (let x = -80; x <= width + 80; x += 26) {
     const normalizedX = x / Math.max(1, width);
     const y = baseline
       + Math.sin(normalizedX * TAU * options.frequency + time * options.speed + options.offset) * options.amplitude
@@ -138,7 +138,7 @@ function drawWave(
   context.closePath();
   context.fillStyle = gradient;
   context.shadowColor = options.glow;
-  context.shadowBlur = 28;
+  context.shadowBlur = 22;
   context.fill();
 
   context.shadowBlur = 0;
@@ -214,7 +214,7 @@ function drawAuroraVeil(
   context.lineWidth = Math.max(28, Math.min(width, height) * 0.055);
   context.globalAlpha = 0.2;
   context.shadowColor = options.highlight;
-  context.shadowBlur = 52;
+  context.shadowBlur = 38;
   context.beginPath();
   context.moveTo(-width * 0.12, y + direction * height * 0.08);
   context.bezierCurveTo(
@@ -261,7 +261,7 @@ function drawGoldenRibbon(
 
   const traceRibbon = (offset: number) => {
     context.beginPath();
-    for (let x = -90; x <= width + 90; x += 16) {
+    for (let x = -90; x <= width + 90; x += 26) {
       const progress = x / Math.max(1, width);
       const y = baseline
         + Math.sin(progress * TAU * 1.12 + time * options.speed * direction + options.phase) * options.amplitude
@@ -280,7 +280,7 @@ function drawGoldenRibbon(
   context.lineCap = "round";
   context.lineJoin = "round";
   context.shadowColor = "rgba(255, 166, 66, 0.48)";
-  context.shadowBlur = 24;
+  context.shadowBlur = 18;
   context.globalAlpha = 0.34;
   context.lineWidth = 2.2;
   traceRibbon(-5);
@@ -321,7 +321,7 @@ function drawGlint(
   context.strokeStyle = color;
   context.fillStyle = color;
   context.shadowColor = color;
-  context.shadowBlur = 16 + size * 3.1;
+  context.shadowBlur = 12 + size * 2.5;
   context.lineCap = "round";
   context.lineWidth = 0.72;
   context.beginPath();
@@ -358,6 +358,10 @@ export default function ArtzStageBackground() {
     let dpr = 1;
     let animationFrame = 0;
     let lastTime = window.performance.now();
+    let lastFrameTime = 0;
+    let frameInterval = 1000 / 30;
+    let sky: CanvasGradient | null = null;
+    let pageVisible = !document.hidden;
     let embers: Ember[] = [];
     let glints: Glint[] = [];
     const pointer = { x: 0, y: 0 };
@@ -366,28 +370,38 @@ export default function ArtzStageBackground() {
     const resize = () => {
       width = Math.max(1, window.innerWidth);
       height = Math.max(1, window.innerHeight);
-      dpr = Math.min(window.devicePixelRatio || 1, 1.65);
+      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+      const lowPower = width <= 780 || navigator.hardwareConcurrency <= 4 || memory <= 4;
+      frameInterval = 1000 / (lowPower ? 24 : 30);
+      dpr = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.2);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sky = context.createLinearGradient(0, 0, 0, height);
+      sky.addColorStop(0, "#07000f");
+      sky.addColorStop(0.48, "#100019");
+      sky.addColorStop(1, "#19041f");
+      canvas.dataset.renderFps = String(Math.round(1000 / frameInterval));
       embers = createEmbers(width, height);
       glints = createGlints(width, height);
     };
 
     const draw = (now: number) => {
-      const delta = Math.min(40, now - lastTime) / 1000;
+      if (!reduceMotion && now - lastFrameTime < frameInterval) {
+        animationFrame = window.requestAnimationFrame(draw);
+        return;
+      }
+
+      const delta = Math.min(64, now - lastTime) / 1000;
       const time = now / 1000;
       lastTime = now;
-      pointer.x += (pointerTarget.x - pointer.x) * 0.035;
-      pointer.y += (pointerTarget.y - pointer.y) * 0.035;
+      lastFrameTime = now;
+      pointer.x += (pointerTarget.x - pointer.x) * 0.065;
+      pointer.y += (pointerTarget.y - pointer.y) * 0.065;
 
-      const sky = context.createLinearGradient(0, 0, 0, height);
-      sky.addColorStop(0, "#07000f");
-      sky.addColorStop(0.48, "#100019");
-      sky.addColorStop(1, "#19041f");
-      context.fillStyle = sky;
+      context.fillStyle = sky ?? "#100019";
       context.fillRect(0, 0, width, height);
 
       const centerGlowPulse = 0.96 + Math.sin(time * 0.28) * 0.055;
@@ -525,7 +539,7 @@ export default function ArtzStageBackground() {
         glow: "rgba(119, 59, 202, 0.3)",
       });
 
-      if (!reduceMotion) {
+      if (!reduceMotion && pageVisible) {
         animationFrame = window.requestAnimationFrame(draw);
       }
     };
@@ -535,15 +549,29 @@ export default function ArtzStageBackground() {
       pointerTarget.y = event.clientY / Math.max(1, height) - 0.5;
     };
 
+    const handleVisibilityChange = () => {
+      pageVisible = !document.hidden;
+      if (!pageVisible) {
+        window.cancelAnimationFrame(animationFrame);
+        return;
+      }
+      lastTime = window.performance.now();
+      lastFrameTime = 0;
+      if (!reduceMotion) animationFrame = window.requestAnimationFrame(draw);
+    };
+
     resize();
     draw(lastTime);
     window.addEventListener("resize", resize, { passive: true });
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    if (finePointer) window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("pointermove", handlePointerMove);
+      if (finePointer) window.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

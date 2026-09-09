@@ -670,6 +670,10 @@ h4,
 .casino-ornament--gold-bars img { animation-duration: 6.4s; }
 .casino-ornament--dice-chips img { animation-delay: -1.7s; animation-duration: 5.2s; }
 .casino-ornament--vault img { animation-delay: -2.4s; animation-duration: 6.8s; }
+.casino-ornament--candy-tumble img { animation-delay: -0.8s; animation-duration: 6.2s; }
+.casino-ornament--holiday-drop img { animation-delay: -2.1s; animation-duration: 6.8s; }
+.casino-ornament--neon-city img { animation-delay: -1.5s; animation-duration: 5.6s; }
+.casino-ornament--olympus-scatter img { animation-delay: -2.8s; animation-duration: 6.5s; }
 
 .casino-ornament > span {
   position: absolute;
@@ -1352,6 +1356,29 @@ textarea:focus {
 @keyframes artz-slot-spark {
   from { transform: rotate(-10deg) scale(0.9); opacity: 0.68; }
   to { transform: rotate(10deg) scale(1.08); opacity: 1; }
+}
+
+/* Defer below-fold paint work while preserving every visual layer. */
+.home-action-zone,
+.home-board-showcase,
+.app-workspace,
+.board-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 360px;
+}
+
+@media (max-width: 780px) {
+  .casino-ornament,
+  .home-lucky-slot,
+  .home-board-slots,
+  .hero-casino-prop {
+    filter: drop-shadow(0 16px 22px rgba(4, 0, 10, 0.48)) drop-shadow(0 0 20px rgba(255, 74, 184, 0.17));
+  }
 }
 
 @media (max-width: 1180px) {

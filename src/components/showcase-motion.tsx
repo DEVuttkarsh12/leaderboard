@@ -12,7 +12,7 @@ import {
   Trophy,
   type LucideIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type PrizeDropFieldProps = {
   compact?: boolean;
@@ -48,27 +48,26 @@ export function PrizeDropField({ compact = false, className = "" }: PrizeDropFie
   return (
     <div className={`prize-drop-field${compact ? " prize-drop-field--compact" : ""} ${className}`.trim()} aria-hidden="true">
       {tokens.map(({ Icon, x, drift, delay, duration, rotate, scale, tone }, index) => (
-        <motion.span
+        <span
           className={`prize-drop-token prize-drop-token--${tone}`}
           key={`${tone}-${x}`}
-          style={{ left: `${x}%`, scale }}
-          initial={reduceMotion ? { opacity: 0.28, y: `${12 + index * 8}%`, rotate: 0 } : { opacity: 0, y: "-18vh", rotate: 0 }}
-          animate={reduceMotion ? undefined : {
-            opacity: [0, 0.62, 0.48, 0],
-            x: [0, drift * 0.42, drift, drift * 0.2],
-            y: ["-18vh", "28vh", "72vh", "118vh"],
-            rotate,
-          }}
-          transition={reduceMotion ? undefined : {
-            delay,
-            duration,
-            ease: "linear",
-            repeat: Infinity,
-            repeatDelay: 0.6,
-          }}
+          data-static={reduceMotion ? "true" : undefined}
+          style={{
+            left: `${x}%`,
+            top: reduceMotion ? `${12 + index * 8}%` : undefined,
+            "--token-delay": `${-delay}s`,
+            "--token-drift": `${drift}px`,
+            "--token-drift-mid": `${drift * 0.42}px`,
+            "--token-drift-end": `${drift * 0.2}px`,
+            "--token-duration": `${duration + 0.6}s`,
+            "--token-rotate": `${rotate}deg`,
+            "--token-rotate-mid": `${rotate * 0.34}deg`,
+            "--token-rotate-far": `${rotate * 0.72}deg`,
+            "--token-scale": scale,
+          } as CSSProperties}
         >
           <Icon size={compact ? 18 : 24} strokeWidth={2.15} />
-        </motion.span>
+        </span>
       ))}
     </div>
   );
