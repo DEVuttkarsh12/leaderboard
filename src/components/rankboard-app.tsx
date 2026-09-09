@@ -83,6 +83,29 @@ const featurePageIcons: Record<string, ZoneIcon> = {
   login: BadgeCheck,
 };
 
+const featurePageOrnaments: Record<string, CasinoOrnamentVariant> = {
+  challenges: "gold-bars",
+  "bonus-hunts": "dice-chips",
+  tournaments: "dice-chips",
+  "wager-raffles": "dice-chips",
+  store: "gold-bars",
+  "custom-bets": "dice-chips",
+  "watch-points": "vault",
+  admin: "vault",
+  help: "vault",
+  support: "vault",
+  login: "vault",
+};
+
+type CasinoOrnamentVariant = "gold-bars" | "dice-chips" | "vault" | "slot-reels";
+
+const casinoOrnamentImages: Record<CasinoOrnamentVariant, string> = {
+  "gold-bars": "/artz-gold-bars.webp",
+  "dice-chips": "/artz-dice-chips.webp",
+  vault: "/artz-vault-jackpot.webp",
+  "slot-reels": "/artz-slot-reels.webp",
+};
+
 const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
   challenges: {
     title: "Missions",
@@ -603,6 +626,7 @@ function Home() {
           <Image src="/artz-lucky-slot.webp" alt="" width={1310} height={1201} sizes="(max-width: 780px) 132px, 220px" />
           <span><Sparkles size={18} strokeWidth={2.4} /></span>
         </motion.figure>
+        <CasinoOrnament className="home-gold-bars" variant="gold-bars" reveal delay={0.12} />
         <div className="home-route-strip">
           {launchpad.map(([title, href, badge, color, Icon]) => (
             <SpotlightRouteCard badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
@@ -629,6 +653,7 @@ function Home() {
             <Image src="/artz-slot-elements.webp" alt="" width={980} height={980} sizes="(max-width: 780px) 124px, 236px" />
             <span><Sparkles size={17} strokeWidth={2.5} /></span>
           </motion.figure>
+          <CasinoOrnament className="home-dice-chips" variant="dice-chips" reveal delay={0.18} />
           <div className="home-board-showcase__pool">
             <span><i /> Live pool</span>
             <strong>{formatPoolDisplay(livePool)}</strong>
@@ -653,6 +678,48 @@ function PlayfulWord({ accent = false, text }: { accent?: boolean; text: string 
         <i key={`${character}-${index}`}>{character}</i>
       ))}
     </span>
+  );
+}
+
+function CasinoOrnament({
+  className,
+  delay = 0,
+  reveal = false,
+  variant,
+}: {
+  className?: string;
+  delay?: number;
+  reveal?: boolean;
+  variant: CasinoOrnamentVariant;
+}) {
+  const figureClass = `casino-ornament casino-ornament--${variant}${className ? ` ${className}` : ""}`;
+  const motionProps = reveal
+    ? {
+        initial: { opacity: 0, y: 28, scale: 0.78, rotate: variant === "dice-chips" ? 12 : -10 },
+        whileInView: { opacity: 1, y: 0, scale: 1, rotate: 0 },
+        viewport: { once: true, amount: 0.2 },
+      }
+    : {
+        initial: { opacity: 0, x: 28, y: 14, scale: 0.76, rotate: 8 },
+        animate: { opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 },
+      };
+
+  return (
+    <motion.figure
+      {...motionProps}
+      className={figureClass}
+      aria-hidden="true"
+      transition={{ delay, duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Image
+        src={casinoOrnamentImages[variant]}
+        alt=""
+        width={920}
+        height={920}
+        sizes="(max-width: 780px) 116px, 220px"
+      />
+      <span><Sparkles size={16} strokeWidth={2.6} /></span>
+    </motion.figure>
   );
 }
 
@@ -852,6 +919,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       </div>
     </LiquidGlass>
     <section className="board-top-three page-width" aria-label="Top three players">
+      <CasinoOrnament className="leaderboard-gold-bars" variant="gold-bars" reveal delay={0.08} />
       <div className="floor-top">
         <span>Top 3</span>
         <div className="live-pool">
@@ -946,19 +1014,11 @@ function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number;
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
   const Icon = featurePageIcons[route] ?? Sparkles;
+  const ornament = featurePageOrnaments[route] ?? "slot-reels";
   return <main>
     <section className="board-hero feature-page-hero page-width">
       <PrizeDropField compact />
-      <motion.figure
-        className="feature-slot-reels"
-        aria-hidden="true"
-        initial={{ opacity: 0, x: 32, y: 18, rotate: 8, scale: 0.76 }}
-        animate={{ opacity: 1, x: 0, y: 0, rotate: 5, scale: 1 }}
-        transition={{ delay: 0.48, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <Image src="/artz-slot-reels.webp" alt="" width={900} height={900} sizes="(max-width: 780px) 92px, 178px" />
-        <span><Sparkles size={15} strokeWidth={2.6} /></span>
-      </motion.figure>
+      <CasinoOrnament className="feature-casino-ornament" variant={ornament} delay={0.48} />
       <motion.div
         className="feature-page-hero__inner"
         initial={{ opacity: 0, y: 18, scale: 0.985 }}
@@ -974,7 +1034,25 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
   </main>;
 }
 
-function Legal({ type }: { type: string }) { const privacy=type==="privacy"; return <main className="legal page-width"><p className="kicker"><span>●</span> ARTZ Rewards legal</p><h1>{privacy?"Privacy":"Terms"}<em>.</em></h1><p className="legal-lead">{privacy?"How ARTZ Rewards handles your data.":"The rules for playing fair."}</p><div className="legal-layout"><aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy?"/terms":"/privacy"}>{privacy?"Read terms":"Read privacy"} ↗</Link></aside><article>{(privacy?[["1. Information we use","ARTZ Rewards may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."],["2. Why we use it","We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."],["3. Your choices","Players may request access, correction, or deletion of eligible account information through support."],["4. Data protection","Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]:[["1. Using ARTZ Rewards","Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."],["2. Rankings and rewards","Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."],["3. Fair play","Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."],["4. Availability","Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]]).map(([h,p])=><section key={h}><h2>{h}</h2><p>{p}</p></section>)}</article></div></main> }
+function Legal({ type }: { type: string }) {
+  const privacy = type === "privacy";
+  const sections = privacy
+    ? [["1. Information we use", "ARTZ Rewards may process account identifiers, leaderboard activity, reward progress, and basic device information needed to operate the product."], ["2. Why we use it", "We use this information to display ranks, maintain reward progress, protect the floor, and respond to support requests."], ["3. Your choices", "Players may request access, correction, or deletion of eligible account information through support."], ["4. Data protection", "Reasonable technical and organizational safeguards are used to protect information from unauthorized access."]]
+    : [["1. Using ARTZ Rewards", "Use the product lawfully, keep account access secure, and do not interfere with rankings, missions, or other players."], ["2. Rankings and rewards", "Rank calculations, challenge eligibility, and rewards may be reviewed when activity appears invalid, duplicated, or manipulated."], ["3. Fair play", "Automation, exploit attempts, false identities, and coordinated manipulation can lead to removal from a round."], ["4. Availability", "Live data can briefly lag or become unavailable. The latest verified state remains the basis for ranking decisions."]];
+
+  return (
+    <main className="legal page-width">
+      <CasinoOrnament className="legal-vault" variant="vault" delay={0.3} />
+      <p className="kicker"><span>●</span> ARTZ Rewards legal</p>
+      <h1>{privacy ? "Privacy" : "Terms"}<em>.</em></h1>
+      <p className="legal-lead">{privacy ? "How ARTZ Rewards handles your data." : "The rules for playing fair."}</p>
+      <div className="legal-layout">
+        <aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy ? "/terms" : "/privacy"}>{privacy ? "Read terms" : "Read privacy"} ↗</Link></aside>
+        <article>{sections.map(([heading, copy]) => <section key={heading}><h2>{heading}</h2><p>{copy}</p></section>)}</article>
+      </div>
+    </main>
+  );
+}
 
 
 function CasinoCard({
@@ -1338,6 +1416,7 @@ function Profile({ account }: { account: HeaderAccount }) {
     return (
       <main>
         <section className="board-hero page-width">
+          <CasinoOrnament className="profile-vault" variant="vault" delay={0.28} />
           <div>
             <p className="kicker"><span>●</span> Player hub</p>
             <h1>Profile</h1>
@@ -1355,6 +1434,7 @@ function Profile({ account }: { account: HeaderAccount }) {
     return (
       <main>
         <section className="board-hero page-width">
+          <CasinoOrnament className="profile-vault" variant="vault" delay={0.18} />
           <div>
             <p className="kicker"><span>●</span> Admin lane</p>
             <h1>Opening Admin</h1>
@@ -1372,6 +1452,7 @@ function Profile({ account }: { account: HeaderAccount }) {
   return (
     <main>
       <section className="board-hero page-width">
+        <CasinoOrnament className="profile-vault" variant="vault" delay={0.28} />
         <div>
           <p className="kicker"><span>●</span> Player hub</p>
           <h1>Profile</h1>

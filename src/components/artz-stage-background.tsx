@@ -234,6 +234,72 @@ function drawAuroraVeil(
   context.restore();
 }
 
+function drawGoldenRibbon(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  time: number,
+  pointerX: number,
+  pointerY: number,
+  options: {
+    lane: number;
+    amplitude: number;
+    phase: number;
+    speed: number;
+    reverse?: boolean;
+  }
+) {
+  const direction = options.reverse ? -1 : 1;
+  const baseline = height * options.lane
+    + Math.sin(time * options.speed * 0.46 + options.phase) * height * 0.022;
+  const gradient = context.createLinearGradient(-80, baseline, width + 80, baseline);
+  gradient.addColorStop(0, "rgba(255, 178, 67, 0)");
+  gradient.addColorStop(0.18, "rgba(255, 171, 61, 0.26)");
+  gradient.addColorStop(0.5, "rgba(255, 220, 129, 0.62)");
+  gradient.addColorStop(0.82, "rgba(255, 141, 53, 0.24)");
+  gradient.addColorStop(1, "rgba(255, 178, 67, 0)");
+
+  const traceRibbon = (offset: number) => {
+    context.beginPath();
+    for (let x = -90; x <= width + 90; x += 16) {
+      const progress = x / Math.max(1, width);
+      const y = baseline
+        + Math.sin(progress * TAU * 1.12 + time * options.speed * direction + options.phase) * options.amplitude
+        + Math.sin(progress * TAU * 2.36 - time * options.speed * 0.44 + options.phase) * options.amplitude * 0.24
+        + pointerX * (progress - 0.5) * 22
+        + pointerY * 10
+        + offset;
+      if (x === -90) context.moveTo(x, y);
+      else context.lineTo(x, y);
+    }
+  };
+
+  context.save();
+  context.globalCompositeOperation = "screen";
+  context.strokeStyle = gradient;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.shadowColor = "rgba(255, 166, 66, 0.48)";
+  context.shadowBlur = 24;
+  context.globalAlpha = 0.34;
+  context.lineWidth = 2.2;
+  traceRibbon(-5);
+  context.stroke();
+  traceRibbon(5);
+  context.stroke();
+
+  context.setLineDash([Math.max(54, width * 0.075), Math.max(170, width * 0.27)]);
+  context.lineDashOffset = -time * 22 * direction - options.phase * 58;
+  context.globalAlpha = 0.72;
+  context.shadowBlur = 15;
+  context.lineWidth = 0.9;
+  traceRibbon(-5);
+  context.stroke();
+  traceRibbon(5);
+  context.stroke();
+  context.restore();
+}
+
 function drawGlint(
   context: CanvasRenderingContext2D,
   glint: Glint,
@@ -357,6 +423,27 @@ export default function ArtzStageBackground() {
         color: "rgba(255, 119, 48, 0.075)",
         highlight: "rgba(177, 61, 224, 0.11)",
         reverse: true,
+      });
+
+      const ribbonTime = reduceMotion ? 0 : time;
+      drawGoldenRibbon(context, width, height, ribbonTime, pointer.x, pointer.y, {
+        lane: 0.19,
+        amplitude: Math.max(24, height * 0.042),
+        phase: 0.6,
+        speed: 0.11,
+      });
+      drawGoldenRibbon(context, width, height, ribbonTime, pointer.x, pointer.y, {
+        lane: 0.5,
+        amplitude: Math.max(28, height * 0.052),
+        phase: 2.7,
+        speed: 0.085,
+        reverse: true,
+      });
+      drawGoldenRibbon(context, width, height, ribbonTime, pointer.x, pointer.y, {
+        lane: 0.72,
+        amplitude: Math.max(20, height * 0.034),
+        phase: 4.4,
+        speed: 0.07,
       });
 
       for (const glint of glints) {
