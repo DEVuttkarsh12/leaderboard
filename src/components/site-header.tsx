@@ -10,7 +10,8 @@ const primaryLinks = [
   { label: "Home", href: "/" },
   { label: "Leaderboard", href: "/leaderboard" },
   { label: "Missions", href: "/challenges" },
-  { label: "Hunts", href: "/bonus-hunts" },
+  { label: "Tournaments", href: "/tournaments" },
+  { label: "Raffles", href: "/wager-raffles" },
   { label: "Store", href: "/store" },
   { label: "Help", href: "/help" },
 ] as const;

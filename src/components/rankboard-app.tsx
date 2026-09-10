@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { animate, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import {
   ArrowUpRight,
   BadgeCheck,
@@ -47,7 +47,8 @@ const NAV = [
   ["Leaderboard", "/leaderboard"],
   ["Missions", "/challenges"],
   ["Bets", "/custom-bets"],
-  ["Hunts", "/bonus-hunts"],
+  ["Raffles", "/wager-raffles"],
+  ["Tournaments", "/tournaments"],
   ["Store", "/store"],
   ["Admin", "/admin"],
 ] as const;
@@ -57,6 +58,8 @@ const DESKTOP_NAV = [
   ["Leaderboard", "/leaderboard"],
   ["Missions", "/challenges"],
   ["Bets", "/custom-bets"],
+  ["Raffles", "/wager-raffles"],
+  ["Tournaments", "/tournaments"],
   ["Store", "/store"],
 ] as const;
 
@@ -65,13 +68,12 @@ const launchpad: [string, string, string, string, ZoneIcon][] = [
   ["Bets", "/custom-bets", "BET", "mint", Coins],
   ["Missions", "/challenges", "XP", "violet", BadgeCheck],
   ["Raffles", "/wager-raffles", "TIX", "blue", Gift],
-  ["Hunts", "/bonus-hunts", "H", "coral", Sparkles],
+  ["Tournaments", "/tournaments", "VS", "coral", Trophy],
   ["Store", "/store", "PTS", "magma", Gift],
 ] as const;
 
 const featurePageIcons: Record<string, ZoneIcon> = {
   challenges: BadgeCheck,
-  "bonus-hunts": Sparkles,
   tournaments: Trophy,
   "wager-raffles": Gift,
   store: Gift,
@@ -85,7 +87,6 @@ const featurePageIcons: Record<string, ZoneIcon> = {
 
 const featurePageOrnaments: Record<string, CasinoOrnamentVariant> = {
   challenges: "candy-tumble",
-  "bonus-hunts": "neon-city",
   tournaments: "olympus-scatter",
   "wager-raffles": "holiday-drop",
   store: "holiday-drop",
@@ -123,11 +124,6 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
     title: "Missions",
     tagline: "Earn. Claim. Repeat.",
     action: ["Leaderboard", "/leaderboard"],
-  },
-  "bonus-hunts": {
-    title: "Bonus Hunts",
-    tagline: "Track. Vote. Win.",
-    action: ["Tournaments", "/tournaments"],
   },
   tournaments: {
     title: "Tournaments",
@@ -178,29 +174,6 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
 
 function fmt(value: number | null | undefined) {
   return new Intl.NumberFormat("en-US").format(value ?? 0);
-}
-
-function poolFractionDigits(value: number) {
-  if (!Number.isFinite(value)) return 0;
-  const thousandths = Math.round(Math.abs(value % 1) * 1000);
-  if (!thousandths) return 0;
-  return thousandths.toString().padStart(3, "0").replace(/0+$/, "").length;
-}
-
-function formatPoolValue(value: number, fractionDigits = poolFractionDigits(value)) {
-  const safeValue = Number.isFinite(value) ? value : 0;
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
-  }).format(safeValue);
-}
-
-function formatPoolDisplay(value: number, fractionDigits = poolFractionDigits(value)) {
-  const safeValue = Number.isFinite(value) ? value : 0;
-  if (Math.abs(safeValue) >= 100_000) {
-    return formatNumberCompact(safeValue);
-  }
-  return formatPoolValue(safeValue, fractionDigits);
 }
 
 function playerScore(player: Player) {
@@ -543,10 +516,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
 }
 
 function Home() {
-  const { users, highestScore } = useLeaderboard();
-  const wager = totalWager(users);
-  const livePool = wager || highestScore || 40000;
-  const livePoolLabel = formatPoolValue(livePool);
+  const { users } = useLeaderboard();
 
   return <main className="artz-home">
     <section className="product-hero product-hero--centered">
@@ -594,31 +564,7 @@ function Home() {
             <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
           </MagneticLink>
         </div>
-        <div className="home-live-stat" aria-label={`Live pool ${livePoolLabel} points`}>
-          <span><i /> Live pool</span>
-          <AnimatedPoolNumber value={livePool} />
-          <small>points</small>
-        </div>
       </motion.div>
-    </section>
-    <section className="home-signal-dock" aria-label="Live ARTZ reward signals">
-      <RevealBlock className="home-signal-dock__inner">
-        <article className="home-signal home-signal--players">
-          <span><Trophy size={19} strokeWidth={2.5} aria-hidden="true" /></span>
-          <div><small>Players</small><strong>{users.length ? formatNumberCompact(users.length) : "Live"}</strong></div>
-          <i aria-hidden="true" />
-        </article>
-        <article className="home-signal home-signal--earn">
-          <span><Sparkles size={19} strokeWidth={2.5} aria-hidden="true" /></span>
-          <div><small>Missions</small><strong>Ready</strong></div>
-          <i aria-hidden="true" />
-        </article>
-        <article className="home-signal home-signal--season">
-          <span><Gift size={19} strokeWidth={2.5} aria-hidden="true" /></span>
-          <div><small>Season</small><strong>08</strong></div>
-          <i aria-hidden="true" />
-        </article>
-      </RevealBlock>
     </section>
     <section className="home-action-zone" aria-label="ARTZ Rewards destinations">
       <RevealBlock className="home-action-zone__inner">
@@ -666,11 +612,6 @@ function Home() {
             <span><Sparkles size={17} strokeWidth={2.5} /></span>
           </motion.figure>
           <CasinoOrnament className="home-dice-chips" variant="dice-chips" reveal delay={0.18} />
-          <div className="home-board-showcase__pool">
-            <span><i /> Live pool</span>
-            <strong>{formatPoolDisplay(livePool)}</strong>
-            <small>points</small>
-          </div>
           <HeroPodium players={users.slice(0, 3)} />
           <MagneticLink className="button primary home-board-cta" href="/leaderboard">
             <Trophy size={17} strokeWidth={2.7} aria-hidden="true" />
@@ -747,50 +688,6 @@ function HeroPodium({ players }: { players: Player[] }) {
       <Podium players={players} compact />
     </motion.div>
   );
-}
-
-function AnimatedPoolNumber({ value }: { value: number }) {
-  const prefersReducedMotion = useReducedMotion();
-  const fractionDigits = useMemo(() => poolFractionDigits(value), [value]);
-  const formatter = useMemo(
-    () =>
-      new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: fractionDigits,
-        maximumFractionDigits: fractionDigits,
-      }),
-    [fractionDigits]
-  );
-  const [introDelay, setIntroDelay] = useState(0.78);
-  const count = useMotionValue(0);
-  const display = useTransform(count, (latest) => formatPoolDisplay(latest, fractionDigits));
-  const displayLabel = formatPoolDisplay(value, fractionDigits);
-  const fullLabel = formatter.format(value);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setIntroDelay(0), 2400);
-    return () => window.clearTimeout(timeout);
-  }, []);
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      count.set(value);
-      return undefined;
-    }
-
-    const controls = animate(count, value, {
-      delay: introDelay,
-      duration: introDelay ? 1.45 : 0.85,
-      ease: [0.16, 1, 0.3, 1],
-    });
-
-    return () => controls.stop();
-  }, [count, introDelay, prefersReducedMotion, value]);
-
-  if (prefersReducedMotion) {
-    return <strong aria-label={fullLabel}>{displayLabel}</strong>;
-  }
-
-  return <motion.strong className="pool-count-number" aria-label={fullLabel}>{display}</motion.strong>;
 }
 
 function MagneticLink({ className, href, children }: { className: string; href: string; children: ReactNode }) {
@@ -1576,6 +1473,8 @@ function Footer() {
     ["Bets", "/custom-bets"],
     ["Store", "/store"],
     ["Missions", "/challenges"],
+    ["Tournaments", "/tournaments"],
+    ["Raffles", "/wager-raffles"],
     ["Profile", "/profile"],
     ["Support", "/support"],
     ["Privacy", "/privacy"],

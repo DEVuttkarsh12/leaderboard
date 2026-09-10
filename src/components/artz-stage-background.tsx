@@ -90,7 +90,7 @@ function createEmbers(width: number, height: number) {
 }
 
 function createGlints(width: number, height: number) {
-  const count = Math.max(13, Math.min(28, Math.round(width / 58)));
+  const count = Math.max(16, Math.min(32, Math.round(width / 52)));
 
   return Array.from({ length: count }, (_, index): Glint => ({
     x: ((index * 149 + 67) % 983) / 983 * width,
@@ -259,9 +259,9 @@ function drawGoldenRibbon(
     + Math.sin(time * options.speed * 0.46 + options.phase) * height * 0.022;
   const gradient = context.createLinearGradient(-80, baseline, width + 80, baseline);
   gradient.addColorStop(0, "rgba(255, 178, 67, 0)");
-  gradient.addColorStop(0.18, "rgba(255, 171, 61, 0.26)");
-  gradient.addColorStop(0.5, "rgba(255, 220, 129, 0.62)");
-  gradient.addColorStop(0.82, "rgba(255, 141, 53, 0.24)");
+  gradient.addColorStop(0.18, "rgba(255, 171, 61, 0.31)");
+  gradient.addColorStop(0.5, "rgba(255, 226, 145, 0.76)");
+  gradient.addColorStop(0.82, "rgba(255, 96, 184, 0.3)");
   gradient.addColorStop(1, "rgba(255, 178, 67, 0)");
 
   const traceRibbon = (offset: number) => {
@@ -286,7 +286,7 @@ function drawGoldenRibbon(
   context.lineJoin = "round";
   context.shadowColor = "rgba(255, 166, 66, 0.48)";
   context.shadowBlur = 18;
-  context.globalAlpha = 0.34;
+  context.globalAlpha = 0.42;
   context.lineWidth = 2.2;
   traceRibbon(-5);
   context.stroke();
@@ -295,7 +295,7 @@ function drawGoldenRibbon(
 
   context.setLineDash([Math.max(54, width * 0.075), Math.max(170, width * 0.27)]);
   context.lineDashOffset = -time * 22 * direction - options.phase * 58;
-  context.globalAlpha = 0.72;
+  context.globalAlpha = 0.84;
   context.shadowBlur = 15;
   context.lineWidth = 0.9;
   traceRibbon(-5);

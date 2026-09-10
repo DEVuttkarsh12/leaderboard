@@ -3,7 +3,6 @@ import {
   CircleHelp,
   Gift,
   Headphones,
-  Radio,
   Store,
   Tickets,
   Trophy,
@@ -42,11 +41,6 @@ export const siteNavigation: NavigationItem[] = [
     label: "Stream",
     children: [
       {
-        label: "Bonus Hunts",
-        href: "/bonus-hunts",
-        description: "Live-session pages and feature blocks for stream events.",
-      },
-      {
         label: "Tournaments",
         href: "/tournaments",
         description: "Scheduled brackets, lobbies, and event summaries.",
@@ -70,7 +64,6 @@ export const footerMenus = [
   {
     title: "Events",
     links: [
-      { label: "Bonus Hunts", href: "/bonus-hunts" },
       { label: "Tournaments", href: "/tournaments" },
       { label: "Wager Raffles", href: "/wager-raffles" },
       { label: "Support", href: "/support" },
@@ -101,10 +94,10 @@ export const routeHubCards = [
     description: "Hit missions.",
   },
   {
-    eyebrow: "♣ Stream",
-    title: "Bonus Hunts",
-    href: "/bonus-hunts",
-    description: "Clip heat.",
+    eyebrow: "♣ Competition",
+    title: "Tournaments",
+    href: "/tournaments",
+    description: "Live brackets.",
   },
   {
     eyebrow: "777 Utility",
@@ -124,15 +117,6 @@ export type SiteFeatureCard = {
 };
 
 export const streamCards: SiteFeatureCard[] = [
-  {
-    title: "Bonus Hunts",
-    description:
-      "Live heat.",
-    href: "/bonus-hunts",
-    cta: "Play zone",
-    meta: "Hot table",
-    icon: Radio,
-  },
   {
     title: "Tournaments",
     description:

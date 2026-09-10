@@ -422,6 +422,7 @@ export const ModelName = {
   HuntClipSave: 'HuntClipSave',
   SupportTicket: 'SupportTicket',
   Tournament: 'Tournament',
+  TournamentMatch: 'TournamentMatch',
   TournamentEntry: 'TournamentEntry'
 } as const
 
@@ -438,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet" | "challengeMission" | "challengeProgress" | "watchSession" | "kickChatActivity" | "kickStreamStatus" | "raffleRound" | "raffleAccount" | "raffleEntry" | "bonusHuntSession" | "huntFollow" | "huntClip" | "huntClipVote" | "huntClipSave" | "supportTicket" | "tournament" | "tournamentEntry"
+    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet" | "challengeMission" | "challengeProgress" | "watchSession" | "kickChatActivity" | "kickStreamStatus" | "raffleRound" | "raffleAccount" | "raffleEntry" | "bonusHuntSession" | "huntFollow" | "huntClip" | "huntClipVote" | "huntClipSave" | "supportTicket" | "tournament" | "tournamentMatch" | "tournamentEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2292,6 +2293,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TournamentMatch: {
+      payload: Prisma.$TournamentMatchPayload<ExtArgs>
+      fields: Prisma.TournamentMatchFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TournamentMatchFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TournamentMatchFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>
+        }
+        findFirst: {
+          args: Prisma.TournamentMatchFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TournamentMatchFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>
+        }
+        findMany: {
+          args: Prisma.TournamentMatchFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>[]
+        }
+        create: {
+          args: Prisma.TournamentMatchCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>
+        }
+        createMany: {
+          args: Prisma.TournamentMatchCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TournamentMatchCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>[]
+        }
+        delete: {
+          args: Prisma.TournamentMatchDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>
+        }
+        update: {
+          args: Prisma.TournamentMatchUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>
+        }
+        deleteMany: {
+          args: Prisma.TournamentMatchDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TournamentMatchUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TournamentMatchUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>[]
+        }
+        upsert: {
+          args: Prisma.TournamentMatchUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentMatchPayload>
+        }
+        aggregate: {
+          args: Prisma.TournamentMatchAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTournamentMatch>
+        }
+        groupBy: {
+          args: Prisma.TournamentMatchGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TournamentMatchGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TournamentMatchCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TournamentMatchCountAggregateOutputType> | number
+        }
+      }
+    }
     TournamentEntry: {
       payload: Prisma.$TournamentEntryPayload<ExtArgs>
       fields: Prisma.TournamentEntryFieldRefs
@@ -2781,6 +2856,24 @@ export const TournamentScalarFieldEnum = {
 export type TournamentScalarFieldEnum = (typeof TournamentScalarFieldEnum)[keyof typeof TournamentScalarFieldEnum]
 
 
+export const TournamentMatchScalarFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  round: 'round',
+  position: 'position',
+  participantA: 'participantA',
+  participantB: 'participantB',
+  scoreA: 'scoreA',
+  scoreB: 'scoreB',
+  winner: 'winner',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TournamentMatchScalarFieldEnum = (typeof TournamentMatchScalarFieldEnum)[keyof typeof TournamentMatchScalarFieldEnum]
+
+
 export const TournamentEntryScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3199,6 +3292,7 @@ export type GlobalOmitConfig = {
   huntClipSave?: Prisma.HuntClipSaveOmit
   supportTicket?: Prisma.SupportTicketOmit
   tournament?: Prisma.TournamentOmit
+  tournamentMatch?: Prisma.TournamentMatchOmit
   tournamentEntry?: Prisma.TournamentEntryOmit
 }
 

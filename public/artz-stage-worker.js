@@ -22,7 +22,7 @@ function seeded(index, multiplier, modulus) {
 
 function rebuildScene() {
   const emberCount = Math.max(22, Math.min(42, Math.round(width / 42)));
-  const glintCount = Math.max(10, Math.min(20, Math.round(width / 88)));
+  const glintCount = Math.max(14, Math.min(24, Math.round(width / 74)));
 
   embers = Array.from({ length: emberCount }, (_, index) => ({
     x: seeded(index, 83, 997) * width,
@@ -74,9 +74,9 @@ function traceRibbon(time, lane, amplitude, phase, speed, reverse) {
   const baseline = height * lane + Math.sin(time * speed * 0.46 + phase) * height * 0.022;
   const gradient = context.createLinearGradient(-80, baseline, width + 80, baseline);
   gradient.addColorStop(0, "rgba(255, 178, 67, 0)");
-  gradient.addColorStop(0.18, "rgba(255, 171, 61, 0.22)");
-  gradient.addColorStop(0.5, "rgba(255, 226, 145, 0.62)");
-  gradient.addColorStop(0.82, "rgba(255, 91, 177, 0.2)");
+  gradient.addColorStop(0.18, "rgba(255, 171, 61, 0.3)");
+  gradient.addColorStop(0.5, "rgba(255, 226, 145, 0.78)");
+  gradient.addColorStop(0.82, "rgba(255, 91, 177, 0.28)");
   gradient.addColorStop(1, "rgba(255, 178, 67, 0)");
 
   context.beginPath();
@@ -91,8 +91,11 @@ function traceRibbon(time, lane, amplitude, phase, speed, reverse) {
     else context.lineTo(x, y);
   }
   context.strokeStyle = gradient;
-  context.lineWidth = 1.7;
-  context.globalAlpha = 0.5;
+  context.lineWidth = 5;
+  context.globalAlpha = 0.1;
+  context.stroke();
+  context.lineWidth = 1.35;
+  context.globalAlpha = 0.68;
   context.stroke();
   context.globalAlpha = 1;
 }
@@ -145,11 +148,12 @@ function draw(now) {
 
   for (const glint of glints) {
     glint.y -= glint.speed * delta;
+    glint.x += Math.sin(time * 0.18 + glint.phase) * delta * 0.22;
     if (glint.y < -12) glint.y = height + 12;
     const pulse = Math.pow(Math.max(0, Math.sin(time * 0.72 + glint.phase)), 5);
     const size = glint.size * (0.9 + pulse * 0.45);
     const color = glint.tone === "gold" ? "#ffc763" : glint.tone === "pink" ? "#ff5cbe" : "#c584ff";
-    context.globalAlpha = 0.22 + pulse * 0.48;
+    context.globalAlpha = 0.28 + pulse * 0.58;
     context.strokeStyle = color;
     context.lineWidth = 0.8;
     context.beginPath();

@@ -302,6 +302,20 @@ h4,
   animation-delay: -2.4s;
 }
 
+@media (min-width: 981px) {
+  .artz-home .product-hero--centered {
+    padding: 204px 24px 114px;
+  }
+
+  .hero-casino-prop--left {
+    top: 295px;
+  }
+
+  .hero-casino-prop--right {
+    top: 273px;
+  }
+}
+
 .home-center-stage {
   width: min(900px, 100%);
   z-index: 5;
@@ -721,7 +735,7 @@ h4,
 .home-route-strip {
   width: min(1080px, 100%);
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 28px 24px;
+  gap: 40px 28px;
 }
 
 .product-hero--centered + .home-action-zone .home-route-card,
@@ -739,14 +753,15 @@ h4,
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     7px 9px 0 rgb(var(--route-rgb) / 0.08),
     0 24px 52px rgba(4, 0, 10, 0.42);
+  transform-origin: 50% 58%;
 }
 
-.home-route-card:nth-child(1) { transform: translateY(12px) rotate(-2.5deg); }
-.home-route-card:nth-child(2) { transform: translateY(-5px) rotate(1.6deg); }
-.home-route-card:nth-child(3) { transform: translateY(9px) rotate(-1deg); }
-.home-route-card:nth-child(4) { transform: translateY(-3px) rotate(2.2deg); }
-.home-route-card:nth-child(5) { transform: translateY(11px) rotate(-1.8deg); }
-.home-route-card:nth-child(6) { transform: translateY(-4px) rotate(2.6deg); }
+.home-route-card:nth-child(1) { transform: translateY(18px) rotate(-3.6deg) !important; }
+.home-route-card:nth-child(2) { transform: translateY(-9px) rotate(2.4deg) !important; }
+.home-route-card:nth-child(3) { transform: translateY(14px) rotate(-2deg) !important; }
+.home-route-card:nth-child(4) { transform: translateY(-7px) rotate(2.9deg) !important; }
+.home-route-card:nth-child(5) { transform: translateY(16px) rotate(-3deg) !important; }
+.home-route-card:nth-child(6) { transform: translateY(-8px) rotate(3.5deg) !important; }
 
 .home-route-card::before {
   background: radial-gradient(300px circle at var(--spotlight-x, 50%) var(--spotlight-y, 0%), rgb(var(--route-rgb) / 0.34), transparent 55%);
@@ -792,12 +807,12 @@ h4,
     0 0 36px rgb(var(--route-rgb) / 0.16);
 }
 
-.home-route-card:nth-child(1):hover { transform: translateY(3px) rotate(-1deg) scale(1.02); }
-.home-route-card:nth-child(2):hover { transform: translateY(-12px) rotate(0.4deg) scale(1.02); }
-.home-route-card:nth-child(3):hover { transform: translateY(1px) rotate(-0.2deg) scale(1.02); }
-.home-route-card:nth-child(4):hover { transform: translateY(-10px) rotate(0.8deg) scale(1.02); }
-.home-route-card:nth-child(5):hover { transform: translateY(3px) rotate(-0.6deg) scale(1.02); }
-.home-route-card:nth-child(6):hover { transform: translateY(-11px) rotate(1deg) scale(1.02); }
+.home-route-card:nth-child(1):hover { transform: translateY(8px) rotate(-2deg) scale(1.02) !important; }
+.home-route-card:nth-child(2):hover { transform: translateY(-17px) rotate(1deg) scale(1.02) !important; }
+.home-route-card:nth-child(3):hover { transform: translateY(5px) rotate(-0.7deg) scale(1.02) !important; }
+.home-route-card:nth-child(4):hover { transform: translateY(-15px) rotate(1.2deg) scale(1.02) !important; }
+.home-route-card:nth-child(5):hover { transform: translateY(7px) rotate(-1.2deg) scale(1.02) !important; }
+.home-route-card:nth-child(6):hover { transform: translateY(-16px) rotate(1.5deg) scale(1.02) !important; }
 
 .home-board-showcase__arena {
   position: relative;
@@ -1584,7 +1599,7 @@ textarea:focus {
   .product-hero--centered + .home-action-zone .home-route-strip,
   .home-route-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px 14px;
+    gap: 28px 18px;
   }
 
   .product-hero--centered + .home-action-zone .home-route-card,
@@ -1601,6 +1616,13 @@ textarea:focus {
   .home-route-card strong {
     font-size: 28px;
   }
+
+  .home-route-card:nth-child(1) { transform: translateY(8px) rotate(-2.4deg) !important; }
+  .home-route-card:nth-child(2) { transform: translateY(-5px) rotate(2.1deg) !important; }
+  .home-route-card:nth-child(3) { transform: translateY(5px) rotate(1.8deg) !important; }
+  .home-route-card:nth-child(4) { transform: translateY(-4px) rotate(-2deg) !important; }
+  .home-route-card:nth-child(5) { transform: translateY(7px) rotate(-2.2deg) !important; }
+  .home-route-card:nth-child(6) { transform: translateY(-5px) rotate(2.3deg) !important; }
 
   .home-board-showcase .podium-card.rank-2,
   .board-top-three .podium-card.rank-2 {
@@ -1729,7 +1751,17 @@ textarea:focus {
   }
 
   .home-route-card strong {
-    font-size: 24px;
+    max-width: 100%;
+    font-size: 18px !important;
+    white-space: nowrap;
+  }
+
+  .home-route-card:nth-child(1) strong {
+    font-size: 17px !important;
+  }
+
+  .home-route-card:nth-child(5) strong {
+    font-size: 16px !important;
   }
 
   .board-hero--leaderboard h1,
@@ -1753,7 +1785,12 @@ textarea:focus {
   }
 
   .home-route-card strong {
-    font-size: 21px;
+    font-size: 17px !important;
+  }
+
+  .home-route-card:nth-child(1) strong,
+  .home-route-card:nth-child(5) strong {
+    font-size: 15px !important;
   }
 
   .board-hero--leaderboard h1,
@@ -1950,4 +1987,272 @@ textarea:focus {
 
 .home-signal-dock {
   contain: layout paint;
+}
+
+/* Feedback pass: tighter home flow and complete primary navigation. */
+.home-action-zone {
+  padding-top: clamp(72px, 8vw, 104px);
+}
+
+.desktop-nav__links {
+  gap: 7px;
+}
+
+.desktop-nav__links a {
+  padding-inline: 7px;
+  font-size: 13px;
+}
+
+/* Keep the leaderboard ornament inside the stage instead of clipping at right. */
+.leaderboard-gold-bars {
+  right: clamp(14px, 2.4vw, 34px);
+  top: 96px;
+  width: clamp(136px, 12vw, 178px);
+  opacity: 0.82;
+}
+
+.winner-arena {
+  position: relative;
+  z-index: 2;
+}
+
+/* Persistent tournament bracket shared by players and the admin editor. */
+.bracket-panel.bracket-panel--live,
+.admin-tournament-manager {
+  display: block;
+  margin-top: 22px;
+  padding: clamp(18px, 2.4vw, 30px);
+  overflow: hidden;
+}
+
+.bracket-panel__head,
+.admin-tournament-manager__head,
+.admin-bracket-seeds {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.bracket-panel__head h3,
+.admin-tournament-manager__head h3 {
+  margin: 5px 0 3px;
+}
+
+.tournament-bracket {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(210px, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+  padding: 6px 4px 14px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: rgba(255, 83, 176, 0.42) transparent;
+}
+
+.tournament-round {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.tournament-round > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 245, 238, 0.76);
+  font-family: var(--font-label);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.tournament-round > header span {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 171, 61, 0.36);
+  border-radius: 50%;
+  color: var(--gold-bright);
+}
+
+.tournament-round__matches {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 14px;
+}
+
+.tournament-match {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 102, 193, 0.24);
+  border-radius: 8px 14px 8px 13px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 30%),
+    linear-gradient(150deg, rgba(53, 9, 65, 0.86), rgba(11, 2, 20, 0.94));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 5px 7px 0 rgba(117, 38, 145, 0.07);
+}
+
+.tournament-match--live {
+  border-color: rgba(255, 177, 65, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 20px rgba(255, 145, 49, 0.12);
+}
+
+.tournament-match > div {
+  min-height: 43px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.tournament-match > div.winner {
+  background: linear-gradient(90deg, rgba(217, 255, 63, 0.11), transparent);
+  color: #e4ff74;
+}
+
+.tournament-match > div > span {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 77, 178, 0.12);
+  color: #ff8bcf;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.tournament-match > div > strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tournament-match > div > b {
+  color: var(--gold-bright);
+  font-size: 13px;
+}
+
+.tournament-match input {
+  width: 44px;
+  min-height: 30px;
+  padding: 4px 6px;
+  text-align: center;
+}
+
+.tournament-match > div > button {
+  width: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.tournament-match footer {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 9px;
+  color: rgba(255, 245, 238, 0.48);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.tournament-match footer button {
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 0;
+  background: transparent;
+  color: #ff9bd5;
+  font-size: 9px;
+}
+
+.tournament-empty {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: #ff95d3;
+  text-align: center;
+}
+
+.tournament-empty span {
+  color: rgba(255, 245, 238, 0.55);
+  font-size: 12px;
+}
+
+.tournament-create-form .tournament-participant-field {
+  grid-column: 1 / -1;
+}
+
+.tournament-participant-field textarea,
+.admin-bracket-seeds textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.admin-tournament-list article.selected {
+  border-color: rgba(255, 171, 61, 0.5);
+  background: linear-gradient(135deg, rgba(255, 171, 61, 0.11), rgba(43, 7, 51, 0.76));
+}
+
+.admin-bracket-seeds {
+  margin-top: 20px;
+  padding: 14px;
+  border: 1px solid rgba(255, 105, 195, 0.18);
+  border-radius: 8px;
+  background: rgba(13, 2, 22, 0.46);
+}
+
+.admin-bracket-seeds label {
+  flex: 1;
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+@media (max-width: 1180px) and (min-width: 981px) {
+  .desktop-nav__links a {
+    padding-inline: 5px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 780px) {
+  .leaderboard-gold-bars {
+    right: 4px;
+    top: 82px;
+    width: 104px;
+  }
+
+  .bracket-panel__head,
+  .admin-tournament-manager__head,
+  .admin-bracket-seeds {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bracket-panel__head > button,
+  .admin-bracket-seeds > button {
+    width: 100%;
+  }
+
+  .tournament-bracket {
+    grid-auto-columns: minmax(190px, 82vw);
+  }
 }

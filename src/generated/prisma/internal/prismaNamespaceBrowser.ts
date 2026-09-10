@@ -76,6 +76,7 @@ export const ModelName = {
   HuntClipSave: 'HuntClipSave',
   SupportTicket: 'SupportTicket',
   Tournament: 'Tournament',
+  TournamentMatch: 'TournamentMatch',
   TournamentEntry: 'TournamentEntry'
 } as const
 
@@ -469,6 +470,24 @@ export const TournamentScalarFieldEnum = {
 } as const
 
 export type TournamentScalarFieldEnum = (typeof TournamentScalarFieldEnum)[keyof typeof TournamentScalarFieldEnum]
+
+
+export const TournamentMatchScalarFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  round: 'round',
+  position: 'position',
+  participantA: 'participantA',
+  participantB: 'participantB',
+  scoreA: 'scoreA',
+  scoreB: 'scoreB',
+  winner: 'winner',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TournamentMatchScalarFieldEnum = (typeof TournamentMatchScalarFieldEnum)[keyof typeof TournamentMatchScalarFieldEnum]
 
 
 export const TournamentEntryScalarFieldEnum = {

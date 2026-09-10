@@ -3,7 +3,6 @@ import {
   BadgeHelp,
   CircleDollarSign,
   KeyRound,
-  Radio,
   ShoppingBag,
   Swords,
   Target,
@@ -22,12 +21,6 @@ const features = [
     label: "Daily push",
     href: "/challenges",
     icon: Target,
-  },
-  {
-    title: "Bonus Hunts",
-    label: "Stream heat",
-    href: "/bonus-hunts",
-    icon: Radio,
   },
   {
     title: "Tournaments",

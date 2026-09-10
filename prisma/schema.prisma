@@ -519,12 +519,34 @@ model Tournament {
   sortOrder Int              @default(0)
 
   entries TournamentEntry[]
+  matches TournamentMatch[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([active, sortOrder])
   @@index([status])
+}
+
+model TournamentMatch {
+  id           String @id @default(cuid())
+  tournamentId String
+  round        Int
+  position     Int
+  participantA String?
+  participantB String?
+  scoreA       Int?
+  scoreB       Int?
+  winner       String?
+  status       String @default("PENDING")
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tournamentId, round, position])
+  @@index([tournamentId, round])
 }
 
 model TournamentEntry {

@@ -143,6 +143,11 @@ export type SupportTicket = Prisma.SupportTicketModel
  */
 export type Tournament = Prisma.TournamentModel
 /**
+ * Model TournamentMatch
+ *
+ */
+export type TournamentMatch = Prisma.TournamentMatchModel
+/**
  * Model TournamentEntry
  * 
  */
