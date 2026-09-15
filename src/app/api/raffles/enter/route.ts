@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { SESSION_COOKIE } from "@/lib/server/auth/session";
 import { enterRaffle } from "@/lib/server/raffles/service";
 
 export const runtime = "nodejs";
+
+const entrySchema = z.object({
+  ticketCount: z.number().int().positive().max(1_000_000),
+});
 
 function sessionTokenFrom(request: NextRequest) {
   return request.cookies.get(SESSION_COOKIE)?.value;
@@ -10,10 +15,11 @@ function sessionTokenFrom(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { ticketCount?: unknown };
-    const ticketCount =
-      typeof body.ticketCount === "number" ? Math.floor(body.ticketCount) : 0;
-    const raffle = await enterRaffle(sessionTokenFrom(request), ticketCount);
+    const parsed = entrySchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Enter a valid ticket amount." }, { status: 400 });
+    }
+    const raffle = await enterRaffle(sessionTokenFrom(request), parsed.data.ticketCount);
 
     return NextResponse.json({ raffle });
   } catch (error) {
@@ -24,6 +30,9 @@ export async function POST(request: NextRequest) {
       message === "Raffle round is closed." ||
       message === "Not enough raffle tickets." ? 400 :
       500;
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json(
+      { error: status === 500 ? "Raffle entry could not be completed." : message },
+      { status }
+    );
   }
 }

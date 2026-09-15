@@ -1,5 +1,4 @@
-import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
-import { promisify } from "node:util";
+import { createHash, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import type { NextResponse } from "next/server";
 import { prisma } from "@/lib/server/db/prisma";
 import type { AuthAccountPayload } from "@/lib/auth/account";
@@ -7,17 +6,48 @@ import {
   linkCasinoAccount,
   unlinkCasinoAccount,
 } from "@/lib/server/casino/verification";
+import {
+  encryptServerSecret,
+  isEncryptedServerSecret,
+} from "@/lib/server/security/encryption";
 
-export const SESSION_COOKIE = "rankboard_session";
+export const SESSION_COOKIE =
+  process.env.NODE_ENV === "production"
+    ? "__Host-rankboard_session"
+    : "rankboard_session";
 
-const SESSION_DAYS = 30;
+const SESSION_DAYS = 7;
 const SESSION_MAX_AGE_SECONDS = SESSION_DAYS * 24 * 60 * 60;
 const PASSWORD_KEY_LENGTH = 64;
-const scryptAsync = promisify(scrypt);
+const SCRYPT_COST = 32_768;
+const SCRYPT_BLOCK_SIZE = 8;
+const SCRYPT_PARALLELIZATION = 1;
+const SCRYPT_MAX_MEMORY = 64 * 1024 * 1024;
+const scryptOptions = {
+  N: SCRYPT_COST,
+  r: SCRYPT_BLOCK_SIZE,
+  p: SCRYPT_PARALLELIZATION,
+  maxmem: SCRYPT_MAX_MEMORY,
+};
+
+function derivePasswordKey(
+  password: string,
+  salt: string,
+  length: number,
+  options: typeof scryptOptions
+) {
+  return new Promise<Buffer>((resolve, reject) => {
+    scrypt(password, salt, length, options, (error, derivedKey) => {
+      if (error) reject(error);
+      else resolve(derivedKey);
+    });
+  });
+}
 
 type SessionUser = {
   id: string;
   email: string | null;
+  emailVerified: Date | null;
   passwordHash?: string | null;
   image: string | null;
   displayName: string | null;
@@ -31,7 +61,10 @@ type SessionUser = {
   timeoutUntil: Date | null;
   role: "PLAYER" | "ADMIN";
   accounts: {
+    id?: string;
     provider: string;
+    access_token?: string | null;
+    refresh_token?: string | null;
     updatedAt: Date;
   }[];
   casinoAccounts: {
@@ -57,12 +90,10 @@ const adminEnvKeys = [
   "RANKBOARD_ADMIN_DISCORD_USERNAMES",
   "RANKBOARD_ADMIN_DISCORD_IDS",
 ];
-const assignedAdminKickUsernames = new Set(["devuttkarsh"]);
-const assignedAdminDiscordUsernames = new Set(["shinra.ae"]);
-
 type AdminIdentityUser = {
   id: string;
   email?: string | null;
+  emailVerified?: Date | null;
   discordId?: string | null;
   discordUsername?: string | null;
   kickId?: string | null;
@@ -89,15 +120,12 @@ function emailAdminListFromEnv(key: string) {
 }
 
 export function hasConfiguredAdminAllowlist() {
-  return (
-    assignedAdminKickUsernames.size > 0 ||
-    assignedAdminDiscordUsernames.size > 0 ||
-    adminEnvKeys.some((key) => adminListFromEnv(key).size > 0)
-  );
+  return adminEnvKeys.some((key) => adminListFromEnv(key).size > 0);
 }
 
 export function isConfiguredAdminIdentity(user: {
   email?: string | null;
+  emailVerified?: Date | null;
   discordId?: string | null;
   discordUsername?: string | null;
   kickId?: string | null;
@@ -110,15 +138,11 @@ export function isConfiguredAdminIdentity(user: {
   const kickUsername = user.kickUsername?.trim().replace(/^@+/, "").toLowerCase();
 
   return Boolean(
-    (email && emailAdminListFromEnv("RANKBOARD_ADMIN_EMAILS").has(email)) ||
+    (email && user.emailVerified && emailAdminListFromEnv("RANKBOARD_ADMIN_EMAILS").has(email)) ||
       (discordId && adminListFromEnv("RANKBOARD_ADMIN_DISCORD_IDS").has(discordId)) ||
-      (discordUsername &&
-        (assignedAdminDiscordUsernames.has(discordUsername) ||
-          adminListFromEnv("RANKBOARD_ADMIN_DISCORD_USERNAMES").has(discordUsername))) ||
+      (discordUsername && adminListFromEnv("RANKBOARD_ADMIN_DISCORD_USERNAMES").has(discordUsername)) ||
       (kickId && adminListFromEnv("RANKBOARD_ADMIN_KICK_IDS").has(kickId)) ||
-      (kickUsername &&
-        (assignedAdminKickUsernames.has(kickUsername) ||
-          adminListFromEnv("RANKBOARD_ADMIN_KICK_USERNAMES").has(kickUsername)))
+      (kickUsername && adminListFromEnv("RANKBOARD_ADMIN_KICK_USERNAMES").has(kickUsername))
   );
 }
 
@@ -152,6 +176,7 @@ async function reconcileConfiguredAdminRoleById(userId: string) {
     select: {
       id: true,
       email: true,
+      emailVerified: true,
       discordId: true,
       discordUsername: true,
       kickId: true,
@@ -193,28 +218,119 @@ function createSessionToken() {
   return randomBytes(32).toString("base64url");
 }
 
+function sessionTokenDigest(sessionToken: string) {
+  return createHash("sha256").update(sessionToken).digest("base64url");
+}
+
+function isAccountAccessRestricted(user: {
+  banned: boolean;
+  timeoutUntil: Date | null;
+}) {
+  return user.banned || Boolean(user.timeoutUntil && user.timeoutUntil > new Date());
+}
+
+async function secureLegacyOAuthTokens(
+  accounts: SessionUser["accounts"]
+) {
+  const updates = accounts.flatMap((account) => {
+    if (!account.id) return [];
+    const accessToken = account.access_token;
+    const refreshToken = account.refresh_token;
+    const needsAccessUpgrade = Boolean(accessToken) && !isEncryptedServerSecret(accessToken);
+    const needsRefreshUpgrade = Boolean(refreshToken) && !isEncryptedServerSecret(refreshToken);
+    if (!needsAccessUpgrade && !needsRefreshUpgrade) return [];
+
+    return prisma.account.update({
+      where: { id: account.id },
+      data: {
+        access_token: needsAccessUpgrade ? encryptServerSecret(accessToken) : undefined,
+        refresh_token: needsRefreshUpgrade ? encryptServerSecret(refreshToken) : undefined,
+      },
+    });
+  });
+
+  if (updates.length > 0) await Promise.all(updates);
+}
+
+async function upgradeLegacySessionToken(
+  id: string,
+  storedSessionToken: string,
+  sessionToken: string
+) {
+  if (storedSessionToken !== sessionToken) return;
+  await prisma.session.update({
+    where: { id },
+    data: { sessionToken: sessionTokenDigest(sessionToken) },
+  });
+}
+
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("base64url");
-  const derivedKey = (await scryptAsync(password, salt, PASSWORD_KEY_LENGTH)) as Buffer;
+  const derivedKey = await derivePasswordKey(
+    password,
+    salt,
+    PASSWORD_KEY_LENGTH,
+    scryptOptions
+  );
 
-  return `scrypt:${salt}:${derivedKey.toString("base64url")}`;
+  return [
+    "scrypt",
+    "v2",
+    SCRYPT_COST,
+    SCRYPT_BLOCK_SIZE,
+    SCRYPT_PARALLELIZATION,
+    salt,
+    derivedKey.toString("base64url"),
+  ].join(":");
 }
 
 async function verifyPassword(password: string, passwordHash: string | null) {
   if (!passwordHash) {
+    await derivePasswordKey(
+      password,
+      "missing-account-timing-salt",
+      PASSWORD_KEY_LENGTH,
+      scryptOptions
+    );
     return false;
   }
 
-  const [scheme, salt, storedHash] = passwordHash.split(":");
+  const parts = passwordHash.split(":");
+  const isCurrent = parts[0] === "scrypt" && parts[1] === "v2";
+  const salt = isCurrent ? parts[5] : parts[1];
+  const storedHash = isCurrent ? parts[6] : parts[2];
+  const cost = isCurrent ? Number(parts[2]) : 16_384;
+  const blockSize = isCurrent ? Number(parts[3]) : 8;
+  const parallelization = isCurrent ? Number(parts[4]) : 1;
 
-  if (scheme !== "scrypt" || !salt || !storedHash) {
+  if (
+    parts[0] !== "scrypt" ||
+    !salt ||
+    !storedHash ||
+    !Number.isSafeInteger(cost) ||
+    !Number.isSafeInteger(blockSize) ||
+    !Number.isSafeInteger(parallelization) ||
+    cost < 16_384 ||
+    cost > SCRYPT_COST ||
+    blockSize !== SCRYPT_BLOCK_SIZE ||
+    parallelization !== SCRYPT_PARALLELIZATION
+  ) {
     return false;
   }
 
   const expected = Buffer.from(storedHash, "base64url");
-  const actual = (await scryptAsync(password, salt, expected.length)) as Buffer;
+  const actual = await derivePasswordKey(password, salt, expected.length, {
+    N: cost,
+    r: blockSize,
+    p: parallelization,
+    maxmem: SCRYPT_MAX_MEMORY,
+  });
 
   return expected.length === actual.length && timingSafeEqual(expected, actual);
+}
+
+function passwordHashNeedsUpgrade(passwordHash: string | null) {
+  return !passwordHash?.startsWith(`scrypt:v2:${SCRYPT_COST}:`);
 }
 
 function discordDisplayName(profile: DiscordProfile) {
@@ -269,7 +385,6 @@ export function accountFromUser(user: SessionUser): AuthAccountPayload {
     email: account.email ?? null,
     isVerified: Boolean(account.isVerified),
     verificationMethod: account.verificationMethod ?? null,
-    verificationCode: account.verificationCode ?? null,
     verifiedAt: account.verifiedAt ? new Date(account.verifiedAt).toISOString() : null,
   }));
 
@@ -307,17 +422,6 @@ export function accountFromUser(user: SessionUser): AuthAccountPayload {
 }
 
 async function createSessionForUser(userId: string) {
-  const expires = sessionExpiresAt();
-  const sessionToken = createSessionToken();
-
-  await prisma.session.create({
-    data: {
-      sessionToken,
-      expires,
-      userId,
-    },
-  });
-
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
     include: {
@@ -326,7 +430,39 @@ async function createSessionForUser(userId: string) {
     },
   });
 
+  if (isAccountAccessRestricted(user)) {
+    await prisma.session.deleteMany({ where: { userId } });
+    throw new Error("This account is unavailable. Contact support.");
+  }
+
+  await secureLegacyOAuthTokens(user.accounts);
   const reconciledUser = await reconcileConfiguredAdminRole(user);
+  const expires = sessionExpiresAt();
+  const sessionToken = createSessionToken();
+  const storedSessionToken = sessionTokenDigest(sessionToken);
+
+  await prisma.session.create({
+    data: {
+      sessionToken: storedSessionToken,
+      expires,
+      userId,
+    },
+  });
+
+  await prisma.session.deleteMany({
+    where: { userId, expires: { lte: new Date() } },
+  });
+  const olderSessions = await prisma.session.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    skip: 10,
+    select: { id: true },
+  });
+  if (olderSessions.length > 0) {
+    await prisma.session.deleteMany({
+      where: { id: { in: olderSessions.map((session) => session.id) } },
+    });
+  }
 
   return {
     sessionToken,
@@ -443,8 +579,15 @@ export async function signInWithEmailPassword(email: string, password: string) {
     },
   });
 
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+  if (!(await verifyPassword(password, user?.passwordHash ?? null)) || !user) {
     throw new Error("Email or password is incorrect.");
+  }
+
+  if (passwordHashNeedsUpgrade(user.passwordHash)) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash: await hashPassword(password) },
+    });
   }
 
   return createSessionForUser(user.id);
@@ -455,8 +598,10 @@ export async function getSessionAccount(sessionToken: string | undefined) {
     return null;
   }
 
-  const session = await prisma.session.findUnique({
-    where: { sessionToken },
+  const session = await prisma.session.findFirst({
+    where: {
+      sessionToken: { in: [sessionTokenDigest(sessionToken), sessionToken] },
+    },
     include: {
       user: {
         include: {
@@ -473,10 +618,18 @@ export async function getSessionAccount(sessionToken: string | undefined) {
 
   if (session.expires <= new Date()) {
     await prisma.session.delete({
-      where: { sessionToken },
+      where: { id: session.id },
     });
     return null;
   }
+
+  if (isAccountAccessRestricted(session.user)) {
+    await prisma.session.deleteMany({ where: { userId: session.userId } });
+    return null;
+  }
+
+  await secureLegacyOAuthTokens(session.user.accounts);
+  await upgradeLegacySessionToken(session.id, session.sessionToken, sessionToken);
 
   return accountFromUser(await reconcileConfiguredAdminRole(session.user));
 }
@@ -486,11 +639,21 @@ export async function getSessionUserId(sessionToken: string | undefined) {
     return null;
   }
 
-  const session = await prisma.session.findUnique({
-    where: { sessionToken },
+  const session = await prisma.session.findFirst({
+    where: {
+      sessionToken: { in: [sessionTokenDigest(sessionToken), sessionToken] },
+    },
     select: {
+      id: true,
+      sessionToken: true,
       userId: true,
       expires: true,
+      user: {
+        select: {
+          banned: true,
+          timeoutUntil: true,
+        },
+      },
     },
   });
 
@@ -500,10 +663,17 @@ export async function getSessionUserId(sessionToken: string | undefined) {
 
   if (session.expires <= new Date()) {
     await prisma.session.delete({
-      where: { sessionToken },
+      where: { id: session.id },
     });
     return null;
   }
+
+  if (isAccountAccessRestricted(session.user)) {
+    await prisma.session.deleteMany({ where: { userId: session.userId } });
+    return null;
+  }
+
+  await upgradeLegacySessionToken(session.id, session.sessionToken, sessionToken);
 
   return session.userId;
 }
@@ -711,16 +881,16 @@ export async function createDiscordUserSession(
       type: "oauth",
       provider: "discord",
       providerAccountId: profile.id,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
+      access_token: encryptServerSecret(tokens.access_token),
+      refresh_token: encryptServerSecret(tokens.refresh_token),
       expires_at: expiresAt,
       token_type: tokens.token_type,
       scope: tokens.scope,
     },
     update: {
       userId: user.id,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
+      access_token: encryptServerSecret(tokens.access_token),
+      refresh_token: encryptServerSecret(tokens.refresh_token),
       expires_at: expiresAt,
       token_type: tokens.token_type,
       scope: tokens.scope,
@@ -793,16 +963,16 @@ export async function createKickUserSession(
       type: "oauth",
       provider: "kick",
       providerAccountId: kickId,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
+      access_token: encryptServerSecret(tokens.access_token),
+      refresh_token: encryptServerSecret(tokens.refresh_token),
       expires_at: expiresAt,
       token_type: tokens.token_type,
       scope: tokens.scope,
     },
     update: {
       userId: user.id,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
+      access_token: encryptServerSecret(tokens.access_token),
+      refresh_token: encryptServerSecret(tokens.refresh_token),
       expires_at: expiresAt,
       token_type: tokens.token_type,
       scope: tokens.scope,
@@ -819,7 +989,9 @@ export async function deleteUserSession(sessionToken: string | undefined) {
   }
 
   await prisma.session.deleteMany({
-    where: { sessionToken },
+    where: {
+      sessionToken: { in: [sessionTokenDigest(sessionToken), sessionToken] },
+    },
   });
 }
 

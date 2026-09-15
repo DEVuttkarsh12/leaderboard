@@ -1,15 +1,21 @@
 import { createHash, createVerify, randomBytes } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/server/db/prisma";
+import {
+  decryptServerSecret,
+  encryptServerSecret,
+} from "@/lib/server/security/encryption";
 
 export const KICK_OAUTH_STATE_COOKIE = "rankboard_kick_oauth_state";
 export const KICK_OAUTH_VERIFIER_COOKIE = "rankboard_kick_oauth_verifier";
 export const KICK_TOKEN_URL = "https://id.kick.com/oauth/token";
 export const KICK_PUBLIC_KEY_URL = "https://api.kick.com/public/v1/public-key";
 export const KICK_EVENTS_SUBSCRIPTIONS_URL = "https://api.kick.com/public/v1/events/subscriptions";
+export const KICK_CHANNELS_URL = "https://api.kick.com/public/v1/channels";
 export const KICK_DEFAULT_SCOPE = "user:read channel:read events:subscribe";
 
 let cachedKickPublicKey: string | null = null;
+let cachedKickAppToken: { accessToken: string; expiresAt: number } | null = null;
 
 export function getKickRedirectUri(request: NextRequest) {
   return (
@@ -42,6 +48,10 @@ function kickClientCredentials() {
 }
 
 export async function getKickAppAccessToken() {
+  if (cachedKickAppToken && cachedKickAppToken.expiresAt > Date.now() + 60_000) {
+    return cachedKickAppToken.accessToken;
+  }
+
   const { clientId, clientSecret } = kickClientCredentials();
   const response = await fetch(KICK_TOKEN_URL, {
     method: "POST",
@@ -57,12 +67,21 @@ export async function getKickAppAccessToken() {
     throw new Error("Kick app token request failed.");
   }
 
-  const payload = (await response.json()) as { access_token?: unknown };
+  const payload = (await response.json()) as {
+    access_token?: unknown;
+    expires_in?: unknown;
+  };
   if (typeof payload.access_token !== "string" || !payload.access_token) {
     throw new Error("Kick app token response was invalid.");
   }
 
-  return payload.access_token;
+  const expiresIn = typeof payload.expires_in === "number" ? payload.expires_in : 3600;
+  cachedKickAppToken = {
+    accessToken: payload.access_token,
+    expiresAt: Date.now() + Math.max(60, expiresIn) * 1000,
+  };
+
+  return cachedKickAppToken.accessToken;
 }
 
 export async function getKickUserAccessToken(userId: string) {
@@ -71,16 +90,18 @@ export async function getKickUserAccessToken(userId: string) {
     orderBy: { updatedAt: "desc" },
   });
 
-  if (!account?.access_token) {
+  const accessToken = decryptServerSecret(account?.access_token);
+  if (!account || !accessToken) {
     throw new Error("Kick account is not connected.");
   }
 
   const expiresAt = account.expires_at ? account.expires_at * 1000 : null;
   if (!expiresAt || expiresAt > Date.now() + 60_000) {
-    return account.access_token;
+    return accessToken;
   }
 
-  if (!account.refresh_token) {
+  const refreshToken = decryptServerSecret(account.refresh_token);
+  if (!refreshToken) {
     throw new Error("Kick account must be reconnected.");
   }
 
@@ -92,7 +113,7 @@ export async function getKickUserAccessToken(userId: string) {
       grant_type: "refresh_token",
       client_id: clientId,
       client_secret: clientSecret,
-      refresh_token: account.refresh_token,
+      refresh_token: refreshToken,
     }),
   });
 
@@ -116,10 +137,10 @@ export async function getKickUserAccessToken(userId: string) {
   await prisma.account.update({
     where: { id: account.id },
     data: {
-      access_token: tokens.access_token,
+      access_token: encryptServerSecret(tokens.access_token),
       refresh_token:
         typeof tokens.refresh_token === "string"
-          ? tokens.refresh_token
+          ? encryptServerSecret(tokens.refresh_token)
           : account.refresh_token,
       expires_at: expiresIn ? Math.floor(Date.now() / 1000) + expiresIn : account.expires_at,
       token_type:
@@ -164,7 +185,10 @@ export async function verifyKickWebhookSignature(
   headers: Headers,
   rawBody: string
 ) {
-  if (process.env.KICK_WEBHOOK_SKIP_SIGNATURE === "true") {
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.KICK_WEBHOOK_SKIP_SIGNATURE === "true"
+  ) {
     return true;
   }
 
@@ -173,6 +197,12 @@ export async function verifyKickWebhookSignature(
   const signature = headers.get("Kick-Event-Signature");
 
   if (!messageId || !timestamp || !signature) {
+    return false;
+  }
+
+  const timestampMs = Date.parse(timestamp);
+  const clockDifference = Math.abs(Date.now() - timestampMs);
+  if (!Number.isFinite(timestampMs) || clockDifference > 10 * 60 * 1000) {
     return false;
   }
 

@@ -366,18 +366,15 @@ export async function claimChallengeMission(
     if (progress?.claimedAt) {
       throw new Error("Mission already claimed.");
     }
+    if (!progress || progress.progress < mission.goal) {
+      throw new Error("Mission is not complete yet.");
+    }
 
     const claimedAt = new Date();
-    if (progress) {
-      await tx.challengeProgress.update({
-        where: { id: progress.id },
-        data: { claimedAt, progress: mission.goal },
-      });
-    } else {
-      await tx.challengeProgress.create({
-        data: { userId, missionId, claimedAt, progress: mission.goal },
-      });
-    }
+    await tx.challengeProgress.update({
+      where: { id: progress.id },
+      data: { claimedAt, progress: mission.goal },
+    });
 
     const updatedUser = await tx.user.update({
       where: { id: userId },

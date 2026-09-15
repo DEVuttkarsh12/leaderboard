@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { SESSION_COOKIE } from "@/lib/server/auth/session";
 import { voteHuntClip } from "@/lib/server/hunts/service";
 
 export const runtime = "nodejs";
+
+const clipSchema = z.object({ clipId: z.string().trim().min(1).max(128) });
 
 function sessionTokenFrom(request: NextRequest) {
   return request.cookies.get(SESSION_COOKIE)?.value;
@@ -10,13 +13,12 @@ function sessionTokenFrom(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { clipId?: unknown };
-    const clipId = typeof body.clipId === "string" ? body.clipId.trim() : "";
-    if (!clipId) {
-      return NextResponse.json({ error: "clipId is required." }, { status: 400 });
+    const parsed = clipSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Choose a valid clip." }, { status: 400 });
     }
 
-    const data = await voteHuntClip(sessionTokenFrom(request), clipId);
+    const data = await voteHuntClip(sessionTokenFrom(request), parsed.data.clipId);
     return NextResponse.json(data);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Clip vote failed.";

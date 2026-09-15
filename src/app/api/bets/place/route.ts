@@ -6,9 +6,9 @@ import { z } from "zod";
 export const dynamic = "force-dynamic";
 
 const betSchema = z.object({
-  marketId: z.string().min(1),
-  side: z.string().min(1),
-  amount: z.number().int().positive(),
+  marketId: z.string().trim().min(1).max(128),
+  side: z.string().trim().min(1).max(64),
+  amount: z.number().int().positive().max(2_000_000_000),
 });
 
 function sessionTokenFrom(request: NextRequest) {
@@ -30,7 +30,19 @@ export async function POST(request: NextRequest) {
     const result = await placeBet(sessionToken, parsed.data.marketId, parsed.data.side, parsed.data.amount);
     return NextResponse.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Bet placement failed.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    const knownErrors = new Set([
+      "Sign in to place bets.",
+      "Enter a valid bet amount.",
+      "This betting market is not open for bets.",
+      "Invalid side chosen.",
+      "User session expired.",
+      "Not enough points.",
+    ]);
+    const candidate = error instanceof Error ? error.message : "";
+    const message = knownErrors.has(candidate) ? candidate : "Bet placement failed. Try again.";
+    return NextResponse.json(
+      { error: message },
+      { status: candidate === "Sign in to place bets." || candidate === "User session expired." ? 401 : 400 }
+    );
   }
 }

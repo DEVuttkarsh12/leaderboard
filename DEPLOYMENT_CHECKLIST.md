@@ -33,6 +33,8 @@
 ```env
 DATABASE_URL=<supabase-pooled-transaction-url>
 DIRECT_URL=<supabase-direct-url>
+AUTH_ENCRYPTION_KEY=<independent-random-secret>
+AUTH_RATE_LIMIT_SECRET=<independent-random-secret>
 
 LEADERBOARD_PROVIDER=shuffle
 LEADERBOARD_API_KEY=<leaderboard-or-shuffle-api-key>
@@ -57,6 +59,10 @@ KICK_WATCH_VERIFICATION_MODE=chat
 KICK_WATCH_ACTIVITY_WINDOW_SECONDS=900
 KICK_WATCH_REQUIRE_LIVE=true
 
+# Prefer immutable provider IDs over usernames for administrator access.
+RANKBOARD_ADMIN_KICK_IDS=<comma-separated-kick-user-ids>
+RANKBOARD_ADMIN_DISCORD_IDS=<comma-separated-discord-user-ids>
+
 # Optional. Leave blank unless Kick signature verification needs a fixed key.
 KICK_WEBHOOK_PUBLIC_KEY=
 
@@ -67,6 +73,10 @@ RANKBOARD_DEV_AUTH_ADMIN=false
 ```
 
 ## Provider Setup
+
+- Generate both auth security secrets independently with `openssl rand -base64 48`; never commit their values.
+- Use provider IDs for admin allowlists. Email allowlisting only applies to verified email addresses.
+- Keep Vercel Deployment Protection enabled for previews and add a platform firewall rate rule for `/api/auth/*` as a second layer beyond the app rate limiter.
 
 - Kick app scopes must include `user:read`, `channel:read`, and `events:subscribe`.
 - Kick app URLs must match the production redirect and webhook URLs exactly.

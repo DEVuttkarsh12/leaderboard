@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const verifySchema = z.object({
   provider: z.enum(["thrill", "packdraw", "shuffle"]),
-  code: z.string().optional(),
+  code: z.string().trim().min(4).max(32).optional(),
   recheck: z.boolean().optional(),
 });
 
@@ -52,7 +52,15 @@ export async function POST(request: NextRequest) {
       message: `Verified ${provider} account successfully! Points sync enabled.`,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Verification failed.";
+    const knownErrors = new Set([
+      "Manual code verification is unavailable. Connect a matching Kick account or contact support.",
+      `No ${provider} account found to verify.`,
+      "Invalid verification code. Please check and try again.",
+    ]);
+    const candidate = error instanceof Error ? error.message : "";
+    const message = knownErrors.has(candidate)
+      ? candidate
+      : "Account verification could not be completed. Try again.";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { SESSION_COOKIE } from "@/lib/server/auth/session";
 import { convertWagerToTickets } from "@/lib/server/raffles/service";
 
 export const runtime = "nodejs";
+
+const convertSchema = z.object({
+  wagerAmount: z.number().int().positive().max(1_000_000_000),
+});
 
 function sessionTokenFrom(request: NextRequest) {
   return request.cookies.get(SESSION_COOKIE)?.value;
@@ -10,10 +15,11 @@ function sessionTokenFrom(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { wagerAmount?: unknown };
-    const wagerAmount =
-      typeof body.wagerAmount === "number" ? Math.floor(body.wagerAmount) : 0;
-    const raffle = await convertWagerToTickets(sessionTokenFrom(request), wagerAmount);
+    const parsed = convertSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Enter a valid wager amount." }, { status: 400 });
+    }
+    const raffle = await convertWagerToTickets(sessionTokenFrom(request), parsed.data.wagerAmount);
 
     return NextResponse.json({ raffle });
   } catch (error) {
@@ -24,6 +30,9 @@ export async function POST(request: NextRequest) {
       message === "Raffle round is closed." ||
       message === "Wager amount does not generate a ticket." ? 400 :
       500;
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json(
+      { error: status === 500 ? "Tickets could not be converted." : message },
+      { status }
+    );
   }
 }

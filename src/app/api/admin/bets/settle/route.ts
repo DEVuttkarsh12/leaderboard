@@ -6,8 +6,8 @@ import { z } from "zod";
 export const dynamic = "force-dynamic";
 
 const settleSchema = z.object({
-  marketId: z.string().min(1),
-  winningSide: z.string().min(1),
+  marketId: z.string().trim().min(1).max(128),
+  winningSide: z.enum(["A", "B"]),
 });
 
 function sessionTokenFrom(request: NextRequest) {

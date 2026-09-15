@@ -1,7 +1,9 @@
 import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
+  createDiscordPkcePair,
   DISCORD_OAUTH_STATE_COOKIE,
+  DISCORD_OAUTH_VERIFIER_COOKIE,
   getDiscordRedirectUri,
 } from "@/lib/server/auth/discord";
 import {
@@ -55,22 +57,33 @@ export async function GET(request: NextRequest) {
   }
 
   const state = randomBytes(32).toString("base64url");
+  const { codeVerifier, codeChallenge } = createDiscordPkcePair();
   const authUrl = new URL(DISCORD_AUTHORIZE_URL);
   authUrl.searchParams.set("client_id", clientId);
   authUrl.searchParams.set("redirect_uri", getDiscordRedirectUri(request));
   authUrl.searchParams.set("response_type", "code");
   authUrl.searchParams.set("scope", "identify");
   authUrl.searchParams.set("state", state);
+  authUrl.searchParams.set("code_challenge", codeChallenge);
+  authUrl.searchParams.set("code_challenge_method", "S256");
 
   const response = NextResponse.redirect(authUrl);
-  response.cookies.set({
-    name: DISCORD_OAUTH_STATE_COOKIE,
-    value: state,
+  const cookieOptions = {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 10 * 60,
+  };
+  response.cookies.set({
+    ...cookieOptions,
+    name: DISCORD_OAUTH_STATE_COOKIE,
+    value: state,
+  });
+  response.cookies.set({
+    ...cookieOptions,
+    name: DISCORD_OAUTH_VERIFIER_COOKIE,
+    value: codeVerifier,
   });
 
   return response;

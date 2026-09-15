@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const result = await syncLeaderboardPoints();
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Sync failed.";
-    return NextResponse.json({ error: message }, { status: 502 });
+    console.error("Leaderboard point sync failed.", error);
+    return NextResponse.json({ error: "Leaderboard sync is temporarily unavailable." }, { status: 502 });
   }
 }

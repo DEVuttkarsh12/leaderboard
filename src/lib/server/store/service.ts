@@ -186,13 +186,23 @@ function cleanImageUrl(value: string | undefined) {
   if (imageUrl.length > 750_000) {
     throw new Error("Choose a smaller item image.");
   }
-  if (
-    !imageUrl.startsWith("https://") &&
-    !imageUrl.startsWith("http://") &&
-    !imageUrl.startsWith("data:image/")
-  ) {
-    throw new Error("Use an image URL or upload an image file.");
+
+  if (/^data:image\/(?:png|jpe?g|webp|gif);base64,/i.test(imageUrl)) {
+    return imageUrl;
   }
+
+  try {
+    const remoteImage = new URL(imageUrl);
+    if (remoteImage.protocol !== "https:") {
+      throw new Error("Store image URLs must use HTTPS.");
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message === "Store image URLs must use HTTPS.") {
+      throw error;
+    }
+    throw new Error("Use an HTTPS image URL or upload a PNG, JPEG, WebP, or GIF image.");
+  }
+
   return imageUrl;
 }
 

@@ -15,12 +15,12 @@ import {
 const KICK_USER_URL = "https://api.kick.com/public/v1/users";
 
 const tokenSchema = z.object({
-  access_token: z.string().min(1),
-  refresh_token: z.string().optional(),
+  access_token: z.string().min(1).max(8192),
+  refresh_token: z.string().max(8192).optional(),
   expires_in: z.number().optional(),
   refresh_expires_in: z.number().optional(),
-  token_type: z.string().optional(),
-  scope: z.string().optional(),
+  token_type: z.string().max(64).optional(),
+  scope: z.string().max(1024).optional(),
 });
 
 const profileSchema = z.object({
@@ -28,9 +28,9 @@ const profileSchema = z.object({
     .array(
       z.object({
         user_id: z.number(),
-        name: z.string().min(1),
-        email: z.string().nullable().optional(),
-        profile_picture: z.string().nullable().optional(),
+        name: z.string().min(1).max(128),
+        email: z.string().email().max(254).nullable().optional(),
+        profile_picture: z.string().url().max(2048).nullable().optional(),
       })
     )
     .min(1),
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
   const codeVerifier = request.cookies.get(KICK_OAUTH_VERIFIER_COOKIE)?.value;
 
   if (error) {
-    return loginRedirect(request, { auth_error: error });
+    return loginRedirect(request, { auth_error: "kick_denied" });
   }
 
   if (!code || !state || !expectedState || !codeVerifier || state !== expectedState) {

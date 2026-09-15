@@ -11,11 +11,6 @@ export type CasinoPlayerValidationResult = {
   message?: string;
 };
 
-export function generateVerificationCode(): string {
-  const digits = Math.floor(1000 + Math.random() * 9000);
-  return `RANK-${digits}`;
-}
-
 export function normalizeCasinoHandle(value: string): string {
   return value.trim().slice(0, 64);
 }
@@ -152,7 +147,7 @@ export async function linkCasinoAccount({
   let isVerified = false;
   let verificationMethod: string | null = null;
   let verifiedAt: Date | null = null;
-  let verificationCode: string | null = generateVerificationCode();
+  const verificationCode: string | null = null;
 
   // Verification Check 1: Kick OAuth Match
   // If user is authenticated with Kick, and the Kick username matches the casino username
@@ -163,16 +158,14 @@ export async function linkCasinoAccount({
     isVerified = true;
     verificationMethod = "KICK_OAUTH";
     verifiedAt = new Date();
-    verificationCode = null;
   }
 
   // Verification Check 2: Casino Email matches verified User email
-  if (!isVerified && cleanEmail && user.email) {
+  if (!isVerified && cleanEmail && user.email && user.emailVerified) {
     if (cleanEmail.toLowerCase() === user.email.trim().toLowerCase()) {
       isVerified = true;
       verificationMethod = "EMAIL_MATCH";
       verifiedAt = new Date();
-      verificationCode = null;
     }
   }
 
@@ -194,7 +187,6 @@ export async function linkCasinoAccount({
           isVerified = true;
           verificationMethod = "KICK_OAUTH";
           verifiedAt = new Date();
-          verificationCode = null;
         }
       }
     } catch {
@@ -245,6 +237,10 @@ export async function verifyCasinoCode({
   provider: CasinoProvider;
   code: string;
 }) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Manual code verification is unavailable. Connect a matching Kick account or contact support.");
+  }
+
   const account = await prisma.casinoAccount.findUnique({
     where: {
       userId_provider: {
@@ -323,6 +319,7 @@ export async function recheckAutoVerification(
   } else if (
     account.email &&
     user.email &&
+    user.emailVerified &&
     account.email.toLowerCase() === user.email.trim().toLowerCase()
   ) {
     isVerified = true;

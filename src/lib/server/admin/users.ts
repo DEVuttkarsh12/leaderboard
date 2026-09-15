@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/server/db/prisma";
 import {
+  getSessionUserId,
   hasConfiguredAdminAllowlist,
   isConfiguredAdminIdentity,
   reconcileConfiguredAdminRole,
@@ -72,28 +73,23 @@ type AdminUserRecord = {
 };
 
 export async function requireAdminUser(sessionToken: string | undefined) {
-  if (!sessionToken) {
+  const userId = await getSessionUserId(sessionToken);
+  if (!userId) {
     throw new Error("Admin login required.");
   }
 
-  const session = await prisma.session.findUnique({
-    where: { sessionToken },
-    include: {
-      user: true,
-    },
-  });
-
-  if (!session || session.expires <= new Date()) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
     throw new Error("Admin login required.");
   }
 
-  const user = await reconcileConfiguredAdminRole(session.user);
+  const reconciledUser = await reconcileConfiguredAdminRole(user);
 
-  if (user.role !== "ADMIN") {
+  if (reconciledUser.role !== "ADMIN") {
     throw new Error("Admin access required.");
   }
 
-  return user;
+  return reconciledUser;
 }
 
 function userHandle(user: AdminUserRecord) {

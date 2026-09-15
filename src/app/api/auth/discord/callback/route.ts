@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
   DISCORD_OAUTH_STATE_COOKIE,
+  DISCORD_OAUTH_VERIFIER_COOKIE,
   getDiscordRedirectUri,
 } from "@/lib/server/auth/discord";
 import {
@@ -14,18 +15,18 @@ const DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
 const DISCORD_USER_URL = "https://discord.com/api/users/@me";
 
 const tokenSchema = z.object({
-  access_token: z.string().min(1),
-  refresh_token: z.string().optional(),
+  access_token: z.string().min(1).max(8192),
+  refresh_token: z.string().max(8192).optional(),
   expires_in: z.number().optional(),
-  token_type: z.string().optional(),
-  scope: z.string().optional(),
+  token_type: z.string().max(64).optional(),
+  scope: z.string().max(1024).optional(),
 });
 
 const profileSchema = z.object({
-  id: z.string().min(1),
-  username: z.string().min(1),
-  global_name: z.string().nullable().optional(),
-  avatar: z.string().nullable().optional(),
+  id: z.string().min(1).max(64),
+  username: z.string().min(1).max(128),
+  global_name: z.string().max(128).nullable().optional(),
+  avatar: z.string().max(256).nullable().optional(),
 });
 
 function loginRedirect(
@@ -41,10 +42,15 @@ function loginRedirect(
 
   const response = NextResponse.redirect(url);
   response.cookies.delete(DISCORD_OAUTH_STATE_COOKIE);
+  response.cookies.delete(DISCORD_OAUTH_VERIFIER_COOKIE);
   return response;
 }
 
-async function exchangeCodeForToken(request: NextRequest, code: string) {
+async function exchangeCodeForToken(
+  request: NextRequest,
+  code: string,
+  codeVerifier: string
+) {
   const clientId = process.env.DISCORD_CLIENT_ID?.trim();
   const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
 
@@ -63,6 +69,7 @@ async function exchangeCodeForToken(request: NextRequest, code: string) {
       grant_type: "authorization_code",
       code,
       redirect_uri: getDiscordRedirectUri(request),
+      code_verifier: codeVerifier,
     }),
   });
 
@@ -93,17 +100,18 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const expectedState = request.cookies.get(DISCORD_OAUTH_STATE_COOKIE)?.value;
+  const codeVerifier = request.cookies.get(DISCORD_OAUTH_VERIFIER_COOKIE)?.value;
 
   if (error) {
-    return loginRedirect(request, { auth_error: error });
+    return loginRedirect(request, { auth_error: "discord_denied" });
   }
 
-  if (!code || !state || !expectedState || state !== expectedState) {
+  if (!code || !state || !expectedState || !codeVerifier || state !== expectedState) {
     return loginRedirect(request, { auth_error: "discord_state" });
   }
 
   try {
-    const tokens = await exchangeCodeForToken(request, code);
+    const tokens = await exchangeCodeForToken(request, code, codeVerifier);
     const profile = await fetchDiscordProfile(tokens.access_token);
     const { sessionToken, expires, account } = await createDiscordUserSession(
       profile,

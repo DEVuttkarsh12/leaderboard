@@ -53,7 +53,8 @@ export async function POST(request: NextRequest) {
         : `Linked ${provider} account! Please complete verification to receive leaderboard points.`,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to link casino account.";
+    console.error("Casino account link failed.", error);
+    const message = "Could not link that casino account. Check the details and try again.";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

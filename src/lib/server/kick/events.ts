@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/server/db/prisma";
 import {
+  KICK_CHANNELS_URL,
   KICK_EVENTS_SUBSCRIPTIONS_URL,
+  getKickAppAccessToken,
   getKickUserAccessToken,
   verifyKickWebhookSignature,
 } from "@/lib/server/auth/kick";
@@ -42,7 +44,31 @@ export type AdminKickStreamPayload = {
   startedAt: string | null;
   endedAt: string | null;
   lastEventAt: string | null;
+  checkedAt: string | null;
+  source: "kick_api" | "webhook";
 };
+
+type KickChannelResponse = {
+  data?: Array<{
+    slug?: string;
+    stream?: {
+      is_live?: boolean;
+      start_time?: string | null;
+    } | null;
+  }>;
+};
+
+const LIVE_STATUS_CACHE_MS = 12_000;
+let cachedLiveStatus: {
+  channelSlug: string;
+  expiresAt: number;
+  value: { isLive: boolean; startedAt: Date | null; checkedAt: Date };
+} | null = null;
+let pendingLiveStatus: Promise<{
+  isLive: boolean;
+  startedAt: Date | null;
+  checkedAt: Date;
+}> | null = null;
 
 function cleanUsername(value: string | null | undefined) {
   return value?.trim().replace(/^@+/, "").toLowerCase() ?? "";
@@ -52,6 +78,14 @@ function dateFrom(value: string | null | undefined) {
   if (!value) return new Date();
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
+function optionalKickDate(value: string | null | undefined) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) || parsed.getUTCFullYear() < 2000
+    ? null
+    : parsed;
 }
 
 function channelSlugFrom(payload: {
@@ -75,14 +109,123 @@ function adminStreamPayload(stream: {
   startedAt: Date | null;
   endedAt: Date | null;
   lastEventAt: Date;
-}): AdminKickStreamPayload {
+}, checkedAt: Date | null = null, source: AdminKickStreamPayload["source"] = "webhook"): AdminKickStreamPayload {
   return {
     channelSlug: stream.channelSlug,
     isLive: stream.isLive,
     startedAt: stream.startedAt?.toISOString() ?? null,
     endedAt: stream.endedAt?.toISOString() ?? null,
     lastEventAt: stream.lastEventAt.toISOString(),
+    checkedAt: checkedAt?.toISOString() ?? null,
+    source,
   };
+}
+
+async function fetchCurrentKickStream(channelSlug: string) {
+  if (
+    cachedLiveStatus?.channelSlug === channelSlug &&
+    cachedLiveStatus.expiresAt > Date.now()
+  ) {
+    return cachedLiveStatus.value;
+  }
+
+  if (pendingLiveStatus) return pendingLiveStatus;
+
+  pendingLiveStatus = (async () => {
+    const accessToken = await getKickAppAccessToken();
+    const url = new URL(KICK_CHANNELS_URL);
+    url.searchParams.set("slug", channelSlug);
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Kick channel status request failed.");
+    }
+
+    const payload = (await response.json()) as KickChannelResponse;
+    const channel = payload.data?.find(
+      (item) => cleanUsername(item.slug) === channelSlug
+    );
+    if (!channel) {
+      throw new Error("Configured Kick channel was not found.");
+    }
+
+    const startedAt = optionalKickDate(channel.stream?.start_time);
+    const value = {
+      isLive: channel.stream?.is_live === true,
+      startedAt,
+      checkedAt: new Date(),
+    };
+    cachedLiveStatus = {
+      channelSlug,
+      expiresAt: Date.now() + LIVE_STATUS_CACHE_MS,
+      value,
+    };
+    return value;
+  })();
+
+  try {
+    return await pendingLiveStatus;
+  } finally {
+    pendingLiveStatus = null;
+  }
+}
+
+export async function getPublicKickStream(): Promise<AdminKickStreamPayload> {
+  const channelSlug = configuredWatchChannelSlug();
+  const stream = await prisma.kickStreamStatus.findUnique({ where: { channelSlug } });
+
+  try {
+    const current = await fetchCurrentKickStream(channelSlug);
+    const now = current.checkedAt;
+    let stored = stream;
+
+    if (!stream || stream.isLive !== current.isLive) {
+      stored = await prisma.kickStreamStatus.upsert({
+        where: { channelSlug },
+        create: {
+          channelSlug,
+          isLive: current.isLive,
+          startedAt: current.isLive ? current.startedAt ?? now : null,
+          endedAt: current.isLive ? null : now,
+          lastEventAt: now,
+        },
+        update: {
+          isLive: current.isLive,
+          startedAt: current.isLive
+            ? current.startedAt ?? stream?.startedAt ?? now
+            : stream?.startedAt ?? null,
+          endedAt: current.isLive ? null : now,
+        },
+      });
+    }
+
+    if (stored) {
+      return adminStreamPayload(
+        { ...stored, isLive: current.isLive, startedAt: current.startedAt ?? stored.startedAt },
+        current.checkedAt,
+        "kick_api"
+      );
+    }
+  } catch {
+    // The signed webhook state remains available when Kick's status API is unavailable.
+  }
+
+  if (!stream) {
+    return {
+      channelSlug,
+      isLive: false,
+      startedAt: null,
+      endedAt: null,
+      lastEventAt: null,
+      checkedAt: null,
+      source: "webhook",
+    };
+  }
+
+  return adminStreamPayload(stream);
 }
 
 async function storeChatMessage(payload: KickChatPayload) {
@@ -122,6 +265,11 @@ async function storeLivestreamStatus(payload: KickLivestreamPayload) {
       ? payload.is_live
       : normalizedStatus === "live" || normalizedStatus === "started";
   const eventDate = dateFrom(payload.created_at ?? payload.started_at ?? payload.ended_at);
+  const existing = await prisma.kickStreamStatus.findUnique({
+    where: { channelSlug },
+    select: { lastEventAt: true },
+  });
+  if (existing && existing.lastEventAt > eventDate) return;
 
   await prisma.kickStreamStatus.upsert({
     where: { channelSlug },
@@ -159,6 +307,9 @@ export async function ingestKickWebhook(headers: Headers, rawBody: string) {
   }
 
   const payload = JSON.parse(rawBody) as KickChatPayload | KickLivestreamPayload;
+  if (channelSlugFrom(payload) !== configuredWatchChannelSlug()) {
+    return { ok: true, ignored: true };
+  }
 
   if (eventType === "chat.message.sent") {
     await storeChatMessage(payload as KickChatPayload);
@@ -232,20 +383,7 @@ export async function adminSubscribeKickEvents(sessionToken: string | undefined)
 
 export async function getAdminKickStream(sessionToken: string | undefined) {
   await requireAdminUser(sessionToken);
-  const channelSlug = configuredWatchChannelSlug();
-  const stream = await prisma.kickStreamStatus.findUnique({ where: { channelSlug } });
-
-  if (!stream) {
-    return {
-      channelSlug,
-      isLive: false,
-      startedAt: null,
-      endedAt: null,
-      lastEventAt: null,
-    } satisfies AdminKickStreamPayload;
-  }
-
-  return adminStreamPayload(stream);
+  return getPublicKickStream();
 }
 
 export async function setAdminKickStream(

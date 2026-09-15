@@ -12,6 +12,7 @@ import {
   Crown,
   Gift,
   LogOut,
+  Radio,
   RefreshCw,
   Search,
   Sparkles,
@@ -20,7 +21,17 @@ import {
   Tv,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, type PointerEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type PointerEvent,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
 import LiquidGlass from "./liquid-glass";
@@ -219,6 +230,29 @@ type HeaderAccount = {
   casinoAccounts: CasinoAccountDetail[];
 };
 
+type HomeWatchSummary = {
+  connected: boolean;
+  running: boolean;
+  verified: boolean;
+  verificationMessage: string;
+  streamLive: boolean;
+  totalSecondsToday: number;
+  earnedPointsToday: number;
+  rateLabel: string;
+  points: number;
+  xp: number;
+};
+
+type PublicKickStream = {
+  channelSlug: string;
+  isLive: boolean;
+  startedAt: string | null;
+  endedAt: string | null;
+  lastEventAt: string | null;
+  checkedAt: string | null;
+  source: "kick_api" | "webhook";
+};
+
 const guestHeaderAccount: HeaderAccount = {
   handle: "@guest",
   image: "",
@@ -382,7 +416,7 @@ function useHeaderAccount() {
     };
   }, []);
 
-  return account;
+  return [account, setAccount] as const;
 }
 
 export default function RankBoardApp({
@@ -393,7 +427,7 @@ export default function RankBoardApp({
   countdownTarget?: string | null;
 }) {
   const [accountOpen, setAccountOpen] = useState(false);
-  const account = useHeaderAccount();
+  const [account, setAccount] = useHeaderAccount();
   return (
     <div className="site-shell">
       <div className="site-tunnel-background" aria-hidden="true">
@@ -410,7 +444,7 @@ export default function RankBoardApp({
       <div className="top-chrome">
         <Header account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
       </div>
-      {route === "" ? <Home /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : route === "profile" ? <Profile account={account} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
+      {route === "" ? <Home account={account} setAccount={setAccount} /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : route === "profile" ? <Profile account={account} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
       <Footer />
     </div>
   );
@@ -515,7 +549,13 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
   );
 }
 
-function Home() {
+function Home({
+  account,
+  setAccount,
+}: {
+  account: HeaderAccount;
+  setAccount: Dispatch<SetStateAction<HeaderAccount>>;
+}) {
   const { users } = useLeaderboard();
 
   return <main className="artz-home">
@@ -565,6 +605,7 @@ function Home() {
           </MagneticLink>
         </div>
       </motion.div>
+      <HomeKickStream account={account} setAccount={setAccount} />
     </section>
     <section className="home-action-zone" aria-label="ARTZ Rewards destinations">
       <RevealBlock className="home-action-zone__inner">
@@ -622,6 +663,182 @@ function Home() {
       </RevealBlock>
     </section>
   </main>;
+}
+
+function HomeKickStream({
+  account,
+  setAccount,
+}: {
+  account: HeaderAccount;
+  setAccount: Dispatch<SetStateAction<HeaderAccount>>;
+}) {
+  const [stream, setStream] = useState<PublicKickStream | null>(null);
+  const [summary, setSummary] = useState<HomeWatchSummary | null>(null);
+  const [streamMessage, setStreamMessage] = useState("Checking channel");
+  const heartbeatActive = useRef(false);
+  const kickConnected = account.authenticated && account.connected.kick.connected;
+
+  const applySummary = useCallback((nextSummary: HomeWatchSummary) => {
+    setSummary(nextSummary);
+    setAccount((current) => ({
+      ...current,
+      points: nextSummary.points,
+      xp: nextSummary.xp,
+    }));
+  }, [setAccount]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function refreshStream() {
+      try {
+        const response = await fetch("/api/kick/stream", { cache: "no-store" });
+        const payload = (await response.json()) as { stream?: PublicKickStream; error?: string };
+        if (!active) return;
+        if (!response.ok || !payload.stream) {
+          throw new Error(payload.error ?? "Channel unavailable");
+        }
+        setStream(payload.stream);
+      } catch (error) {
+        if (active) setStreamMessage(error instanceof Error ? error.message : "Channel unavailable");
+      }
+    }
+
+    void refreshStream();
+    const timer = window.setInterval(refreshStream, 15000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!account.authenticated) {
+      return () => { active = false; };
+    }
+
+    if (!kickConnected) {
+      return () => { active = false; };
+    }
+
+    async function sendHeartbeat() {
+      if (document.visibilityState !== "visible" || heartbeatActive.current) return;
+      heartbeatActive.current = true;
+      try {
+        const response = await fetch("/api/watch-points/heartbeat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ running: true }),
+        });
+        const payload = (await response.json()) as { summary?: HomeWatchSummary; error?: string };
+        if (!active) return;
+        if (!response.ok || !payload.summary) {
+          throw new Error(payload.error ?? "Auto earn unavailable");
+        }
+        applySummary(payload.summary);
+        setStreamMessage(`Auto earning ${payload.summary.rateLabel}`);
+      } catch (error) {
+        if (active) setStreamMessage(error instanceof Error ? error.message : "Auto earn unavailable");
+      } finally {
+        heartbeatActive.current = false;
+      }
+    }
+
+    async function loadSummary() {
+      try {
+        const response = await fetch("/api/watch-points", { cache: "no-store" });
+        const payload = (await response.json()) as { summary?: HomeWatchSummary; error?: string };
+        if (!active) return;
+        if (!response.ok || !payload.summary) {
+          throw new Error(payload.error ?? "Auto earn unavailable");
+        }
+        applySummary(payload.summary);
+        setStreamMessage(payload.summary.verified ? `Auto earning ${payload.summary.rateLabel}` : payload.summary.verificationMessage);
+        await sendHeartbeat();
+      } catch (error) {
+        if (active) setStreamMessage(error instanceof Error ? error.message : "Auto earn unavailable");
+      }
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        void sendHeartbeat();
+        return;
+      }
+
+      void fetch("/api/watch-points/heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ running: false }),
+        keepalive: true,
+      }).catch(() => null);
+    }
+
+    void loadSummary();
+    const timer = window.setInterval(sendHeartbeat, 10000);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      void fetch("/api/watch-points/heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ running: false }),
+        keepalive: true,
+      }).catch(() => null);
+    };
+  }, [account.authenticated, applySummary, kickConnected]);
+
+  const playerUrl = stream?.channelSlug
+    ? `https://player.kick.com/${encodeURIComponent(stream.channelSlug)}?autoplay=true&muted=true`
+    : "";
+  const isLive = stream?.isLive ?? summary?.streamLive ?? false;
+  const earningMessage = !account.authenticated
+    ? "Sign in with Kick to earn"
+    : !kickConnected
+      ? "Connect Kick to earn"
+      : streamMessage;
+
+  return (
+    <motion.section
+      className={`home-kick-stream${isLive ? " is-live" : ""}`}
+      id="live"
+      initial={{ opacity: 0, y: 28, rotate: -1.5 }}
+      animate={{ opacity: 1, y: 0, rotate: -0.45 }}
+      transition={{ delay: 0.82, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+      aria-label="Kick livestream"
+    >
+      <div className="home-kick-stream__bar">
+        <span className="home-kick-stream__status"><i />{isLive ? "Live now" : "Channel offline"}</span>
+        <strong>{stream?.channelSlug ? `@${stream.channelSlug}` : "Kick stream"}</strong>
+        <span className="home-kick-stream__earning"><Radio size={15} strokeWidth={2.6} aria-hidden="true" />{earningMessage}</span>
+      </div>
+      <div className="home-kick-stream__player">
+        {playerUrl ? (
+          <iframe
+            src={playerUrl}
+            title={`${stream?.channelSlug ?? "Kick"} livestream`}
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            scrolling="no"
+          />
+        ) : (
+          <div className="home-kick-stream__empty"><Tv size={34} strokeWidth={2.1} /><span>{earningMessage}</span></div>
+        )}
+      </div>
+      <div className="home-kick-stream__footer">
+        <span><small>Earned today</small><strong>{fmt(summary?.earnedPointsToday)} PTS</strong></span>
+        <span><small>Total balance</small><strong>{fmt(summary?.points ?? account.points)} PTS</strong></span>
+        <a href={stream?.channelSlug ? `https://kick.com/${stream.channelSlug}` : "https://kick.com"} target="_blank" rel="noreferrer">
+          Open Kick <ArrowUpRight size={14} strokeWidth={2.7} aria-hidden="true" />
+        </a>
+      </div>
+    </motion.section>
+  );
 }
 
 function PlayfulWord({ accent = false, text }: { accent?: boolean; text: string }) {
@@ -969,7 +1186,6 @@ function CasinoCard({
   const [mode, setMode] = useState<"username" | "email">("username");
   const [usernameInput, setUsernameInput] = useState(detail?.username ?? "");
   const [emailInput, setEmailInput] = useState(detail?.email ?? "");
-  const [codeInput, setCodeInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
@@ -1004,29 +1220,6 @@ function CasinoCard({
       onRefresh();
     } catch (e: unknown) {
       setStatusMsg({ type: "error", text: e instanceof Error ? e.message : "Failed to link" });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleVerify() {
-    if (!codeInput.trim()) return;
-    setLoading(true);
-    setStatusMsg(null);
-    try {
-      const res = await fetch("/api/casino/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider, code: codeInput.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "Verification failed");
-      setStatusMsg({ type: "success", text: data.message });
-      setCodeInput("");
-      window.dispatchEvent(new CustomEvent("rankboard-storage"));
-      onRefresh();
-    } catch (e: unknown) {
-      setStatusMsg({ type: "error", text: e instanceof Error ? e.message : "Verification failed" });
     } finally {
       setLoading(false);
     }
@@ -1128,34 +1321,9 @@ function CasinoCard({
             <p>
               Linked Handle: <strong>@{detail?.username}</strong>
             </p>
-            {detail?.verificationCode && (
-              <div className="casino-code-row">
-                <span>Verification Code</span>
-                <code>
-                  {detail.verificationCode}
-                </code>
-              </div>
-            )}
             <p className="casino-muted">
-              Anti-spoof: enter your code or auto-verify with Kick.
+              Verification pending. Connect the matching Kick account or contact support.
             </p>
-          </div>
-
-          <div className="casino-inline-form">
-            <input
-              className="casino-input"
-              value={codeInput}
-              onChange={(e) => setCodeInput(e.target.value)}
-              placeholder="Enter code (e.g. RANK-1234)"
-            />
-            <button
-              type="button"
-              className="button primary casino-button"
-              onClick={handleVerify}
-              disabled={loading || !codeInput.trim()}
-            >
-              {loading ? "Verifying..." : "Confirm Code"}
-            </button>
           </div>
 
           {account.connected.kick.connected && (

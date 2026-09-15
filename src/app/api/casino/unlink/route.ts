@@ -34,7 +34,10 @@ export async function POST(request: NextRequest) {
       message: `Unlinked ${parsed.data.provider} account.`,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unlink failed.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    console.error("Casino account unlink failed.", error);
+    return NextResponse.json(
+      { error: "Could not unlink that casino account. Try again." },
+      { status: 400 }
+    );
   }
 }

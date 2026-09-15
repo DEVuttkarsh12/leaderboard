@@ -13,13 +13,13 @@
     "admin:demote": "node scripts/set-admin.cjs demote"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.9.1",
-    "@prisma/client": "^7.9.1",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
     "clsx": "^2.1.1",
     "framer-motion": "^13.1.1",
     "gsap": "^3.15.0",
     "lucide-react": "^1.25.0",
-    "next": "16.3.1",
+    "next": "16.3.5",
     "ogl": "^1.0.11",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -33,9 +33,17 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.10",
-    "prisma": "^7.9.1",
+    "eslint-config-next": "16.3.5",
+    "prisma": "7.10.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "baseline-browser-mapping": "2.11.23",
+    "browserslist": "4.28.9",
+    "deepmerge-ts": "8.0.2",
+    "fast-uri": "3.1.6",
+    "js-yaml": "4.3.2",
+    "mysql2": "3.24.4"
   }
 }

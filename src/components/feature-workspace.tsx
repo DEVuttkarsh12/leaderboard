@@ -123,6 +123,8 @@ type AdminKickStream = {
   startedAt: string | null;
   endedAt: string | null;
   lastEventAt: string | null;
+  checkedAt: string | null;
+  source: "kick_api" | "webhook";
 };
 
 type RafflePayload = {
@@ -945,6 +947,7 @@ type ApiStoreItem = {
 };
 
 const storeImageMaxBytes = 550_000;
+const supportedStoreImageTypes = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
 function getStoreItemIcon(item: Pick<ApiStoreItem, "title" | "tag" | "imageLabel">): WorkspaceIcon {
   const value = `${item.title} ${item.tag} ${item.imageLabel}`.toLowerCase();
@@ -968,6 +971,13 @@ function storeImageStyle(imageUrl: string) {
 }
 
 function readImageFileAsDataUrl(file: File) {
+  if (!supportedStoreImageTypes.has(file.type)) {
+    return Promise.reject(new Error("Upload a PNG, JPEG, WebP, or GIF image."));
+  }
+  if (file.size > storeImageMaxBytes) {
+    return Promise.reject(new Error("Choose an image smaller than 550 KB."));
+  }
+
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener("load", () => resolve(String(reader.result ?? "")), { once: true });
@@ -1477,7 +1487,7 @@ function WatchPointsWorkspace({
           <small>earned</small>
         </div>
         <div className="watch-actions">
-          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode === "chat" ? "Chat" : "OAuth"], ["Rate", summary?.rateLabel ?? "25 / 10s"], ["Today", `${earnedToday.toLocaleString()} pts`]]} />
+          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode === "chat" ? "Chat" : "OAuth"], ["Rate", summary?.rateLabel ?? "25 / 10s"], ["Earned today", `${earnedToday.toLocaleString()} pts`]]} />
           <div className="watch-credit-row">
             <SignalChip
               icon={Activity}
@@ -1699,22 +1709,29 @@ function AdminWorkspace({
     if (!isAdmin) return;
 
     let active = true;
-    fetch("/api/admin/kick/stream", { cache: "no-store" })
-      .then((response) => response.json().then((payload) => ({ response, payload })))
-      .then(({ response, payload }: { response: Response; payload: { stream?: AdminKickStream; error?: string } }) => {
+    async function refreshKickStream() {
+      try {
+        const response = await fetch("/api/admin/kick/stream", { cache: "no-store" });
+        const payload = (await response.json()) as { stream?: AdminKickStream; error?: string };
         if (!active) return;
         if (!response.ok || !payload.stream) {
           throw new Error(payload.error ?? "Could not load Kick stream state");
         }
         setKickStream(payload.stream);
-      })
-      .catch((error) => {
+      } catch (error) {
         if (active) {
           setKickEventStatus(error instanceof Error ? error.message : "Could not load Kick stream state");
         }
-      });
+      }
+    }
 
-    return () => { active = false; };
+    void refreshKickStream();
+    const timer = window.setInterval(refreshKickStream, 15000);
+
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
   }, [isAdmin]);
 
   useEffect(() => {
@@ -2454,7 +2471,15 @@ function AdminWorkspace({
         <LiquidGlass as="article" className="admin-panel" tone="success">
           <small>KICK EVENTS</small>
           <h3>Watch verification</h3>
-          <StatusGrid items={[["Mode", "Webhook"], ["Live", kickStream?.isLive ? "On" : "Off"], ["State", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
+          <div className={`admin-kick-monitor${kickStream?.isLive ? " is-live" : ""}`}>
+            <span><Radio size={21} strokeWidth={2.6} aria-hidden="true" /></span>
+            <div>
+              <small>{kickStream?.channelSlug ? `@${kickStream.channelSlug}` : "Kick channel"}</small>
+              <strong>{kickStream?.isLive ? "Stream is live" : "Stream is offline"}</strong>
+            </div>
+            <time>{kickStream?.checkedAt || kickStream?.lastEventAt ? `Checked ${new Date(kickStream.checkedAt ?? kickStream.lastEventAt ?? "").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Waiting for Kick"}</time>
+          </div>
+          <StatusGrid items={[["Mode", kickStream?.source === "kick_api" ? "Kick API" : "Webhook"], ["Signal", kickStream?.isLive ? "Live" : "Offline"], ["Events", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
           <div className="button-row">
             <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
             <button className={kickStream?.isLive ? "button ghost" : "button primary"} type="button" onClick={() => setKickStreamLive(!kickStream?.isLive)} disabled={kickStreamBusy}>
@@ -2990,7 +3015,7 @@ function LoginWorkspace({
                 <form className="auth-form" onSubmit={submit}>
                   {mode === "signup" ? <label>DISPLAY NAME<input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Player name" autoComplete="name" /></label> : null}
                   <label>EMAIL<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@email.com" autoComplete="email" required /></label>
-                  <label>PASSWORD<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="8+ chars" autoComplete={mode === "signup" ? "new-password" : "current-password"} required minLength={8} /></label>
+                  <label>PASSWORD<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder={mode === "signup" ? "12+ chars" : "Password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} required minLength={mode === "signup" ? 12 : 1} maxLength={128} /></label>
                   <button className="button primary" type="submit" disabled={busy}>{busy ? "Working" : mode === "signup" ? "Create account" : "Sign in"} <span>↗</span></button>
                 </form>
                 <div className="auth-divider"><span>OR</span></div>

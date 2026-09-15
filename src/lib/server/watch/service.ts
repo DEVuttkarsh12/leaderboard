@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
+import { getPublicKickStream } from "@/lib/server/kick/events";
 import type { Prisma } from "@/generated/prisma/client";
 
 const POINTS_PER_SLICE = 25;
@@ -88,7 +89,7 @@ async function verifyWatchActivity(user: {
 
   const since = new Date(Date.now() - activityWindowMs());
   const [stream, activity] = await Promise.all([
-    prisma.kickStreamStatus.findUnique({ where: { channelSlug } }),
+    getPublicKickStream(),
     prisma.kickChatActivity.findFirst({
       where: {
         channelSlug,
