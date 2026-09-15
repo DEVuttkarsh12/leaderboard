@@ -285,7 +285,10 @@ model WatchSession {
   status             WatchSessionStatus @default(ACTIVE)
   totalSeconds       Int                @default(0)
   pointsAwarded      Int                @default(0)
+  awardPoints        Int                @default(25)
+  awardIntervalSeconds Int              @default(10)
   dailyBonusAwarded  Boolean            @default(false)
+  dailyBonusPoints   Int                @default(0)
   startedAt          DateTime           @default(now())
   lastHeartbeatAt    DateTime           @default(now())
   endedAt            DateTime?
@@ -297,6 +300,16 @@ model WatchSession {
 
   @@index([userId, status])
   @@index([userId, startedAt])
+}
+
+model WatchPointConfig {
+  id                String   @id @default("default")
+  pointsPerInterval Int      @default(50)
+  intervalSeconds   Int      @default(60)
+  dailyBonus        Int      @default(0)
+  updatedById       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model KickChatActivity {

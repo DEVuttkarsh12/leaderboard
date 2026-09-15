@@ -93,33 +93,60 @@ export async function syncPoints(
   });
 }
 
-/**
- * Mirror a user's rank score without touching spendable points.
- * Used to keep the tracked casino wager score as XP; spendable
- * balance is only ever changed by earning/spending flows.
- */
-export async function syncXp(
-  userId: string,
-  newXp: number
-): Promise<number> {
-  if (newXp < 0) newXp = 0;
+export type AdminPointOperation = "add" | "deduct" | "set";
 
-  const updated = await prisma.user.update({
-    where: { id: userId },
-    data: { xp: newXp },
-    select: { xp: true },
+/** Admin: add, deduct, or set a user's spendable points and log the exact change. */
+export async function adminAdjustPoints(
+  userId: string,
+  operation: AdminPointOperation,
+  amount: number,
+  adminId: string,
+  note: string = ""
+): Promise<number> {
+  if (!Number.isInteger(amount) || amount < 0 || amount > 2_000_000_000) {
+    throw new Error("Enter a whole-number amount from 0 to 2,000,000,000.");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: { points: true },
+    });
+    if (!user) throw new Error("Player not found.");
+
+    const newPoints = operation === "set"
+      ? amount
+      : operation === "add"
+        ? Math.min(2_000_000_000, user.points + amount)
+        : Math.max(0, user.points - amount);
+    const delta = newPoints - user.points;
+    if (delta === 0) return user.points;
+
+    const update = await tx.user.updateMany({
+      where: { id: userId, points: user.points },
+      data: { points: newPoints },
+    });
+    if (update.count !== 1) {
+      throw new Error("The balance changed while saving. Refresh and try again.");
+    }
+
+    await tx.pointTransaction.create({
+      data: {
+        userId,
+        amount: delta,
+        reason: `admin_${operation}`,
+        meta: JSON.stringify({
+          adminId,
+          operation,
+          requestedAmount: amount,
+          previousPoints: user.points,
+          newPoints,
+          note: note.trim().slice(0, 120),
+        }),
+      },
+    });
+    return newPoints;
   });
-
-  return updated.xp ?? newXp;
-}
-
-/** Admin: set a user's points to a specific value and log it. */
-export async function adminSetPoints(
-  userId: string,
-  newPoints: number,
-  adminId: string
-): Promise<number> {
-  return syncPoints(userId, newPoints, "admin_grant", { adminId });
 }
 
 /** Get last N point transactions for a user. */

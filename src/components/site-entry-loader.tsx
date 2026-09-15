@@ -56,7 +56,7 @@ export default function SiteEntryLoader({
           <div className="site-loader__card-stack">
             <span className="site-loader__shuffle-card site-loader__shuffle-card--left">
               <Sparkles size={22} strokeWidth={2.5} />
-              <em>XP</em>
+              <em>PTS</em>
             </span>
             <span className="site-loader__shuffle-card site-loader__shuffle-card--right">
               <Coins size={23} strokeWidth={2.5} />

@@ -34,7 +34,9 @@ export async function POST(request: NextRequest) {
       casinoAccount = await recheckAutoVerification(userId, provider);
       if (!casinoAccount?.isVerified) {
         return NextResponse.json({
-          error: "Auto-verification could not confirm account match. Please verify using your code or link Kick.",
+          error: provider === "shuffle"
+            ? "Shuffle ownership could not be confirmed from your linked Kick identity. The username remains linked but unverified."
+            : "Auto-verification could not confirm the account match. Link the matching Kick account or use your verification code.",
         }, { status: 400 });
       }
     } else if (code) {
@@ -49,7 +51,7 @@ export async function POST(request: NextRequest) {
       success: true,
       casinoAccount,
       account,
-      message: `Verified ${provider} account successfully! Points sync enabled.`,
+      message: `${provider} account verified successfully.`,
     });
   } catch (error) {
     const knownErrors = new Set([

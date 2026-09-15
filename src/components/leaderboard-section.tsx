@@ -154,7 +154,7 @@ export default function LeaderboardSection({
                   <CountUpValue value={user.score} mode="score" />
                 </strong>
                 <small className="product-podium-card__score-label">
-                  WEIGHTED XP
+                  WEIGHTED SCORE
                 </small>
                 <div className="product-podium-card__wager">
                   <span>WAGERED</span>
@@ -224,7 +224,7 @@ export default function LeaderboardSection({
                     setPage(1);
                   }}
                 >
-                  TOP XP
+                  TOP SCORE
                 </button>
                 <button
                   type="button"
@@ -246,7 +246,7 @@ export default function LeaderboardSection({
             <div className="full-board-head">
               <span>RANK / PLAYER</span>
               <span>STATUS</span>
-              <span>WEIGHTED XP</span>
+              <span>WEIGHTED SCORE</span>
               <span>WAGERED</span>
             </div>
 

@@ -77,7 +77,7 @@ const DESKTOP_NAV = [
 const launchpad: [string, string, string, string, ZoneIcon][] = [
   ["Leaderboard", "/leaderboard", "LB", "ember", Trophy],
   ["Bets", "/custom-bets", "BET", "mint", Coins],
-  ["Missions", "/challenges", "XP", "violet", BadgeCheck],
+  ["Missions", "/challenges", "PTS", "violet", BadgeCheck],
   ["Raffles", "/wager-raffles", "TIX", "blue", Gift],
   ["Tournaments", "/tournaments", "VS", "coral", Trophy],
   ["Store", "/store", "PTS", "magma", Gift],
@@ -209,7 +209,6 @@ type HeaderAccount = {
   email?: string;
   profileProvider: "kick" | "discord" | "email";
   points: number;
-  xp: number;
   authenticated: boolean;
   badges: string[];
   connected: {
@@ -240,7 +239,6 @@ type HomeWatchSummary = {
   earnedPointsToday: number;
   rateLabel: string;
   points: number;
-  xp: number;
 };
 
 type PublicKickStream = {
@@ -258,7 +256,6 @@ const guestHeaderAccount: HeaderAccount = {
   image: "",
   profileProvider: "email",
   points: 0,
-  xp: 0,
   authenticated: false,
   badges: [],
   connected: {
@@ -336,7 +333,6 @@ function headerAccountFromPayload(payload: AuthAccountPayload): HeaderAccount {
     email: payload.email,
     profileProvider: payload.profileProvider,
     points: payload.points,
-    xp: payload.xp,
     authenticated: true,
     connected: {
       kick: {
@@ -683,7 +679,6 @@ function HomeKickStream({
     setAccount((current) => ({
       ...current,
       points: nextSummary.points,
-      xp: nextSummary.xp,
     }));
   }, [setAccount]);
 
@@ -975,11 +970,11 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
 
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Ranking</small>}<b>0 <em>XP</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Ranking</small>}<b>0 <em>SCORE</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
-  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{compact ? playerHandle(p) : playerName(p)}</strong>{!compact && <small>{playerHandle(p)}</small>}<b>{fmt(playerScore(p))} <em>XP</em></b>{!compact && <span>{fmt(p.points)} wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{compact ? playerHandle(p) : playerName(p)}</strong>{!compact && <small>{playerHandle(p)}</small>}<b>{fmt(playerScore(p))} <em>SCORE</em></b>{!compact && <span>{fmt(p.points)} wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
 }
 
 function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | null }) {
@@ -991,7 +986,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     retry,
   } = useLeaderboard();
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<"xp"|"rank">("xp");
+  const [sort, setSort] = useState<"score"|"rank">("score");
   const [visible, setVisible] = useState(10);
   const [refreshing, setRefreshing] = useState(false);
   const [selected, setSelected] = useState<Player | null>(null);
@@ -1005,7 +1000,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         )
       : [...users];
 
-    results.sort((a,b) => sort === "xp" ? playerScore(b)-playerScore(a) : a.rank-b.rank);
+    results.sort((a,b) => sort === "score" ? playerScore(b)-playerScore(a) : a.rank-b.rank);
     return results;
   }, [users, query, sort]);
   const visiblePlayers = filtered.slice(0, visible);
@@ -1051,8 +1046,8 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     </section>
     <section className="section page-width board-section">
       <LiquidGlass className="standings" tone="cyan">
-        <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="xp"?"active":""} onClick={()=>{setSort("xp");setVisible(10)}}>Top XP</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
-        <div className="table-head"><span>Rank / Player</span><span>XP</span><span>Wagered</span><span /></div>
+        <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="score"?"active":""} onClick={()=>{setSort("score");setVisible(10)}}>Top score</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
+        <div className="table-head"><span>Rank / Player</span><span>Score</span><span>Wagered</span><span /></div>
         <div className="player-list" aria-live="polite">
           {error ? (
             <div className="empty-state"><span>!</span><h3>The leaderboard blinked.</h3><button type="button" onClick={refresh}>Try again</button></div>
@@ -1067,7 +1062,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
       </LiquidGlass>
     </section>
-    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>XP</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Updated</small><strong>{selected.lastActive ?? "Recently"}</strong></div></div><Link href="/challenges">Missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
+    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>Score</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Updated</small><strong>{selected.lastActive ?? "Recently"}</strong></div></div><Link href="/challenges">Missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
   </main>;
 }
 
@@ -1127,7 +1122,7 @@ function SeasonClock({
   );
 }
 
-function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div className="xp-cell"><strong>{fmt(score)} <small>XP</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
+function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div className="xp-cell"><strong>{fmt(score)} <small>SCORE</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
   const Icon = featurePageIcons[route] ?? Sparkles;
@@ -1348,7 +1343,7 @@ function CasinoCard({
         </div>
       ) : (
         <div className="casino-stack">
-          <div className="casino-mode-tabs" role="tablist" aria-label={`${provider} link mode`}>
+          {provider !== "shuffle" && <div className="casino-mode-tabs" role="tablist" aria-label={`${provider} link mode`}>
             <button
               type="button"
               className={mode === "username" ? "active" : ""}
@@ -1363,7 +1358,7 @@ function CasinoCard({
             >
               By Casino Email
             </button>
-          </div>
+          </div>}
 
           {mode === "username" ? (
             <input
@@ -1397,7 +1392,7 @@ function CasinoCard({
               onClick={() => handleLink()}
               disabled={loading || !usernameInput.trim()}
             >
-              {loading ? "Linking..." : "Link & Verify"}
+              {loading ? "Checking..." : provider === "shuffle" ? "Find & Link" : "Link account"}
             </button>
 
             {kickName && (
@@ -1466,6 +1461,11 @@ function Profile({ account }: { account: HeaderAccount }) {
       leaderboard_sync: "Leaderboard sync",
       store_purchase: "Store purchase",
       admin_grant: "Admin adjustment",
+      admin_add: "Admin credit",
+      admin_deduct: "Admin debit",
+      admin_set: "Admin balance set",
+      watch_points: "Watch points",
+      challenge_claim: "Mission reward",
     };
     return map[reason] ?? reason;
   }
@@ -1530,7 +1530,7 @@ function Profile({ account }: { account: HeaderAccount }) {
 
       <section className="stat-strip page-width">
         <div><span>Points</span><strong>{fmt(account.points)}</strong></div>
-        <div><span>XP</span><strong>{formatNumberCompact(account.xp)}</strong></div>
+        <div><span>Account</span><strong>{account.profileProvider.toUpperCase()}</strong></div>
         <div><span>Handle</span><strong>{account.handle}</strong></div>
         <div className="round-block"><span>Via</span><strong>{account.profileProvider.toUpperCase()}</strong></div>
       </section>

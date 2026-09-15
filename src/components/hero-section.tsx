@@ -72,7 +72,7 @@ export default function HeroSection({
                 </strong>
               </div>
               <div>
-                <span>TOP XP</span>
+                <span>TOP SCORE</span>
                 <strong>
                   {isLoading ? "..." : <CountUpValue value={highestScore} mode="score" />}
                 </strong>
@@ -126,7 +126,7 @@ export default function HeroSection({
                       </div>
                       <div className="rivl-xp-block">
                         <strong>...</strong>
-                        <span>WEIGHTED XP</span>
+                        <span>WEIGHTED SCORE</span>
                       </div>
                       <div className="rivl-podium-prize">
                         <span>WAGERED</span>
@@ -167,7 +167,7 @@ export default function HeroSection({
                       <strong>
                         <CountUpValue value={user.score} mode="score" />
                       </strong>
-                      <span>WEIGHTED XP</span>
+                      <span>WEIGHTED SCORE</span>
                     </div>
                     <div className="rivl-podium-prize">
                       <span>WAGERED</span>
@@ -184,7 +184,7 @@ export default function HeroSection({
               <span>{isLoading ? "..." : `${total.toLocaleString()} PLAYERS`}</span>
               <i />
               <span>
-                {isLoading ? "..." : <><CountUpValue value={averageScore} mode="score" /> AVG XP</>}
+                {isLoading ? "..." : <><CountUpValue value={averageScore} mode="score" /> AVG SCORE</>}
               </span>
               <i />
               <span>

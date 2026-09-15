@@ -6,6 +6,7 @@ import type { CasinoProvider } from "@/lib/server/auth/session";
 export type CasinoPlayerValidationResult = {
   exists: boolean;
   foundInLeaderboard: boolean;
+  canonicalUsername?: string;
   score?: number;
   wagerAmount?: number;
   message?: string;
@@ -39,33 +40,39 @@ export async function validateCasinoPlayer(
   if (provider === "shuffle") {
     try {
       const result = await getLeaderboardRouteResult();
-      if (result.status === 200 && !("error" in result.body)) {
-        const body = result.body as { users?: NormalizedLeaderboardUser[] };
-        const players = body.users ?? [];
-        const found = players.find(
-          (p) =>
-            (p.username && p.username.toLowerCase() === cleanUsername.toLowerCase()) ||
-            (p.kickUsername && p.kickUsername.toLowerCase() === cleanUsername.toLowerCase()) ||
-            (p.name && p.name.toLowerCase() === cleanUsername.toLowerCase())
-        );
-
-        if (found) {
-          return {
-            exists: true,
-            foundInLeaderboard: true,
-            score: found.score,
-            wagerAmount: found.points ?? undefined,
-          };
-        }
+      if (result.status !== 200 || "error" in result.body) {
+        throw new Error("Shuffle player lookup is temporarily unavailable.");
       }
-    } catch {
-      // Fallback if leaderboard service unreachable
+      const body = result.body as { users?: NormalizedLeaderboardUser[] };
+      const players = body.users ?? [];
+      const found = players.find(
+        (p) =>
+          (p.username && p.username.toLowerCase() === cleanUsername.toLowerCase()) ||
+          (p.kickUsername && p.kickUsername.toLowerCase() === cleanUsername.toLowerCase()) ||
+          (p.name && p.name.toLowerCase() === cleanUsername.toLowerCase())
+      );
+
+      if (found) {
+        return {
+          exists: true,
+          foundInLeaderboard: true,
+          canonicalUsername: found.username ?? found.name,
+          score: found.score,
+          wagerAmount: found.points ?? undefined,
+          message: `Found @${found.username ?? found.name} in the live wager data.`,
+        };
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message === "Shuffle player lookup is temporarily unavailable.") {
+        throw error;
+      }
+      throw new Error("Shuffle player lookup is temporarily unavailable.");
     }
 
     return {
-      exists: true,
+      exists: false,
       foundInLeaderboard: false,
-      message: "Player handle format valid. Not currently in top wager snapshot.",
+      message: `No exact Shuffle player named "${cleanUsername}" was found in the live wager data.`,
     };
   }
 
@@ -152,6 +159,7 @@ export async function linkCasinoAccount({
   // Verification Check 1: Kick OAuth Match
   // If user is authenticated with Kick, and the Kick username matches the casino username
   if (
+    provider !== "shuffle" &&
     user.kickUsername &&
     user.kickUsername.trim().toLowerCase() === cleanUsername.toLowerCase()
   ) {
@@ -161,7 +169,7 @@ export async function linkCasinoAccount({
   }
 
   // Verification Check 2: Casino Email matches verified User email
-  if (!isVerified && cleanEmail && user.email && user.emailVerified) {
+  if (!isVerified && provider !== "shuffle" && cleanEmail && user.email && user.emailVerified) {
     if (cleanEmail.toLowerCase() === user.email.trim().toLowerCase()) {
       isVerified = true;
       verificationMethod = "EMAIL_MATCH";
@@ -310,13 +318,33 @@ export async function recheckAutoVerification(
   let isVerified = false;
   let verificationMethod: string | null = null;
 
-  if (
+  if (provider === "shuffle" && user.kickUsername) {
+    try {
+      const result = await getLeaderboardRouteResult();
+      if (result.status === 200 && !("error" in result.body)) {
+        const body = result.body as { users?: NormalizedLeaderboardUser[] };
+        const match = (body.users ?? []).find(
+          (player) =>
+            player.username?.toLowerCase() === account.username.toLowerCase() &&
+            player.kickUsername?.toLowerCase() === user.kickUsername?.toLowerCase()
+        );
+        if (match) {
+          isVerified = true;
+          verificationMethod = "KICK_OAUTH";
+        }
+      }
+    } catch {
+      // Leave the account pending when the upstream ownership check is unavailable.
+    }
+  } else if (
+    provider !== "shuffle" &&
     user.kickUsername &&
     user.kickUsername.trim().toLowerCase() === account.username.toLowerCase()
   ) {
     isVerified = true;
     verificationMethod = "KICK_OAUTH";
   } else if (
+    provider !== "shuffle" &&
     account.email &&
     user.email &&
     user.emailVerified &&

@@ -66,7 +66,6 @@ type AdminUser = {
   email: string;
   image: string;
   points: number;
-  xp: number;
   role: "PLAYER" | "ADMIN";
   banned: boolean;
   bannedReason: string;
@@ -114,7 +113,13 @@ type WatchSummary = {
   dailyBonus: number;
   rateLabel: string;
   points: number;
-  xp: number;
+};
+
+type WatchPointConfig = {
+  pointsPerInterval: number;
+  intervalSeconds: number;
+  dailyBonus: number;
+  updatedAt: string;
 };
 
 type AdminKickStream = {
@@ -259,7 +264,6 @@ const defaultAccount: Account = {
   profileProvider: "email",
   accessKey: "",
   points: 0,
-  xp: 0,
   streak: 0,
   inventory: [],
   connected: {
@@ -288,7 +292,7 @@ const defaultSiteConfig: SiteConfig = {
 };
 
 const faq = [
-  { q: "Weighted XP", a: "Live API. Read-only." },
+  { q: "Wager score", a: "Live API. Read-only." },
   { q: "Kick points", a: "Watch. Earn. Spend." },
   { q: "Store rewards", a: "Pending to fulfilled." },
   { q: "Custom bets", a: "Admin settles." },
@@ -341,7 +345,7 @@ const statusIcons: Record<string, WorkspaceIcon> = {
   Users: WalletCards,
   Verify: BadgeCheck,
   Winners: Trophy,
-  XP: Sparkles,
+  Score: Sparkles,
 };
 
 function iconForLabel(label: string) {
@@ -613,7 +617,6 @@ function ChallengesWorkspace({
       const payload = (await response.json()) as {
         mission?: ChallengeMission;
         newPoints?: number;
-        newXp?: number;
         error?: string;
       };
       if (!response.ok || !payload.mission) {
@@ -626,7 +629,6 @@ function ChallengesWorkspace({
         return {
           ...safe,
           points: payload.newPoints ?? safe.points,
-          xp: payload.newXp ?? safe.xp,
         };
       });
       setMessage("Reward claimed.");
@@ -1394,7 +1396,6 @@ function WatchPointsWorkspace({
       return {
         ...safe,
         points: nextSummary.points,
-        xp: nextSummary.xp,
         watchMinutes: Math.floor(nextSummary.totalSecondsToday / 60),
       };
     });
@@ -1487,7 +1488,7 @@ function WatchPointsWorkspace({
           <small>earned</small>
         </div>
         <div className="watch-actions">
-          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode === "chat" ? "Chat" : "OAuth"], ["Rate", summary?.rateLabel ?? "25 / 10s"], ["Earned today", `${earnedToday.toLocaleString()} pts`]]} />
+          <StatusGrid items={[["Kick", connected ? account.connected.kick.username || "Linked" : "Not linked"], ["Verify", summary?.verified ? "Live" : summary?.verificationMode === "chat" ? "Chat" : "OAuth"], ["Rate", summary?.rateLabel ?? "50 / 1m"], ["Earned today", `${earnedToday.toLocaleString()} pts`]]} />
           <div className="watch-credit-row">
             <SignalChip
               icon={Activity}
@@ -1643,6 +1644,10 @@ function AdminWorkspace({
   const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
   const [adminUserStatus, setAdminUserStatus] = useState("Loading users");
   const [adminUsersLoading, setAdminUsersLoading] = useState(false);
+  const [pointAmount, setPointAmount] = useState("1000");
+  const [pointNote, setPointNote] = useState("");
+  const [pointUpdateBusy, setPointUpdateBusy] = useState(false);
+  const [moderationReason, setModerationReason] = useState("Admin action");
   const [adminMarketMessage, setAdminMarketMessage] = useState("");
   const [adminStoreMessage, setAdminStoreMessage] = useState("Loading store");
   const [supportTickets, setSupportTickets] = useState<Ticket[]>([]);
@@ -1652,6 +1657,11 @@ function AdminWorkspace({
   const [kickEventStatus, setKickEventStatus] = useState("Idle");
   const [kickStream, setKickStream] = useState<AdminKickStream | null>(null);
   const [kickStreamBusy, setKickStreamBusy] = useState(false);
+  const [watchConfig, setWatchConfig] = useState<WatchPointConfig | null>(null);
+  const [watchPointsInput, setWatchPointsInput] = useState("50");
+  const [watchMinutesInput, setWatchMinutesInput] = useState("1");
+  const [watchBonusInput, setWatchBonusInput] = useState("0");
+  const [watchConfigBusy, setWatchConfigBusy] = useState(false);
   const isAdmin = isAdminAccount(account);
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
@@ -1700,6 +1710,31 @@ function AdminWorkspace({
       })
       .catch((error) => {
         if (active) setAdminTournamentStatus(error instanceof Error ? error.message : "Could not load tournaments");
+      });
+
+    return () => { active = false; };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    let active = true;
+
+    fetch("/api/admin/watch-points/config", { cache: "no-store" })
+      .then((response) => response.json().then((payload) => ({ response, payload })))
+      .then(({ response, payload }: { response: Response; payload: { config?: WatchPointConfig; error?: string } }) => {
+        if (!active) return;
+        if (!response.ok || !payload.config) {
+          throw new Error(payload.error ?? "Could not load watch settings");
+        }
+        setWatchConfig(payload.config);
+        setWatchPointsInput(String(payload.config.pointsPerInterval));
+        setWatchMinutesInput(String(payload.config.intervalSeconds / 60));
+        setWatchBonusInput(String(payload.config.dailyBonus));
+      })
+      .catch((error) => {
+        if (active) {
+          setKickEventStatus(error instanceof Error ? error.message : "Could not load watch settings");
+        }
       });
 
     return () => { active = false; };
@@ -1851,10 +1886,10 @@ function AdminWorkspace({
           }
           return payload.users?.[0]?.id ?? "";
         });
-        setAdminUserStatus(`${payload.users.length} admin${payload.users.length === 1 ? "" : "s"} loaded`);
+        setAdminUserStatus(`${payload.users.length} user${payload.users.length === 1 ? "" : "s"} loaded`);
       } catch (error) {
         if (!controller.signal.aborted) {
-          setAdminUserStatus(error instanceof Error ? error.message : "Could not load admins");
+          setAdminUserStatus(error instanceof Error ? error.message : "Could not load users");
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -1885,13 +1920,6 @@ function AdminWorkspace({
         </div>
       </section>
     );
-  }
-
-  function givePoints(amount: number) {
-    setAccount((current) => {
-      const safe = normalizeAccount(current);
-      return { ...safe, points: Math.max(0, safe.points + amount) };
-    });
   }
 
   async function addItem(event: FormEvent<HTMLFormElement>) {
@@ -2204,7 +2232,7 @@ function AdminWorkspace({
     }
   }
 
-  async function updateSelectedUser(patch: Partial<Pick<AdminUser, "points" | "xp" | "banned" | "bannedReason" | "role">> & { timeoutUntil?: string | null }) {
+  async function updateSelectedUser(patch: Partial<Pick<AdminUser, "banned" | "bannedReason" | "role">> & { timeoutUntil?: string | null }) {
     if (!selectedAdminUser) return;
     setAdminUserStatus("Updating user");
 
@@ -2235,11 +2263,39 @@ function AdminWorkspace({
     }
   }
 
-  function adjustSelectedUser(field: "points" | "xp", amount: number) {
+  async function adjustSelectedPoints(operation: "add" | "deduct" | "set") {
     if (!selectedAdminUser) return;
-    updateSelectedUser({
-      [field]: Math.max(0, selectedAdminUser[field] + amount),
-    });
+    const amount = Number(pointAmount);
+    if (!Number.isInteger(amount) || amount < 0 || amount > 2_000_000_000) {
+      setAdminUserStatus("Enter a whole-number amount from 0 to 2,000,000,000");
+      return;
+    }
+
+    setPointUpdateBusy(true);
+    setAdminUserStatus(`${operation === "set" ? "Setting" : operation === "add" ? "Adding" : "Deducting"} points`);
+    try {
+      const response = await fetch(`/api/admin/users/${selectedAdminUser.id}/points`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ operation, amount, note: pointNote.trim() }),
+      });
+      const payload = (await response.json()) as { ok?: boolean; points?: number; error?: string };
+      if (!response.ok || !payload.ok || typeof payload.points !== "number") {
+        throw new Error(payload.error ?? "Point update failed");
+      }
+      setAdminUsers((current) => current.map((user) =>
+        user.id === selectedAdminUser.id ? { ...user, points: payload.points! } : user
+      ));
+      if (selectedAdminUser.handle === account.handle) {
+        setAccount((current) => ({ ...normalizeAccount(current), points: payload.points! }));
+      }
+      setAdminUserStatus(`${selectedAdminUser.handle}: ${payload.points.toLocaleString()} points`);
+      setPointNote("");
+    } catch (error) {
+      setAdminUserStatus(error instanceof Error ? error.message : "Point update failed");
+    } finally {
+      setPointUpdateBusy(false);
+    }
   }
 
   function timeoutSelectedUser(hours: number) {
@@ -2386,12 +2442,50 @@ function AdminWorkspace({
     }
   }
 
+  async function saveWatchConfig(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const pointsPerInterval = Number(watchPointsInput);
+    const intervalSeconds = Math.round(Number(watchMinutesInput) * 60);
+    const dailyBonus = Number(watchBonusInput);
+    if (
+      !Number.isInteger(pointsPerInterval) || pointsPerInterval < 0 || pointsPerInterval > 1_000_000 ||
+      !Number.isInteger(intervalSeconds) || intervalSeconds < 10 || intervalSeconds > 3_600 ||
+      !Number.isInteger(dailyBonus) || dailyBonus < 0 || dailyBonus > 1_000_000
+    ) {
+      setKickEventStatus("Use whole-number points, 0.17-60 minutes, and a valid bonus");
+      return;
+    }
+
+    setWatchConfigBusy(true);
+    setKickEventStatus("Saving watch rate...");
+    try {
+      const response = await fetch("/api/admin/watch-points/config", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pointsPerInterval, intervalSeconds, dailyBonus }),
+      });
+      const payload = (await response.json()) as { config?: WatchPointConfig; error?: string };
+      if (!response.ok || !payload.config) {
+        throw new Error(payload.error ?? "Watch settings could not be saved");
+      }
+      setWatchConfig(payload.config);
+      setWatchPointsInput(String(payload.config.pointsPerInterval));
+      setWatchMinutesInput(String(payload.config.intervalSeconds / 60));
+      setWatchBonusInput(String(payload.config.dailyBonus));
+      setKickEventStatus(`Saved ${payload.config.pointsPerInterval} points every ${payload.config.intervalSeconds / 60} minute(s)`);
+    } catch (error) {
+      setKickEventStatus(error instanceof Error ? error.message : "Watch settings could not be saved");
+    } finally {
+      setWatchConfigBusy(false);
+    }
+  }
+
   return (
     <section className="section page-width app-workspace">
       <WorkspaceHeader overline="Admin" title="Control room" meta={adminUserStatus} />
       <LiquidGlass className="admin-user-manager" tone="violet">
         <div className="admin-user-manager__bar">
-          <label>ADMIN SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Search users" /></label>
+          <label>PLAYER SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Name, email, Kick, Discord, or Shuffle" /></label>
           <button type="button" onClick={() => setAdminQuery((value) => value.trim())} disabled={adminUsersLoading}>{adminUsersLoading ? "Loading" : "Refresh"}</button>
         </div>
         <div className="admin-user-layout">
@@ -2402,7 +2496,7 @@ function AdminWorkspace({
                 <strong>{user.handle}</strong>
                 <small>{user.role} / {user.banned ? "BANNED" : user.timeoutUntil ? "TIMEOUT" : "ACTIVE"}</small>
               </button>
-            )) : <p>{adminUsersLoading ? "Loading admins." : "No admins found."}</p>}
+            )) : <p>{adminUsersLoading ? "Loading users." : "No users found."}</p>}
           </div>
           <LiquidGlass as="article" className="admin-user-detail" tone="cyan">
             {selectedAdminUser ? (
@@ -2415,38 +2509,39 @@ function AdminWorkspace({
                     <p>{selectedAdminUser.connected.kick.connected ? `Kick ${selectedAdminUser.connected.kick.username}` : "Kick off"} / {selectedAdminUser.connected.discord.connected ? `Discord ${selectedAdminUser.connected.discord.username}` : "Discord off"}</p>
                   </div>
                 </div>
-                <StatusGrid items={[["Points", formatNumberCompact(selectedAdminUser.points)], ["XP", formatNumberCompact(selectedAdminUser.xp)], ["Role", selectedAdminUser.role], ["State", selectedAdminUser.banned ? "Banned" : selectedAdminUser.timeoutUntil ? "Timed out" : "Active"]]} />
-                <div className="admin-action-grid">
-                  <button type="button" onClick={() => adjustSelectedUser("points", 1000)}>+1K points</button>
-                  <button type="button" onClick={() => adjustSelectedUser("points", -1000)}>-1K points</button>
-                  <button type="button" onClick={() => adjustSelectedUser("xp", 1000)}>+1K XP</button>
-                  <button type="button" onClick={() => adjustSelectedUser("xp", -1000)}>-1K XP</button>
-                  <button type="button" onClick={() => updateSelectedUser({ banned: !selectedAdminUser.banned, bannedReason: selectedAdminUser.banned ? "" : "Admin action" })}>{selectedAdminUser.banned ? "Unban" : "Ban"}</button>
-                  <button type="button" onClick={() => timeoutSelectedUser(24)}>24h timeout</button>
-                  <button type="button" onClick={() => updateSelectedUser({ timeoutUntil: null })}>Clear timeout</button>
-                  <button type="button" onClick={() => updateSelectedUser({ role: selectedAdminUser.role === "ADMIN" ? "PLAYER" : "ADMIN" })}>{selectedAdminUser.role === "ADMIN" ? "Demote" : "Promote"}</button>
+                <StatusGrid items={[["Points", formatNumberCompact(selectedAdminUser.points)], ["Role", selectedAdminUser.role], ["State", selectedAdminUser.banned ? "Banned" : selectedAdminUser.timeoutUntil ? "Timed out" : "Active"]]} />
+                <div className="admin-point-control">
+                  <div>
+                    <label>POINT AMOUNT<input type="number" min="0" max="2000000000" step="1" inputMode="numeric" value={pointAmount} onChange={(event) => setPointAmount(event.target.value)} /></label>
+                    <label>NOTE (OPTIONAL)<input value={pointNote} maxLength={120} onChange={(event) => setPointNote(event.target.value)} placeholder="Reason for the ledger" /></label>
+                  </div>
+                  <div className="admin-point-actions">
+                    <button type="button" disabled={pointUpdateBusy} onClick={() => adjustSelectedPoints("add")}>Add</button>
+                    <button type="button" disabled={pointUpdateBusy} onClick={() => adjustSelectedPoints("deduct")}>Deduct</button>
+                    <button type="button" disabled={pointUpdateBusy} onClick={() => adjustSelectedPoints("set")}>Set exact</button>
+                  </div>
+                  <small>Current balance: {selectedAdminUser.points.toLocaleString()} points</small>
+                </div>
+                <div className="admin-moderation-control">
+                  <label>MODERATION REASON<input value={moderationReason} maxLength={160} onChange={(event) => setModerationReason(event.target.value)} /></label>
+                  <div className="admin-action-grid">
+                    <button type="button" onClick={() => updateSelectedUser({ banned: !selectedAdminUser.banned, bannedReason: selectedAdminUser.banned ? "" : moderationReason.trim() || "Admin action" })}>{selectedAdminUser.banned ? "Unban" : "Ban"}</button>
+                    <button type="button" onClick={() => timeoutSelectedUser(24)}>24h timeout</button>
+                    <button type="button" onClick={() => updateSelectedUser({ timeoutUntil: null })}>Clear timeout</button>
+                    <button type="button" onClick={() => updateSelectedUser({ role: selectedAdminUser.role === "ADMIN" ? "PLAYER" : "ADMIN" })}>{selectedAdminUser.role === "ADMIN" ? "Demote" : "Promote"}</button>
+                  </div>
                 </div>
                 <div className="admin-casino-strip">
                   {(Object.keys(selectedAdminUser.casinos) as Casino[]).map((casino) => <span key={casino}>{casino}<b>{selectedAdminUser.casinos[casino] || "Not linked"}</b></span>)}
                 </div>
               </>
             ) : (
-              <p className="admin-empty-state">Sign in as an admin to manage users.</p>
+              <p className="admin-empty-state">Choose a player to manage points and access.</p>
             )}
           </LiquidGlass>
         </div>
       </LiquidGlass>
       <div className="admin-grid">
-        <LiquidGlass as="article" className="admin-panel" tone="ember">
-          <small>USER</small>
-          <h3>{account.handle}</h3>
-          <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["Kick", account.connected.kick.connected ? "Linked" : "Off"], ["Discord", account.connected.discord.connected ? "Linked" : "Off"], ["State", account.banned ? "Banned" : "Active"]]} />
-          <div className="button-row">
-            <button className="button primary" type="button" onClick={() => givePoints(1000)}>+1K <span>+</span></button>
-            <button className="button ghost" type="button" onClick={() => givePoints(-1000)}>-1K <span>-</span></button>
-            <button className="button ghost" type="button" onClick={() => setAccount((current) => ({ ...normalizeAccount(current), banned: !normalizeAccount(current).banned }))}>{account.banned ? "Unban" : "Ban"} <span>!</span></button>
-          </div>
-        </LiquidGlass>
         <LiquidGlass as="article" className="admin-panel" tone="success">
           <small>LEADERBOARD</small>
           <h3>{siteConfig.leaderboardMode}</h3>
@@ -2479,7 +2574,13 @@ function AdminWorkspace({
             </div>
             <time>{kickStream?.checkedAt || kickStream?.lastEventAt ? `Checked ${new Date(kickStream.checkedAt ?? kickStream.lastEventAt ?? "").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Waiting for Kick"}</time>
           </div>
-          <StatusGrid items={[["Mode", kickStream?.source === "kick_api" ? "Kick API" : "Webhook"], ["Signal", kickStream?.isLive ? "Live" : "Offline"], ["Events", kickEventStatus.includes("failed") ? "Check" : "Ready"]]} />
+          <StatusGrid items={[["Mode", kickStream?.source === "kick_api" ? "Kick API" : "Webhook"], ["Signal", kickStream?.isLive ? "Live" : "Offline"], ["Rate", watchConfig ? `${watchConfig.pointsPerInterval} / ${watchConfig.intervalSeconds / 60}m` : "Loading"]]} />
+          <form className="admin-watch-config" onSubmit={saveWatchConfig}>
+            <label>POINTS<input type="number" min="0" max="1000000" step="1" inputMode="numeric" value={watchPointsInput} onChange={(event) => setWatchPointsInput(event.target.value)} /></label>
+            <label>EVERY (MINUTES)<input type="number" min="0.17" max="60" step="0.01" inputMode="decimal" value={watchMinutesInput} onChange={(event) => setWatchMinutesInput(event.target.value)} /></label>
+            <label>DAILY BONUS<input type="number" min="0" max="1000000" step="1" inputMode="numeric" value={watchBonusInput} onChange={(event) => setWatchBonusInput(event.target.value)} /></label>
+            <button className="button primary" type="submit" disabled={watchConfigBusy}>{watchConfigBusy ? "Saving" : "Save rate"}</button>
+          </form>
           <div className="button-row">
             <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
             <button className={kickStream?.isLive ? "button ghost" : "button primary"} type="button" onClick={() => setKickStreamLive(!kickStream?.isLive)} disabled={kickStreamBusy}>
@@ -2741,7 +2842,7 @@ function HelpWorkspace() {
       <WorkspaceHeader overline="Help Center" title="Find answers fast" meta={`${results.length} answers`} />
       <label className="wide-search">
         <span>SEARCH HELP</span>
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="XP, rewards, bets" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Points, rewards, bets" />
       </label>
       <div className="workspace-list">
         {results.map((item) => (
@@ -3000,7 +3101,7 @@ function LoginWorkspace({
                     <small>{accountProviderLabel(account)}</small>
                   </div>
                 </div>
-                <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["XP", formatNumberCompact(account.xp)], ["Kick", account.connected.kick.connected ? "Linked" : "Off"], ["Discord", account.connected.discord.connected ? "Linked" : "Off"]]} />
+                <StatusGrid items={[["Points", formatNumberCompact(account.points)], ["Role", isAdminAccount(account) ? "Admin" : "Player"], ["Kick", account.connected.kick.connected ? "Linked" : "Off"], ["Discord", account.connected.discord.connected ? "Linked" : "Off"]]} />
                 <div className="auth-session-actions">
                   <Link className="button primary" href={accountDestination(account)}>{accountDestinationLabel(account)} <span>↗</span></Link>
                   <button className="button ghost" type="button" onClick={signOut} disabled={busy}>{busy ? "Working" : "Logout"} <span>↻</span></button>
@@ -3131,7 +3232,7 @@ function AccountStrip({ account }: { account: Account }) {
   const stats: { label: string; value: string; icon: WorkspaceIcon }[] = [
     { label: "Player", value: account.handle, icon: CircleUserRound },
     { label: "Points", value: account.points.toLocaleString(), icon: Coins },
-    { label: "XP", value: account.xp.toLocaleString(), icon: Sparkles },
+    { label: "Via", value: accountProviderLabel(account), icon: BadgeCheck },
     { label: "Streak", value: `${account.streak} ${account.streak === 1 ? "day" : "days"}`, icon: Flame },
   ];
 

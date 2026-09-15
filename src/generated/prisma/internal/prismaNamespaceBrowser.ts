@@ -64,6 +64,7 @@ export const ModelName = {
   ChallengeMission: 'ChallengeMission',
   ChallengeProgress: 'ChallengeProgress',
   WatchSession: 'WatchSession',
+  WatchPointConfig: 'WatchPointConfig',
   KickChatActivity: 'KickChatActivity',
   KickStreamStatus: 'KickStreamStatus',
   RaffleRound: 'RaffleRound',
@@ -296,7 +297,10 @@ export const WatchSessionScalarFieldEnum = {
   status: 'status',
   totalSeconds: 'totalSeconds',
   pointsAwarded: 'pointsAwarded',
+  awardPoints: 'awardPoints',
+  awardIntervalSeconds: 'awardIntervalSeconds',
   dailyBonusAwarded: 'dailyBonusAwarded',
+  dailyBonusPoints: 'dailyBonusPoints',
   startedAt: 'startedAt',
   lastHeartbeatAt: 'lastHeartbeatAt',
   endedAt: 'endedAt',
@@ -305,6 +309,19 @@ export const WatchSessionScalarFieldEnum = {
 } as const
 
 export type WatchSessionScalarFieldEnum = (typeof WatchSessionScalarFieldEnum)[keyof typeof WatchSessionScalarFieldEnum]
+
+
+export const WatchPointConfigScalarFieldEnum = {
+  id: 'id',
+  pointsPerInterval: 'pointsPerInterval',
+  intervalSeconds: 'intervalSeconds',
+  dailyBonus: 'dailyBonus',
+  updatedById: 'updatedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WatchPointConfigScalarFieldEnum = (typeof WatchPointConfigScalarFieldEnum)[keyof typeof WatchPointConfigScalarFieldEnum]
 
 
 export const KickChatActivityScalarFieldEnum = {

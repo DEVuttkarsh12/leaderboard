@@ -35,7 +35,7 @@ export default function HomeRouteHub() {
             <div className="casino-feature-stats" aria-hidden="true">
               <span>TOP 3</span>
               <span>60S SYNC</span>
-              <span>XP RUSH</span>
+              <span>POINT RUSH</span>
             </div>
             <i aria-hidden="true">777</i>
             <b>

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const [user, transactions] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
-      select: { points: true, xp: true },
+      select: { points: true },
     }),
     getUserTransactions(userId, 30),
   ]);
@@ -27,5 +27,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Session expired." }, { status: 401 });
   }
 
-  return NextResponse.json({ points: user.points, xp: user.xp, transactions });
+  return NextResponse.json({ points: user.points, transactions });
 }

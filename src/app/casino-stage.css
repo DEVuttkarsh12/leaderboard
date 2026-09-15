@@ -2534,3 +2534,53 @@ textarea:focus {
     animation: none;
   }
 }
+
+.admin-point-control,
+.admin-moderation-control {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--card-radius);
+  background: rgba(23, 5, 31, 0.42);
+}
+
+.admin-point-control > div:first-child {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.7fr) minmax(220px, 1.3fr);
+  gap: 10px;
+}
+
+.admin-point-control label,
+.admin-moderation-control label,
+.admin-watch-config label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-point-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.admin-point-control > small {
+  color: var(--muted);
+}
+
+.admin-watch-config {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+@media (max-width: 760px) {
+  .admin-point-control > div:first-child,
+  .admin-watch-config {
+    grid-template-columns: 1fr;
+  }
+}

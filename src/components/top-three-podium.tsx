@@ -79,7 +79,7 @@ function PodiumCard({ user, rank, delay, leaderScore }: PodiumCardProps) {
       </div>
 
       <div className="relative mt-8">
-        <div className="podium-kicker">Weighted XP</div>
+        <div className="podium-kicker">Weighted score</div>
         <div className="podium-score">
           <CountUpValue value={user.score} mode="score" />
         </div>

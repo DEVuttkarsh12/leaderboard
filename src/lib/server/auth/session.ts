@@ -5,6 +5,7 @@ import type { AuthAccountPayload } from "@/lib/auth/account";
 import {
   linkCasinoAccount,
   unlinkCasinoAccount,
+  validateCasinoPlayer,
 } from "@/lib/server/casino/verification";
 import {
   encryptServerSecret,
@@ -56,7 +57,6 @@ type SessionUser = {
   kickId: string | null;
   kickUsername: string | null;
   points: number;
-  xp: number;
   banned: boolean;
   timeoutUntil: Date | null;
   role: "PLAYER" | "ADMIN";
@@ -396,7 +396,6 @@ export function accountFromUser(user: SessionUser): AuthAccountPayload {
     email: user.email ?? undefined,
     profileProvider: profileProviderFrom(user),
     points: user.points,
-    xp: user.xp,
     streak: 1,
     inventory: [],
     connected: {
@@ -697,10 +696,14 @@ export async function updateUserCasinoAccounts(
     if (!username) {
       await unlinkCasinoAccount(userId, provider);
     } else {
+      const validation = await validateCasinoPlayer(provider, username);
+      if (!validation.exists) {
+        throw new Error(validation.message ?? `No ${provider} player with that username was found.`);
+      }
       await linkCasinoAccount({
         userId,
         provider,
-        username,
+        username: validation.canonicalUsername ?? username,
       });
     }
   }

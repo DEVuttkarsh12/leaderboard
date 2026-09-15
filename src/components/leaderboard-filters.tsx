@@ -56,7 +56,7 @@ export default function LeaderboardFilters({
     icon: typeof ArrowDownWideNarrow;
   }> = [
     {
-      label: "Top XP",
+      label: "Top score",
       field: "score",
       direction: "desc",
       icon: ArrowDownWideNarrow,

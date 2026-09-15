@@ -12,7 +12,6 @@ export type AdminUserSummary = {
   email: string;
   image: string;
   points: number;
-  xp: number;
   role: "PLAYER" | "ADMIN";
   banned: boolean;
   bannedReason: string;
@@ -56,7 +55,6 @@ type AdminUserRecord = {
   kickId: string | null;
   kickUsername: string | null;
   points: number;
-  xp: number;
   role: "PLAYER" | "ADMIN";
   banned: boolean;
   bannedReason: string | null;
@@ -123,11 +121,13 @@ export function adminUserSummary(user: AdminUserRecord): AdminUserSummary {
     email: user.email ?? "",
     image: user.image ?? "",
     points: user.points,
-    xp: user.xp,
     role: user.role,
     banned: user.banned,
     bannedReason: user.bannedReason ?? "",
-    timeoutUntil: user.timeoutUntil?.toISOString() ?? "",
+    timeoutUntil:
+      user.timeoutUntil && user.timeoutUntil > new Date()
+        ? user.timeoutUntil.toISOString()
+        : "",
     connected: {
       kick: {
         connected: Boolean(user.kickUsername),
@@ -180,9 +180,7 @@ export async function listAdminUsers(query: string) {
     users.map((user) => reconcileConfiguredAdminRole(user))
   );
 
-  return reconciledUsers
-    .filter((user) => user.role === "ADMIN")
-    .map(adminUserSummary);
+  return reconciledUsers.map(adminUserSummary);
 }
 
 async function assertPromotableAdminUser(userId: string) {
@@ -213,8 +211,6 @@ async function assertPromotableAdminUser(userId: string) {
 export async function updateAdminUser(
   userId: string,
   data: {
-    points?: number;
-    xp?: number;
     banned?: boolean;
     bannedReason?: string;
     timeoutUntil?: Date | null;
@@ -225,12 +221,21 @@ export async function updateAdminUser(
     await assertPromotableAdminUser(userId);
   }
 
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data,
-    include: {
-      casinoAccounts: true,
-    },
+  const user = await prisma.$transaction(async (tx) => {
+    const updated = await tx.user.update({
+      where: { id: userId },
+      data,
+      include: {
+        casinoAccounts: true,
+      },
+    });
+
+    const timeoutIsActive = data.timeoutUntil instanceof Date && data.timeoutUntil > new Date();
+    if (data.banned === true || timeoutIsActive) {
+      await tx.session.deleteMany({ where: { userId } });
+    }
+
+    return updated;
   });
 
   return adminUserSummary(await reconcileConfiguredAdminRole(user));

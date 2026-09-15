@@ -410,6 +410,7 @@ export const ModelName = {
   ChallengeMission: 'ChallengeMission',
   ChallengeProgress: 'ChallengeProgress',
   WatchSession: 'WatchSession',
+  WatchPointConfig: 'WatchPointConfig',
   KickChatActivity: 'KickChatActivity',
   KickStreamStatus: 'KickStreamStatus',
   RaffleRound: 'RaffleRound',
@@ -439,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet" | "challengeMission" | "challengeProgress" | "watchSession" | "kickChatActivity" | "kickStreamStatus" | "raffleRound" | "raffleAccount" | "raffleEntry" | "bonusHuntSession" | "huntFollow" | "huntClip" | "huntClipVote" | "huntClipSave" | "supportTicket" | "tournament" | "tournamentMatch" | "tournamentEntry"
+    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet" | "challengeMission" | "challengeProgress" | "watchSession" | "watchPointConfig" | "kickChatActivity" | "kickStreamStatus" | "raffleRound" | "raffleAccount" | "raffleEntry" | "bonusHuntSession" | "huntFollow" | "huntClip" | "huntClipVote" | "huntClipSave" | "supportTicket" | "tournament" | "tournamentMatch" | "tournamentEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1402,6 +1403,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.WatchSessionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.WatchSessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    WatchPointConfig: {
+      payload: Prisma.$WatchPointConfigPayload<ExtArgs>
+      fields: Prisma.WatchPointConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WatchPointConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WatchPointConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.WatchPointConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WatchPointConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>
+        }
+        findMany: {
+          args: Prisma.WatchPointConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>[]
+        }
+        create: {
+          args: Prisma.WatchPointConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>
+        }
+        createMany: {
+          args: Prisma.WatchPointConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WatchPointConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.WatchPointConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>
+        }
+        update: {
+          args: Prisma.WatchPointConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.WatchPointConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WatchPointConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WatchPointConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.WatchPointConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WatchPointConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.WatchPointConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWatchPointConfig>
+        }
+        groupBy: {
+          args: Prisma.WatchPointConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WatchPointConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WatchPointConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WatchPointConfigCountAggregateOutputType> | number
         }
       }
     }
@@ -2680,7 +2755,10 @@ export const WatchSessionScalarFieldEnum = {
   status: 'status',
   totalSeconds: 'totalSeconds',
   pointsAwarded: 'pointsAwarded',
+  awardPoints: 'awardPoints',
+  awardIntervalSeconds: 'awardIntervalSeconds',
   dailyBonusAwarded: 'dailyBonusAwarded',
+  dailyBonusPoints: 'dailyBonusPoints',
   startedAt: 'startedAt',
   lastHeartbeatAt: 'lastHeartbeatAt',
   endedAt: 'endedAt',
@@ -2689,6 +2767,19 @@ export const WatchSessionScalarFieldEnum = {
 } as const
 
 export type WatchSessionScalarFieldEnum = (typeof WatchSessionScalarFieldEnum)[keyof typeof WatchSessionScalarFieldEnum]
+
+
+export const WatchPointConfigScalarFieldEnum = {
+  id: 'id',
+  pointsPerInterval: 'pointsPerInterval',
+  intervalSeconds: 'intervalSeconds',
+  dailyBonus: 'dailyBonus',
+  updatedById: 'updatedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WatchPointConfigScalarFieldEnum = (typeof WatchPointConfigScalarFieldEnum)[keyof typeof WatchPointConfigScalarFieldEnum]
 
 
 export const KickChatActivityScalarFieldEnum = {
@@ -3280,6 +3371,7 @@ export type GlobalOmitConfig = {
   challengeMission?: Prisma.ChallengeMissionOmit
   challengeProgress?: Prisma.ChallengeProgressOmit
   watchSession?: Prisma.WatchSessionOmit
+  watchPointConfig?: Prisma.WatchPointConfigOmit
   kickChatActivity?: Prisma.KickChatActivityOmit
   kickStreamStatus?: Prisma.KickStreamStatusOmit
   raffleRound?: Prisma.RaffleRoundOmit

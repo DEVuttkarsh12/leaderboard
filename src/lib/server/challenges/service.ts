@@ -333,7 +333,6 @@ export async function claimChallengeMission(
 ): Promise<{
   mission: ChallengeMissionPayload;
   newPoints: number;
-  newXp: number;
 }> {
   const userId = await getSessionUserId(sessionToken);
   if (!userId) throw new Error("Sign in to claim missions.");
@@ -378,11 +377,8 @@ export async function claimChallengeMission(
 
     const updatedUser = await tx.user.update({
       where: { id: userId },
-      data: {
-        points: { increment: mission.reward },
-        xp: { increment: mission.reward },
-      },
-      select: { points: true, xp: true },
+      data: { points: { increment: mission.reward } },
+      select: { points: true },
     });
 
     await tx.pointTransaction.create({
@@ -401,7 +397,6 @@ export async function claimChallengeMission(
     return {
       mission: toPayload(mission, { progress: mission.goal, claimedAt }),
       newPoints: updatedUser.points,
-      newXp: updatedUser.xp,
     };
   });
 }

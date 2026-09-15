@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const linkSchema = z.object({
   provider: z.enum(["thrill", "packdraw", "shuffle"]),
-  username: z.string().min(1).max(64),
+  username: z.string().trim().min(2).max(64),
   email: z.string().email().optional().or(z.literal("")),
 });
 
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const casinoAccount = await linkCasinoAccount({
       userId,
       provider,
-      username,
+      username: existence.canonicalUsername ?? username,
       email: email || undefined,
     });
 
@@ -49,12 +49,17 @@ export async function POST(request: NextRequest) {
       account,
       playerDetails: existence,
       message: casinoAccount.isVerified
-        ? `Successfully verified and linked ${provider} account (${casinoAccount.verificationMethod})!`
-        : `Linked ${provider} account! Please complete verification to receive leaderboard points.`,
+        ? `${provider} account verified and linked.`
+        : existence.foundInLeaderboard
+          ? `${provider} player found and linked. Ownership verification is pending.`
+          : `${provider} account linked. Ownership verification is pending.`,
     });
   } catch (error) {
     console.error("Casino account link failed.", error);
-    const message = "Could not link that casino account. Check the details and try again.";
+    const candidate = error instanceof Error ? error.message : "";
+    const message = candidate.includes("already linked to another player")
+      ? candidate
+      : "Could not link that casino account. Check the details and try again.";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

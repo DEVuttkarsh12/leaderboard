@@ -29,11 +29,17 @@ export type AggregateWatchSession = {
 export type WatchSessionAvgAggregateOutputType = {
   totalSeconds: number | null
   pointsAwarded: number | null
+  awardPoints: number | null
+  awardIntervalSeconds: number | null
+  dailyBonusPoints: number | null
 }
 
 export type WatchSessionSumAggregateOutputType = {
   totalSeconds: number | null
   pointsAwarded: number | null
+  awardPoints: number | null
+  awardIntervalSeconds: number | null
+  dailyBonusPoints: number | null
 }
 
 export type WatchSessionMinAggregateOutputType = {
@@ -44,7 +50,10 @@ export type WatchSessionMinAggregateOutputType = {
   status: $Enums.WatchSessionStatus | null
   totalSeconds: number | null
   pointsAwarded: number | null
+  awardPoints: number | null
+  awardIntervalSeconds: number | null
   dailyBonusAwarded: boolean | null
+  dailyBonusPoints: number | null
   startedAt: Date | null
   lastHeartbeatAt: Date | null
   endedAt: Date | null
@@ -60,7 +69,10 @@ export type WatchSessionMaxAggregateOutputType = {
   status: $Enums.WatchSessionStatus | null
   totalSeconds: number | null
   pointsAwarded: number | null
+  awardPoints: number | null
+  awardIntervalSeconds: number | null
   dailyBonusAwarded: boolean | null
+  dailyBonusPoints: number | null
   startedAt: Date | null
   lastHeartbeatAt: Date | null
   endedAt: Date | null
@@ -76,7 +88,10 @@ export type WatchSessionCountAggregateOutputType = {
   status: number
   totalSeconds: number
   pointsAwarded: number
+  awardPoints: number
+  awardIntervalSeconds: number
   dailyBonusAwarded: number
+  dailyBonusPoints: number
   startedAt: number
   lastHeartbeatAt: number
   endedAt: number
@@ -89,11 +104,17 @@ export type WatchSessionCountAggregateOutputType = {
 export type WatchSessionAvgAggregateInputType = {
   totalSeconds?: true
   pointsAwarded?: true
+  awardPoints?: true
+  awardIntervalSeconds?: true
+  dailyBonusPoints?: true
 }
 
 export type WatchSessionSumAggregateInputType = {
   totalSeconds?: true
   pointsAwarded?: true
+  awardPoints?: true
+  awardIntervalSeconds?: true
+  dailyBonusPoints?: true
 }
 
 export type WatchSessionMinAggregateInputType = {
@@ -104,7 +125,10 @@ export type WatchSessionMinAggregateInputType = {
   status?: true
   totalSeconds?: true
   pointsAwarded?: true
+  awardPoints?: true
+  awardIntervalSeconds?: true
   dailyBonusAwarded?: true
+  dailyBonusPoints?: true
   startedAt?: true
   lastHeartbeatAt?: true
   endedAt?: true
@@ -120,7 +144,10 @@ export type WatchSessionMaxAggregateInputType = {
   status?: true
   totalSeconds?: true
   pointsAwarded?: true
+  awardPoints?: true
+  awardIntervalSeconds?: true
   dailyBonusAwarded?: true
+  dailyBonusPoints?: true
   startedAt?: true
   lastHeartbeatAt?: true
   endedAt?: true
@@ -136,7 +163,10 @@ export type WatchSessionCountAggregateInputType = {
   status?: true
   totalSeconds?: true
   pointsAwarded?: true
+  awardPoints?: true
+  awardIntervalSeconds?: true
   dailyBonusAwarded?: true
+  dailyBonusPoints?: true
   startedAt?: true
   lastHeartbeatAt?: true
   endedAt?: true
@@ -239,7 +269,10 @@ export type WatchSessionGroupByOutputType = {
   status: $Enums.WatchSessionStatus
   totalSeconds: number
   pointsAwarded: number
+  awardPoints: number
+  awardIntervalSeconds: number
   dailyBonusAwarded: boolean
+  dailyBonusPoints: number
   startedAt: Date
   lastHeartbeatAt: Date
   endedAt: Date | null
@@ -278,7 +311,10 @@ export type WatchSessionWhereInput = {
   status?: Prisma.EnumWatchSessionStatusFilter<"WatchSession"> | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFilter<"WatchSession"> | number
   pointsAwarded?: Prisma.IntFilter<"WatchSession"> | number
+  awardPoints?: Prisma.IntFilter<"WatchSession"> | number
+  awardIntervalSeconds?: Prisma.IntFilter<"WatchSession"> | number
   dailyBonusAwarded?: Prisma.BoolFilter<"WatchSession"> | boolean
+  dailyBonusPoints?: Prisma.IntFilter<"WatchSession"> | number
   startedAt?: Prisma.DateTimeFilter<"WatchSession"> | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFilter<"WatchSession"> | Date | string
   endedAt?: Prisma.DateTimeNullableFilter<"WatchSession"> | Date | string | null
@@ -295,7 +331,10 @@ export type WatchSessionOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   totalSeconds?: Prisma.SortOrder
   pointsAwarded?: Prisma.SortOrder
+  awardPoints?: Prisma.SortOrder
+  awardIntervalSeconds?: Prisma.SortOrder
   dailyBonusAwarded?: Prisma.SortOrder
+  dailyBonusPoints?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   lastHeartbeatAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -315,7 +354,10 @@ export type WatchSessionWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumWatchSessionStatusFilter<"WatchSession"> | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFilter<"WatchSession"> | number
   pointsAwarded?: Prisma.IntFilter<"WatchSession"> | number
+  awardPoints?: Prisma.IntFilter<"WatchSession"> | number
+  awardIntervalSeconds?: Prisma.IntFilter<"WatchSession"> | number
   dailyBonusAwarded?: Prisma.BoolFilter<"WatchSession"> | boolean
+  dailyBonusPoints?: Prisma.IntFilter<"WatchSession"> | number
   startedAt?: Prisma.DateTimeFilter<"WatchSession"> | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFilter<"WatchSession"> | Date | string
   endedAt?: Prisma.DateTimeNullableFilter<"WatchSession"> | Date | string | null
@@ -332,7 +374,10 @@ export type WatchSessionOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   totalSeconds?: Prisma.SortOrder
   pointsAwarded?: Prisma.SortOrder
+  awardPoints?: Prisma.SortOrder
+  awardIntervalSeconds?: Prisma.SortOrder
   dailyBonusAwarded?: Prisma.SortOrder
+  dailyBonusPoints?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   lastHeartbeatAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -356,7 +401,10 @@ export type WatchSessionScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumWatchSessionStatusWithAggregatesFilter<"WatchSession"> | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntWithAggregatesFilter<"WatchSession"> | number
   pointsAwarded?: Prisma.IntWithAggregatesFilter<"WatchSession"> | number
+  awardPoints?: Prisma.IntWithAggregatesFilter<"WatchSession"> | number
+  awardIntervalSeconds?: Prisma.IntWithAggregatesFilter<"WatchSession"> | number
   dailyBonusAwarded?: Prisma.BoolWithAggregatesFilter<"WatchSession"> | boolean
+  dailyBonusPoints?: Prisma.IntWithAggregatesFilter<"WatchSession"> | number
   startedAt?: Prisma.DateTimeWithAggregatesFilter<"WatchSession"> | Date | string
   lastHeartbeatAt?: Prisma.DateTimeWithAggregatesFilter<"WatchSession"> | Date | string
   endedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"WatchSession"> | Date | string | null
@@ -371,7 +419,10 @@ export type WatchSessionCreateInput = {
   status?: $Enums.WatchSessionStatus
   totalSeconds?: number
   pointsAwarded?: number
+  awardPoints?: number
+  awardIntervalSeconds?: number
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: number
   startedAt?: Date | string
   lastHeartbeatAt?: Date | string
   endedAt?: Date | string | null
@@ -388,7 +439,10 @@ export type WatchSessionUncheckedCreateInput = {
   status?: $Enums.WatchSessionStatus
   totalSeconds?: number
   pointsAwarded?: number
+  awardPoints?: number
+  awardIntervalSeconds?: number
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: number
   startedAt?: Date | string
   lastHeartbeatAt?: Date | string
   endedAt?: Date | string | null
@@ -403,7 +457,10 @@ export type WatchSessionUpdateInput = {
   status?: Prisma.EnumWatchSessionStatusFieldUpdateOperationsInput | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   pointsAwarded?: Prisma.IntFieldUpdateOperationsInput | number
+  awardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awardIntervalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   dailyBonusAwarded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyBonusPoints?: Prisma.IntFieldUpdateOperationsInput | number
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -420,7 +477,10 @@ export type WatchSessionUncheckedUpdateInput = {
   status?: Prisma.EnumWatchSessionStatusFieldUpdateOperationsInput | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   pointsAwarded?: Prisma.IntFieldUpdateOperationsInput | number
+  awardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awardIntervalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   dailyBonusAwarded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyBonusPoints?: Prisma.IntFieldUpdateOperationsInput | number
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -436,7 +496,10 @@ export type WatchSessionCreateManyInput = {
   status?: $Enums.WatchSessionStatus
   totalSeconds?: number
   pointsAwarded?: number
+  awardPoints?: number
+  awardIntervalSeconds?: number
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: number
   startedAt?: Date | string
   lastHeartbeatAt?: Date | string
   endedAt?: Date | string | null
@@ -451,7 +514,10 @@ export type WatchSessionUpdateManyMutationInput = {
   status?: Prisma.EnumWatchSessionStatusFieldUpdateOperationsInput | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   pointsAwarded?: Prisma.IntFieldUpdateOperationsInput | number
+  awardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awardIntervalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   dailyBonusAwarded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyBonusPoints?: Prisma.IntFieldUpdateOperationsInput | number
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -467,7 +533,10 @@ export type WatchSessionUncheckedUpdateManyInput = {
   status?: Prisma.EnumWatchSessionStatusFieldUpdateOperationsInput | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   pointsAwarded?: Prisma.IntFieldUpdateOperationsInput | number
+  awardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awardIntervalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   dailyBonusAwarded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyBonusPoints?: Prisma.IntFieldUpdateOperationsInput | number
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -493,7 +562,10 @@ export type WatchSessionCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   totalSeconds?: Prisma.SortOrder
   pointsAwarded?: Prisma.SortOrder
+  awardPoints?: Prisma.SortOrder
+  awardIntervalSeconds?: Prisma.SortOrder
   dailyBonusAwarded?: Prisma.SortOrder
+  dailyBonusPoints?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   lastHeartbeatAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
@@ -504,6 +576,9 @@ export type WatchSessionCountOrderByAggregateInput = {
 export type WatchSessionAvgOrderByAggregateInput = {
   totalSeconds?: Prisma.SortOrder
   pointsAwarded?: Prisma.SortOrder
+  awardPoints?: Prisma.SortOrder
+  awardIntervalSeconds?: Prisma.SortOrder
+  dailyBonusPoints?: Prisma.SortOrder
 }
 
 export type WatchSessionMaxOrderByAggregateInput = {
@@ -514,7 +589,10 @@ export type WatchSessionMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   totalSeconds?: Prisma.SortOrder
   pointsAwarded?: Prisma.SortOrder
+  awardPoints?: Prisma.SortOrder
+  awardIntervalSeconds?: Prisma.SortOrder
   dailyBonusAwarded?: Prisma.SortOrder
+  dailyBonusPoints?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   lastHeartbeatAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
@@ -530,7 +608,10 @@ export type WatchSessionMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   totalSeconds?: Prisma.SortOrder
   pointsAwarded?: Prisma.SortOrder
+  awardPoints?: Prisma.SortOrder
+  awardIntervalSeconds?: Prisma.SortOrder
   dailyBonusAwarded?: Prisma.SortOrder
+  dailyBonusPoints?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   lastHeartbeatAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
@@ -541,6 +622,9 @@ export type WatchSessionMinOrderByAggregateInput = {
 export type WatchSessionSumOrderByAggregateInput = {
   totalSeconds?: Prisma.SortOrder
   pointsAwarded?: Prisma.SortOrder
+  awardPoints?: Prisma.SortOrder
+  awardIntervalSeconds?: Prisma.SortOrder
+  dailyBonusPoints?: Prisma.SortOrder
 }
 
 export type WatchSessionCreateNestedManyWithoutUserInput = {
@@ -596,7 +680,10 @@ export type WatchSessionCreateWithoutUserInput = {
   status?: $Enums.WatchSessionStatus
   totalSeconds?: number
   pointsAwarded?: number
+  awardPoints?: number
+  awardIntervalSeconds?: number
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: number
   startedAt?: Date | string
   lastHeartbeatAt?: Date | string
   endedAt?: Date | string | null
@@ -611,7 +698,10 @@ export type WatchSessionUncheckedCreateWithoutUserInput = {
   status?: $Enums.WatchSessionStatus
   totalSeconds?: number
   pointsAwarded?: number
+  awardPoints?: number
+  awardIntervalSeconds?: number
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: number
   startedAt?: Date | string
   lastHeartbeatAt?: Date | string
   endedAt?: Date | string | null
@@ -656,7 +746,10 @@ export type WatchSessionScalarWhereInput = {
   status?: Prisma.EnumWatchSessionStatusFilter<"WatchSession"> | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFilter<"WatchSession"> | number
   pointsAwarded?: Prisma.IntFilter<"WatchSession"> | number
+  awardPoints?: Prisma.IntFilter<"WatchSession"> | number
+  awardIntervalSeconds?: Prisma.IntFilter<"WatchSession"> | number
   dailyBonusAwarded?: Prisma.BoolFilter<"WatchSession"> | boolean
+  dailyBonusPoints?: Prisma.IntFilter<"WatchSession"> | number
   startedAt?: Prisma.DateTimeFilter<"WatchSession"> | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFilter<"WatchSession"> | Date | string
   endedAt?: Prisma.DateTimeNullableFilter<"WatchSession"> | Date | string | null
@@ -671,7 +764,10 @@ export type WatchSessionCreateManyUserInput = {
   status?: $Enums.WatchSessionStatus
   totalSeconds?: number
   pointsAwarded?: number
+  awardPoints?: number
+  awardIntervalSeconds?: number
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: number
   startedAt?: Date | string
   lastHeartbeatAt?: Date | string
   endedAt?: Date | string | null
@@ -686,7 +782,10 @@ export type WatchSessionUpdateWithoutUserInput = {
   status?: Prisma.EnumWatchSessionStatusFieldUpdateOperationsInput | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   pointsAwarded?: Prisma.IntFieldUpdateOperationsInput | number
+  awardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awardIntervalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   dailyBonusAwarded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyBonusPoints?: Prisma.IntFieldUpdateOperationsInput | number
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -701,7 +800,10 @@ export type WatchSessionUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumWatchSessionStatusFieldUpdateOperationsInput | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   pointsAwarded?: Prisma.IntFieldUpdateOperationsInput | number
+  awardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awardIntervalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   dailyBonusAwarded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyBonusPoints?: Prisma.IntFieldUpdateOperationsInput | number
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -716,7 +818,10 @@ export type WatchSessionUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumWatchSessionStatusFieldUpdateOperationsInput | $Enums.WatchSessionStatus
   totalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   pointsAwarded?: Prisma.IntFieldUpdateOperationsInput | number
+  awardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  awardIntervalSeconds?: Prisma.IntFieldUpdateOperationsInput | number
   dailyBonusAwarded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyBonusPoints?: Prisma.IntFieldUpdateOperationsInput | number
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastHeartbeatAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -734,7 +839,10 @@ export type WatchSessionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   status?: boolean
   totalSeconds?: boolean
   pointsAwarded?: boolean
+  awardPoints?: boolean
+  awardIntervalSeconds?: boolean
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: boolean
   startedAt?: boolean
   lastHeartbeatAt?: boolean
   endedAt?: boolean
@@ -751,7 +859,10 @@ export type WatchSessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   status?: boolean
   totalSeconds?: boolean
   pointsAwarded?: boolean
+  awardPoints?: boolean
+  awardIntervalSeconds?: boolean
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: boolean
   startedAt?: boolean
   lastHeartbeatAt?: boolean
   endedAt?: boolean
@@ -768,7 +879,10 @@ export type WatchSessionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   status?: boolean
   totalSeconds?: boolean
   pointsAwarded?: boolean
+  awardPoints?: boolean
+  awardIntervalSeconds?: boolean
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: boolean
   startedAt?: boolean
   lastHeartbeatAt?: boolean
   endedAt?: boolean
@@ -785,7 +899,10 @@ export type WatchSessionSelectScalar = {
   status?: boolean
   totalSeconds?: boolean
   pointsAwarded?: boolean
+  awardPoints?: boolean
+  awardIntervalSeconds?: boolean
   dailyBonusAwarded?: boolean
+  dailyBonusPoints?: boolean
   startedAt?: boolean
   lastHeartbeatAt?: boolean
   endedAt?: boolean
@@ -793,7 +910,7 @@ export type WatchSessionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type WatchSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "streamId" | "status" | "totalSeconds" | "pointsAwarded" | "dailyBonusAwarded" | "startedAt" | "lastHeartbeatAt" | "endedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["watchSession"]>
+export type WatchSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "provider" | "streamId" | "status" | "totalSeconds" | "pointsAwarded" | "awardPoints" | "awardIntervalSeconds" | "dailyBonusAwarded" | "dailyBonusPoints" | "startedAt" | "lastHeartbeatAt" | "endedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["watchSession"]>
 export type WatchSessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -817,7 +934,10 @@ export type $WatchSessionPayload<ExtArgs extends runtime.Types.Extensions.Intern
     status: $Enums.WatchSessionStatus
     totalSeconds: number
     pointsAwarded: number
+    awardPoints: number
+    awardIntervalSeconds: number
     dailyBonusAwarded: boolean
+    dailyBonusPoints: number
     startedAt: Date
     lastHeartbeatAt: Date
     endedAt: Date | null
@@ -1254,7 +1374,10 @@ export interface WatchSessionFieldRefs {
   readonly status: Prisma.FieldRef<"WatchSession", 'WatchSessionStatus'>
   readonly totalSeconds: Prisma.FieldRef<"WatchSession", 'Int'>
   readonly pointsAwarded: Prisma.FieldRef<"WatchSession", 'Int'>
+  readonly awardPoints: Prisma.FieldRef<"WatchSession", 'Int'>
+  readonly awardIntervalSeconds: Prisma.FieldRef<"WatchSession", 'Int'>
   readonly dailyBonusAwarded: Prisma.FieldRef<"WatchSession", 'Boolean'>
+  readonly dailyBonusPoints: Prisma.FieldRef<"WatchSession", 'Int'>
   readonly startedAt: Prisma.FieldRef<"WatchSession", 'DateTime'>
   readonly lastHeartbeatAt: Prisma.FieldRef<"WatchSession", 'DateTime'>
   readonly endedAt: Prisma.FieldRef<"WatchSession", 'DateTime'>

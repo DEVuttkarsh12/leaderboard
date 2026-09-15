@@ -76,7 +76,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="row-chip">
-                      Weighted XP
+                      Weighted score
                     </span>
                     <span className="row-chip row-chip--muted">
                       Gap {gapToLeader > 0 ? <CountUpValue value={gapToLeader} mode="score" /> : "Leader"}
@@ -88,7 +88,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
               <div className="row-stats">
                 <div className="row-stat-block row-stat-block--score">
                   <div>
-                    <div className="row-stat-block__label">Weighted XP</div>
+                    <div className="row-stat-block__label">Weighted score</div>
                     <div className="row-stat-block__value">
                       <CountUpValue value={user.score} mode="score" />
                     </div>

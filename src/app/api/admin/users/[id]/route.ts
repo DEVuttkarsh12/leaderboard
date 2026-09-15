@@ -4,8 +4,6 @@ import { requireAdminUser, updateAdminUser } from "@/lib/server/admin/users";
 import { SESSION_COOKIE } from "@/lib/server/auth/session";
 
 const updateUserSchema = z.object({
-  points: z.number().int().min(0).max(2_000_000_000).optional(),
-  xp: z.number().int().min(0).max(2_000_000_000).optional(),
   banned: z.boolean().optional(),
   bannedReason: z.string().trim().max(160).optional(),
   timeoutUntil: z.string().datetime().nullable().optional(),
@@ -40,14 +38,27 @@ export async function PATCH(
       );
     }
 
+    const requestedTimeout = parsed.data.timeoutUntil
+      ? new Date(parsed.data.timeoutUntil)
+      : null;
+    if (
+      id === admin.id &&
+      (parsed.data.banned === true || (requestedTimeout && requestedTimeout > new Date()))
+    ) {
+      return NextResponse.json(
+        { error: "You cannot ban or time out your own admin session." },
+        { status: 400 }
+      );
+    }
+
     const user = await updateAdminUser(id, {
       ...parsed.data,
       bannedReason: parsed.data.bannedReason ?? undefined,
       timeoutUntil:
         parsed.data.timeoutUntil === undefined
           ? undefined
-          : parsed.data.timeoutUntil
-            ? new Date(parsed.data.timeoutUntil)
+          : requestedTimeout
+            ? requestedTimeout
             : null,
     });
 

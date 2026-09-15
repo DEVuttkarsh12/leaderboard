@@ -14,7 +14,6 @@ export type AuthAccountPayload = {
   email?: string;
   profileProvider: "kick" | "discord" | "email";
   points: number;
-  xp: number;
   streak: number;
   inventory: string[];
   connected: {
