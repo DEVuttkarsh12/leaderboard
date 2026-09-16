@@ -262,8 +262,8 @@ const defaultAccount: Account = {
 const faq = [
   { q: "Wager score", a: "Live API. Read-only." },
   { q: "Kick points", a: "Watch. Earn. Spend." },
-  { q: "Store rewards", a: "Pending to fulfilled." },
-  { q: "Custom bets", a: "Admin settles." },
+  { q: "Store rewards", a: "Order → delivered by admin." },
+  { q: "Custom bets", a: "Admin picks the winner." },
   { q: "Casino names", a: "Link in profile." },
 ];
 
@@ -2207,7 +2207,7 @@ function AdminWorkspace({
       setMarkets((current) =>
         current.map((entry) => (entry.id === market.id ? { ...entry, status: "Settled", winner } : entry))
       );
-      setAdminMarketMessage(`Settled! Paid ${data.winnersPaid ?? 0} winner(s) a total of ${(data.totalPointsPaid ?? 0).toLocaleString()} pts.`);
+      setAdminMarketMessage(`Winner picked! Paid ${data.winnersPaid ?? 0} winner${data.winnersPaid === 1 ? "" : "s"} a total of ${(data.totalPointsPaid ?? 0).toLocaleString()} pts.`);
       window.dispatchEvent(new CustomEvent("rankboard-storage"));
     } catch (error) {
       setAdminMarketMessage(error instanceof Error ? error.message : "Settlement failed");
@@ -2452,7 +2452,7 @@ function AdminWorkspace({
       <WorkspaceHeader overline="Admin" title="Control room" meta={adminUserStatus} />
       <LiquidGlass className="admin-user-manager" tone="violet">
         <div className="admin-user-manager__bar">
-          <label>PLAYER SEARCH<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Name, email, Kick, Discord, or Shuffle" /></label>
+          <label>FIND A PLAYER<input value={adminQuery} onChange={(event) => setAdminQuery(event.target.value)} placeholder="Name, email, Kick, Discord, or Shuffle" /></label>
           <button type="button" onClick={() => setAdminQuery((value) => value.trim())} disabled={adminUsersLoading}>{adminUsersLoading ? "Loading" : "Refresh"}</button>
         </div>
         <div className="admin-user-layout">
@@ -2511,7 +2511,7 @@ function AdminWorkspace({
       <div className="admin-grid">
         <LiquidGlass as="article" className="admin-panel" tone="violet">
           <small>WEBSITE</small>
-          <h3>Banners</h3>
+          <h3>Site banners</h3>
           <label>Announcement<input maxLength={200} value={siteBannerInputs.announcement} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, announcement: event.target.value }))} /></label>
           <label>Banner<input maxLength={200} value={siteBannerInputs.banner} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, banner: event.target.value }))} /></label>
           <label>Promo<input maxLength={200} value={siteBannerInputs.promotion} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, promotion: event.target.value }))} /></label>
@@ -2522,14 +2522,14 @@ function AdminWorkspace({
         </LiquidGlass>
         <LiquidGlass as="article" className="admin-panel" tone="cyan">
           <small>DATA PIPELINE</small>
-          <h3>Infra</h3>
+          <h3>System status</h3>
           <StatusGrid items={[["API", "Live"], ["Cache", "No-store"], ["DB", "Ready"], ["Backend", "Route live"]]} />
         </LiquidGlass>
       </div>
       <div className="admin-section-title">
         <div>
-          <p>Tournament control</p>
-          <h2>Build brackets</h2>
+          <p>Tournaments</p>
+          <h2>Create & manage</h2>
         </div>
       </div>
       <p className="admin-note">{adminTournamentStatus}</p>
@@ -2595,8 +2595,8 @@ function AdminWorkspace({
       ) : null}
       <div className="admin-section-title">
         <div>
-          <p>Challenge missions</p>
-          <h2>Publish slots</h2>
+          <p>Bonus challenges</p>
+          <h2>Add a challenge</h2>
         </div>
       </div>
       <p className="admin-note">{adminChallengeStatus}</p>
@@ -2671,8 +2671,8 @@ function AdminWorkspace({
       {/* Bet Markets & Settlement Section */}
       <div className="admin-section-title">
         <div>
-          <p>Prediction markets</p>
-          <h2>Settle & pay</h2>
+          <p>Betting</p>
+          <h2>Pick the winner</h2>
         </div>
       </div>
       <form className="support-form account-form" onSubmit={addMarket}>
@@ -2713,14 +2713,14 @@ function AdminWorkspace({
                   className="settle-btn win"
                   onClick={() => settleMarket(market, market.sides[0])}
                 >
-                  Settle {market.sides[0]}
+                  {market.sides[0]} wins
                 </button>
                 <button
                   type="button"
                   className="settle-btn lose"
                   onClick={() => settleMarket(market, market.sides[1])}
                 >
-                  Settle {market.sides[1]}
+                  {market.sides[1]} wins
                 </button>
               </div>
             )}
@@ -2731,8 +2731,8 @@ function AdminWorkspace({
       {/* Raffle Drawing */}
       <div className="admin-section-title">
         <div>
-          <p>Wager raffles</p>
-          <h2>Draw winners</h2>
+          <p>Raffles</p>
+          <h2>Draw a winner</h2>
         </div>
       </div>
       <div className="tool-panel">
@@ -2747,8 +2747,8 @@ function AdminWorkspace({
       {/* Support Inbox */}
       <div className="admin-section-title">
         <div>
-          <p>Support inbox</p>
-          <h2>Resolve tickets</h2>
+          <p>Support</p>
+          <h2>Reply to tickets</h2>
         </div>
       </div>
       <div className="workspace-list">
@@ -2767,8 +2767,8 @@ function AdminWorkspace({
       {/* Store Claims Fulfillment */}
       <div className="admin-section-title">
         <div>
-          <p>Reward claims</p>
-          <h2>Fulfill purchases</h2>
+          <p>Store orders</p>
+          <h2>Deliver rewards</h2>
         </div>
       </div>
       <div className="workspace-list">
