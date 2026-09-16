@@ -112,6 +112,11 @@ export type WatchSession = Prisma.WatchSessionModel
  */
 export type WatchPointConfig = Prisma.WatchPointConfigModel
 /**
+ * Model SiteBanner
+ * 
+ */
+export type SiteBanner = Prisma.SiteBannerModel
+/**
  * Model KickChatActivity
  * 
  */

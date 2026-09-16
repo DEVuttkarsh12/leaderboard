@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
 import { requireAdminUser } from "@/lib/server/admin/users";
+import { challongeSlug } from "@/lib/challonge";
+import {
+  createChallongeTournament,
+  getChallongeTournament,
+} from "@/lib/server/challonge/client";
 
 export type TournamentMatchPayload = {
   id: string;
@@ -27,6 +32,8 @@ export type TournamentPayload = {
   active: boolean;
   entrants: string[];
   matches: TournamentMatchPayload[];
+  challongeId: string | null;
+  challongeUrl: string | null;
   updatedAt: string;
 };
 
@@ -48,6 +55,8 @@ type TournamentRecord = {
   taken: number;
   status: TournamentStatus;
   active: boolean;
+  challongeId: string | null;
+  challongeUrl: string | null;
   updatedAt: Date;
   entries: Array<{
     userId: string;
@@ -134,6 +143,8 @@ function toPayload(tournament: TournamentRecord, userId?: string | null): Tourna
       winner: match.winner,
       status: matchStatusLabel(match.status),
     })),
+    challongeId: tournament.challongeId,
+    challongeUrl: tournament.challongeUrl,
     updatedAt: tournament.updatedAt.toISOString(),
   };
 }
@@ -262,6 +273,58 @@ export async function buildTournamentBracket(
     prisma.tournamentMatch.createMany({ data: matches }),
     prisma.tournament.update({ where: { id: tournamentId }, data: { status: "LOCKED" } }),
   ]);
+  return getAdminTournament(sessionToken, tournamentId);
+}
+
+export async function linkTournamentToChallonge(
+  sessionToken: string | undefined,
+  tournamentId: string,
+  url: string
+) {
+  await requireAdminUser(sessionToken);
+  const slug = challongeSlug(url);
+  if (!slug) throw new Error("Provide a valid Challonge tournament URL.");
+
+  const challonge = await getChallongeTournament(slug);
+  await prisma.tournament.update({
+    where: { id: tournamentId },
+    data: { challongeId: challonge.id, challongeUrl: challonge.url },
+  });
+  return getAdminTournament(sessionToken, tournamentId);
+}
+
+export async function createTournamentOnChallonge(
+  sessionToken: string | undefined,
+  tournamentId: string,
+  input: { name?: string; url?: string }
+) {
+  await requireAdminUser(sessionToken);
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { title: true },
+  });
+  if (!tournament) throw new Error("Tournament not found.");
+
+  const challonge = await createChallongeTournament({
+    name: input.name?.trim() || tournament.title,
+    url: input.url?.trim() || undefined,
+  });
+  await prisma.tournament.update({
+    where: { id: tournamentId },
+    data: { challongeId: challonge.id, challongeUrl: challonge.url },
+  });
+  return getAdminTournament(sessionToken, tournamentId);
+}
+
+export async function unlinkTournamentChallonge(
+  sessionToken: string | undefined,
+  tournamentId: string
+) {
+  await requireAdminUser(sessionToken);
+  await prisma.tournament.update({
+    where: { id: tournamentId },
+    data: { challongeId: null, challongeUrl: null },
+  });
   return getAdminTournament(sessionToken, tournamentId);
 }
 

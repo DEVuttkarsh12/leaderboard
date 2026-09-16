@@ -411,6 +411,7 @@ export const ModelName = {
   ChallengeProgress: 'ChallengeProgress',
   WatchSession: 'WatchSession',
   WatchPointConfig: 'WatchPointConfig',
+  SiteBanner: 'SiteBanner',
   KickChatActivity: 'KickChatActivity',
   KickStreamStatus: 'KickStreamStatus',
   RaffleRound: 'RaffleRound',
@@ -440,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet" | "challengeMission" | "challengeProgress" | "watchSession" | "watchPointConfig" | "kickChatActivity" | "kickStreamStatus" | "raffleRound" | "raffleAccount" | "raffleEntry" | "bonusHuntSession" | "huntFollow" | "huntClip" | "huntClipVote" | "huntClipSave" | "supportTicket" | "tournament" | "tournamentMatch" | "tournamentEntry"
+    modelProps: "user" | "storeItem" | "storePurchase" | "account" | "session" | "verificationToken" | "casinoAccount" | "pointTransaction" | "betMarket" | "userBet" | "challengeMission" | "challengeProgress" | "watchSession" | "watchPointConfig" | "siteBanner" | "kickChatActivity" | "kickStreamStatus" | "raffleRound" | "raffleAccount" | "raffleEntry" | "bonusHuntSession" | "huntFollow" | "huntClip" | "huntClipVote" | "huntClipSave" | "supportTicket" | "tournament" | "tournamentMatch" | "tournamentEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1477,6 +1478,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.WatchPointConfigCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.WatchPointConfigCountAggregateOutputType> | number
+        }
+      }
+    }
+    SiteBanner: {
+      payload: Prisma.$SiteBannerPayload<ExtArgs>
+      fields: Prisma.SiteBannerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SiteBannerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SiteBannerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>
+        }
+        findFirst: {
+          args: Prisma.SiteBannerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SiteBannerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>
+        }
+        findMany: {
+          args: Prisma.SiteBannerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>[]
+        }
+        create: {
+          args: Prisma.SiteBannerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>
+        }
+        createMany: {
+          args: Prisma.SiteBannerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SiteBannerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>[]
+        }
+        delete: {
+          args: Prisma.SiteBannerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>
+        }
+        update: {
+          args: Prisma.SiteBannerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>
+        }
+        deleteMany: {
+          args: Prisma.SiteBannerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SiteBannerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SiteBannerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>[]
+        }
+        upsert: {
+          args: Prisma.SiteBannerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteBannerPayload>
+        }
+        aggregate: {
+          args: Prisma.SiteBannerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSiteBanner>
+        }
+        groupBy: {
+          args: Prisma.SiteBannerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteBannerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SiteBannerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteBannerCountAggregateOutputType> | number
         }
       }
     }
@@ -2782,6 +2857,19 @@ export const WatchPointConfigScalarFieldEnum = {
 export type WatchPointConfigScalarFieldEnum = (typeof WatchPointConfigScalarFieldEnum)[keyof typeof WatchPointConfigScalarFieldEnum]
 
 
+export const SiteBannerScalarFieldEnum = {
+  id: 'id',
+  announcement: 'announcement',
+  banner: 'banner',
+  promotion: 'promotion',
+  updatedById: 'updatedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SiteBannerScalarFieldEnum = (typeof SiteBannerScalarFieldEnum)[keyof typeof SiteBannerScalarFieldEnum]
+
+
 export const KickChatActivityScalarFieldEnum = {
   id: 'id',
   messageId: 'messageId',
@@ -2940,6 +3028,8 @@ export const TournamentScalarFieldEnum = {
   status: 'status',
   active: 'active',
   sortOrder: 'sortOrder',
+  challongeId: 'challongeId',
+  challongeUrl: 'challongeUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3372,6 +3462,7 @@ export type GlobalOmitConfig = {
   challengeProgress?: Prisma.ChallengeProgressOmit
   watchSession?: Prisma.WatchSessionOmit
   watchPointConfig?: Prisma.WatchPointConfigOmit
+  siteBanner?: Prisma.SiteBannerOmit
   kickChatActivity?: Prisma.KickChatActivityOmit
   kickStreamStatus?: Prisma.KickStreamStatusOmit
   raffleRound?: Prisma.RaffleRoundOmit

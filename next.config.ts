@@ -8,7 +8,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self' https://id.kick.com https://api.kick.com https://discord.com https://cdn.discordapp.com",
-  "frame-src https://player.kick.com",
+  "frame-src https://player.kick.com https://challonge.com https://*.challonge.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

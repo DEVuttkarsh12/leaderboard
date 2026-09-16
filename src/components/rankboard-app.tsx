@@ -439,9 +439,68 @@ export default function RankBoardApp({
       <SiteEntryLoader />
       <div className="top-chrome">
         <Header account={account} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />
+        <SiteBanner />
       </div>
       {route === "" ? <Home account={account} setAccount={setAccount} /> : route === "leaderboard" ? <Leaderboard countdownTarget={countdownTarget} /> : route === "privacy" || route === "terms" ? <Legal type={route} /> : route === "profile" ? <Profile account={account} /> : <FeaturePage route={route} data={pageData[route] ?? pageData.help} />}
       <Footer />
+    </div>
+  );
+}
+
+type SiteBannerPayload = {
+  announcement: string;
+  banner: string;
+  promotion: string;
+};
+
+function SiteBanner() {
+  const [banner, setBanner] = useState<SiteBannerPayload | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function refreshBanner() {
+      try {
+        const response = await fetch("/api/site/banners", { cache: "no-store" });
+        const payload = (await response.json()) as { banner?: SiteBannerPayload; error?: string };
+        if (!active) return;
+        if (response.ok && payload.banner) setBanner(payload.banner);
+      } catch {
+        // Keep showing the last known banner on transient errors.
+      }
+    }
+
+    void refreshBanner();
+    const timer = window.setInterval(refreshBanner, 120000);
+    const onFocus = () => { void refreshBanner(); };
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, []);
+
+  const items = banner
+    ? ([
+        ["announcement", banner.announcement],
+        ["banner", banner.banner],
+        ["promotion", banner.promotion],
+      ] as const).filter(([, value]) => value.trim().length > 0)
+    : [];
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="site-banner-strip" role="status">
+      <div className="site-banner-strip__track">
+        {items.map(([kind, value]) => (
+          <span className={`site-banner-strip__item site-banner-strip__item--${kind}`} key={kind}>
+            {value}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

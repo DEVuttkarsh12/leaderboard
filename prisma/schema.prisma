@@ -312,6 +312,16 @@ model WatchPointConfig {
   updatedAt         DateTime @updatedAt
 }
 
+model SiteBanner {
+  id           String   @id @default("default")
+  announcement String   @default("")
+  banner       String   @default("")
+  promotion    String   @default("")
+  updatedById  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model KickChatActivity {
   id          String   @id @default(cuid())
   messageId   String   @unique
@@ -530,6 +540,8 @@ model Tournament {
   status    TournamentStatus @default(OPEN)
   active    Boolean          @default(true)
   sortOrder Int              @default(0)
+  challongeId  String?
+  challongeUrl String?
 
   entries TournamentEntry[]
   matches TournamentMatch[]

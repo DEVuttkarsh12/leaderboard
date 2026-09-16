@@ -322,8 +322,49 @@ export async function ingestKickWebhook(headers: Headers, rawBody: string) {
   return { ok: true, ignored: false };
 }
 
-export async function adminSubscribeKickEvents(sessionToken: string | undefined) {
-  const admin = await requireAdminUser(sessionToken);
+type KickSubscriptionAdmin = {
+  id: string;
+  email: string | null;
+  kickUsername: string | null;
+  kickId: string | null;
+};
+
+type KickEventSubscriptionResult = {
+  event: string;
+  ok: boolean;
+  status: number;
+  body: string;
+};
+
+async function listSubscribedEventNames(accessToken: string, broadcasterUserId: string | null) {
+  const subscribed = new Set<string>();
+
+  try {
+    const url = new URL(KICK_EVENTS_SUBSCRIPTIONS_URL);
+    if (broadcasterUserId) {
+      url.searchParams.set("broadcaster_user_id", broadcasterUserId);
+    }
+
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok) return subscribed;
+
+    const payload = (await response.json()) as { data?: Array<{ event?: string }> };
+    for (const item of payload.data ?? []) {
+      if (item.event) subscribed.add(item.event);
+    }
+  } catch {
+    // If listing fails we fall through and attempt the subscription.
+  }
+
+  return subscribed;
+}
+
+async function subscribeKickEventsForAdmin(
+  admin: KickSubscriptionAdmin
+): Promise<KickEventSubscriptionResult[]> {
   const webhookUrl = process.env.KICK_WEBHOOK_URL?.trim();
 
   if (!webhookUrl) {
@@ -354,9 +395,16 @@ export async function adminSubscribeKickEvents(sessionToken: string | undefined)
 
     throw error;
   }
-  const results = [];
+
+  const alreadySubscribed = await listSubscribedEventNames(accessToken, admin.kickId);
+  const results: KickEventSubscriptionResult[] = [];
 
   for (const event of SUPPORTED_EVENTS) {
+    if (alreadySubscribed.has(event)) {
+      results.push({ event, ok: true, status: 200, body: "Already subscribed" });
+      continue;
+    }
+
     const response = await fetch(KICK_EVENTS_SUBSCRIPTIONS_URL, {
       method: "POST",
       headers: {
@@ -381,39 +429,25 @@ export async function adminSubscribeKickEvents(sessionToken: string | undefined)
   return results;
 }
 
-export async function getAdminKickStream(sessionToken: string | undefined) {
-  await requireAdminUser(sessionToken);
-  return getPublicKickStream();
+export async function adminSubscribeKickEvents(sessionToken: string | undefined) {
+  const admin = await requireAdminUser(sessionToken);
+  return subscribeKickEventsForAdmin(admin);
 }
 
-export async function setAdminKickStream(
-  sessionToken: string | undefined,
-  isLive: boolean
-) {
-  const admin = await requireAdminUser(sessionToken);
-  const channelSlug = configuredWatchChannelSlug();
-  const now = new Date();
-  const current = await prisma.kickStreamStatus.findUnique({ where: { channelSlug } });
-  const stream = await prisma.kickStreamStatus.upsert({
-    where: { channelSlug },
-    create: {
-      channelSlug,
-      broadcasterKickId: admin.kickId,
-      broadcasterUsername: admin.kickUsername ?? channelSlug,
-      isLive,
-      startedAt: isLive ? now : null,
-      endedAt: isLive ? null : now,
-      lastEventAt: now,
-    },
-    update: {
-      broadcasterKickId: admin.kickId ?? undefined,
-      broadcasterUsername: admin.kickUsername ?? undefined,
-      isLive,
-      startedAt: isLive ? current?.startedAt ?? now : current?.startedAt ?? null,
-      endedAt: isLive ? null : now,
-      lastEventAt: now,
-    },
+export async function ensureKickEventSubscriptionsForUser(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, kickUsername: true, kickId: true, role: true },
   });
 
-  return adminStreamPayload(stream);
+  if (!user || user.role !== "ADMIN" || !user.kickId) {
+    return null;
+  }
+
+  const results = await subscribeKickEventsForAdmin(user);
+  return {
+    total: results.length,
+    failed: results.filter((result) => !result.ok).length,
+    alreadySubscribed: results.filter((result) => result.body === "Already subscribed").length,
+  };
 }

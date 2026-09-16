@@ -46,6 +46,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import type { AuthAccountPayload } from "@/lib/auth/account";
+import { challongeEmbedUrl } from "@/lib/challonge";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
 import LiquidGlass from "./liquid-glass";
@@ -115,23 +116,6 @@ type WatchSummary = {
   points: number;
 };
 
-type WatchPointConfig = {
-  pointsPerInterval: number;
-  intervalSeconds: number;
-  dailyBonus: number;
-  updatedAt: string;
-};
-
-type AdminKickStream = {
-  channelSlug: string;
-  isLive: boolean;
-  startedAt: string | null;
-  endedAt: string | null;
-  lastEventAt: string | null;
-  checkedAt: string | null;
-  source: "kick_api" | "webhook";
-};
-
 type RafflePayload = {
   round: {
     id: string;
@@ -173,6 +157,8 @@ type ApiTournament = {
   active: boolean;
   entrants: string[];
   matches: ApiTournamentMatch[];
+  challongeId: string | null;
+  challongeUrl: string | null;
   updatedAt: string;
 };
 
@@ -249,15 +235,6 @@ const adminChallengeCadences: { value: AdminChallengeCadence; label: string }[] 
   { value: "SEASONAL", label: "Seasonal" },
 ];
 
-type SiteConfig = {
-  announcement: string;
-  banner: string;
-  promotion: string;
-  prizePool: number;
-  leaderboardMode: "Weekly" | "Bi-weekly" | "Monthly";
-  leaderboardStatus: "Live" | "Ended";
-};
-
 const defaultAccount: Account = {
   handle: "@guest",
   image: "",
@@ -280,15 +257,6 @@ const defaultAccount: Account = {
   banned: false,
   timeoutUntil: "",
   badges: [],
-};
-
-const defaultSiteConfig: SiteConfig = {
-  announcement: "Double watch points live",
-  banner: "Season 08 prize sprint",
-  promotion: "VIP role restocked",
-  prizePool: 40000,
-  leaderboardMode: "Weekly",
-  leaderboardStatus: "Live",
 };
 
 const faq = [
@@ -690,6 +658,7 @@ function TournamentsWorkspace() {
   const [message, setMessage] = useState("Loading tournaments...");
   const tournament = tournamentList.find((item) => item.id === selected) ?? tournamentList[0] ?? null;
   const registrations = tournamentList.filter((item) => item.joined).length;
+  const bracketEmbedUrl = tournament ? challongeEmbedUrl(tournament.challongeUrl) : null;
 
   const loadTournaments = useCallback(async (announce = false) => {
     try {
@@ -766,7 +735,19 @@ function TournamentsWorkspace() {
               {tournament.joined ? "Withdraw" : tournament.status === "Open" ? "Enter" : tournament.status}
             </button>
           </div>
-          {tournament.matches.length ? (
+          {bracketEmbedUrl ? (
+            <div className="tournament-embed">
+              <iframe
+                src={bracketEmbedUrl}
+                title={`${tournament.title} bracket`}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+              />
+              <a className="tournament-embed__link" href={tournament.challongeUrl ?? "#"} target="_blank" rel="noreferrer">
+                Open on Challonge <span>↗</span>
+              </a>
+            </div>
+          ) : tournament.matches.length ? (
             <TournamentBracket tournament={tournament} />
           ) : (
             <div className="tournament-empty"><Trophy size={24} aria-hidden="true" /><strong>Bracket preparing</strong><span>Admin seeds will appear here live.</span></div>
@@ -1607,7 +1588,10 @@ function AdminWorkspace({
   const [items, setItems] = useState<ApiStoreItem[]>([]);
   const [purchases, setPurchases] = useState<AdminApiPurchase[]>([]);
   const [markets, setMarkets] = useState<BetMarket[]>([]);
-  const [siteConfig, setSiteConfig] = useStoredState<SiteConfig>("rankboard-site-config", defaultSiteConfig);
+  const [siteBannerInputs, setSiteBannerInputs] = useState({ announcement: "", banner: "", promotion: "" });
+  const [siteBannerLoaded, setSiteBannerLoaded] = useState({ announcement: "", banner: "", promotion: "" });
+  const [siteBannerBusy, setSiteBannerBusy] = useState(false);
+  const [siteBannerStatus, setSiteBannerStatus] = useState("");
   const [newItem, setNewItem] = useState({
     title: "",
     description: "",
@@ -1632,6 +1616,10 @@ function AdminWorkspace({
   const [selectedTournamentId, setSelectedTournamentId] = useState("");
   const [adminTournamentStatus, setAdminTournamentStatus] = useState("Loading tournaments");
   const [bracketParticipants, setBracketParticipants] = useState("");
+  const [challongeLinkInput, setChallongeLinkInput] = useState("");
+  const [challongeCreateName, setChallongeCreateName] = useState("");
+  const [challongeStatus, setChallongeStatus] = useState("");
+  const [challongeBusy, setChallongeBusy] = useState(false);
   const [newTournament, setNewTournament] = useState({
     title: "",
     starts: "",
@@ -1654,14 +1642,6 @@ function AdminWorkspace({
   const [supportStatus, setSupportStatus] = useState("Loading support");
   const [adminRaffle, setAdminRaffle] = useState<RafflePayload | null>(null);
   const [adminRaffleStatus, setAdminRaffleStatus] = useState("Loading raffle");
-  const [kickEventStatus, setKickEventStatus] = useState("Idle");
-  const [kickStream, setKickStream] = useState<AdminKickStream | null>(null);
-  const [kickStreamBusy, setKickStreamBusy] = useState(false);
-  const [watchConfig, setWatchConfig] = useState<WatchPointConfig | null>(null);
-  const [watchPointsInput, setWatchPointsInput] = useState("50");
-  const [watchMinutesInput, setWatchMinutesInput] = useState("1");
-  const [watchBonusInput, setWatchBonusInput] = useState("0");
-  const [watchConfigBusy, setWatchConfigBusy] = useState(false);
   const isAdmin = isAdminAccount(account);
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
@@ -1717,60 +1697,6 @@ function AdminWorkspace({
 
   useEffect(() => {
     if (!isAdmin) return;
-    let active = true;
-
-    fetch("/api/admin/watch-points/config", { cache: "no-store" })
-      .then((response) => response.json().then((payload) => ({ response, payload })))
-      .then(({ response, payload }: { response: Response; payload: { config?: WatchPointConfig; error?: string } }) => {
-        if (!active) return;
-        if (!response.ok || !payload.config) {
-          throw new Error(payload.error ?? "Could not load watch settings");
-        }
-        setWatchConfig(payload.config);
-        setWatchPointsInput(String(payload.config.pointsPerInterval));
-        setWatchMinutesInput(String(payload.config.intervalSeconds / 60));
-        setWatchBonusInput(String(payload.config.dailyBonus));
-      })
-      .catch((error) => {
-        if (active) {
-          setKickEventStatus(error instanceof Error ? error.message : "Could not load watch settings");
-        }
-      });
-
-    return () => { active = false; };
-  }, [isAdmin]);
-
-  useEffect(() => {
-    if (!isAdmin) return;
-
-    let active = true;
-    async function refreshKickStream() {
-      try {
-        const response = await fetch("/api/admin/kick/stream", { cache: "no-store" });
-        const payload = (await response.json()) as { stream?: AdminKickStream; error?: string };
-        if (!active) return;
-        if (!response.ok || !payload.stream) {
-          throw new Error(payload.error ?? "Could not load Kick stream state");
-        }
-        setKickStream(payload.stream);
-      } catch (error) {
-        if (active) {
-          setKickEventStatus(error instanceof Error ? error.message : "Could not load Kick stream state");
-        }
-      }
-    }
-
-    void refreshKickStream();
-    const timer = window.setInterval(refreshKickStream, 15000);
-
-    return () => {
-      active = false;
-      window.clearInterval(timer);
-    };
-  }, [isAdmin]);
-
-  useEffect(() => {
-    if (!isAdmin) return;
 
     let active = true;
     fetch("/api/bets/markets", { cache: "no-store" })
@@ -1785,6 +1711,31 @@ function AdminWorkspace({
     return () => {
       active = false;
     };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    let active = true;
+    fetch("/api/admin/site/banners", { cache: "no-store" })
+      .then((response) => response.json().then((payload) => ({ response, payload })))
+      .then(({ response, payload }: { response: Response; payload: { banner?: { announcement: string; banner: string; promotion: string }; error?: string } }) => {
+        if (!active) return;
+        if (!response.ok || !payload.banner) {
+          throw new Error(payload.error ?? "Could not load site banner");
+        }
+        const next = { announcement: payload.banner.announcement, banner: payload.banner.banner, promotion: payload.banner.promotion };
+        setSiteBannerInputs(next);
+        setSiteBannerLoaded(next);
+        setSiteBannerStatus("Synced with site");
+      })
+      .catch((error) => {
+        if (active) {
+          setSiteBannerStatus(error instanceof Error ? error.message : "Could not load site banner");
+        }
+      });
+
+    return () => { active = false; };
   }, [isAdmin]);
 
   useEffect(() => {
@@ -2092,6 +2043,37 @@ function AdminWorkspace({
     }
   }
 
+  async function updateTournamentChallonge(action: "link" | "create" | "unlink") {
+    if (!selectedTournament) return;
+    setChallongeBusy(true);
+    setChallongeStatus(action === "link" ? "Linking bracket..." : action === "create" ? "Creating bracket..." : "Unlinking bracket...");
+    try {
+      const body =
+        action === "link"
+          ? { action, url: challongeLinkInput }
+          : action === "create"
+            ? { action, name: challongeCreateName }
+            : { action };
+      const response = await fetch(`/api/admin/tournaments/${selectedTournament.id}/challonge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const payload = (await response.json()) as { tournament?: ApiTournament; error?: string };
+      if (!response.ok || !payload.tournament) throw new Error(payload.error ?? "Challonge update failed");
+      replaceAdminTournament(payload.tournament);
+      setChallongeStatus(payload.tournament.challongeUrl ? `Linked ${payload.tournament.challongeUrl}` : "Challonge bracket detached");
+      if (action !== "unlink") {
+        setChallongeLinkInput("");
+        setChallongeCreateName("");
+      }
+    } catch (error) {
+      setChallongeStatus(error instanceof Error ? error.message : "Challonge update failed");
+    } finally {
+      setChallongeBusy(false);
+    }
+  }
+
   async function publishChallenge(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const slotName = newChallenge.slotName.trim();
@@ -2234,10 +2216,22 @@ function AdminWorkspace({
 
   async function updateSelectedUser(patch: Partial<Pick<AdminUser, "banned" | "bannedReason" | "role">> & { timeoutUntil?: string | null }) {
     if (!selectedAdminUser) return;
+    const userId = selectedAdminUser.id;
+    const previousUser = selectedAdminUser;
+    // Optimistic update so moderation actions feel instant; reverted on failure.
+    setAdminUsers((current) =>
+      current.map((user) => (user.id === userId ? {
+        ...user,
+        ...(patch.banned !== undefined ? { banned: patch.banned } : {}),
+        ...(patch.bannedReason !== undefined ? { bannedReason: patch.bannedReason } : {}),
+        ...(patch.role !== undefined ? { role: patch.role } : {}),
+        ...(patch.timeoutUntil !== undefined ? { timeoutUntil: patch.timeoutUntil ?? "" } : {}),
+      } : user))
+    );
     setAdminUserStatus("Updating user");
 
     try {
-      const response = await fetch(`/api/admin/users/${selectedAdminUser.id}`, {
+      const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -2259,6 +2253,9 @@ function AdminWorkspace({
       setSelectedAdminUserId(payload.user.id);
       setAdminUserStatus(`${payload.user.handle} updated`);
     } catch (error) {
+      setAdminUsers((current) =>
+        current.map((user) => (user.id === userId ? previousUser : user))
+      );
       setAdminUserStatus(error instanceof Error ? error.message : "User update failed");
     }
   }
@@ -2271,8 +2268,20 @@ function AdminWorkspace({
       return;
     }
 
-    setPointUpdateBusy(true);
+    const previousPoints = selectedAdminUser.points;
+    const optimisticPoints =
+      operation === "set" ? amount
+      : operation === "add" ? Math.min(2_000_000_000, previousPoints + amount)
+      : Math.max(0, previousPoints - amount);
+
+    setAdminUsers((current) => current.map((user) =>
+      user.id === selectedAdminUser.id ? { ...user, points: optimisticPoints } : user
+    ));
+    if (selectedAdminUser.handle === account.handle) {
+      setAccount((current) => ({ ...normalizeAccount(current), points: optimisticPoints }));
+    }
     setAdminUserStatus(`${operation === "set" ? "Setting" : operation === "add" ? "Adding" : "Deducting"} points`);
+    setPointUpdateBusy(true);
     try {
       const response = await fetch(`/api/admin/users/${selectedAdminUser.id}/points`, {
         method: "PATCH",
@@ -2292,6 +2301,12 @@ function AdminWorkspace({
       setAdminUserStatus(`${selectedAdminUser.handle}: ${payload.points.toLocaleString()} points`);
       setPointNote("");
     } catch (error) {
+      setAdminUsers((current) => current.map((user) =>
+        user.id === selectedAdminUser.id ? { ...user, points: previousPoints } : user
+      ));
+      if (selectedAdminUser.handle === account.handle) {
+        setAccount((current) => ({ ...normalizeAccount(current), points: previousPoints }));
+      }
       setAdminUserStatus(error instanceof Error ? error.message : "Point update failed");
     } finally {
       setPointUpdateBusy(false);
@@ -2396,87 +2411,39 @@ function AdminWorkspace({
     }
   }
 
-  async function subscribeKickEvents() {
-    setKickEventStatus("Subscribing Kick events...");
+  async function saveSiteBanner() {
+    const next = siteBannerInputs;
+    const previous = siteBannerLoaded;
+    setSiteBannerBusy(true);
+    setSiteBannerLoaded(next);
+    setSiteBannerStatus("Saving banner...");
 
     try {
-      const response = await fetch("/api/admin/kick/events/subscribe", { method: "POST" });
-      const payload = (await response.json()) as {
-        results?: { event: string; ok: boolean; status: number; body: string }[];
-        error?: string;
-      };
-      if (!response.ok || !payload.results) {
-        throw new Error(payload.error ?? "Kick subscription failed");
-      }
-      const failed = payload.results.filter((result) => !result.ok);
-      setKickEventStatus(
-        failed.length
-          ? `${failed.length} Kick event subscription(s) failed`
-          : "Kick chat/live events subscribed"
-      );
-    } catch (error) {
-      setKickEventStatus(error instanceof Error ? error.message : "Kick subscription failed");
-    }
-  }
-
-  async function setKickStreamLive(isLive: boolean) {
-    setKickStreamBusy(true);
-    setKickEventStatus(isLive ? "Opening watch earning..." : "Closing watch earning...");
-
-    try {
-      const response = await fetch("/api/admin/kick/stream", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isLive }),
-      });
-      const payload = (await response.json()) as { stream?: AdminKickStream; error?: string };
-      if (!response.ok || !payload.stream) {
-        throw new Error(payload.error ?? "Kick stream update failed");
-      }
-      setKickStream(payload.stream);
-      setKickEventStatus(isLive ? "Watch earning is live" : "Watch earning is closed");
-    } catch (error) {
-      setKickEventStatus(error instanceof Error ? error.message : "Kick stream update failed");
-    } finally {
-      setKickStreamBusy(false);
-    }
-  }
-
-  async function saveWatchConfig(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const pointsPerInterval = Number(watchPointsInput);
-    const intervalSeconds = Math.round(Number(watchMinutesInput) * 60);
-    const dailyBonus = Number(watchBonusInput);
-    if (
-      !Number.isInteger(pointsPerInterval) || pointsPerInterval < 0 || pointsPerInterval > 1_000_000 ||
-      !Number.isInteger(intervalSeconds) || intervalSeconds < 10 || intervalSeconds > 3_600 ||
-      !Number.isInteger(dailyBonus) || dailyBonus < 0 || dailyBonus > 1_000_000
-    ) {
-      setKickEventStatus("Use whole-number points, 0.17-60 minutes, and a valid bonus");
-      return;
-    }
-
-    setWatchConfigBusy(true);
-    setKickEventStatus("Saving watch rate...");
-    try {
-      const response = await fetch("/api/admin/watch-points/config", {
+      const response = await fetch("/api/admin/site/banners", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pointsPerInterval, intervalSeconds, dailyBonus }),
+        body: JSON.stringify(next),
       });
-      const payload = (await response.json()) as { config?: WatchPointConfig; error?: string };
-      if (!response.ok || !payload.config) {
-        throw new Error(payload.error ?? "Watch settings could not be saved");
+      const payload = (await response.json()) as {
+        banner?: { announcement: string; banner: string; promotion: string };
+        error?: string;
+      };
+      if (!response.ok || !payload.banner) {
+        throw new Error(payload.error ?? "Site banner could not be saved");
       }
-      setWatchConfig(payload.config);
-      setWatchPointsInput(String(payload.config.pointsPerInterval));
-      setWatchMinutesInput(String(payload.config.intervalSeconds / 60));
-      setWatchBonusInput(String(payload.config.dailyBonus));
-      setKickEventStatus(`Saved ${payload.config.pointsPerInterval} points every ${payload.config.intervalSeconds / 60} minute(s)`);
+      const saved = {
+        announcement: payload.banner.announcement,
+        banner: payload.banner.banner,
+        promotion: payload.banner.promotion,
+      };
+      setSiteBannerInputs(saved);
+      setSiteBannerLoaded(saved);
+      setSiteBannerStatus("Live on site");
     } catch (error) {
-      setKickEventStatus(error instanceof Error ? error.message : "Watch settings could not be saved");
+      setSiteBannerLoaded(previous);
+      setSiteBannerStatus(error instanceof Error ? error.message : "Site banner could not be saved");
     } finally {
-      setWatchConfigBusy(false);
+      setSiteBannerBusy(false);
     }
   }
 
@@ -2542,52 +2509,21 @@ function AdminWorkspace({
         </div>
       </LiquidGlass>
       <div className="admin-grid">
-        <LiquidGlass as="article" className="admin-panel" tone="success">
-          <small>LEADERBOARD</small>
-          <h3>{siteConfig.leaderboardMode}</h3>
-          <StatusGrid items={[["Status", siteConfig.leaderboardStatus], ["Prize", formatNumberCompact(siteConfig.prizePool)], ["Winners", "Top 3"], ["Reset", "Ready"]]} />
-          <div className="button-row">
-            {(["Weekly", "Bi-weekly", "Monthly"] as SiteConfig["leaderboardMode"][]).map((mode) => <button className="button ghost" key={mode} type="button" onClick={() => setSiteConfig((current) => ({ ...current, leaderboardMode: mode }))}>{mode}<span>↗</span></button>)}
-            <button className="button primary" type="button" onClick={() => setSiteConfig((current) => ({ ...current, leaderboardStatus: current.leaderboardStatus === "Live" ? "Ended" : "Live" }))}>{siteConfig.leaderboardStatus === "Live" ? "End" : "Start"} <span>●</span></button>
-          </div>
-        </LiquidGlass>
         <LiquidGlass as="article" className="admin-panel" tone="violet">
           <small>WEBSITE</small>
           <h3>Banners</h3>
-          <label>Announcement<input value={siteConfig.announcement} onChange={(event) => setSiteConfig((current) => ({ ...current, announcement: event.target.value }))} /></label>
-          <label>Banner<input value={siteConfig.banner} onChange={(event) => setSiteConfig((current) => ({ ...current, banner: event.target.value }))} /></label>
-          <label>Promo<input value={siteConfig.promotion} onChange={(event) => setSiteConfig((current) => ({ ...current, promotion: event.target.value }))} /></label>
+          <label>Announcement<input maxLength={200} value={siteBannerInputs.announcement} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, announcement: event.target.value }))} /></label>
+          <label>Banner<input maxLength={200} value={siteBannerInputs.banner} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, banner: event.target.value }))} /></label>
+          <label>Promo<input maxLength={200} value={siteBannerInputs.promotion} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, promotion: event.target.value }))} /></label>
+          <div className="button-row">
+            <button className="button primary" type="button" onClick={saveSiteBanner} disabled={siteBannerBusy}>{siteBannerBusy ? "Saving" : "Save banners"} <span>↗</span></button>
+          </div>
+          <p className="admin-helper-text">{siteBannerStatus || "Publishes to the site ticker"}</p>
         </LiquidGlass>
         <LiquidGlass as="article" className="admin-panel" tone="cyan">
           <small>DATA PIPELINE</small>
           <h3>Infra</h3>
           <StatusGrid items={[["API", "Live"], ["Cache", "No-store"], ["DB", "Ready"], ["Backend", "Route live"]]} />
-        </LiquidGlass>
-        <LiquidGlass as="article" className="admin-panel" tone="success">
-          <small>KICK EVENTS</small>
-          <h3>Watch verification</h3>
-          <div className={`admin-kick-monitor${kickStream?.isLive ? " is-live" : ""}`}>
-            <span><Radio size={21} strokeWidth={2.6} aria-hidden="true" /></span>
-            <div>
-              <small>{kickStream?.channelSlug ? `@${kickStream.channelSlug}` : "Kick channel"}</small>
-              <strong>{kickStream?.isLive ? "Stream is live" : "Stream is offline"}</strong>
-            </div>
-            <time>{kickStream?.checkedAt || kickStream?.lastEventAt ? `Checked ${new Date(kickStream.checkedAt ?? kickStream.lastEventAt ?? "").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Waiting for Kick"}</time>
-          </div>
-          <StatusGrid items={[["Mode", kickStream?.source === "kick_api" ? "Kick API" : "Webhook"], ["Signal", kickStream?.isLive ? "Live" : "Offline"], ["Rate", watchConfig ? `${watchConfig.pointsPerInterval} / ${watchConfig.intervalSeconds / 60}m` : "Loading"]]} />
-          <form className="admin-watch-config" onSubmit={saveWatchConfig}>
-            <label>POINTS<input type="number" min="0" max="1000000" step="1" inputMode="numeric" value={watchPointsInput} onChange={(event) => setWatchPointsInput(event.target.value)} /></label>
-            <label>EVERY (MINUTES)<input type="number" min="0.17" max="60" step="0.01" inputMode="decimal" value={watchMinutesInput} onChange={(event) => setWatchMinutesInput(event.target.value)} /></label>
-            <label>DAILY BONUS<input type="number" min="0" max="1000000" step="1" inputMode="numeric" value={watchBonusInput} onChange={(event) => setWatchBonusInput(event.target.value)} /></label>
-            <button className="button primary" type="submit" disabled={watchConfigBusy}>{watchConfigBusy ? "Saving" : "Save rate"}</button>
-          </form>
-          <div className="button-row">
-            <button className="button primary" type="button" onClick={subscribeKickEvents}>Subscribe events <span>↗</span></button>
-            <button className={kickStream?.isLive ? "button ghost" : "button primary"} type="button" onClick={() => setKickStreamLive(!kickStream?.isLive)} disabled={kickStreamBusy}>
-              {kickStreamBusy ? "Updating" : kickStream?.isLive ? "End live" : "Go live"} <span>●</span>
-            </button>
-          </div>
-          <p className="admin-helper-text">{kickEventStatus}</p>
         </LiquidGlass>
       </div>
       <div className="admin-section-title">
@@ -2632,6 +2568,27 @@ function AdminWorkspace({
           <div className="admin-bracket-seeds">
             <label>BRACKET SEEDS<textarea value={bracketParticipants} onChange={(event) => setBracketParticipants(event.target.value)} placeholder="Leave blank to use registered players" /></label>
             <button className="button primary" type="button" onClick={generateAdminBracket}>Generate bracket <span>↗</span></button>
+          </div>
+          <div className="admin-challonge">
+            <div className="admin-challonge__head">
+              <small>CHALLONGE</small>
+              <strong>{selectedTournament.challongeUrl ? "Bracket linked" : "Not linked"}</strong>
+            </div>
+            {selectedTournament.challongeUrl ? (
+              <p className="admin-note"><a href={selectedTournament.challongeUrl} target="_blank" rel="noreferrer">{selectedTournament.challongeUrl}</a></p>
+            ) : null}
+            <div className="admin-challonge__row">
+              <input value={challongeLinkInput} onChange={(event) => setChallongeLinkInput(event.target.value)} placeholder="challonge.com/your-bracket" />
+              <button className="button ghost" type="button" onClick={() => updateTournamentChallonge("link")} disabled={challongeBusy || !challongeLinkInput.trim()}>Link existing</button>
+            </div>
+            <div className="admin-challonge__row">
+              <input value={challongeCreateName} onChange={(event) => setChallongeCreateName(event.target.value)} placeholder={selectedTournament.title} />
+              <button className="button primary" type="button" onClick={() => updateTournamentChallonge("create")} disabled={challongeBusy}>Create on Challonge <span>↗</span></button>
+            </div>
+            {selectedTournament.challongeUrl ? (
+              <button className="button ghost" type="button" onClick={() => updateTournamentChallonge("unlink")} disabled={challongeBusy}>Detach bracket</button>
+            ) : null}
+            <p className="admin-helper-text">{challongeStatus || "Embedded live via iframe"}</p>
           </div>
           {selectedTournament.matches.length ? <TournamentBracket tournament={selectedTournament} onUpdate={updateAdminMatch} /> : <p className="admin-note">Add seed names or use registered players, then generate the bracket.</p>}
         </LiquidGlass>

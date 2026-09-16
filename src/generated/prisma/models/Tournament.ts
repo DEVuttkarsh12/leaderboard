@@ -49,6 +49,8 @@ export type TournamentMinAggregateOutputType = {
   status: $Enums.TournamentStatus | null
   active: boolean | null
   sortOrder: number | null
+  challongeId: string | null
+  challongeUrl: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,6 +66,8 @@ export type TournamentMaxAggregateOutputType = {
   status: $Enums.TournamentStatus | null
   active: boolean | null
   sortOrder: number | null
+  challongeId: string | null
+  challongeUrl: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -79,6 +83,8 @@ export type TournamentCountAggregateOutputType = {
   status: number
   active: number
   sortOrder: number
+  challongeId: number
+  challongeUrl: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -108,6 +114,8 @@ export type TournamentMinAggregateInputType = {
   status?: true
   active?: true
   sortOrder?: true
+  challongeId?: true
+  challongeUrl?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -123,6 +131,8 @@ export type TournamentMaxAggregateInputType = {
   status?: true
   active?: true
   sortOrder?: true
+  challongeId?: true
+  challongeUrl?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -138,6 +148,8 @@ export type TournamentCountAggregateInputType = {
   status?: true
   active?: true
   sortOrder?: true
+  challongeId?: true
+  challongeUrl?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -240,6 +252,8 @@ export type TournamentGroupByOutputType = {
   status: $Enums.TournamentStatus
   active: boolean
   sortOrder: number
+  challongeId: string | null
+  challongeUrl: string | null
   createdAt: Date
   updatedAt: Date
   _count: TournamentCountAggregateOutputType | null
@@ -278,6 +292,8 @@ export type TournamentWhereInput = {
   status?: Prisma.EnumTournamentStatusFilter<"Tournament"> | $Enums.TournamentStatus
   active?: Prisma.BoolFilter<"Tournament"> | boolean
   sortOrder?: Prisma.IntFilter<"Tournament"> | number
+  challongeId?: Prisma.StringNullableFilter<"Tournament"> | string | null
+  challongeUrl?: Prisma.StringNullableFilter<"Tournament"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Tournament"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tournament"> | Date | string
   entries?: Prisma.TournamentEntryListRelationFilter
@@ -295,6 +311,8 @@ export type TournamentOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   active?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  challongeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  challongeUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   entries?: Prisma.TournamentEntryOrderByRelationAggregateInput
@@ -315,6 +333,8 @@ export type TournamentWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumTournamentStatusFilter<"Tournament"> | $Enums.TournamentStatus
   active?: Prisma.BoolFilter<"Tournament"> | boolean
   sortOrder?: Prisma.IntFilter<"Tournament"> | number
+  challongeId?: Prisma.StringNullableFilter<"Tournament"> | string | null
+  challongeUrl?: Prisma.StringNullableFilter<"Tournament"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Tournament"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Tournament"> | Date | string
   entries?: Prisma.TournamentEntryListRelationFilter
@@ -332,6 +352,8 @@ export type TournamentOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   active?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  challongeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  challongeUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.TournamentCountOrderByAggregateInput
@@ -355,6 +377,8 @@ export type TournamentScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumTournamentStatusWithAggregatesFilter<"Tournament"> | $Enums.TournamentStatus
   active?: Prisma.BoolWithAggregatesFilter<"Tournament"> | boolean
   sortOrder?: Prisma.IntWithAggregatesFilter<"Tournament"> | number
+  challongeId?: Prisma.StringNullableWithAggregatesFilter<"Tournament"> | string | null
+  challongeUrl?: Prisma.StringNullableWithAggregatesFilter<"Tournament"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Tournament"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Tournament"> | Date | string
 }
@@ -370,6 +394,8 @@ export type TournamentCreateInput = {
   status?: $Enums.TournamentStatus
   active?: boolean
   sortOrder?: number
+  challongeId?: string | null
+  challongeUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   entries?: Prisma.TournamentEntryCreateNestedManyWithoutTournamentInput
@@ -387,6 +413,8 @@ export type TournamentUncheckedCreateInput = {
   status?: $Enums.TournamentStatus
   active?: boolean
   sortOrder?: number
+  challongeId?: string | null
+  challongeUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   entries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutTournamentInput
@@ -404,6 +432,8 @@ export type TournamentUpdateInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.TournamentEntryUpdateManyWithoutTournamentNestedInput
@@ -421,6 +451,8 @@ export type TournamentUncheckedUpdateInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutTournamentNestedInput
@@ -438,6 +470,8 @@ export type TournamentCreateManyInput = {
   status?: $Enums.TournamentStatus
   active?: boolean
   sortOrder?: number
+  challongeId?: string | null
+  challongeUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -453,6 +487,8 @@ export type TournamentUpdateManyMutationInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -468,6 +504,8 @@ export type TournamentUncheckedUpdateManyInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -483,6 +521,8 @@ export type TournamentCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   active?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  challongeId?: Prisma.SortOrder
+  challongeUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -504,6 +544,8 @@ export type TournamentMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   active?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  challongeId?: Prisma.SortOrder
+  challongeUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -519,6 +561,8 @@ export type TournamentMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   active?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  challongeId?: Prisma.SortOrder
+  challongeUrl?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -577,6 +621,8 @@ export type TournamentCreateWithoutMatchesInput = {
   status?: $Enums.TournamentStatus
   active?: boolean
   sortOrder?: number
+  challongeId?: string | null
+  challongeUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   entries?: Prisma.TournamentEntryCreateNestedManyWithoutTournamentInput
@@ -593,6 +639,8 @@ export type TournamentUncheckedCreateWithoutMatchesInput = {
   status?: $Enums.TournamentStatus
   active?: boolean
   sortOrder?: number
+  challongeId?: string | null
+  challongeUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   entries?: Prisma.TournamentEntryUncheckedCreateNestedManyWithoutTournamentInput
@@ -625,6 +673,8 @@ export type TournamentUpdateWithoutMatchesInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.TournamentEntryUpdateManyWithoutTournamentNestedInput
@@ -641,6 +691,8 @@ export type TournamentUncheckedUpdateWithoutMatchesInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   entries?: Prisma.TournamentEntryUncheckedUpdateManyWithoutTournamentNestedInput
@@ -657,6 +709,8 @@ export type TournamentCreateWithoutEntriesInput = {
   status?: $Enums.TournamentStatus
   active?: boolean
   sortOrder?: number
+  challongeId?: string | null
+  challongeUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   matches?: Prisma.TournamentMatchCreateNestedManyWithoutTournamentInput
@@ -673,6 +727,8 @@ export type TournamentUncheckedCreateWithoutEntriesInput = {
   status?: $Enums.TournamentStatus
   active?: boolean
   sortOrder?: number
+  challongeId?: string | null
+  challongeUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   matches?: Prisma.TournamentMatchUncheckedCreateNestedManyWithoutTournamentInput
@@ -705,6 +761,8 @@ export type TournamentUpdateWithoutEntriesInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   matches?: Prisma.TournamentMatchUpdateManyWithoutTournamentNestedInput
@@ -721,6 +779,8 @@ export type TournamentUncheckedUpdateWithoutEntriesInput = {
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  challongeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challongeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   matches?: Prisma.TournamentMatchUncheckedUpdateManyWithoutTournamentNestedInput
@@ -777,6 +837,8 @@ export type TournamentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   status?: boolean
   active?: boolean
   sortOrder?: boolean
+  challongeId?: boolean
+  challongeUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   entries?: boolean | Prisma.Tournament$entriesArgs<ExtArgs>
@@ -795,6 +857,8 @@ export type TournamentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   status?: boolean
   active?: boolean
   sortOrder?: boolean
+  challongeId?: boolean
+  challongeUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["tournament"]>
@@ -810,6 +874,8 @@ export type TournamentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   status?: boolean
   active?: boolean
   sortOrder?: boolean
+  challongeId?: boolean
+  challongeUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["tournament"]>
@@ -825,11 +891,13 @@ export type TournamentSelectScalar = {
   status?: boolean
   active?: boolean
   sortOrder?: boolean
+  challongeId?: boolean
+  challongeUrl?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "title" | "starts" | "prize" | "seats" | "taken" | "status" | "active" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
+export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "title" | "starts" | "prize" | "seats" | "taken" | "status" | "active" | "sortOrder" | "challongeId" | "challongeUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
 export type TournamentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   entries?: boolean | Prisma.Tournament$entriesArgs<ExtArgs>
   matches?: boolean | Prisma.Tournament$matchesArgs<ExtArgs>
@@ -855,6 +923,8 @@ export type $TournamentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     status: $Enums.TournamentStatus
     active: boolean
     sortOrder: number
+    challongeId: string | null
+    challongeUrl: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["tournament"]>
@@ -1292,6 +1362,8 @@ export interface TournamentFieldRefs {
   readonly status: Prisma.FieldRef<"Tournament", 'TournamentStatus'>
   readonly active: Prisma.FieldRef<"Tournament", 'Boolean'>
   readonly sortOrder: Prisma.FieldRef<"Tournament", 'Int'>
+  readonly challongeId: Prisma.FieldRef<"Tournament", 'String'>
+  readonly challongeUrl: Prisma.FieldRef<"Tournament", 'String'>
   readonly createdAt: Prisma.FieldRef<"Tournament", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Tournament", 'DateTime'>
 }

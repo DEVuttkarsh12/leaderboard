@@ -65,6 +65,7 @@ export const ModelName = {
   ChallengeProgress: 'ChallengeProgress',
   WatchSession: 'WatchSession',
   WatchPointConfig: 'WatchPointConfig',
+  SiteBanner: 'SiteBanner',
   KickChatActivity: 'KickChatActivity',
   KickStreamStatus: 'KickStreamStatus',
   RaffleRound: 'RaffleRound',
@@ -324,6 +325,19 @@ export const WatchPointConfigScalarFieldEnum = {
 export type WatchPointConfigScalarFieldEnum = (typeof WatchPointConfigScalarFieldEnum)[keyof typeof WatchPointConfigScalarFieldEnum]
 
 
+export const SiteBannerScalarFieldEnum = {
+  id: 'id',
+  announcement: 'announcement',
+  banner: 'banner',
+  promotion: 'promotion',
+  updatedById: 'updatedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SiteBannerScalarFieldEnum = (typeof SiteBannerScalarFieldEnum)[keyof typeof SiteBannerScalarFieldEnum]
+
+
 export const KickChatActivityScalarFieldEnum = {
   id: 'id',
   messageId: 'messageId',
@@ -482,6 +496,8 @@ export const TournamentScalarFieldEnum = {
   status: 'status',
   active: 'active',
   sortOrder: 'sortOrder',
+  challongeId: 'challongeId',
+  challongeUrl: 'challongeUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

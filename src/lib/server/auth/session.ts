@@ -982,8 +982,19 @@ export async function createKickUserSession(
     },
   });
 
-  await reconcileConfiguredAdminRoleById(user.id);
-  return createSessionForUser(user.id);
+  const reconciled = await reconcileConfiguredAdminRoleById(user.id);
+  const sessionToken = await createSessionForUser(user.id);
+
+  if (reconciled?.role === "ADMIN") {
+    try {
+      const { ensureKickEventSubscriptionsForUser } = await import("@/lib/server/kick/events");
+      await ensureKickEventSubscriptionsForUser(user.id);
+    } catch {
+      // Kick event subscriptions are best-effort and must never block login.
+    }
+  }
+
+  return sessionToken;
 }
 
 export async function deleteUserSession(sessionToken: string | undefined) {
