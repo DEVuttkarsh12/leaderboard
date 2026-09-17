@@ -2755,3 +2755,171 @@ textarea:focus {
     height: 62vh;
   }
 }
+
+/* Leaderboard season panel — cleaner reward-pool progress + premium countdown. */
+.leaderboard-progress {
+  gap: clamp(18px, 2.4vw, 26px);
+}
+
+.leaderboard-progress .progress-main {
+  min-width: 0;
+}
+
+.progress-head {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: clamp(12px, 2vw, 18px);
+  align-items: baseline;
+}
+
+.progress-kicker {
+  min-width: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-kicker b {
+  color: var(--gold-bright);
+  font-weight: 950;
+}
+
+.progress-head > strong {
+  color: #fff8ed;
+  font-family: var(--font-label);
+  font-size: clamp(20px, 2.4vw, 24px);
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.progress-head > em {
+  align-self: center;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 50%),
+    linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: #100c04;
+  padding: 8px 13px;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 24px rgba(255, 122, 0, 0.32);
+}
+
+.progress-bar {
+  position: relative;
+  height: 9px;
+}
+
+.progress-bar i {
+  position: relative;
+  animation: artz-progress-shimmer 3.2s ease-in-out infinite;
+}
+
+@keyframes artz-progress-shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.86; }
+}
+
+.season-clock {
+  padding: 18px;
+  border-radius: 20px 13px 19px 13px;
+}
+
+.season-clock__head {
+  position: relative;
+}
+
+.season-clock__head > span {
+  gap: 8px;
+  color: rgba(255, 247, 237, 0.84);
+}
+
+.season-clock__head > span svg {
+  color: var(--gold-bright);
+}
+
+.season-clock__live {
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 12px rgba(75, 240, 173, 0.8);
+  animation: artz-clock-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes artz-clock-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(75, 240, 173, 0.8); }
+  50% { opacity: 0.4; box-shadow: 0 0 3px rgba(75, 240, 173, 0.25); }
+}
+
+.season-clock__digits {
+  gap: 7px;
+}
+
+.season-clock__digits > span {
+  border-color: rgba(255, 255, 255, 0.14);
+  border-radius: 13px 9px 12px 9px;
+}
+
+.season-clock__digits strong {
+  font-size: clamp(17px, 1.9vw, 20px);
+  color: var(--gold-bright);
+}
+
+.season-clock__digits small {
+  font-size: 10px;
+  letter-spacing: 0.09em;
+}
+
+@media (max-width: 900px) {
+  .progress-head > strong {
+    font-size: 19px;
+  }
+
+  .progress-head > em {
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .leaderboard-progress {
+    padding: 20px 18px;
+  }
+
+  .progress-head {
+    grid-template-columns: 1fr auto;
+  }
+
+  .progress-head > strong {
+    grid-column: 1 / -1;
+    order: 3;
+    font-size: 20px;
+  }
+
+  .progress-kicker {
+    font-size: 10px;
+  }
+
+  .season-clock {
+    padding: 15px;
+  }
+
+  .season-clock__digits strong {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar i,
+  .season-clock__live {
+    animation: none;
+  }
+}

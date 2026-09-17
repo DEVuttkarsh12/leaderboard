@@ -693,7 +693,7 @@ function Home({
         <div className="home-section-heading">
           <span>Live rankings</span>
           <h2>Leader <em>Boards</em></h2>
-          <p>Three spots. One crown.</p>
+          <p>Every player counts. Your move.</p>
         </div>
         <div className="home-board-showcase__arena">
           <motion.figure
@@ -1084,8 +1084,12 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     </section>
     <LiquidGlass as="section" className="leaderboard-progress page-width" tone="ember" aria-label="Season wager progress">
       <div className="progress-medal"><Trophy size={23} strokeWidth={2.7} aria-hidden="true" /></div>
-      <div>
-        <div className="progress-head"><span>Next drop</span><strong>{fmt(wager)} / {fmt(targetWager)}</strong><b>{wagerProgress}%</b></div>
+      <div className="progress-main">
+        <div className="progress-head">
+          <span className="progress-kicker">Reward pool <b>· Season 08</b></span>
+          <strong>{fmt(wager)}</strong>
+          <em>{wagerProgress}%</em>
+        </div>
         <div className="progress-bar"><i style={{ width: `${wagerProgress}%` }} /></div>
       </div>
     </LiquidGlass>
@@ -1156,7 +1160,8 @@ function SeasonClock({
   return (
     <LiquidGlass as="aside" className="season-clock" depth="clear" tone="violet" aria-label="Leaderboard season status">
       <div className="season-clock__head">
-        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Countdown</span>
+        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Round ends in</span>
+        <i className="season-clock__live" aria-hidden="true" />
       </div>
       <div className={`season-clock__digits ${countdown ? "" : "season-clock__digits--live"}`}>
         {countdown ? countdown.map(([value, label]) => (
