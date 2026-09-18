@@ -199,10 +199,6 @@ function playerHandle(player: Player) {
   return maskPlayerHandle(player.username ?? player.globalName ?? player.kickUsername);
 }
 
-function totalWager(players: Player[]) {
-  return players.reduce((sum, player) => sum + (player.points ?? 0), 0);
-}
-
 type HeaderAccount = {
   handle: string;
   image: string;
@@ -1064,10 +1060,6 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
   }, [users, query, sort]);
   const visiblePlayers = filtered.slice(0, visible);
   const leaderScore = filtered[0] ? playerScore(filtered[0]) : 0;
-  const wager = totalWager(users);
-  const wagerStep = 500_000;
-  const targetWager = Math.max(wagerStep, (Math.floor(wager / wagerStep) + 1) * wagerStep);
-  const wagerProgress = Math.min(100, Math.round(((wager || 0) / targetWager) * 100));
   const targetDate = countdownTarget ? new Date(countdownTarget) : null;
 
   function refresh(){
@@ -1082,17 +1074,6 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       <div><p className="kicker"><span>●</span> Season 08</p><h1>Leaderboard</h1></div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
-    <LiquidGlass as="section" className="leaderboard-progress page-width" tone="ember" aria-label="Season wager progress">
-      <div className="progress-medal"><Trophy size={23} strokeWidth={2.7} aria-hidden="true" /></div>
-      <div className="progress-main">
-        <div className="progress-head">
-          <span className="progress-kicker">Reward pool <b>· Season 08</b></span>
-          <strong>{fmt(wager)}</strong>
-          <em>{wagerProgress}%</em>
-        </div>
-        <div className="progress-bar"><i style={{ width: `${wagerProgress}%` }} /></div>
-      </div>
-    </LiquidGlass>
     <section className="board-top-three page-width" aria-label="Top three players">
       <CasinoOrnament className="leaderboard-gold-bars" variant="olympus-scatter" reveal delay={0.08} />
       <div className="floor-top">

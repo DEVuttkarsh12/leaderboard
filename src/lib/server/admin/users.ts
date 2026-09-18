@@ -168,7 +168,7 @@ export async function listAdminUsers(query: string) {
     : {};
 
   const users = await prisma.user.findMany({
-    where,
+    where: trimmed ? where : { role: "ADMIN" },
     include: {
       casinoAccounts: true,
     },
@@ -180,7 +180,9 @@ export async function listAdminUsers(query: string) {
     users.map((user) => reconcileConfiguredAdminRole(user))
   );
 
-  return reconciledUsers.map(adminUserSummary);
+  return trimmed
+    ? reconciledUsers.map(adminUserSummary)
+    : reconciledUsers.filter((user) => user.role === "ADMIN").map(adminUserSummary);
 }
 
 async function assertPromotableAdminUser(userId: string) {
