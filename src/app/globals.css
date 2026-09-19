@@ -2793,6 +2793,10 @@ button:disabled {
   gap: 10px;
 }
 
+.admin-panel--wide {
+  grid-column: 1 / -1;
+}
+
 .workspace-grid.two,
 .design-card-grid--2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));

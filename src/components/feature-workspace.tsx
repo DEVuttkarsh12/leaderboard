@@ -2509,7 +2509,7 @@ function AdminWorkspace({
         </div>
       </LiquidGlass>
       <div className="admin-grid">
-        <LiquidGlass as="article" className="admin-panel" tone="violet">
+        <LiquidGlass as="article" className="admin-panel admin-panel--wide" tone="violet">
           <small>WEBSITE</small>
           <h3>Site banners</h3>
           <label>Announcement<input maxLength={200} value={siteBannerInputs.announcement} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, announcement: event.target.value }))} /></label>
@@ -2519,11 +2519,6 @@ function AdminWorkspace({
             <button className="button primary" type="button" onClick={saveSiteBanner} disabled={siteBannerBusy}>{siteBannerBusy ? "Saving" : "Save banners"} <span>↗</span></button>
           </div>
           <p className="admin-helper-text">{siteBannerStatus || "Publishes to the site ticker"}</p>
-        </LiquidGlass>
-        <LiquidGlass as="article" className="admin-panel" tone="cyan">
-          <small>DATA PIPELINE</small>
-          <h3>System status</h3>
-          <StatusGrid items={[["API", "Live"], ["Cache", "No-store"], ["DB", "Ready"], ["Backend", "Route live"]]} />
         </LiquidGlass>
       </div>
       <div className="admin-section-title">
