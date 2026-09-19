@@ -485,3 +485,61 @@ Kick scopes needed:
 ### E. Still Needed From User
 * Free at least another `2-5GB` of disk space for stable local development and browser QA.
 * For production, confirm the final Vercel domain and exact environment values from section 7.
+
+---
+
+## 🧭 10. Resume Checkpoint: ARTZ Rewards, Admin Lockdown, Site Banners
+
+**Timestamp**: 2026-09-19  
+**Branch**: `main`  
+**Latest commit**: `c709662`  
+**Local app**: `http://localhost:3000`
+
+This section supersedes the Vercel-prep details in sections 7-9 where they differ. The product has been rebranded to **ARTZ Rewards** and several systems were added after the earlier checkpoints.
+
+### A. Current Working State
+* Worktree is clean and in sync with `origin/main`.
+* `npm run lint` passes: 0 errors, 4 pre-existing `no-location-assign-relative-destination` warnings.
+* `npm run build` passes.
+* Root disk has repeatedly hit 100% / `ENOSPC`. Safe cleanup before builds/QA:
+  ```bash
+  rm -rf .next ~/.cache/google-chrome ~/.cache/pip ~/.npm/_cacache ~/.npm/_logs
+  ```
+
+### B. Features Added After Section 9
+* **ARTZ Rewards redesign**: animated casino stage background, ornamentation, slot artwork, responsive navigation, homepage route hub, top-three podium.
+* **Admin role lockdown** (`42b923c`): admin is restricted to explicit allowlist accounts. Config via `RANKBOARD_ADMIN_EMAILS`, `RANKBOARD_ADMIN_KICK_USERNAMES`, `RANKBOARD_ADMIN_KICK_IDS`, `RANKBOARD_ADMIN_DISCORD_USERNAMES`, `RANKBOARD_ADMIN_DISCORD_IDS`.
+* **Site banners** (`c79b8e9`): DB-backed announcement/banner/promo content published to the site ticker. Endpoints `GET /api/site/banners`, `POST /api/admin/site/banners`. Model `SiteBanner`.
+* **Auto Kick subscriptions** (`c79b8e9`): admin control room subscribes Kick events automatically; `POST /api/admin/kick/events/subscribe`.
+* **Challonge tournament brackets** (`c79b8e9`): `src/lib/challonge.ts`, `src/lib/server/challonge/client.ts`, `POST /api/admin/tournaments/[id]/challonge`; env `CHALLONGE_API_KEY`, `CHALLONGE_SUBDOMAIN`.
+* **Secure admin rewards and watch points** (`88ed6f5`): hardened admin point adjustments and watch-point config. Models `WatchPointConfig`, `SiteBanner`.
+* **Kick stream embed + auth hardening** (`a17f927`): `GET /api/kick/stream`, encrypted OAuth token storage (`AUTH_ENCRYPTION_KEY`), auth rate limiting (`AUTH_RATE_LIMIT_SECRET`).
+* **Tournament brackets** (`4a1f8e0`): `TournamentMatch` model, bracket management endpoints.
+* **Leaderboard changes** (`aaaf935`, `16a5ed5`): season panel polish; wager panel removed; admin list scoped to team.
+* **Admin layout tweak** (`c709662`): "Site banners" panel spans full admin grid via `.admin-panel--wide`; static "System status" panel removed.
+
+### C. New Env Vars To Remember
+* `AUTH_ENCRYPTION_KEY` — encrypts stored OAuth tokens. Generate with `openssl rand -base64 48`.
+* `AUTH_RATE_LIMIT_SECRET` — auth limiter secret. Generate independently.
+* `CHALLONGE_API_KEY`, `CHALLONGE_SUBDOMAIN` — tournament bracket sync.
+* `RANKBOARD_ADMIN_*` allowlists — controls admin access; prefer immutable provider IDs.
+* `KICK_WEBHOOK_SKIP_SIGNATURE` — local-only escape hatch; keep `false` in production.
+* `.env.example` is the current source of truth for supported variables.
+
+### D. Migrations
+Applied migration history now includes:
+* `20260902000000_add_store_item_images`
+* `20260910050000_add_tournament_brackets`
+* `20260910053000_sync_tournament_entry_counts`
+* `20260915180000_admin_points_watch_config_remove_xp`
+* `20260916000000_add_site_banner`
+* `20260916010000_add_tournament_challonge`
+
+Note: `20260915180000` removes the `xp` concept in favor of points + watch config.
+
+### E. Remaining Work
+* Production deployment (Vercel) and env var completion from section 7, plus the newer vars in section 10.C.
+* Update Kick and Discord developer app URLs for the production domain.
+* Reconnect Kick, then `/admin` -> `Subscribe events`.
+* Live QA: OAuth, casino verification, admin points, store fulfillment, bets, challenges, tournaments + Challonge, raffles, support, site banners, watch points.
+* Optional hardening: broader mutation rate limits, admin audit logs, webhook retry/monitoring, `<img>` -> `next/image`.
