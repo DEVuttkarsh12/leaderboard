@@ -7,8 +7,7 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     return NextResponse.json({ banner: await getSiteBanner() });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Site banner could not be loaded.";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Site banner could not be loaded." }, { status: 500 });
   }
 }

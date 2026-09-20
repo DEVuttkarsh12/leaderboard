@@ -24,7 +24,8 @@ function toSiteBannerPayload(banner: {
 }
 
 export async function getSiteBanner(): Promise<SiteBannerPayload> {
-  const banner = await prisma.siteBanner.upsert({
+  const existing = await prisma.siteBanner.findUnique({ where: { id: SITE_BANNER_ID } });
+  const banner = existing ?? await prisma.siteBanner.upsert({
     where: { id: SITE_BANNER_ID },
     create: { id: SITE_BANNER_ID },
     update: {},

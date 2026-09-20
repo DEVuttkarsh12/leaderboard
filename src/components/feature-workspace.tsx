@@ -116,6 +116,23 @@ type WatchSummary = {
   points: number;
 };
 
+type WatchPointConfig = {
+  pointsPerInterval: number;
+  intervalSeconds: number;
+  dailyBonus: number;
+  updatedAt: string;
+};
+
+type AdminKickStream = {
+  channelSlug: string;
+  isLive: boolean;
+  startedAt: string | null;
+  endedAt: string | null;
+  lastEventAt: string | null;
+  checkedAt: string | null;
+  source: "kick_api" | "webhook";
+};
+
 type RafflePayload = {
   round: {
     id: string;
@@ -735,6 +752,13 @@ function TournamentsWorkspace() {
               {tournament.joined ? "Withdraw" : tournament.status === "Open" ? "Enter" : tournament.status}
             </button>
           </div>
+          {tournament.challongeUrl && !bracketEmbedUrl ? (
+            <div className="tournament-embed">
+              <a className="tournament-embed__link" href={tournament.challongeUrl} target="_blank" rel="noreferrer">
+                Open live bracket on Challonge <span>↗</span>
+              </a>
+            </div>
+          ) : null}
           {bracketEmbedUrl ? (
             <div className="tournament-embed">
               <iframe
@@ -1642,6 +1666,13 @@ function AdminWorkspace({
   const [supportStatus, setSupportStatus] = useState("Loading support");
   const [adminRaffle, setAdminRaffle] = useState<RafflePayload | null>(null);
   const [adminRaffleStatus, setAdminRaffleStatus] = useState("Loading raffle");
+  const [kickEventStatus, setKickEventStatus] = useState("Loading Kick status");
+  const [kickStream, setKickStream] = useState<AdminKickStream | null>(null);
+  const [kickSubscribeBusy, setKickSubscribeBusy] = useState(false);
+  const [watchConfig, setWatchConfig] = useState<WatchPointConfig | null>(null);
+  const [watchPointsInput, setWatchPointsInput] = useState("50");
+  const [watchMinutesInput, setWatchMinutesInput] = useState("1");
+  const [watchConfigBusy, setWatchConfigBusy] = useState(false);
   const isAdmin = isAdminAccount(account);
   const selectedAdminUser =
     adminUsers.find((user) => user.id === selectedAdminUserId) ??
@@ -1693,6 +1724,57 @@ function AdminWorkspace({
       });
 
     return () => { active = false; };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    let active = true;
+    fetch("/api/admin/watch-points/config", { cache: "no-store" })
+      .then((response) => response.json().then((payload) => ({ response, payload })))
+      .then(({ response, payload }: { response: Response; payload: { config?: WatchPointConfig; error?: string } }) => {
+        if (!active) return;
+        if (!response.ok || !payload.config) {
+          throw new Error(payload.error ?? "Could not load watch settings");
+        }
+        setWatchConfig(payload.config);
+        setWatchPointsInput(String(payload.config.pointsPerInterval));
+        setWatchMinutesInput(String(payload.config.intervalSeconds / 60));
+      })
+      .catch((error) => {
+        if (active) setKickEventStatus(error instanceof Error ? error.message : "Could not load watch settings");
+      });
+
+    return () => { active = false; };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    let active = true;
+
+    async function refreshKickStream() {
+      try {
+        const response = await fetch("/api/kick/stream", { cache: "no-store" });
+        const payload = (await response.json()) as { stream?: AdminKickStream; error?: string };
+        if (!active) return;
+        if (!response.ok || !payload.stream) {
+          throw new Error(payload.error ?? "Could not load Kick stream state");
+        }
+        setKickStream(payload.stream);
+        setKickEventStatus(payload.stream.isLive ? "Automatic earning is active" : "Waiting for the stream to go live");
+      } catch (error) {
+        if (active) setKickEventStatus(error instanceof Error ? error.message : "Could not load Kick stream state");
+      }
+    }
+
+    void refreshKickStream();
+    const timer = window.setInterval(refreshKickStream, 30000);
+
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
   }, [isAdmin]);
 
   useEffect(() => {
@@ -2411,6 +2493,64 @@ function AdminWorkspace({
     }
   }
 
+  async function subscribeKickEvents() {
+    setKickSubscribeBusy(true);
+    setKickEventStatus("Syncing Kick events...");
+
+    try {
+      const response = await fetch("/api/admin/kick/events/subscribe", { method: "POST" });
+      const payload = (await response.json()) as {
+        results?: { event: string; ok: boolean; status: number; body: string }[];
+        error?: string;
+      };
+      if (!response.ok || !payload.results) {
+        throw new Error(payload.error ?? "Kick subscription failed");
+      }
+      const failed = payload.results.filter((result) => !result.ok);
+      setKickEventStatus(failed.length ? `${failed.length} Kick event subscription(s) failed` : "Kick events are synced");
+    } catch (error) {
+      setKickEventStatus(error instanceof Error ? error.message : "Kick subscription failed");
+    } finally {
+      setKickSubscribeBusy(false);
+    }
+  }
+
+  async function saveWatchConfig(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const pointsPerInterval = Number(watchPointsInput);
+    const intervalSeconds = Math.round(Number(watchMinutesInput) * 60);
+
+    if (
+      !Number.isInteger(pointsPerInterval) || pointsPerInterval < 0 || pointsPerInterval > 1_000_000 ||
+      !Number.isInteger(intervalSeconds) || intervalSeconds < 10 || intervalSeconds > 3_600
+    ) {
+      setKickEventStatus("Use whole-number points and an interval from 0.17 to 60 minutes");
+      return;
+    }
+
+    setWatchConfigBusy(true);
+    setKickEventStatus("Saving automatic earning rate...");
+    try {
+      const response = await fetch("/api/admin/watch-points/config", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pointsPerInterval, intervalSeconds, dailyBonus: 0 }),
+      });
+      const payload = (await response.json()) as { config?: WatchPointConfig; error?: string };
+      if (!response.ok || !payload.config) {
+        throw new Error(payload.error ?? "Watch settings could not be saved");
+      }
+      setWatchConfig(payload.config);
+      setWatchPointsInput(String(payload.config.pointsPerInterval));
+      setWatchMinutesInput(String(payload.config.intervalSeconds / 60));
+      setKickEventStatus(`Saved ${payload.config.pointsPerInterval} points every ${payload.config.intervalSeconds / 60} minute(s)`);
+    } catch (error) {
+      setKickEventStatus(error instanceof Error ? error.message : "Watch settings could not be saved");
+    } finally {
+      setWatchConfigBusy(false);
+    }
+  }
+
   async function saveSiteBanner() {
     const next = siteBannerInputs;
     const previous = siteBannerLoaded;
@@ -2519,6 +2659,28 @@ function AdminWorkspace({
             <button className="button primary" type="button" onClick={saveSiteBanner} disabled={siteBannerBusy}>{siteBannerBusy ? "Saving" : "Save banners"} <span>↗</span></button>
           </div>
           <p className="admin-helper-text">{siteBannerStatus || "Publishes to the site ticker"}</p>
+        </LiquidGlass>
+        <LiquidGlass as="article" className="admin-panel admin-panel--wide" tone="success">
+          <small>KICK WATCH</small>
+          <h3>Automatic earning</h3>
+          <div className={`admin-kick-monitor${kickStream?.isLive ? " is-live" : ""}`}>
+            <span><Radio size={21} strokeWidth={2.6} aria-hidden="true" /></span>
+            <div>
+              <small>{kickStream?.channelSlug ? `@${kickStream.channelSlug}` : "Kick channel"}</small>
+              <strong>{kickStream?.isLive ? "Stream is live" : "Stream is offline"}</strong>
+            </div>
+            <time>{kickStream?.checkedAt || kickStream?.lastEventAt ? `Checked ${new Date(kickStream.checkedAt ?? kickStream.lastEventAt ?? "").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : "Waiting for Kick"}</time>
+          </div>
+          <StatusGrid items={[["Signal", kickStream?.isLive ? "Live" : "Offline"], ["Source", kickStream?.source === "kick_api" ? "Kick API" : "Webhook"], ["Rate", watchConfig ? `${watchConfig.pointsPerInterval} / ${watchConfig.intervalSeconds / 60}m` : "Loading"]]} />
+          <form className="admin-watch-config" onSubmit={saveWatchConfig}>
+            <label>POINTS<input type="number" min="0" max="1000000" step="1" inputMode="numeric" value={watchPointsInput} onChange={(event) => setWatchPointsInput(event.target.value)} /></label>
+            <label>EVERY (MINUTES)<input type="number" min="0.17" max="60" step="0.01" inputMode="decimal" value={watchMinutesInput} onChange={(event) => setWatchMinutesInput(event.target.value)} /></label>
+            <button className="button primary" type="submit" disabled={watchConfigBusy}>{watchConfigBusy ? "Saving" : "Save rate"}</button>
+          </form>
+          <div className="button-row">
+            <button className="button ghost" type="button" onClick={subscribeKickEvents} disabled={kickSubscribeBusy}>{kickSubscribeBusy ? "Syncing" : "Sync Kick events"} <span>↗</span></button>
+          </div>
+          <p className="admin-helper-text">{kickEventStatus}</p>
         </LiquidGlass>
       </div>
       <div className="admin-section-title">

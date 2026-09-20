@@ -26,7 +26,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ banner: await getSiteBanner() });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Admin access required.";
-    return NextResponse.json({ error: message }, { status: 403 });
+    const unauthorized = message === "Admin login required." || message === "Admin access required.";
+    return NextResponse.json(
+      { error: unauthorized ? message : "Site banner could not be loaded." },
+      { status: unauthorized ? 403 : 500 }
+    );
   }
 }
 
@@ -45,6 +49,10 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ banner });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Site banner could not be saved.";
-    return NextResponse.json({ error: message }, { status: 403 });
+    const unauthorized = message === "Admin login required." || message === "Admin access required.";
+    return NextResponse.json(
+      { error: unauthorized ? message : "Site banner could not be saved." },
+      { status: unauthorized ? 403 : 500 }
+    );
   }
 }

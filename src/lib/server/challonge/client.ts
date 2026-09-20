@@ -21,11 +21,19 @@ type ChallongeTournamentResponse = {
 
 type ChallongeListResponse = ChallongeTournamentResponse[];
 
-function challongeApiBase() {
+function challongeSubdomain() {
   const subdomain = process.env.CHALLONGE_SUBDOMAIN?.trim();
-  return subdomain
-    ? `https://${subdomain}.challonge.com/api/v1`
-    : CHALLONGE_API_ORIGIN;
+  if (subdomain && !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(subdomain)) {
+    throw new Error("CHALLONGE_SUBDOMAIN is invalid.");
+  }
+  return subdomain || null;
+}
+
+function challongeTournamentIdentifier(idOrSlug: string) {
+  const subdomain = challongeSubdomain();
+  return subdomain && !/^\d+$/.test(idOrSlug)
+    ? `${subdomain}-${idOrSlug}`
+    : idOrSlug;
 }
 
 function challongeApiKey() {
@@ -42,7 +50,7 @@ export function isChallongeConfigured() {
 
 async function challongeRequest(path: string, init?: RequestInit) {
   const apiKey = challongeApiKey();
-  const url = new URL(`${challongeApiBase()}${path}`);
+  const url = new URL(`${CHALLONGE_API_ORIGIN}${path}`);
   url.searchParams.set("api_key", apiKey);
 
   const response = await fetch(url, {
@@ -52,11 +60,12 @@ async function challongeRequest(path: string, init?: RequestInit) {
       ...(init?.headers ?? {}),
     },
     cache: "no-store",
+    signal: AbortSignal.timeout(8_000),
   });
 
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`Challonge request failed (${response.status}): ${text.slice(0, 300)}`);
+    throw new Error(`Challonge request failed (${response.status}).`);
   }
 
   return text ? (JSON.parse(text) as unknown) : null;
@@ -69,11 +78,27 @@ function normalizeTournament(payload: ChallongeTournamentResponse | null | undef
   }
 
   const slugOrUrl = tournament.full_challonge_url ?? tournament.url ?? String(tournament.id);
+  const subdomain = challongeSubdomain();
+  let publicUrl = slugOrUrl.includes("://")
+    ? slugOrUrl
+    : `https://${subdomain ? `${subdomain}.` : ""}challonge.com/${slugOrUrl}`;
+
+  try {
+    const parsed = new URL(publicUrl);
+    if (parsed.hostname === "challonge.com" || parsed.hostname.endsWith(".challonge.com")) {
+      parsed.protocol = "https:";
+      publicUrl = parsed.toString();
+    } else {
+      publicUrl = `https://${subdomain ? `${subdomain}.` : ""}challonge.com/${tournament.url ?? tournament.id}`;
+    }
+  } catch {
+    publicUrl = `https://${subdomain ? `${subdomain}.` : ""}challonge.com/${tournament.url ?? tournament.id}`;
+  }
 
   return {
     id: String(tournament.id),
     name: tournament.name ?? "Tournament",
-    url: slugOrUrl.includes("://") ? slugOrUrl : `https://challonge.com/${slugOrUrl}`,
+    url: publicUrl,
     state: tournament.state ?? null,
     tournamentType: tournament.tournament_type ?? null,
   };
@@ -93,8 +118,9 @@ export async function listChallongeTournaments(): Promise<ChallongeTournament[]>
 }
 
 export async function getChallongeTournament(idOrSlug: string): Promise<ChallongeTournament> {
+  const identifier = challongeTournamentIdentifier(idOrSlug);
   const payload = (await challongeRequest(
-    `/tournaments/${encodeURIComponent(idOrSlug)}.json`
+    `/tournaments/${encodeURIComponent(identifier)}.json`
   )) as ChallongeTournamentResponse | null;
   return normalizeTournament(payload);
 }
@@ -109,6 +135,8 @@ export async function createChallongeTournament(input: {
     name: input.name,
     tournament_type: input.tournamentType ?? "single elimination",
   };
+  const subdomain = challongeSubdomain();
+  if (subdomain) body.subdomain = subdomain;
   if (input.url) body.url = input.url;
   if (input.description) body.description = input.description;
 

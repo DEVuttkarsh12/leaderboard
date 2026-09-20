@@ -59,6 +59,7 @@ type KickChannelResponse = {
 };
 
 const LIVE_STATUS_CACHE_MS = 12_000;
+const KICK_EVENT_REQUEST_TIMEOUT_MS = 5_000;
 let cachedLiveStatus: {
   channelSlug: string;
   expiresAt: number;
@@ -138,6 +139,7 @@ async function fetchCurrentKickStream(channelSlug: string) {
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(KICK_EVENT_REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -348,6 +350,7 @@ async function listSubscribedEventNames(accessToken: string, broadcasterUserId: 
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(KICK_EVENT_REQUEST_TIMEOUT_MS),
     });
     if (!response.ok) return subscribed;
 
@@ -397,36 +400,35 @@ async function subscribeKickEventsForAdmin(
   }
 
   const alreadySubscribed = await listSubscribedEventNames(accessToken, admin.kickId);
-  const results: KickEventSubscriptionResult[] = [];
-
-  for (const event of SUPPORTED_EVENTS) {
+  return Promise.all([...SUPPORTED_EVENTS].map(async (event): Promise<KickEventSubscriptionResult> => {
     if (alreadySubscribed.has(event)) {
-      results.push({ event, ok: true, status: 200, body: "Already subscribed" });
-      continue;
+      return { event, ok: true, status: 200, body: "Already subscribed" };
     }
 
-    const response = await fetch(KICK_EVENTS_SUBSCRIPTIONS_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        events: [{ name: event, version: 1 }],
-        method: "webhook",
-      }),
-    });
+    try {
+      const response = await fetch(KICK_EVENTS_SUBSCRIPTIONS_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          events: [{ name: event, version: 1 }],
+          method: "webhook",
+        }),
+        signal: AbortSignal.timeout(KICK_EVENT_REQUEST_TIMEOUT_MS),
+      });
 
-    const body = await response.text();
-    results.push({
-      event,
-      ok: response.ok,
-      status: response.status,
-      body: body.slice(0, 500),
-    });
-  }
-
-  return results;
+      return {
+        event,
+        ok: response.ok,
+        status: response.status,
+        body: response.ok ? "Subscribed" : `Kick returned ${response.status}`,
+      };
+    } catch {
+      return { event, ok: false, status: 0, body: "Kick request timed out or failed" };
+    }
+  }));
 }
 
 export async function adminSubscribeKickEvents(sessionToken: string | undefined) {
