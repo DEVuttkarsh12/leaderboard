@@ -1071,18 +1071,25 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
   return <main>
     <section className="board-hero board-hero--leaderboard page-width">
       <PrizeDropField compact />
-      <div><p className="kicker"><span>●</span> Season 08</p><h1>Leaderboard</h1></div>
+      <div className="board-hero__title">
+        <p className="kicker"><span>●</span> Season 08</p>
+        <h1>Leaderboard</h1>
+      </div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
     <section className="board-top-three page-width" aria-label="Top three players">
       <CasinoOrnament className="leaderboard-gold-bars" variant="olympus-scatter" reveal delay={0.08} />
       <div className="floor-top">
-        <span>Top 3</span>
-        <div className="live-pool">
-          <small>Pool</small>
-          <strong>$1,150</strong>
+        <span className="floor-top__label"><Trophy size={15} strokeWidth={2.5} aria-hidden="true" /> Top 3</span>
+        <div className="live-pool" aria-label="Total prize pool: $1,150">
+          <span className="live-pool__icon" aria-hidden="true"><Trophy size={22} strokeWidth={2.4} /></span>
+          <span className="live-pool__copy">
+            <small>Total prize pool</small>
+            <strong><span>$</span>1,150</strong>
+          </span>
+          <Sparkles className="live-pool__spark" size={19} strokeWidth={2.3} aria-hidden="true" />
         </div>
-        <span className="pulse-text">●</span>
+        <span className="pulse-text pool-signal" aria-hidden="true"><Sparkles size={17} strokeWidth={2.4} /></span>
       </div>
       <div className="winner-arena">
         <Podium players={users.slice(0, 3)} />
