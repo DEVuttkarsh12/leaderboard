@@ -398,13 +398,22 @@ function useHeaderAccount() {
     }
 
     void syncFromSession();
+    const refreshWhenActive = () => {
+      if (document.visibilityState === "visible") void syncFromSession();
+    };
+    const refreshInterval = window.setInterval(refreshWhenActive, 30_000);
     window.addEventListener("storage", refreshFromSession);
     window.addEventListener("rankboard-storage", refreshFromSession);
+    window.addEventListener("focus", refreshWhenActive);
+    document.addEventListener("visibilitychange", refreshWhenActive);
 
     return () => {
       active = false;
+      window.clearInterval(refreshInterval);
       window.removeEventListener("storage", refreshFromSession);
       window.removeEventListener("rankboard-storage", refreshFromSession);
+      window.removeEventListener("focus", refreshWhenActive);
+      document.removeEventListener("visibilitychange", refreshWhenActive);
     };
   }, []);
 
@@ -467,7 +476,7 @@ function SiteBanner() {
     }
 
     void refreshBanner();
-    const timer = window.setInterval(refreshBanner, 120000);
+    const timer = window.setInterval(refreshBanner, 30_000);
     const onFocus = () => { void refreshBanner(); };
     window.addEventListener("focus", onFocus);
 

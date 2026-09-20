@@ -584,9 +584,16 @@ function ChallengesWorkspace({
       }
     }
 
-    loadMissions();
+    void loadMissions();
+    const refresh = () => {
+      if (document.visibilityState === "visible") void loadMissions();
+    };
+    const interval = window.setInterval(refresh, 15_000);
+    window.addEventListener("focus", refresh);
     return () => {
       activeRequest = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
     };
   }, []);
 
@@ -632,6 +639,7 @@ function ChallengesWorkspace({
           const percent = mission.goal > 0 ? Math.round((mission.progress / mission.goal) * 100) : 0;
           const displayPercent = Math.min(100, Math.max(0, percent));
           const isClaimed = mission.claimed;
+          const isReady = mission.progress >= mission.goal;
           const isPending = pendingMissionId === mission.id;
           const showMissionMeta = mission.meta.trim().toLowerCase() !== mission.cadence.toLowerCase();
           return (
@@ -648,9 +656,9 @@ function ChallengesWorkspace({
               <ProgressBar value={displayPercent} />
               <div className="action-card__footer">
                 <strong>{isClaimed ? <CheckCircle2 size={17} aria-hidden="true" /> : <Coins size={17} aria-hidden="true" />}{isClaimed ? "Claimed" : `${mission.reward.toLocaleString()} pts`}</strong>
-                <button type="button" onClick={() => claimMission(mission.id)} disabled={isClaimed || Boolean(pendingMissionId)}>
+                <button type="button" onClick={() => claimMission(mission.id)} disabled={!isReady || isClaimed || Boolean(pendingMissionId)}>
                   <Gift size={15} strokeWidth={2.7} aria-hidden="true" />
-                  {isPending ? "Saving" : isClaimed ? "Claimed" : "Claim"}
+                  {isPending ? "Saving" : isClaimed ? "Claimed" : isReady ? "Claim" : "Locked"}
                 </button>
               </div>
             </LiquidGlass>
@@ -854,9 +862,10 @@ function RafflesWorkspace({ account }: { account: Account }) {
   useEffect(() => {
     let active = true;
 
-    fetch("/api/raffles", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((payload: { raffle?: RafflePayload; error?: string }) => {
+    async function loadRaffle() {
+      try {
+        const response = await fetch("/api/raffles", { cache: "no-store" });
+        const payload = (await response.json()) as { raffle?: RafflePayload; error?: string };
         if (!active) return;
         if (payload.raffle) {
           setRaffle(payload.raffle);
@@ -864,10 +873,23 @@ function RafflesWorkspace({ account }: { account: Account }) {
         } else {
           setMessage(payload.error ?? "Could not load raffle.");
         }
-      })
-      .catch(() => { if (active) setMessage("Could not load raffle."); });
+      } catch {
+        if (active) setMessage("Could not load raffle.");
+      }
+    }
 
-    return () => { active = false; };
+    void loadRaffle();
+    const refresh = () => {
+      if (document.visibilityState === "visible") void loadRaffle();
+    };
+    const interval = window.setInterval(refresh, 15_000);
+    window.addEventListener("focus", refresh);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
   }, []);
 
   async function postRaffle(path: string, body: Record<string, number | string>) {
@@ -1030,9 +1052,10 @@ function StoreWorkspace({
   // Load items from server
   useEffect(() => {
     let active = true;
-    fetch("/api/store/items", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data: { items?: ApiStoreItem[]; error?: string }) => {
+    async function loadItems() {
+      try {
+        const response = await fetch("/api/store/items", { cache: "no-store" });
+        const data = (await response.json()) as { items?: ApiStoreItem[]; error?: string };
         if (!active) return;
         if (data.items) {
           setItems(data.items);
@@ -1040,23 +1063,49 @@ function StoreWorkspace({
         } else {
           setMessage(data.error ?? "Could not load items.");
         }
-      })
-      .catch(() => { if (active) setMessage("Could not load items."); });
-    return () => { active = false; };
+      } catch {
+        if (active) setMessage("Could not load items.");
+      }
+    }
+
+    void loadItems();
+    const refresh = () => {
+      if (document.visibilityState === "visible") void loadItems();
+    };
+    const interval = window.setInterval(refresh, 15_000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
   }, [isGuest]);
 
   // Load purchase history from server (only if signed in)
   useEffect(() => {
     if (isGuest) return;
     let active = true;
-    fetch("/api/store/purchases", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data: { purchases?: ApiPurchase[]; error?: string }) => {
-        if (!active) return;
-        if (data.purchases) setPurchases(data.purchases);
-      })
-      .catch(() => {});
-    return () => { active = false; };
+    async function loadPurchases() {
+      try {
+        const response = await fetch("/api/store/purchases", { cache: "no-store" });
+        const data = (await response.json()) as { purchases?: ApiPurchase[]; error?: string };
+        if (active && data.purchases) setPurchases(data.purchases);
+      } catch {
+        // Keep the last known purchase list on transient errors.
+      }
+    }
+
+    void loadPurchases();
+    const refresh = () => {
+      if (document.visibilityState === "visible") void loadPurchases();
+    };
+    const interval = window.setInterval(refresh, 30_000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
   }, [isGuest]);
 
   async function redeem(item: ApiStoreItem) {
@@ -1213,34 +1262,52 @@ function CustomBetsWorkspace({
 
   useEffect(() => {
     let active = true;
-    fetch("/api/bets/markets", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data: { markets?: BetMarket[]; error?: string }) => {
-        if (!active) return;
-        if (data.markets) {
-          setMarkets(data.markets);
-        }
-      })
-      .catch(() => {});
+    async function loadMarkets() {
+      try {
+        const response = await fetch("/api/bets/markets", { cache: "no-store" });
+        const data = (await response.json()) as { markets?: BetMarket[]; error?: string };
+        if (active && data.markets) setMarkets(data.markets);
+      } catch {
+        // Keep the last known markets on transient errors.
+      }
+    }
+
+    void loadMarkets();
+    const refresh = () => {
+      if (document.visibilityState === "visible") void loadMarkets();
+    };
+    const interval = window.setInterval(refresh, 15_000);
+    window.addEventListener("focus", refresh);
     return () => {
       active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
     };
   }, []);
 
   useEffect(() => {
     if (isGuest) return;
     let active = true;
-    fetch("/api/bets/my-bets", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data: { bets?: Bet[]; error?: string }) => {
-        if (!active) return;
-        if (data.bets) {
-          setBets(data.bets);
-        }
-      })
-      .catch(() => {});
+    async function loadBets() {
+      try {
+        const response = await fetch("/api/bets/my-bets", { cache: "no-store" });
+        const data = (await response.json()) as { bets?: Bet[]; error?: string };
+        if (active && data.bets) setBets(data.bets);
+      } catch {
+        // Keep the last known bets on transient errors.
+      }
+    }
+
+    void loadBets();
+    const refresh = () => {
+      if (document.visibilityState === "visible") void loadBets();
+    };
+    const interval = window.setInterval(refresh, 15_000);
+    window.addEventListener("focus", refresh);
     return () => {
       active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
     };
   }, [isGuest]);
 
@@ -1957,7 +2024,10 @@ function AdminWorkspace({
 
   async function addItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!newItem.title.trim()) return;
+    if (!newItem.title.trim()) {
+      setAdminStoreMessage("Add an item name");
+      return;
+    }
     setAdminStoreMessage("Creating store item...");
 
     try {
@@ -2238,7 +2308,10 @@ function AdminWorkspace({
 
   async function addMarket(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!newMarket.title.trim()) return;
+    if (!newMarket.title.trim()) {
+      setAdminMarketMessage("Add a market title");
+      return;
+    }
     setAdminMarketMessage("Creating market...");
     try {
       const response = await fetch("/api/admin/bets/markets", {
@@ -2984,9 +3057,10 @@ function SupportWorkspace() {
   useEffect(() => {
     let active = true;
 
-    fetch("/api/support/tickets", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((payload: { tickets?: Ticket[]; error?: string }) => {
+    async function loadTickets() {
+      try {
+        const response = await fetch("/api/support/tickets", { cache: "no-store" });
+        const payload = (await response.json()) as { tickets?: Ticket[]; error?: string };
         if (!active) return;
         if (payload.tickets) {
           setTickets(payload.tickets);
@@ -2994,15 +3068,31 @@ function SupportWorkspace() {
         } else {
           setStatus(payload.error ?? "Could not load tickets.");
         }
-      })
-      .catch(() => { if (active) setStatus("Could not load tickets."); });
+      } catch {
+        if (active) setStatus("Could not load tickets.");
+      }
+    }
 
-    return () => { active = false; };
+    void loadTickets();
+    const refresh = () => {
+      if (document.visibilityState === "visible") void loadTickets();
+    };
+    const interval = window.setInterval(refresh, 30_000);
+    window.addEventListener("focus", refresh);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
   }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!subject.trim() || !message.trim()) return;
+    if (!subject.trim() || !message.trim()) {
+      setStatus("Add a subject and message.");
+      return;
+    }
     setStatus("Creating ticket...");
 
     try {
@@ -3029,9 +3119,9 @@ function SupportWorkspace() {
       <WorkspaceHeader overline="Support" title="Open a ticket" meta={`${tickets.length} tickets · ${status}`} />
       <form className="support-form" onSubmit={submit}>
         <label>CATEGORY<select value={category} onChange={(event) => setCategory(event.target.value)}><option>Reward</option><option>Account</option><option>Leaderboard</option><option>Claim</option></select></label>
-        <label>SUBJECT<input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="What broke?" /></label>
-        <label>MESSAGE<textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Useful details." /></label>
-        <button className="button primary" type="submit">Create ticket <span>↗</span></button>
+        <label>SUBJECT<input required value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="What broke?" /></label>
+        <label>MESSAGE<textarea required value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Useful details." /></label>
+        <button className="button primary" type="submit" disabled={!subject.trim() || !message.trim()}>Create ticket <span>↗</span></button>
       </form>
       <div className="workspace-list">
         {tickets.length ? tickets.map((ticket) => (
