@@ -68,7 +68,7 @@ export default function HomeRouteHub() {
 
         <div className="casino-quick-actions" aria-label="Quick actions">
           <Link href="/challenges">MISSIONS</Link>
-          <Link href="/wager-raffles">RAFFLES</Link>
+          <Link href="/bonus-hunts">BONUS HUNTS</Link>
           <Link href="/tournaments">EVENTS</Link>
         </div>
       </div>

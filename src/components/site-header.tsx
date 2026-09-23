@@ -11,7 +11,7 @@ const primaryLinks = [
   { label: "Leaderboard", href: "/leaderboard" },
   { label: "Missions", href: "/challenges" },
   { label: "Tournaments", href: "/tournaments" },
-  { label: "Raffles", href: "/wager-raffles" },
+  { label: "Bonus Hunts", href: "/bonus-hunts" },
   { label: "Store", href: "/store" },
   { label: "Help", href: "/help" },
 ] as const;

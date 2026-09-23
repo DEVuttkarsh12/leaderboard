@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   BadgeHelp,
-  CircleDollarSign,
+  Flame,
   KeyRound,
   ShoppingBag,
   Swords,
@@ -29,10 +29,10 @@ const features = [
     icon: Swords,
   },
   {
-    title: "Raffles",
-    label: "Ticket drops",
-    href: "/wager-raffles",
-    icon: CircleDollarSign,
+    title: "Bonus Hunts",
+    label: "Big hits",
+    href: "/bonus-hunts",
+    icon: Flame,
   },
   {
     title: "Store",

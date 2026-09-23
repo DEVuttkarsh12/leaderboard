@@ -11,6 +11,7 @@ import {
   Coins,
   Crown,
   Gift,
+  Flame,
   LogOut,
   Radio,
   RefreshCw,
@@ -19,7 +20,6 @@ import {
   Timer,
   Trophy,
   Tv,
-  X,
 } from "lucide-react";
 import {
   useCallback,
@@ -58,7 +58,7 @@ const NAV = [
   ["Leaderboard", "/leaderboard"],
   ["Missions", "/challenges"],
   ["Bets", "/custom-bets"],
-  ["Raffles", "/wager-raffles"],
+  ["Bonus Hunts", "/bonus-hunts"],
   ["Tournaments", "/tournaments"],
   ["Store", "/store"],
   ["Admin", "/admin"],
@@ -69,7 +69,7 @@ const DESKTOP_NAV = [
   ["Leaderboard", "/leaderboard"],
   ["Missions", "/challenges"],
   ["Bets", "/custom-bets"],
-  ["Raffles", "/wager-raffles"],
+  ["Bonus Hunts", "/bonus-hunts"],
   ["Tournaments", "/tournaments"],
   ["Store", "/store"],
 ] as const;
@@ -78,7 +78,7 @@ const launchpad: [string, string, string, string, ZoneIcon][] = [
   ["Leaderboard", "/leaderboard", "LB", "ember", Trophy],
   ["Bets", "/custom-bets", "BET", "mint", Coins],
   ["Missions", "/challenges", "PTS", "violet", BadgeCheck],
-  ["Raffles", "/wager-raffles", "TIX", "blue", Gift],
+  ["Bonus Hunts", "/bonus-hunts", "LIVE", "blue", Flame],
   ["Tournaments", "/tournaments", "VS", "coral", Trophy],
   ["Store", "/store", "PTS", "magma", Gift],
 ] as const;
@@ -86,7 +86,7 @@ const launchpad: [string, string, string, string, ZoneIcon][] = [
 const featurePageIcons: Record<string, ZoneIcon> = {
   challenges: BadgeCheck,
   tournaments: Trophy,
-  "wager-raffles": Gift,
+  "bonus-hunts": Flame,
   store: Gift,
   "custom-bets": Coins,
   "watch-points": Tv,
@@ -99,7 +99,7 @@ const featurePageIcons: Record<string, ZoneIcon> = {
 const featurePageOrnaments: Record<string, CasinoOrnamentVariant> = {
   challenges: "candy-tumble",
   tournaments: "olympus-scatter",
-  "wager-raffles": "holiday-drop",
+  "bonus-hunts": "olympus-scatter",
   store: "holiday-drop",
   "custom-bets": "neon-city",
   "watch-points": "candy-tumble",
@@ -141,9 +141,9 @@ const pageData: Record<string, { title: string; tagline: string; action: [string
     tagline: "Enter. Compete. Climb.",
     action: ["Leaderboard", "/leaderboard"],
   },
-  "wager-raffles": {
-    title: "Wager Raffles",
-    tagline: "Wager → Tickets → Prizes.",
+  "bonus-hunts": {
+    title: "Bonus Hunts",
+    tagline: "Follow the hunt. Catch the biggest hits.",
     action: ["Leaderboard", "/leaderboard"],
   },
   store: {
@@ -1034,11 +1034,11 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
 
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{!compact && <small>Ranking</small>}<b>0 <em>SCORE</em></b>{!compact && <span>0 wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{compact ? <b>0 <em>SCORE</em></b> : <span><b>0</b> wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
-  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{compact ? playerHandle(p) : playerName(p)}</strong>{!compact && <small>{playerHandle(p)}</small>}<b>{fmt(playerScore(p))} <em>SCORE</em></b>{!compact && <span>{fmt(p.points)} wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{compact ? playerHandle(p) : playerName(p)}</strong>{compact ? <b>{fmt(playerScore(p))} <em>SCORE</em></b> : <span><b>{fmt(p.points)}</b> wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
 }
 
 function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | null }) {
@@ -1050,10 +1050,8 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     retry,
   } = useLeaderboard();
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<"score"|"rank">("score");
   const [visible, setVisible] = useState(10);
   const [refreshing, setRefreshing] = useState(false);
-  const [selected, setSelected] = useState<Player | null>(null);
   const filtered = useMemo(() => {
     const trimmedQuery = query.trim().toLowerCase();
     const results = trimmedQuery
@@ -1064,11 +1062,10 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         )
       : [...users];
 
-    results.sort((a,b) => sort === "score" ? playerScore(b)-playerScore(a) : a.rank-b.rank);
+    results.sort((a,b) => a.rank-b.rank);
     return results;
-  }, [users, query, sort]);
+  }, [users, query]);
   const visiblePlayers = filtered.slice(0, visible);
-  const leaderScore = filtered[0] ? playerScore(filtered[0]) : 0;
   const targetDate = countdownTarget ? new Date(countdownTarget) : null;
 
   function refresh(){
@@ -1081,40 +1078,32 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="board-hero board-hero--leaderboard page-width">
       <PrizeDropField compact />
       <div className="board-hero__title">
-        <p className="kicker"><span>●</span> Season 08</p>
-        <h1>Leaderboard</h1>
+        <p className="board-hero__signature">ARTZ Rewards</p>
+        <h1><span>Monthly</span> Leaderboard</h1>
+        <div className="board-hero__prize" aria-label="Total prize pool: $1,150">
+          <small>Total prize pool</small>
+          <strong>$1,150</strong>
+        </div>
       </div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
     <section className="board-top-three page-width" aria-label="Top three players">
       <CasinoOrnament className="leaderboard-gold-bars" variant="olympus-scatter" reveal delay={0.08} />
-      <div className="floor-top">
-        <span className="floor-top__label"><Trophy size={15} strokeWidth={2.5} aria-hidden="true" /> Top 3</span>
-        <div className="live-pool" aria-label="Total prize pool: $1,150">
-          <span className="live-pool__icon" aria-hidden="true"><Trophy size={22} strokeWidth={2.4} /></span>
-          <span className="live-pool__copy">
-            <small>Total prize pool</small>
-            <strong><span>$</span>1,150</strong>
-          </span>
-          <Sparkles className="live-pool__spark" size={19} strokeWidth={2.3} aria-hidden="true" />
-        </div>
-        <span className="pulse-text pool-signal" aria-hidden="true"><Sparkles size={17} strokeWidth={2.4} /></span>
-      </div>
       <div className="winner-arena">
         <Podium players={users.slice(0, 3)} />
       </div>
     </section>
     <section className="section page-width board-section">
       <LiquidGlass className="standings" tone="cyan">
-        <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><div className="segment"><button type="button" className={sort==="score"?"active":""} onClick={()=>{setSort("score");setVisible(10)}}>Top score</button><button type="button" className={sort==="rank"?"active":""} onClick={()=>{setSort("rank");setVisible(10)}}>Rank</button></div><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
-        <div className="table-head"><span>Rank / Player</span><span>Score</span><span>Wagered</span><span /></div>
+        <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
+        <div className="table-head"><span>Rank / Player</span><span>Wagered</span></div>
         <div className="player-list" aria-live="polite">
           {error ? (
             <div className="empty-state"><span>!</span><h3>The leaderboard blinked.</h3><button type="button" onClick={refresh}>Try again</button></div>
           ) : isLoading && users.length === 0 ? (
             Array.from({ length: 8 }).map((_, index) => <div className="skeleton-row" key={index}><i/><span><i/><i/></span></div>)
           ) : visiblePlayers.length ? (
-            visiblePlayers.map(p=><PlayerRow key={p.id} player={p} leader={leaderScore} onOpen={()=>setSelected(p)}/>)
+            visiblePlayers.map(p=><PlayerRow key={p.id} player={p} />)
           ) : (
             <div className="empty-state"><span><Search size={34} strokeWidth={1.8} aria-hidden="true" /></span><h3>Nobody here.</h3><button type="button" onClick={()=>setQuery("")}>Clear search</button></div>
           )}
@@ -1122,7 +1111,6 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         {filtered.length > visible && !error && <button type="button" className="load-more" onClick={()=>setVisible(v=>v+8)}>Load more <span>{Math.min(visible,filtered.length)} / {filtered.length}</span></button>}
       </LiquidGlass>
     </section>
-    {selected && <div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="player-modal" onClick={e=>e.stopPropagation()}><button type="button" onClick={()=>setSelected(null)} aria-label="Close"><X size={18} strokeWidth={2.5} aria-hidden="true" /></button><p>Player · #{selected.rank}</p><div className="modal-identity"><div className="avatar"><span>{getInitials(selected.name)}</span></div><div><h2>{playerName(selected)}</h2><span>{playerHandle(selected)} · {selected.verified?"Verified":"Challenger"}</span></div></div><div className="modal-stats"><div><small>Score</small><strong>{fmt(playerScore(selected))}</strong></div><div><small>Wagered</small><strong>{fmt(selected.points)}</strong></div><div><small>Updated</small><strong>{selected.lastActive ?? "Recently"}</strong></div></div><Link href="/challenges">Missions <ArrowUpRight size={15} strokeWidth={2.5} aria-hidden="true" /></Link></article></div>}
   </main>;
 }
 
@@ -1140,12 +1128,17 @@ function SeasonClock({
 
   useEffect(() => {
     if (!validTarget) return undefined;
+    const initial = window.setTimeout(() => setNow(Date.now()), 0);
     const interval = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(interval);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(interval);
+    };
   }, [validTarget]);
 
+  const expired = Boolean(validTarget && now !== null && now >= validTarget.getTime());
   const remaining = validTarget && now !== null ? Math.max(0, validTarget.getTime() - now) : null;
-  const countdown = validTarget
+  const countdown = validTarget && !expired
     ? [
         [remaining === null ? null : Math.floor(remaining / 86_400_000), "Days"],
         [remaining === null ? null : Math.floor((remaining / 3_600_000) % 24), "Hrs"],
@@ -1157,13 +1150,18 @@ function SeasonClock({
   return (
     <LiquidGlass as="aside" className="season-clock" depth="clear" tone="violet" aria-label="Leaderboard season status">
       <div className="season-clock__head">
-        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Round ends in</span>
+        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> {expired ? "Round complete" : "Round ends in"}</span>
         <i className="season-clock__live" aria-hidden="true" />
       </div>
       <div className={`season-clock__digits ${countdown ? "" : "season-clock__digits--live"}`}>
         {countdown ? countdown.map(([value, label]) => (
           <span key={label}><strong>{value === null ? "--" : String(value).padStart(2, "0")}</strong><small>{label}</small></span>
-        )) : (
+        )) : expired ? (
+          <>
+            <span><strong>FINAL</strong><small>Window</small></span>
+            <span><strong>ENDED</strong><small>Round</small></span>
+          </>
+        ) : (
           <>
             <span><strong>NOW</strong><small>Window</small></span>
             <span><strong>AUTO</strong><small>Updates</small></span>
@@ -1173,6 +1171,8 @@ function SeasonClock({
       <small className="season-clock__meta">
         {error
           ? "Syncing season data"
+          : expired && validTarget
+          ? `Closed ${formatShortDate(validTarget)}`
           : validTarget
           ? `Closes ${formatShortDate(validTarget)}`
           : lastUpdated
@@ -1183,7 +1183,9 @@ function SeasonClock({
   );
 }
 
-function PlayerRow({ player, leader, onOpen }: { player: Player; leader: number; onOpen: () => void }) { const score = playerScore(player); return <button type="button" className={`player-row rank-row-${player.rank}`} onClick={onOpen}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong><small>{playerHandle(player)}</small></span></div><div className="xp-cell"><strong>{fmt(score)} <small>SCORE</small></strong><span><i style={{width:`${leader > 0 ? (score/leader)*100 : 0}%`}}/></span></div><strong className="wager">{fmt(player.points)}</strong><span className="open-row"><ArrowUpRight size={16} strokeWidth={2.5} aria-hidden="true" /></span></button> }
+function PlayerRow({ player }: { player: Player }) {
+  return <div className={`player-row rank-row-${player.rank}`}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong></span></div><strong className="wager">{fmt(player.points)} <small>wagered</small></strong></div>;
+}
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
   const Icon = featurePageIcons[route] ?? Sparkles;
@@ -1703,7 +1705,7 @@ function Footer() {
     ["Store", "/store"],
     ["Missions", "/challenges"],
     ["Tournaments", "/tournaments"],
-    ["Raffles", "/wager-raffles"],
+    ["Bonus Hunts", "/bonus-hunts"],
     ["Profile", "/profile"],
     ["Support", "/support"],
     ["Privacy", "/privacy"],

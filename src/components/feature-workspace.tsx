@@ -133,34 +133,6 @@ type AdminKickStream = {
   source: "kick_api" | "webhook";
 };
 
-type RafflePayload = {
-  round: {
-    id: string;
-    title: string;
-    ticketRateWager: number;
-    status: "Open" | "Drawing" | "Closed";
-    totalEntries: number;
-    winnerEntryId: string | null;
-    drawnAt: string | null;
-  };
-  account: {
-    tickets: number;
-    entries: number;
-  };
-  entries: {
-    id: string;
-    handle: string;
-    ticketCount: number;
-    createdAt: string;
-  }[];
-  winner?: {
-    id: string;
-    handle: string;
-    ticketCount: number;
-    createdAt: string;
-  };
-};
-
 type ApiTournament = {
   id: string;
   code: string;
@@ -295,7 +267,7 @@ const workspaceIcons: Record<string, WorkspaceIcon> = {
   "Reward Store": Gift,
   Support: Headphones,
   Tournaments: Trophy,
-  "Wager Raffles": Ticket,
+  "Bonus Hunts": Flame,
   "Watch Points": Tv,
 };
 
@@ -530,7 +502,7 @@ export default function FeatureWorkspace({ route }: { route: string }) {
 
   if (route === "challenges") return <ChallengesWorkspace account={account} setAccount={setAccount} />;
   if (route === "tournaments") return <TournamentsWorkspace />;
-  if (route === "wager-raffles") return <RafflesWorkspace account={account} />;
+  if (route === "bonus-hunts") return <BonusHuntsWorkspace />;
   if (route === "store") return <StoreWorkspace account={account} setAccount={setAccount} />;
   if (route === "custom-bets") return <CustomBetsWorkspace account={account} setAccount={setAccount} />;
   if (route === "watch-points") return <WatchPointsWorkspace account={account} setAccount={setAccount} />;
@@ -849,42 +821,58 @@ function TournamentBracket({
   );
 }
 
-function RafflesWorkspace({ account }: { account: Account }) {
-  const [raffle, setRaffle] = useState<RafflePayload | null>(null);
-  const [message, setMessage] = useState("Loading raffle...");
-  const [busy, setBusy] = useState(false);
-  const [wager, setWager] = useState("10000");
-  const ticketRate = raffle?.round.ticketRateWager ?? 10000;
-  const tickets = raffle?.account.tickets ?? 0;
-  const entries = raffle?.account.entries ?? 0;
-  const generated = Math.max(0, Math.floor(Number(wager || 0) / ticketRate));
+type BonusHunt = {
+  id: string;
+  title: string;
+  time: string;
+  host: string;
+  status: "Live" | "Upcoming" | "Completed";
+  heat: number;
+  followed: boolean;
+  startBankroll: number;
+  currentBankroll: number;
+  bonusCount: number;
+  openedCount: number;
+  totalPayout: number;
+  bestMultiplier: number;
+};
+
+type BonusHuntClip = {
+  id: string;
+  huntId: string;
+  title: string;
+  stat: string;
+  votes: number;
+  saved: boolean;
+  voted: boolean;
+};
+
+type BonusHuntsPayload = { hunts: BonusHunt[]; clips: BonusHuntClip[] };
+
+function BonusHuntsWorkspace() {
+  const [data, setData] = useState<BonusHuntsPayload>({ hunts: [], clips: [] });
+  const [message, setMessage] = useState("Loading hunts...");
+  const [busy, setBusy] = useState("");
 
   useEffect(() => {
     let active = true;
-
-    async function loadRaffle() {
+    async function loadHunts() {
       try {
-        const response = await fetch("/api/raffles", { cache: "no-store" });
-        const payload = (await response.json()) as { raffle?: RafflePayload; error?: string };
-        if (!active) return;
-        if (payload.raffle) {
-          setRaffle(payload.raffle);
-          setMessage("Raffle synced.");
-        } else {
-          setMessage(payload.error ?? "Could not load raffle.");
+        const response = await fetch("/api/hunts", { cache: "no-store" });
+        const payload = (await response.json()) as BonusHuntsPayload & { error?: string };
+        if (!response.ok || !payload.hunts) throw new Error(payload.error ?? "Could not load hunts.");
+        if (active) {
+          setData({ hunts: payload.hunts, clips: payload.clips ?? [] });
+          setMessage("");
         }
-      } catch {
-        if (active) setMessage("Could not load raffle.");
+      } catch (error) {
+        if (active) setMessage(error instanceof Error ? error.message : "Could not load hunts.");
       }
     }
-
-    void loadRaffle();
-    const refresh = () => {
-      if (document.visibilityState === "visible") void loadRaffle();
-    };
+    void loadHunts();
+    const refresh = () => { if (document.visibilityState === "visible") void loadHunts(); };
     const interval = window.setInterval(refresh, 15_000);
     window.addEventListener("focus", refresh);
-
     return () => {
       active = false;
       window.clearInterval(interval);
@@ -892,73 +880,57 @@ function RafflesWorkspace({ account }: { account: Account }) {
     };
   }, []);
 
-  async function postRaffle(path: string, body: Record<string, number | string>) {
-    setBusy(true);
+  async function act(path: string, key: string, body: Record<string, string>) {
+    setBusy(key);
     try {
-      const response = await fetch(path, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const payload = (await response.json()) as {
-        raffle?: RafflePayload;
-        error?: string;
-      };
-      if (!response.ok || !payload.raffle) {
-        throw new Error(payload.error ?? "Raffle action failed.");
-      }
-      setRaffle(payload.raffle);
-      setMessage(payload.raffle.winner ? `Winner: ${payload.raffle.winner.handle}` : "Raffle state saved.");
+      const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const payload = (await response.json()) as BonusHuntsPayload & { error?: string };
+      if (!response.ok || !payload.hunts) throw new Error(payload.error ?? "Action failed.");
+      setData({ hunts: payload.hunts, clips: payload.clips ?? [] });
+      setMessage("Saved.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Raffle action failed.");
+      setMessage(error instanceof Error ? error.message : "Action failed.");
     } finally {
-      setBusy(false);
+      setBusy("");
     }
   }
 
+  const live = data.hunts.find((hunt) => hunt.status === "Live");
+  const featured = live ?? data.hunts[0];
+  const money = (value: number) => `$${value.toLocaleString("en-US")}`;
+
   return (
-    <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Wager Raffles" title={raffle?.round.title ?? "Wager → tickets → prizes"} meta={`${tickets} tickets · ${entries} entries · ${message}`} />
-      <div className="tool-panel">
-        <label>
-          WAGER AMOUNT
-          <input value={wager} inputMode="numeric" onChange={(event) => setWager(event.target.value.replace(/\D/g, ""))} />
-        </label>
-        <div><small>GENERATES</small><strong>{generated}</strong><span>tickets</span></div>
-        <button type="button" onClick={() => postRaffle("/api/raffles/convert", { wagerAmount: Number(wager || 0) })} disabled={busy || generated === 0}>Convert</button>
-      </div>
-      <div className="workspace-grid three">
-        {[1, 5, 10].map((amount) => (
-          <LiquidGlass as="article" className="action-card" key={amount} tone="success">
-            <small>DRAW ENTRY</small>
-            <h3>{amount} ticket{amount > 1 ? "s" : ""}</h3>
-            <p>{tickets >= amount ? "Ready" : "Locked"}</p>
-            <div className="action-card__footer">
-              <strong>{tickets >= amount ? "Ready" : "Need tickets"}</strong>
-              <button type="button" disabled={busy || tickets < amount} onClick={() => postRaffle("/api/raffles/enter", { ticketCount: amount })}>
-                Enter
-              </button>
-            </div>
-          </LiquidGlass>
-        ))}
-      </div>
-      {account.badges.includes("Admin") && raffle?.round.status === "Open" && (
-        <div className="tool-panel tool-panel--offset">
-          <div><small>DRAW TOOL</small><strong>{raffle.round.totalEntries}</strong><span>weighted entries</span></div>
-          <button type="button" disabled={busy || raffle.round.totalEntries <= 0} onClick={() => postRaffle("/api/admin/raffles/draw", { roundId: raffle.round.id })}>Draw winner</button>
-        </div>
-      )}
-      <div className="workspace-list">
-        {raffle?.entries.length ? raffle.entries.map((entry) => (
-          <article key={entry.id}>
-            <span>{entry.ticketCount}x</span>
-            <div>
-              <h3>{entry.handle}</h3>
-              <p>{new Date(entry.createdAt).toLocaleString()}</p>
-            </div>
-          </article>
-        )) : <article><span>EMPTY</span><div><h3>No raffle entries</h3><p>Convert wagers above.</p></div></article>}
-      </div>
+    <section className="section page-width app-workspace bonus-hunts-workspace">
+      <WorkspaceHeader overline="Bonus Hunts" title="Every bonus has a moment" meta={message || `${data.hunts.length} hunts · ${live ? "Live hunt in progress" : "Next hunt on deck"}`} />
+      {featured ? (
+        <LiquidGlass as="article" className="hunt-feature" tone="violet">
+          <div className="hunt-feature__intro">
+            <span className={`hunt-status hunt-status--${featured.status.toLowerCase()}`}>{featured.status === "Live" ? <Radio size={15} aria-hidden="true" /> : <Clock3 size={15} aria-hidden="true" />}{featured.status} hunt</span>
+            <h2>{featured.title}</h2>
+            <p>Hosted by {featured.host} · {featured.time}</p>
+            <button type="button" disabled={Boolean(busy)} onClick={() => void act("/api/hunts/follow", `hunt-${featured.id}`, { huntId: featured.id })}>{featured.followed ? "Following" : "Follow hunt"} <ArrowUpRight size={15} aria-hidden="true" /></button>
+          </div>
+          <div className="hunt-feature__stats">
+            <div><small>Bonuses opened</small><strong>{featured.openedCount}<span> / {featured.bonusCount}</span></strong></div>
+            <div><small>Total payout</small><strong>{money(featured.totalPayout)}</strong></div>
+            <div><small>Best hit</small><strong>{featured.bestMultiplier.toLocaleString()}x</strong></div>
+            <div><small>Current bankroll</small><strong>{money(featured.currentBankroll)}</strong></div>
+          </div>
+          <div className="hunt-feature__progress"><span style={{ width: `${Math.min(100, Math.max(0, featured.bonusCount ? featured.openedCount / featured.bonusCount * 100 : 0))}%` }} /></div>
+        </LiquidGlass>
+      ) : <div className="hunt-empty">{message || "No bonus hunts scheduled yet."}</div>}
+      {data.hunts.length > 1 && <div className="hunt-list" aria-label="All bonus hunts">{data.hunts.filter((hunt) => hunt.id !== featured?.id).map((hunt) => (
+        <LiquidGlass as="article" className="hunt-list__card" key={hunt.id} tone="cyan">
+          <span className={`hunt-status hunt-status--${hunt.status.toLowerCase()}`}>{hunt.status}</span>
+          <h3>{hunt.title}</h3>
+          <p>{hunt.host} · {hunt.time}</p>
+          <div><span>{hunt.openedCount} / {hunt.bonusCount} bonuses</span><strong>{hunt.bestMultiplier.toLocaleString()}x best</strong></div>
+          <button type="button" disabled={Boolean(busy)} onClick={() => void act("/api/hunts/follow", `hunt-${hunt.id}`, { huntId: hunt.id })}>{hunt.followed ? "Following" : "Follow hunt"}</button>
+        </LiquidGlass>
+      ))}</div>}
+      {data.clips.length > 0 && <section className="hunt-clips" aria-label="Hunt highlights"><h2>Big hit highlights</h2><div>{data.clips.map((clip) => (
+        <article key={clip.id}><span><Flame size={18} aria-hidden="true" /> {clip.stat}</span><h3>{clip.title}</h3><div><button type="button" disabled={Boolean(busy) || clip.voted} onClick={() => void act("/api/hunts/clips/vote", `vote-${clip.id}`, { clipId: clip.id })}>{clip.voted ? "Voted" : "Vote"} · {clip.votes}</button><button type="button" disabled={Boolean(busy)} onClick={() => void act("/api/hunts/clips/save", `save-${clip.id}`, { clipId: clip.id })}>{clip.saved ? "Saved" : "Save"}</button></div></article>
+      ))}</div></section>}
     </section>
   );
 }
@@ -1731,8 +1703,6 @@ function AdminWorkspace({
   const [adminStoreMessage, setAdminStoreMessage] = useState("Loading store");
   const [supportTickets, setSupportTickets] = useState<Ticket[]>([]);
   const [supportStatus, setSupportStatus] = useState("Loading support");
-  const [adminRaffle, setAdminRaffle] = useState<RafflePayload | null>(null);
-  const [adminRaffleStatus, setAdminRaffleStatus] = useState("Loading raffle");
   const [kickEventStatus, setKickEventStatus] = useState("Loading Kick status");
   const [kickStream, setKickStream] = useState<AdminKickStream | null>(null);
   const [kickSubscribeBusy, setKickSubscribeBusy] = useState(false);
@@ -1921,14 +1891,9 @@ function AdminWorkspace({
 
     let active = true;
 
-    Promise.all([
-      fetch("/api/admin/support/tickets", { cache: "no-store" }).then((response) => response.json()),
-      fetch("/api/raffles", { cache: "no-store" }).then((response) => response.json()),
-    ])
-      .then(([ticketPayload, rafflePayload]: [
-        { tickets?: Ticket[]; error?: string },
-        { raffle?: RafflePayload; error?: string },
-      ]) => {
+    fetch("/api/admin/support/tickets", { cache: "no-store" })
+      .then((response) => response.json() as Promise<{ tickets?: Ticket[]; error?: string }>)
+      .then((ticketPayload) => {
         if (!active) return;
         if (ticketPayload.tickets) {
           setSupportTickets(ticketPayload.tickets);
@@ -1936,17 +1901,10 @@ function AdminWorkspace({
         } else {
           setSupportStatus(ticketPayload.error ?? "Could not load support");
         }
-        if (rafflePayload.raffle) {
-          setAdminRaffle(rafflePayload.raffle);
-          setAdminRaffleStatus("Raffle loaded");
-        } else {
-          setAdminRaffleStatus(rafflePayload.error ?? "Could not load raffle");
-        }
       })
       .catch(() => {
         if (!active) return;
         setSupportStatus("Could not load support");
-        setAdminRaffleStatus("Could not load raffle");
       });
 
     return () => { active = false; };
@@ -2545,27 +2503,6 @@ function AdminWorkspace({
     }
   }
 
-  async function drawAdminRaffle() {
-    if (!adminRaffle) return;
-    setAdminRaffleStatus("Drawing winner...");
-
-    try {
-      const response = await fetch("/api/admin/raffles/draw", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roundId: adminRaffle.round.id }),
-      });
-      const payload = (await response.json()) as { raffle?: RafflePayload; error?: string };
-      if (!response.ok || !payload.raffle) {
-        throw new Error(payload.error ?? "Raffle draw failed");
-      }
-      setAdminRaffle(payload.raffle);
-      setAdminRaffleStatus(payload.raffle.winner ? `Winner: ${payload.raffle.winner.handle}` : "Winner drawn");
-    } catch (error) {
-      setAdminRaffleStatus(error instanceof Error ? error.message : "Raffle draw failed");
-    }
-  }
-
   async function subscribeKickEvents() {
     setKickSubscribeBusy(true);
     setKickEventStatus("Syncing Kick events...");
@@ -2956,22 +2893,6 @@ function AdminWorkspace({
             )}
           </article>
         ))}
-      </div>
-
-      {/* Raffle Drawing */}
-      <div className="admin-section-title">
-        <div>
-          <p>Raffles</p>
-          <h2>Draw a winner</h2>
-        </div>
-      </div>
-      <div className="tool-panel">
-        <div>
-          <small>{adminRaffle?.round.status ?? "Raffle"}</small>
-          <strong>{adminRaffle?.round.totalEntries ?? 0}</strong>
-          <span>{adminRaffleStatus}</span>
-        </div>
-        <button type="button" disabled={!adminRaffle || adminRaffle.round.totalEntries <= 0 || adminRaffle.round.status !== "Open"} onClick={drawAdminRaffle}>Draw winner</button>
       </div>
 
       {/* Support Inbox */}

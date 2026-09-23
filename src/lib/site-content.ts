@@ -31,9 +31,9 @@ export const siteNavigation: NavigationItem[] = [
         description: "Daily, weekly, and campaign challenge layouts.",
       },
       {
-        label: "Wager Raffles",
-        href: "/wager-raffles",
-        description: "Prize-draw surfaces and ticket-based reward pages.",
+        label: "Bonus Hunts",
+        href: "/bonus-hunts",
+        description: "Live bonus hunts and biggest hits.",
       },
     ],
   },
@@ -65,7 +65,7 @@ export const footerMenus = [
     title: "Events",
     links: [
       { label: "Tournaments", href: "/tournaments" },
-      { label: "Wager Raffles", href: "/wager-raffles" },
+      { label: "Bonus Hunts", href: "/bonus-hunts" },
       { label: "Support", href: "/support" },
     ],
   },
@@ -127,12 +127,12 @@ export const streamCards: SiteFeatureCard[] = [
     icon: Trophy,
   },
   {
-    title: "Wager Raffles",
+    title: "Bonus Hunts",
     description:
-      "Ticket drops.",
-    href: "/wager-raffles",
-    cta: "Grab tickets",
-    meta: "Lucky draw",
+      "Follow the biggest hits.",
+    href: "/bonus-hunts",
+    cta: "Explore hunts",
+    meta: "Live hunts",
     icon: Tickets,
   },
 ];
