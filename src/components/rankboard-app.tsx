@@ -1080,14 +1080,14 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       <div className="board-hero__title">
         <p className="board-hero__signature">ARTZ Rewards</p>
         <h1><span>Monthly</span> Leaderboard</h1>
-        <div className="board-hero__prize" aria-label="Total prize pool: $1,150">
-          <small>Total prize pool</small>
-          <strong>$1,150</strong>
-        </div>
       </div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
     <section className="board-top-three page-width" aria-label="Top three players">
+      <div className="board-prize-spotlight" aria-label="Total prize pool: $1,150">
+        <small>Total prize pool</small>
+        <strong>$1,150</strong>
+      </div>
       <CasinoOrnament className="leaderboard-gold-bars" variant="olympus-scatter" reveal delay={0.08} />
       <div className="winner-arena">
         <Podium players={users.slice(0, 3)} />
@@ -1136,9 +1136,8 @@ function SeasonClock({
     };
   }, [validTarget]);
 
-  const expired = Boolean(validTarget && now !== null && now >= validTarget.getTime());
   const remaining = validTarget && now !== null ? Math.max(0, validTarget.getTime() - now) : null;
-  const countdown = validTarget && !expired
+  const countdown = validTarget
     ? [
         [remaining === null ? null : Math.floor(remaining / 86_400_000), "Days"],
         [remaining === null ? null : Math.floor((remaining / 3_600_000) % 24), "Hrs"],
@@ -1150,18 +1149,13 @@ function SeasonClock({
   return (
     <LiquidGlass as="aside" className="season-clock" depth="clear" tone="violet" aria-label="Leaderboard season status">
       <div className="season-clock__head">
-        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> {expired ? "Round complete" : "Round ends in"}</span>
+        <span><Timer size={16} strokeWidth={2.5} aria-hidden="true" /> Round ends in</span>
         <i className="season-clock__live" aria-hidden="true" />
       </div>
       <div className={`season-clock__digits ${countdown ? "" : "season-clock__digits--live"}`}>
         {countdown ? countdown.map(([value, label]) => (
           <span key={label}><strong>{value === null ? "--" : String(value).padStart(2, "0")}</strong><small>{label}</small></span>
-        )) : expired ? (
-          <>
-            <span><strong>FINAL</strong><small>Window</small></span>
-            <span><strong>ENDED</strong><small>Round</small></span>
-          </>
-        ) : (
+        )) : (
           <>
             <span><strong>NOW</strong><small>Window</small></span>
             <span><strong>AUTO</strong><small>Updates</small></span>
@@ -1171,8 +1165,6 @@ function SeasonClock({
       <small className="season-clock__meta">
         {error
           ? "Syncing season data"
-          : expired && validTarget
-          ? `Closed ${formatShortDate(validTarget)}`
           : validTarget
           ? `Closes ${formatShortDate(validTarget)}`
           : lastUpdated
