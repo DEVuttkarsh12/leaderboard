@@ -1,0 +1,189 @@
+/* Funky gamified layer: glow, chunky sticker headings, curvy playful
+   containers. Loaded last so it wins at equal specificity. */
+
+:root {
+  --funk-cream: #fff6e5;
+  --funk-lemon: #ffe45e;
+  --funk-tangelo: #ff7a1a;
+  --funk-amber: #ffb02e;
+  --funk-mint: #2de1a7;
+  --funk-coral: #ff4d6d;
+  --funk-pine: #07110e;
+}
+
+/* 1. Hero ARTZ Rewards: highlight + glow. */
+.site-shell .home-artz-title {
+  filter: drop-shadow(0 12px 46px rgba(255, 176, 46, 0.3));
+}
+
+.site-shell .home-artz-title .playful-word i {
+  filter: drop-shadow(3px 4px 0 rgba(190, 90, 20, 0.9))
+    drop-shadow(7px 8px 0 rgba(7, 17, 14, 0.95))
+    drop-shadow(0 0 28px rgba(255, 228, 94, 0.5));
+}
+
+.site-shell .home-artz-title .playful-word--accent i {
+  filter: drop-shadow(3px 4px 0 rgba(120, 40, 10, 0.9))
+    drop-shadow(7px 8px 0 rgba(7, 17, 14, 0.9))
+    drop-shadow(0 0 34px rgba(255, 122, 26, 0.6));
+}
+
+.site-shell .home-artz-subtitle {
+  color: rgba(255, 246, 229, 0.85);
+  text-shadow: 0 0 16px rgba(255, 176, 46, 0.4);
+}
+
+/* 2. Every section heading: gamified, engaging, funky. */
+.site-shell .home-section-heading h2,
+.site-shell .workspace-heading h2,
+.site-shell .feature-page-hero__inner h1,
+.site-shell .legal > h1 {
+  color: var(--funk-cream);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transform: rotate(-1deg);
+  text-shadow: 2px 2px 0 #b25a12, 4px 4px 0 rgba(7, 17, 14, 0.9),
+    0 0 26px rgba(255, 176, 46, 0.35);
+}
+
+.site-shell .home-section-heading h2 em,
+.site-shell .workspace-heading h2 em,
+.site-shell .feature-page-hero__inner h1 em,
+.site-shell .legal > h1 em {
+  color: var(--funk-lemon);
+  text-shadow: 2px 2px 0 #b25a12, 4px 4px 0 rgba(7, 17, 14, 0.9),
+    0 0 30px rgba(255, 228, 94, 0.55);
+}
+
+.site-shell .home-section-heading > span,
+.site-shell .workspace-heading > span,
+.site-shell .workspace-heading p {
+  text-shadow: 0 0 14px rgba(255, 228, 94, 0.45);
+}
+
+/* 3. Kickers become mini sticker pills. */
+.site-shell .kicker,
+.site-shell .product-kicker {
+  border: 1.5px solid var(--funk-pine);
+  background: linear-gradient(145deg, var(--funk-lemon), var(--funk-amber));
+  color: #2b1404;
+  box-shadow: 3px 3px 0 var(--funk-pine), 0 0 18px rgba(255, 176, 46, 0.4);
+  transform: rotate(-1.5deg);
+}
+
+.site-shell .kicker span,
+.site-shell .product-kicker span {
+  color: #2b1404;
+}
+
+/* 4. No straight containers: curvy, tilted, sticker-framed. */
+.site-shell .standings,
+.site-shell .season-clock,
+.site-shell .action-card,
+.site-shell .auth-card,
+.site-shell .auth-session-card,
+.site-shell .bracket-panel,
+.site-shell .inventory-panel,
+.site-shell .connection-card,
+.site-shell .casino-link-card,
+.site-shell .workspace-list article,
+.site-shell .tool-panel,
+.site-shell .admin-panel,
+.site-shell .watch-console,
+.site-shell .profile-card,
+.site-shell .profile-panel {
+  border-radius: 22px;
+}
+
+.site-shell .player-row,
+.site-shell .table-head {
+  border-radius: 18px;
+}
+
+/* Arcade-cabinet frame for the main standings board. */
+.site-shell .standings {
+  border: 2px solid var(--funk-cream);
+  box-shadow: 6px 6px 0 var(--funk-pine), 0 26px 60px rgba(0, 0, 0, 0.5),
+    0 0 36px rgba(255, 122, 26, 0.22);
+  transform: rotate(-0.3deg);
+}
+
+/* Leaderboard rows shimmy: alternating playful tilt. */
+.site-shell .board-section .player-row:nth-child(odd) {
+  transform: rotate(-0.35deg);
+}
+
+.site-shell .board-section .player-row:nth-child(even) {
+  transform: rotate(0.35deg);
+}
+
+.site-shell .board-section .player-row:hover {
+  transform: translateX(4px) rotate(0deg);
+}
+
+/* Reward + workspace cards fan out like a hand of cards. */
+.site-shell .workspace-list article:nth-child(3n + 1),
+.site-shell .action-card:nth-child(3n + 1) {
+  transform: rotate(-0.9deg);
+}
+
+.site-shell .workspace-list article:nth-child(3n + 2),
+.site-shell .action-card:nth-child(3n + 2) {
+  transform: rotate(0.5deg);
+}
+
+.site-shell .workspace-list article:nth-child(3n),
+.site-shell .action-card:nth-child(3n) {
+  transform: rotate(-0.4deg);
+}
+
+.site-shell .workspace-list article:hover,
+.site-shell .action-card:hover {
+  transform: translateY(-5px) rotate(0deg);
+}
+
+/* 5. Glowing accent text: timers, amounts, live labels. */
+.site-shell .season-clock__digits strong,
+.site-shell .board-section .player-row .wager,
+.site-shell .hero-rank-tracker__score strong,
+.site-shell .home-live-stat strong {
+  text-shadow: 0 0 16px rgba(255, 228, 94, 0.45);
+}
+
+.site-shell .live-pool .live-pool__copy strong {
+  text-shadow: 0 0 20px rgba(255, 166, 61, 0.5), 2px 3px 0 rgba(60, 30, 5, 0.6);
+}
+
+/* 6. CTA buttons get a playful sticker tilt. */
+.site-shell .home-hero-actions .button:first-child {
+  transform: rotate(-0.8deg);
+}
+
+.site-shell .home-hero-actions .button:last-child {
+  transform: rotate(0.8deg);
+}
+
+.site-shell .home-hero-actions .button:hover:first-child {
+  transform: translateY(-2px) rotate(-0.2deg);
+}
+
+.site-shell .home-hero-actions .button:hover:last-child {
+  transform: translateY(-2px) rotate(0.2deg);
+}
+
+@media (max-width: 780px) {
+  .site-shell .standings {
+    transform: none;
+  }
+
+  .site-shell .workspace-list article:nth-child(n),
+  .site-shell .action-card:nth-child(n) {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell .home-artz-title {
+    filter: none;
+  }
+}

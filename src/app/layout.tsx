@@ -8,6 +8,7 @@ import "./globals.css";
 import "./artz-polish.css";
 import "./casino-stage.css";
 import "./leaderboard-refresh.css";
+import "./funky-gamified.css";
 
 const artzBody = Instrument_Sans({
   variable: "--font-artz-body",

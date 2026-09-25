@@ -38,7 +38,7 @@ type StaggeredMenuProps = {
 
 export default function StaggeredMenu({
   position = "left",
-  colors = ["#d8ff3f", "#43e8ff", "#ff4fa2"],
+  colors = ["#d8ff3f", "#43e8ff", "#ff4d6d"],
   items = [],
   socialItems = [],
   displaySocials = true,

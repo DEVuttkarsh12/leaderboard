@@ -1,5 +1,5 @@
 /* Leaderboard: chunky sticker-ticket presentation, soda-shop palette.
-   Tangelo #FF7A1A / lemon #FFE45E / mint #2DE1A7 / coral #FF4D6D on deep pine. */
+   Tangelo #FF7A1A / lemon #FFE45E / mint #2DE1A7 / coral #ff4d6d on deep pine. */
 .board-hero--leaderboard {
   min-height: 320px;
   display: flex;
@@ -325,11 +325,11 @@
 
 /* Bonus hunts reuse the site's glass language with live event data. */
 .bonus-hunts-workspace { gap: 24px; }
-.hunt-feature { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1fr); gap: 32px; padding: clamp(24px, 4vw, 44px); border-color: rgba(255, 150, 106, 0.35); background: radial-gradient(circle at 12% 8%, rgba(255, 103, 149, 0.21), transparent 46%), linear-gradient(145deg, rgba(55, 9, 65, 0.94), rgba(13, 2, 24, 0.96)); }
+.hunt-feature { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1fr); gap: 32px; padding: clamp(24px, 4vw, 44px); border-color: rgba(255, 150, 106, 0.35); background: radial-gradient(circle at 12% 8%, rgba(255, 77, 109, 0.21), transparent 46%), linear-gradient(145deg, rgba(19, 38, 32, 0.94), rgba(13, 2, 24, 0.96)); }
 .hunt-feature__intro { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .hunt-status { display: inline-flex; align-items: center; gap: 6px; width: max-content; padding: 7px 11px; border: 1px solid rgba(255, 177, 100, 0.45); border-radius: 999px; color: #ffd18c; font-size: 11px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; }
 .hunt-status--live { color: #ffba72; box-shadow: 0 0 18px rgba(255, 132, 82, 0.21); }
-.hunt-status--upcoming { color: #cfadff; border-color: rgba(189, 126, 255, 0.43); }
+.hunt-status--upcoming { color: #ffedbe; border-color: rgba(255, 176, 46, 0.43); }
 .hunt-feature h2 { margin: 0; color: #fff4fc; font-family: var(--font-artz-display), sans-serif; font-size: clamp(35px, 4.5vw, 60px); line-height: 0.98; }
 .hunt-feature p, .hunt-list__card p { margin: 0; color: rgba(255, 235, 248, 0.62); }
 .hunt-feature button, .hunt-list__card button, .hunt-clips button { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 16px; border: 1px solid rgba(255, 201, 125, 0.62); border-radius: 999px; background: rgba(255, 179, 96, 0.13); color: #ffdeb0; font-weight: 800; cursor: pointer; }
@@ -338,10 +338,10 @@
 .hunt-feature__stats { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .hunt-feature__stats > div { display: grid; align-content: center; gap: 7px; min-height: 91px; padding: 16px; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 16px; background: rgba(10, 1, 22, 0.45); }
 .hunt-feature__stats small { color: rgba(255, 236, 247, 0.56); font-size: 11px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
-.hunt-feature__stats strong { color: #fff1db; font-size: clamp(21px, 2.5vw, 32px); line-height: 1; }
+.hunt-feature__stats strong { color: #ffedbe; font-size: clamp(21px, 2.5vw, 32px); line-height: 1; }
 .hunt-feature__stats strong span { color: rgba(255, 240, 249, 0.5); font-size: 0.63em; }
 .hunt-feature__progress { grid-column: 1 / -1; height: 8px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.1); }
-.hunt-feature__progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #af67f6, #ff72ae, #ffc66e); box-shadow: 0 0 18px rgba(255, 169, 104, 0.62); }
+.hunt-feature__progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffb02e, #ff4d6d, #ffc66e); box-shadow: 0 0 18px rgba(255, 169, 104, 0.62); }
 .hunt-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
 .hunt-list__card { display: grid; align-content: start; gap: 12px; min-height: 205px; padding: 22px; }
 .hunt-list__card h3 { margin: 0; color: #fff7fb; font-size: 24px; }
@@ -350,7 +350,7 @@
 .hunt-list__card button { justify-self: start; margin-top: 4px; }
 .hunt-clips h2 { color: #fff5fa; font-size: clamp(27px, 3vw, 38px); }
 .hunt-clips > div { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-.hunt-clips article { display: grid; align-content: start; gap: 14px; min-height: 170px; padding: 20px; border: 1px solid rgba(255, 112, 176, 0.26); border-radius: 18px; background: rgba(32, 5, 43, 0.82); }
+.hunt-clips article { display: grid; align-content: start; gap: 14px; min-height: 170px; padding: 20px; border: 1px solid rgba(255, 77, 109, 0.26); border-radius: 18px; background: rgba(14, 29, 25, 0.82); }
 .hunt-clips article > span { display: inline-flex; align-items: center; gap: 7px; color: #ffbc84; font-weight: 900; }
 .hunt-clips h3 { margin: 0; color: #fff6fa; font-size: 20px; }
 .hunt-clips article > div { display: flex; gap: 9px; flex-wrap: wrap; }
