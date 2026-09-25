@@ -19,21 +19,27 @@ export default function SiteEntryLoader({
   );
 
   useEffect(() => {
-    if (embedded) return undefined;
+    // Timers always run — even in embedded mode (route loading UI). The
+    // embedded loader previously never dismissed itself and relied solely on
+    // the parent unmounting it, which bricked the site whenever a segment
+    // stayed suspended. Self-dismiss is the backstop; the parent unmounting
+    // first is still the normal path.
+    let exitTimer = 0;
+    let hideTimer = 0;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-    const visibleMs = prefersReducedMotion
+    const baseVisibleMs = prefersReducedMotion
       ? REDUCED_MOTION_VISIBLE_MS
       : VISIBLE_MS;
+    const visibleMs = embedded
+      ? Math.max(baseVisibleMs, 2400)
+      : baseVisibleMs;
     const exitMs = prefersReducedMotion ? 0 : EXIT_MS;
 
-    const exitTimer = window.setTimeout(() => setPhase("exiting"), visibleMs);
-    const hideTimer = window.setTimeout(
-      () => setPhase("hidden"),
-      visibleMs + exitMs
-    );
+    exitTimer = window.setTimeout(() => setPhase("exiting"), visibleMs);
+    hideTimer = window.setTimeout(() => setPhase("hidden"), visibleMs + exitMs);
 
     return () => {
       window.clearTimeout(exitTimer);

@@ -9279,6 +9279,7 @@ textarea {
   position: fixed;
   inset: 0;
   min-height: 100svh;
+  animation: site-loader-failsafe 0s 8s forwards;
   background:
     linear-gradient(rgba(216, 255, 63, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(67, 232, 255, 0.035) 1px, transparent 1px),
@@ -9305,7 +9306,8 @@ textarea {
 }
 
 .site-loader--exit {
-  animation: rank-gate-exit 0.24s cubic-bezier(0.7, 0, 1, 1) forwards;
+  animation: rank-gate-exit 0.24s cubic-bezier(0.7, 0, 1, 1) forwards, site-loader-failsafe 0s 4s forwards;
+  pointer-events: none;
 }
 
 .site-loader--exit .site-loader__stage {
@@ -9603,6 +9605,12 @@ textarea {
 
 @keyframes rank-gate-exit {
   to { opacity: 0; }
+}
+
+/* Last-resort backstop: even if loader JS state ever stalls mid-exit, the
+   overlay can never trap the page — it drops out of hit-testing. */
+@keyframes site-loader-failsafe {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
 
 /* Responsive 3D gloss for actionable surfaces. */
