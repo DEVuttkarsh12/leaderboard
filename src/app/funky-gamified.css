@@ -11,21 +11,21 @@
   --funk-pine: #07110e;
 }
 
-/* 1. Hero ARTZ Rewards: highlight + glow. */
+/* 1. Hero ARTZ Rewards: highlight + glow. The soft halo lives on the
+   parent (composited once, always safe); per-letter shadows stay solid
+   offsets so glyph counters never ghost or fill in. */
 .site-shell .home-artz-title {
   filter: drop-shadow(0 12px 46px rgba(255, 176, 46, 0.3));
 }
 
 .site-shell .home-artz-title .playful-word i {
-  filter: drop-shadow(3px 4px 0 rgba(190, 90, 20, 0.9))
-    drop-shadow(7px 8px 0 rgba(7, 17, 14, 0.95))
-    drop-shadow(0 0 28px rgba(255, 228, 94, 0.5));
+  filter: drop-shadow(3px 4px 0 rgba(150, 60, 10, 0.9))
+    drop-shadow(6px 7px 0 rgba(7, 17, 14, 0.95));
 }
 
 .site-shell .home-artz-title .playful-word--accent i {
-  filter: drop-shadow(3px 4px 0 rgba(120, 40, 10, 0.9))
-    drop-shadow(7px 8px 0 rgba(7, 17, 14, 0.9))
-    drop-shadow(0 0 34px rgba(255, 122, 26, 0.6));
+  filter: drop-shadow(3px 4px 0 rgba(120, 45, 5, 0.9))
+    drop-shadow(6px 7px 0 rgba(7, 17, 14, 0.9));
 }
 
 .site-shell .home-artz-subtitle {

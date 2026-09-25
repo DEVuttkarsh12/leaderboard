@@ -370,7 +370,6 @@ h4,
   font-weight: 400;
   line-height: 0.95;
   text-transform: none;
-  text-shadow: 7px 8px 0 rgba(15, 90, 60, 0.46), 0 24px 52px rgba(4, 0, 10, 0.5);
   white-space: nowrap;
 }
 
@@ -390,17 +389,17 @@ h4,
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1.35px rgba(255, 225, 247, 0.94);
+  -webkit-text-stroke: 2.5px #ffc44d;
   paint-order: stroke fill;
-  filter: drop-shadow(3px 4px 0 rgba(255, 77, 109, 0.72)) drop-shadow(6px 7px 0 rgba(15, 90, 60, 0.62));
+  filter: drop-shadow(3px 4px 0 rgba(150, 60, 10, 0.9)) drop-shadow(6px 7px 0 rgba(7, 17, 14, 0.95));
   animation: artz-title-shine 4.2s ease-in-out infinite alternate;
 }
 
 .playful-word--accent i {
   color: #ff8a5c;
   background-image: linear-gradient(180deg, #ffedbe 0%, #ff8a5c 38%, #ff4d6d 62%, #ffb02e 100%);
-  -webkit-text-stroke-color: rgba(255, 237, 190, 0.96);
-  filter: drop-shadow(3px 4px 0 rgba(15, 90, 60, 0.78)) drop-shadow(6px 7px 0 rgba(17, 35, 30, 0.7)) drop-shadow(0 0 18px rgba(255, 77, 109, 0.32));
+  -webkit-text-stroke-color: #ffe45e;
+  filter: drop-shadow(3px 4px 0 rgba(120, 45, 5, 0.9)) drop-shadow(6px 7px 0 rgba(7, 17, 14, 0.9));
 }
 
 @keyframes artz-title-shine {
@@ -408,13 +407,13 @@ h4,
   76%, 100% { background-position: 50% 100%; }
 }
 
-.playful-word i:nth-child(1) { transform: translateY(2px) rotate(-3deg); }
-.playful-word i:nth-child(2) { transform: translateY(-3px) rotate(2deg); }
-.playful-word i:nth-child(3) { transform: translateY(3px) rotate(-1deg); }
-.playful-word i:nth-child(4) { transform: translateY(-2px) rotate(3deg); }
-.playful-word i:nth-child(5) { transform: translateY(2px) rotate(-2deg); }
-.playful-word i:nth-child(6) { transform: translateY(-3px) rotate(1deg); }
-.playful-word i:nth-child(7) { transform: translateY(1px) rotate(2deg); }
+.playful-word i:nth-child(1) { transform: translateY(4px) rotate(-5deg); }
+.playful-word i:nth-child(2) { transform: translateY(-5px) rotate(4deg); }
+.playful-word i:nth-child(3) { transform: translateY(5px) rotate(-3deg); }
+.playful-word i:nth-child(4) { transform: translateY(-4px) rotate(5deg); }
+.playful-word i:nth-child(5) { transform: translateY(4px) rotate(-4deg); }
+.playful-word i:nth-child(6) { transform: translateY(-5px) rotate(3deg); }
+.playful-word i:nth-child(7) { transform: translateY(3px) rotate(-5deg); }
 
 .home-artz-subtitle {
   margin-top: 13px;
