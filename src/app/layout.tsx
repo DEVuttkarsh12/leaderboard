@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import {
-  Bricolage_Grotesque,
+  Baloo_2,
   Instrument_Sans,
-  Sedgwick_Ave,
+  Titan_One,
 } from "next/font/google";
 import "./globals.css";
 import "./artz-polish.css";
@@ -15,13 +15,13 @@ const artzBody = Instrument_Sans({
   display: "swap",
 });
 
-const artzDisplay = Bricolage_Grotesque({
+const artzDisplay = Baloo_2({
   variable: "--font-artz-display",
   subsets: ["latin"],
   display: "swap",
 });
 
-const artzLogo = Sedgwick_Ave({
+const artzLogo = Titan_One({
   variable: "--font-artz-logo",
   weight: "400",
   subsets: ["latin"],

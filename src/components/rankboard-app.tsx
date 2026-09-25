@@ -1078,15 +1078,24 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="board-hero board-hero--leaderboard page-width">
       <PrizeDropField compact />
       <div className="board-hero__title">
-        <p className="board-hero__signature">ARTZ Rewards</p>
+        <p className="board-hero__badge"><i />Season 08 · Live now</p>
         <h1><span>Monthly</span> Leaderboard</h1>
+        <p className="board-hero__sub">Top wagers take the pot. No fluff, just hits.</p>
       </div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
     <section className="board-top-three page-width" aria-label="Top three players">
       <div className="board-prize-spotlight" aria-label="Total prize pool: $1,150">
-        <small>Total prize pool</small>
-        <strong>$1,150</strong>
+        <span className="prize-ticket__coin" aria-hidden="true"><Trophy size={26} strokeWidth={2.4} /></span>
+        <span className="prize-ticket__main">
+          <small><i />Prize pot · paid in cash</small>
+          <strong>$1,150</strong>
+        </span>
+        <span className="prize-ticket__splits">
+          <b className="split split--first">1st · $600</b>
+          <b className="split split--second">2nd · $325</b>
+          <b className="split split--third">3rd · $225</b>
+        </span>
       </div>
       <CasinoOrnament className="leaderboard-gold-bars" variant="olympus-scatter" reveal delay={0.08} />
       <div className="winner-arena">

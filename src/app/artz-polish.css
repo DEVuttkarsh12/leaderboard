@@ -1,10 +1,10 @@
 /* Final ARTZ presentation layer: quiet backdrop, compact navigation, clearer hierarchy. */
 :root {
-  --artz-amber: #f5a33b;
-  --artz-amber-soft: rgba(245, 163, 59, 0.18);
-  --artz-plum: #7d32bd;
-  --artz-pink: #ff4fac;
-  --artz-ink: #0a0312;
+  --artz-amber: #ffb02e;
+  --artz-amber-soft: rgba(255, 176, 46, 0.18);
+  --artz-plum: #0e2a22;
+  --artz-pink: #ff7a1a;
+  --artz-ink: #07110e;
 }
 
 body {

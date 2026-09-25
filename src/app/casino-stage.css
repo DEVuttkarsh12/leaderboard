@@ -1,27 +1,27 @@
-/* ARTZ casino stage: an original, CodeShib-inspired presentation layer. */
+/* ARTZ casino stage: original arcade soda-shop presentation layer. */
 :root {
   --font-body: var(--font-artz-body), Arial, sans-serif;
   --font-display: var(--font-artz-display), Arial, sans-serif;
   --font-label: var(--font-artz-body), Arial, sans-serif;
-  --font-logo: var(--font-artz-logo), cursive;
-  --bg: #0a0112;
-  --bg-deep: #06000d;
-  --surface: rgba(25, 5, 36, 0.78);
-  --surface-2: rgba(35, 7, 47, 0.86);
-  --surface-3: rgba(48, 9, 58, 0.92);
-  --text: #fff7ec;
-  --muted: #d8c8d9;
-  --faint: #a78fae;
-  --gold: #ffab3d;
-  --gold-bright: #ffd378;
-  --violet: #a855f7;
-  --blue: #ca69ff;
-  --coral: #ff4ca5;
-  --success: #d6ff4a;
-  --line: rgba(255, 171, 61, 0.16);
-  --line-strong: rgba(255, 171, 61, 0.46);
-  --glass-edge: rgba(255, 128, 205, 0.25);
-  --glass-deep: rgba(15, 1, 25, 0.82);
+  --font-logo: var(--font-artz-logo), sans-serif;
+  --bg: #07110e;
+  --bg-deep: #040c0a;
+  --surface: rgba(14, 33, 27, 0.78);
+  --surface-2: rgba(18, 42, 34, 0.86);
+  --surface-3: rgba(24, 54, 43, 0.92);
+  --text: #fff6e5;
+  --muted: #d8cfbc;
+  --faint: #a89e88;
+  --gold: #ffb02e;
+  --gold-bright: #ffe45e;
+  --violet: #2de1a7;
+  --blue: #5ac8ff;
+  --coral: #ff4d6d;
+  --success: #2de1a7;
+  --line: rgba(255, 176, 46, 0.16);
+  --line-strong: rgba(255, 176, 46, 0.46);
+  --glass-edge: rgba(255, 228, 94, 0.25);
+  --glass-deep: rgba(7, 17, 14, 0.82);
   --neon: var(--gold);
   --accent: var(--gold);
   --orange: var(--gold);
