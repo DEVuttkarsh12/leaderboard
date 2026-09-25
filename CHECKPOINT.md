@@ -543,3 +543,19 @@ Note: `20260915180000` removes the `xp` concept in favor of points + watch confi
 * Reconnect Kick, then `/admin` -> `Subscribe events`.
 * Live QA: OAuth, casino verification, admin points, store fulfillment, bets, challenges, tournaments + Challonge, raffles, support, site banners, watch points.
 * Optional hardening: broader mutation rate limits, admin audit logs, webhook retry/monitoring, `<img>` -> `next/image`.
+
+### F. Session Checkpoint — 2026-09-25 (visual identity overhaul)
+
+Goal: stop resembling Codeshib (handwritten purple prize readout, all-purple theme); go full funky-gamified soda-shop identity.
+
+Commits on `main` (all pushed to `origin/main`):
+* `eed6d9f` — leaderboard prize-pot ticket (1st $600 / 2nd $325 / 3rd $225 splits), Titan One + Baloo 2 fonts, mint/coral/lemon podium, tangelo/lemon/mint/coral on deep pine.
+* `7393a96` — loader fix: `loading.tsx` embedded loader never dismissed itself and trapped the page; timers now run in all modes, CSS failsafe + `pointer-events: none` on exit.
+* `9284270` — full purple purge (~150 tint replacements incl. dark plum surfaces → deep pine), 950→800 weights, new `src/app/funky-gamified.css` layer (glowing hero, sticker kickers, curvy tilted cards, arcade standings frame).
+* `1a6a477` — gold 2.5px hero letter outlines, bigger per-letter bounce, fixed "e" ghost-fill glitch (dropped parent `text-shadow` + per-letter blur glows), canvas stage + `public/artz-stage-worker.js` rethemed to ember lagoon (deep pine sky, amber/coral/mint embers, glints, auroras, waves).
+
+Key files touched: `src/app/layout.tsx` (fonts Titan One/Baloo 2, `funky-gamified.css` import), `src/app/{globals,artz-polish,casino-stage,leaderboard-refresh,funky-gamified}.css`, `src/components/{rankboard-app,site-entry-loader,artz-stage-background,staggered-menu}.tsx`, `public/artz-stage-worker.js`.
+
+Verify: `npm run lint` (0 errors, 4 pre-existing warnings), `npm run build` passes. Dev: `npm run dev`, open `http://localhost:3000` (HMR blocked on `127.0.0.1`).
+
+Open threads: confirm hero "e" render on user's screen; next pages to style (store, bets, home sections). Push-note: if `git push` gets 403 as `zykkenai-dev`, run `gh auth switch --hostname github.com --user DEVuttkarsh12` first.
