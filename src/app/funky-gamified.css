@@ -315,6 +315,71 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 13. Sticker navbar with the same funky vibe as the boards. */
+.site-shell .desktop-nav {
+  border: 2px solid var(--funk-cream);
+  border-radius: 22px;
+  box-shadow: 4px 4px 0 var(--funk-pine), 0 18px 44px rgba(0, 0, 0, 0.45),
+    0 0 30px rgba(255, 122, 26, 0.12);
+}
+
+.site-shell .desktop-nav__mark {
+  border: 2px solid var(--funk-pine);
+  font-family: var(--font-artz-logo);
+  font-weight: 700;
+  transform: rotate(-8deg) scale(1.06);
+  box-shadow: 2px 2px 0 var(--funk-pine), 0 0 18px rgba(255, 176, 46, 0.4);
+}
+
+.site-shell .desktop-nav__word {
+  font-weight: 600;
+  -webkit-text-stroke: 0.6px var(--funk-amber);
+  paint-order: stroke fill;
+}
+
+.site-shell .desktop-nav__links a {
+  font-family: var(--font-artz-display);
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.site-shell .desktop-nav__links a:hover {
+  background: rgba(255, 176, 46, 0.14);
+  color: var(--funk-lemon);
+  text-shadow: 0 0 12px rgba(255, 228, 94, 0.55);
+  transform: rotate(-2deg) translateY(-1px);
+}
+
+.site-shell .desktop-nav__links a.active {
+  background: linear-gradient(145deg, var(--funk-lemon), var(--funk-amber));
+  color: #2b1404;
+  text-shadow: none;
+  transform: rotate(-1deg);
+  box-shadow: 2px 2px 0 var(--funk-pine);
+}
+
+.site-shell .desktop-nav__account {
+  border: 1.5px solid rgba(255, 246, 229, 0.9);
+  border-radius: 16px;
+}
+
+.site-shell .desktop-nav__logout--login {
+  border: 2px solid var(--funk-pine);
+  transform: rotate(1deg);
+  box-shadow: 3px 3px 0 var(--funk-pine);
+}
+
+.site-shell .desktop-nav__logout--login:hover {
+  transform: rotate(0deg) translateY(-1px);
+}
+
+/* Mobile menu header gets the sticker treatment too. */
+.site-shell .staggered-menu-header {
+  border: 2px solid rgba(255, 246, 229, 0.9);
+  border-radius: 18px;
+  box-shadow: 3px 3px 0 var(--funk-pine);
+}
+
 @media (max-width: 780px) {
   .site-shell .standings {
     transform: none;
