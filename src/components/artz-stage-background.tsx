@@ -10,7 +10,7 @@ type Ember = {
   sway: number;
   phase: number;
   opacity: number;
-  tone: "gold" | "coral" | "mint";
+  tone: "gold" | "coral" | "ruby";
 };
 
 type AmbientBloom = {
@@ -31,7 +31,7 @@ type Glint = {
   speed: number;
   phase: number;
   opacity: number;
-  tone: "gold" | "coral" | "mint";
+  tone: "gold" | "coral" | "ruby";
 };
 
 const TAU = Math.PI * 2;
@@ -49,7 +49,7 @@ const AMBIENT_BLOOMS: AmbientBloom[] = [
     phase: 0.4,
     speed: 0.13,
     drift: 0.052,
-    core: "rgba(255, 170, 60, 0.16)",
+    core: "rgba(255, 185, 80, 0.17)",
     edge: "rgba(255, 122, 26, 0.04)",
   },
   {
@@ -59,8 +59,8 @@ const AMBIENT_BLOOMS: AmbientBloom[] = [
     phase: 2.1,
     speed: 0.1,
     drift: 0.045,
-    core: "rgba(45, 225, 167, 0.14)",
-    edge: "rgba(20, 120, 85, 0.035)",
+    core: "rgba(255, 120, 70, 0.15)",
+    edge: "rgba(140, 30, 45, 0.04)",
   },
   {
     x: 0.54,
@@ -85,7 +85,7 @@ function createEmbers(width: number, height: number) {
     sway: 5 + ((index * 29) % 18),
     phase: ((index * 47) % 360) * (Math.PI / 180),
     opacity: 0.18 + ((index * 13) % 35) / 100,
-    tone: index % 7 === 0 ? "coral" : index % 5 === 0 ? "mint" : "gold",
+    tone: index % 7 === 0 ? "coral" : index % 5 === 0 ? "ruby" : "gold",
   }));
 }
 
@@ -99,7 +99,7 @@ function createGlints(width: number, height: number) {
     speed: 1.2 + ((index * 23) % 30) / 10,
     phase: ((index * 71) % 360) * (Math.PI / 180),
     opacity: 0.18 + ((index * 11) % 28) / 100,
-    tone: index % 6 === 0 ? "gold" : index % 3 === 0 ? "coral" : "mint",
+    tone: index % 6 === 0 ? "gold" : index % 3 === 0 ? "coral" : "ruby",
   }));
 }
 
@@ -179,7 +179,7 @@ function drawAmbientBloom(
   const glow = context.createRadialGradient(x, y, 0, x, y, radius);
   glow.addColorStop(0, bloom.core);
   glow.addColorStop(0.46, bloom.edge);
-  glow.addColorStop(1, "rgba(5, 0, 12, 0)");
+  glow.addColorStop(1, "rgba(10, 4, 5, 0)");
 
   context.save();
   context.globalCompositeOperation = "screen";
@@ -317,7 +317,7 @@ function drawGlint(
     ? "rgba(255, 199, 99, 0.96)"
     : glint.tone === "coral"
       ? "rgba(255, 110, 120, 0.95)"
-      : "rgba(80, 255, 190, 0.9)";
+      : "rgba(255, 70, 95, 0.92)";
 
   context.save();
   context.translate(glint.x, glint.y);
@@ -487,9 +487,9 @@ export default function ArtzStageBackground() {
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       sky = context.createLinearGradient(0, 0, 0, height);
-      sky.addColorStop(0, "#04100d");
-      sky.addColorStop(0.48, "#082018");
-      sky.addColorStop(1, "#0d2a20");
+      sky.addColorStop(0, "#0d0507");
+      sky.addColorStop(0.48, "#1c0b08");
+      sky.addColorStop(1, "#28110a");
       canvas.dataset.renderFps = String(Math.round(1000 / frameInterval));
       embers = createEmbers(width, height);
       glints = createGlints(width, height);
@@ -508,7 +508,7 @@ export default function ArtzStageBackground() {
       pointer.x += (pointerTarget.x - pointer.x) * 0.065;
       pointer.y += (pointerTarget.y - pointer.y) * 0.065;
 
-      context.fillStyle = sky ?? "#0a1f18";
+      context.fillStyle = sky ?? "#160b07";
       context.fillRect(0, 0, width, height);
 
       const centerGlowPulse = 0.96 + Math.sin(time * 0.28) * 0.055;
@@ -521,7 +521,7 @@ export default function ArtzStageBackground() {
         Math.max(width, height) * 0.54 * centerGlowPulse
       );
       centerGlow.addColorStop(0, "rgba(255, 122, 26, 0.24)");
-      centerGlow.addColorStop(0.48, "rgba(45, 225, 167, 0.1)");
+      centerGlow.addColorStop(0.48, "rgba(255, 150, 60, 0.09)");
       centerGlow.addColorStop(1, "rgba(4, 12, 10, 0)");
       context.fillStyle = centerGlow;
       context.fillRect(0, 0, width, height);
@@ -534,8 +534,8 @@ export default function ArtzStageBackground() {
         y: 0.26,
         phase: 0.7,
         speed: 0.09,
-        color: "rgba(45, 225, 167, 0.11)",
-        highlight: "rgba(255, 228, 94, 0.13)",
+        color: "rgba(255, 200, 100, 0.12)",
+        highlight: "rgba(255, 90, 110, 0.12)",
       });
       drawAuroraVeil(context, width, height, time, pointer.x, {
         y: 0.62,
@@ -590,8 +590,8 @@ export default function ArtzStageBackground() {
         const pulse = 0.72 + Math.sin(time * 1.15 + ember.phase) * 0.28;
         const color = ember.tone === "coral"
           ? `rgba(255, 100, 110, ${ember.opacity * pulse})`
-          : ember.tone === "mint"
-            ? `rgba(90, 255, 190, ${ember.opacity * pulse})`
+          : ember.tone === "ruby"
+            ? `rgba(255, 70, 95, ${ember.opacity * pulse})`
             : `rgba(255, 169, 66, ${ember.opacity * pulse})`;
         context.beginPath();
         context.arc(ember.x, ember.y, ember.radius * pulse, 0, TAU);
@@ -621,9 +621,9 @@ export default function ArtzStageBackground() {
         speed: 0.18,
         frequency: 1.2,
         offset: 0.8,
-        top: "rgba(20, 80, 60, 0.44)",
-        bottom: "rgba(6, 20, 16, 0.88)",
-        glow: "rgba(45, 225, 167, 0.38)",
+        top: "rgba(120, 50, 20, 0.44)",
+        bottom: "rgba(24, 10, 6, 0.9)",
+        glow: "rgba(255, 150, 60, 0.36)",
       });
       drawWave(context, width, height, time, pointer.x, {
         baseline: 0.87,
@@ -631,8 +631,8 @@ export default function ArtzStageBackground() {
         speed: -0.14,
         frequency: 1.45,
         offset: 2.2,
-        top: "rgba(150, 70, 25, 0.28)",
-        bottom: "rgba(20, 10, 4, 0.96)",
+        top: "rgba(160, 75, 25, 0.3)",
+        bottom: "rgba(22, 9, 5, 0.96)",
         glow: "rgba(255, 150, 60, 0.3)",
       });
       drawWave(context, width, height, time, pointer.x, {
@@ -641,8 +641,8 @@ export default function ArtzStageBackground() {
         speed: 0.1,
         frequency: 1.1,
         offset: 4.1,
-        top: "rgba(14, 60, 45, 0.5)",
-        bottom: "rgba(3, 10, 8, 1)",
+        top: "rgba(90, 30, 25, 0.5)",
+        bottom: "rgba(12, 5, 4, 1)",
         glow: "rgba(255, 176, 46, 0.3)",
       });
 

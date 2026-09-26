@@ -32,7 +32,7 @@ function rebuildScene() {
     sway: 5 + ((index * 29) % 16),
     phase: ((index * 47) % 360) * Math.PI / 180,
     alpha: 0.16 + ((index * 13) % 28) / 100,
-    tone: index % 7 === 0 ? "coral" : index % 5 === 0 ? "mint" : "gold",
+    tone: index % 7 === 0 ? "coral" : index % 5 === 0 ? "ruby" : "gold",
   }));
 
   glints = Array.from({ length: glintCount }, (_, index) => ({
@@ -41,7 +41,7 @@ function rebuildScene() {
     size: 1.7 + ((index * 19) % 26) / 10,
     speed: 1.2 + ((index * 23) % 26) / 10,
     phase: ((index * 71) % 360) * Math.PI / 180,
-    tone: index % 6 === 0 ? "gold" : index % 3 === 0 ? "coral" : "mint",
+    tone: index % 6 === 0 ? "gold" : index % 3 === 0 ? "coral" : "ruby",
   }));
 }
 
@@ -54,9 +54,9 @@ function resize(nextWidth, nextHeight, nextRatio, nextFps) {
   canvas.height = Math.round(height * ratio);
   context.setTransform(ratio, 0, 0, ratio, 0, 0);
   sky = context.createLinearGradient(0, 0, 0, height);
-  sky.addColorStop(0, "#04100d");
-  sky.addColorStop(0.48, "#082018");
-  sky.addColorStop(1, "#0d2a20");
+  sky.addColorStop(0, "#0d0507");
+  sky.addColorStop(0.48, "#1c0b08");
+  sky.addColorStop(1, "#28110a");
   rebuildScene();
 }
 
@@ -130,16 +130,16 @@ function draw(now) {
 
   context.globalCompositeOperation = "source-over";
   context.globalAlpha = 1;
-  context.fillStyle = sky || "#0a1f18";
+  context.fillStyle = sky || "#160b07";
   context.fillRect(0, 0, width, height);
 
   const radius = Math.max(width, height) * 0.54;
-  drawBloom(width * (0.5 + pointer.x * 0.018), height * (0.43 + pointer.y * 0.012), radius, "rgba(255, 122, 26, 0.24)", "rgba(45, 225, 167, 0.08)");
+  drawBloom(width * (0.5 + pointer.x * 0.018), height * (0.43 + pointer.y * 0.012), radius, "rgba(255, 122, 26, 0.24)", "rgba(255, 150, 60, 0.08)");
 
   context.globalCompositeOperation = "screen";
   const minSide = Math.min(width, height);
-  drawBloom(width * (0.18 + Math.sin(time * 0.13) * 0.045), height * 0.28, Math.max(220, minSide * 0.38), "rgba(255, 170, 60, 0.15)", "rgba(255, 122, 26, 0.03)");
-  drawBloom(width * (0.82 + Math.sin(time * 0.1 + 2.1) * 0.04), height * 0.42, Math.max(230, minSide * 0.42), "rgba(45, 225, 167, 0.14)", "rgba(20, 120, 85, 0.03)");
+  drawBloom(width * (0.18 + Math.sin(time * 0.13) * 0.045), height * 0.28, Math.max(220, minSide * 0.38), "rgba(255, 185, 80, 0.16)", "rgba(255, 122, 26, 0.03)");
+  drawBloom(width * (0.82 + Math.sin(time * 0.1 + 2.1) * 0.04), height * 0.42, Math.max(230, minSide * 0.42), "rgba(255, 120, 70, 0.15)", "rgba(20, 120, 85, 0.03)");
   drawBloom(width * 0.54, height * (0.78 + Math.cos(time * 0.08) * 0.026), Math.max(250, minSide * 0.48), "rgba(255, 136, 57, 0.1)", "rgba(120, 50, 10, 0.025)");
 
   traceRibbon(time, 0.19, Math.max(24, height * 0.042), 0.6, 0.11, false);
@@ -152,7 +152,7 @@ function draw(now) {
     if (glint.y < -12) glint.y = height + 12;
     const pulse = Math.pow(Math.max(0, Math.sin(time * 0.72 + glint.phase)), 5);
     const size = glint.size * (0.9 + pulse * 0.45);
-    const color = glint.tone === "gold" ? "#ffc763" : glint.tone === "coral" ? "#ff6e78" : "#50ffbe";
+    const color = glint.tone === "gold" ? "#ffc763" : glint.tone === "coral" ? "#ff6e78" : "#ff5e6e";
     context.globalAlpha = 0.28 + pulse * 0.58;
     context.strokeStyle = color;
     context.lineWidth = 0.8;
@@ -170,7 +170,7 @@ function draw(now) {
     if (ember.y < -12) ember.y = height + 12;
     const pulse = 0.72 + Math.sin(time * 1.15 + ember.phase) * 0.28;
     context.globalAlpha = ember.alpha * pulse;
-    context.fillStyle = ember.tone === "coral" ? "#ff646e" : ember.tone === "mint" ? "#5affbe" : "#ffa942";
+    context.fillStyle = ember.tone === "coral" ? "#ff646e" : ember.tone === "ruby" ? "#ff5e6e" : "#ffa942";
     context.beginPath();
     context.arc(ember.x, ember.y, ember.radius * pulse, 0, TAU);
     context.fill();
@@ -178,9 +178,9 @@ function draw(now) {
 
   context.globalAlpha = 1;
   context.globalCompositeOperation = "source-over";
-  drawWave(time, 0.82, Math.max(16, height * 0.025), 0.18, 1.2, 0.8, "rgba(20, 80, 60, 0.42)", "rgba(6, 20, 16, 0.88)");
-  drawWave(time, 0.87, Math.max(20, height * 0.034), -0.14, 1.45, 2.2, "rgba(150, 70, 25, 0.26)", "rgba(20, 10, 4, 0.96)");
-  drawWave(time, 0.92, Math.max(23, height * 0.044), 0.1, 1.1, 4.1, "rgba(14, 60, 45, 0.48)", "rgba(3, 10, 8, 1)");
+  drawWave(time, 0.82, Math.max(16, height * 0.025), 0.18, 1.2, 0.8, "rgba(120, 50, 20, 0.42)", "rgba(24, 10, 6, 0.9)");
+  drawWave(time, 0.87, Math.max(20, height * 0.034), -0.14, 1.45, 2.2, "rgba(160, 75, 25, 0.28)", "rgba(22, 9, 5, 0.96)");
+  drawWave(time, 0.92, Math.max(23, height * 0.044), 0.1, 1.1, 4.1, "rgba(90, 30, 25, 0.48)", "rgba(12, 5, 4, 1)");
 }
 
 function schedule() {

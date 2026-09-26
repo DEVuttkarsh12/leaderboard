@@ -41,7 +41,7 @@
   padding: 8px 16px;
   border: 1.5px solid rgba(255, 228, 94, 0.5);
   border-radius: 999px;
-  background: rgba(7, 17, 14, 0.82);
+  background: rgba(19, 11, 7, 0.82);
   color: #ffe45e;
   font-family: var(--font-artz-body), sans-serif;
   font-size: 12px;
@@ -71,7 +71,7 @@
   letter-spacing: 0.01em;
   text-transform: uppercase;
   transform: rotate(-1deg);
-  text-shadow: 3px 3px 0 #ff7a1a, 6px 6px 0 rgba(7, 17, 14, 0.9), 0 18px 40px rgba(0, 0, 0, 0.5);
+  text-shadow: 3px 3px 0 #ff7a1a, 6px 6px 0 rgba(19, 11, 7, 0.9), 0 18px 40px rgba(0, 0, 0, 0.5);
 }
 
 .board-hero--leaderboard .board-hero__title h1::after { display: none; }
@@ -101,7 +101,7 @@
   border: 2px solid #fff6e5;
   border-radius: 26px;
   background: linear-gradient(145deg, #ffb02e, #ff7a1a 62%, #f25c1d);
-  box-shadow: 6px 6px 0 #07110e, 0 22px 50px rgba(0, 0, 0, 0.45), 0 0 34px rgba(255, 122, 26, 0.25);
+  box-shadow: 6px 6px 0 #130b07, 0 22px 50px rgba(0, 0, 0, 0.45), 0 0 34px rgba(255, 122, 26, 0.25);
   transform: rotate(-1.2deg);
   isolation: isolate;
 }
@@ -111,7 +111,7 @@
   position: absolute;
   inset: 6px;
   z-index: -1;
-  border: 1.5px dashed rgba(7, 17, 14, 0.4);
+  border: 1.5px dashed rgba(19, 11, 7, 0.4);
   border-radius: 19px;
   pointer-events: none;
 }
@@ -135,9 +135,9 @@
   height: 58px;
   display: grid;
   place-items: center;
-  border: 2px solid #07110e;
+  border: 2px solid #130b07;
   border-radius: 50%;
-  background: #07110e;
+  background: #130b07;
   color: #ffe45e;
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.22);
   transform: rotate(6deg);
@@ -167,12 +167,12 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #07110e;
+  background: #130b07;
   animation: pulse 1.6s infinite;
 }
 
 .prize-ticket__main strong {
-  color: #07110e;
+  color: #130b07;
   font-family: var(--font-artz-logo), sans-serif;
   font-size: clamp(52px, 7vw, 84px);
   font-weight: 400;
@@ -185,23 +185,23 @@
   display: grid;
   gap: 7px;
   padding-left: 16px;
-  border-left: 2px dashed rgba(7, 17, 14, 0.35);
+  border-left: 2px dashed rgba(19, 11, 7, 0.35);
 }
 
 .prize-ticket__splits .split {
   white-space: nowrap;
   padding: 6px 12px;
-  border: 1.5px solid #07110e;
+  border: 1.5px solid #130b07;
   border-radius: 999px;
   font-family: var(--font-artz-body), sans-serif;
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.04em;
-  box-shadow: 2px 2px 0 rgba(7, 17, 14, 0.85);
+  box-shadow: 2px 2px 0 rgba(19, 11, 7, 0.85);
 }
 
 .split--first { background: #ffe45e; color: #2b1404; transform: rotate(-1.5deg); }
-.split--second { background: #2de1a7; color: #06231a; transform: rotate(1.2deg); }
+.split--second { background: #2de1a7; color: #21130c; transform: rotate(1.2deg); }
 .split--third { background: #fff6e5; color: #4a1524; transform: rotate(-1deg); }
 
 .board-hero--leaderboard .season-clock {
@@ -250,14 +250,14 @@
   --podium-glow: rgba(45, 225, 167, 0.35);
   border: 2px solid rgba(255, 246, 229, 0.9);
   border-radius: 24px;
-  background: linear-gradient(155deg, #12342a, #07110e 68%);
-  box-shadow: 5px 5px 0 #07110e, 0 24px 55px rgba(0, 0, 0, 0.5), 0 0 30px var(--podium-glow);
+  background: linear-gradient(155deg, #372014, #130b07 68%);
+  box-shadow: 5px 5px 0 #130b07, 0 24px 55px rgba(0, 0, 0, 0.5), 0 0 30px var(--podium-glow);
 }
 
 .board-top-three .winner-arena .podium-card.rank-1 {
   --podium-glow: rgba(255, 178, 46, 0.5);
   border-color: #ffe45e;
-  background: linear-gradient(155deg, #4a2c08, #1a0e02 62%, #07110e);
+  background: linear-gradient(155deg, #4a2c08, #1a0e02 62%, #130b07);
 }
 
 .board-top-three .winner-arena .podium-card.rank-2 {
@@ -268,7 +268,7 @@
 .board-top-three .winner-arena .podium-card.rank-3 {
   --podium-glow: rgba(255, 77, 109, 0.42);
   border-color: #ff4d6d;
-  background: linear-gradient(155deg, #43101d, #160509 62%, #07110e);
+  background: linear-gradient(155deg, #43101d, #160509 62%, #130b07);
 }
 
 .board-top-three .winner-arena .podium-card .avatar {
@@ -325,7 +325,7 @@
 
 /* Bonus hunts reuse the site's glass language with live event data. */
 .bonus-hunts-workspace { gap: 24px; }
-.hunt-feature { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1fr); gap: 32px; padding: clamp(24px, 4vw, 44px); border-color: rgba(255, 150, 106, 0.35); background: radial-gradient(circle at 12% 8%, rgba(255, 77, 109, 0.21), transparent 46%), linear-gradient(145deg, rgba(19, 38, 32, 0.94), rgba(13, 2, 24, 0.96)); }
+.hunt-feature { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1fr); gap: 32px; padding: clamp(24px, 4vw, 44px); border-color: rgba(255, 150, 106, 0.35); background: radial-gradient(circle at 12% 8%, rgba(255, 77, 109, 0.21), transparent 46%), linear-gradient(145deg, rgba(44, 26, 16, 0.94), rgba(13, 2, 24, 0.96)); }
 .hunt-feature__intro { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .hunt-status { display: inline-flex; align-items: center; gap: 6px; width: max-content; padding: 7px 11px; border: 1px solid rgba(255, 177, 100, 0.45); border-radius: 999px; color: #ffd18c; font-size: 11px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; }
 .hunt-status--live { color: #ffba72; box-shadow: 0 0 18px rgba(255, 132, 82, 0.21); }
@@ -350,7 +350,7 @@
 .hunt-list__card button { justify-self: start; margin-top: 4px; }
 .hunt-clips h2 { color: #fff5fa; font-size: clamp(27px, 3vw, 38px); }
 .hunt-clips > div { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-.hunt-clips article { display: grid; align-content: start; gap: 14px; min-height: 170px; padding: 20px; border: 1px solid rgba(255, 77, 109, 0.26); border-radius: 18px; background: rgba(14, 29, 25, 0.82); }
+.hunt-clips article { display: grid; align-content: start; gap: 14px; min-height: 170px; padding: 20px; border: 1px solid rgba(255, 77, 109, 0.26); border-radius: 18px; background: rgba(33, 20, 12, 0.82); }
 .hunt-clips article > span { display: inline-flex; align-items: center; gap: 7px; color: #ffbc84; font-weight: 900; }
 .hunt-clips h3 { margin: 0; color: #fff6fa; font-size: 20px; }
 .hunt-clips article > div { display: flex; gap: 9px; flex-wrap: wrap; }
@@ -363,7 +363,7 @@
   .board-hero--leaderboard .season-clock { position: relative; top: auto; left: auto; right: auto; width: min(350px, 100%); transform: none; }
   .board-prize-spotlight { flex-wrap: wrap; justify-content: center; text-align: center; }
   .prize-ticket__main { justify-items: center; text-align: center; }
-  .prize-ticket__splits { border-left: 0; border-top: 2px dashed rgba(7, 17, 14, 0.35); padding-left: 0; padding-top: 12px; }
+  .prize-ticket__splits { border-left: 0; border-top: 2px dashed rgba(19, 11, 7, 0.35); padding-left: 0; padding-top: 12px; }
   .board-top-three { margin-top: 0; }
   .hunt-feature { grid-template-columns: 1fr; }
 }
