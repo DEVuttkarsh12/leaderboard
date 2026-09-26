@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import {
-  Baloo_2,
+  Fredoka,
   Instrument_Sans,
-  Titan_One,
 } from "next/font/google";
 import "./globals.css";
 import "./artz-polish.css";
@@ -16,15 +15,16 @@ const artzBody = Instrument_Sans({
   display: "swap",
 });
 
-const artzDisplay = Baloo_2({
+const artzDisplay = Fredoka({
   variable: "--font-artz-display",
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
   display: "swap",
 });
 
-const artzLogo = Titan_One({
+const artzLogo = Fredoka({
   variable: "--font-artz-logo",
-  weight: "400",
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
   display: "swap",
 });

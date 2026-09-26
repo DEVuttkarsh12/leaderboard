@@ -33,15 +33,18 @@
   text-shadow: 0 0 16px rgba(255, 176, 46, 0.4);
 }
 
-/* 2. Every section heading: gamified, engaging, funky. */
+/* 2. Every section heading: gamified, engaging, funky. Each letter gets a
+   golden border strip; solid fills keep counters crisp. */
 .site-shell .home-section-heading h2,
 .site-shell .workspace-heading h2,
 .site-shell .feature-page-hero__inner h1,
 .site-shell .legal > h1 {
   color: var(--funk-cream);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.01em;
   transform: rotate(-1deg);
+  -webkit-text-stroke: 1.5px var(--funk-amber);
+  paint-order: stroke fill;
   text-shadow: 2px 2px 0 #b25a12, 4px 4px 0 rgba(7, 17, 14, 0.9),
     0 0 26px rgba(255, 176, 46, 0.35);
 }
@@ -51,8 +54,24 @@
 .site-shell .feature-page-hero__inner h1 em,
 .site-shell .legal > h1 em {
   color: var(--funk-lemon);
+  -webkit-text-stroke: 1.5px #ffdf80;
   text-shadow: 2px 2px 0 #b25a12, 4px 4px 0 rgba(7, 17, 14, 0.9),
     0 0 30px rgba(255, 228, 94, 0.55);
+}
+
+/* Leaderboard title + prize pot get the same golden-letter treatment. */
+.site-shell .board-hero--leaderboard .board-hero__title h1 {
+  -webkit-text-stroke: 2px var(--funk-amber);
+  paint-order: stroke fill;
+}
+
+.site-shell .board-hero--leaderboard .board-hero__title h1 span {
+  -webkit-text-stroke-color: #fff3d0;
+}
+
+.site-shell .prize-ticket__main strong {
+  -webkit-text-stroke: 2px var(--funk-lemon);
+  paint-order: stroke fill;
 }
 
 .site-shell .home-section-heading > span,
