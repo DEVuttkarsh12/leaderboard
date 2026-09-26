@@ -217,6 +217,104 @@
   border-radius: 12px;
 }
 
+/* 9. Marquee prize tape: scrolling casino ticker between sections. */
+.site-shell .prize-tape {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  border-block: 2px solid var(--funk-pine);
+  background: linear-gradient(90deg, var(--funk-amber), var(--funk-tangelo), var(--funk-amber));
+  box-shadow: 0 5px 0 var(--funk-pine), 0 14px 34px rgba(0, 0, 0, 0.4);
+  transform: rotate(-1deg) scale(1.01);
+}
+
+.site-shell .prize-tape__track {
+  display: flex;
+  width: max-content;
+  animation: tape-scroll 28s linear infinite;
+}
+
+.site-shell .prize-tape:hover .prize-tape__track {
+  animation-play-state: paused;
+}
+
+.site-shell .prize-tape__half {
+  display: flex;
+  align-items: center;
+  gap: 38px;
+  padding: 10px 38px 10px 0;
+}
+
+.site-shell .prize-tape__half span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #2b1404;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@keyframes tape-scroll {
+  to { transform: translateX(-50%); }
+}
+
+/* 10. Medal ranks for the top three standings rows. */
+.site-shell .board-section .player-row .row-rank {
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  font-size: 13px;
+}
+
+.site-shell .board-section .rank-row-1 .row-rank {
+  border: 1.5px solid var(--funk-pine);
+  background: linear-gradient(145deg, var(--funk-lemon), var(--funk-amber));
+  color: #2b1404;
+  box-shadow: 2px 2px 0 var(--funk-pine), 0 0 18px rgba(255, 228, 94, 0.6);
+  transform: rotate(-6deg);
+}
+
+.site-shell .board-section .rank-row-2 .row-rank {
+  border: 1.5px solid var(--funk-pine);
+  background: linear-gradient(145deg, #d8fff1, var(--funk-mint));
+  color: #06231a;
+  box-shadow: 2px 2px 0 var(--funk-pine), 0 0 16px rgba(45, 225, 167, 0.55);
+  transform: rotate(5deg);
+}
+
+.site-shell .board-section .rank-row-3 .row-rank {
+  border: 1.5px solid var(--funk-pine);
+  background: linear-gradient(145deg, #ffd9de, var(--funk-coral));
+  color: #4a1524;
+  box-shadow: 2px 2px 0 var(--funk-pine), 0 0 16px rgba(255, 77, 109, 0.5);
+  transform: rotate(-4deg);
+}
+
+/* 11. Winner ribbon glows like a jackpot light. */
+.site-shell .board-top-three .podium-card.rank-1 .prize-ribbon {
+  animation: ribbon-glow 2.6s ease-in-out infinite;
+}
+
+@keyframes ribbon-glow {
+  0%, 100% { box-shadow: 0 0 18px rgba(255, 180, 60, 0.35); }
+  50% { box-shadow: 0 0 36px rgba(255, 210, 90, 0.7); }
+}
+
+/* 12. Tabular numerals so prize + wager amounts never jitter. */
+.site-shell .wager,
+.site-shell .prize-ticket__main strong,
+.site-shell .season-clock__digits strong,
+.site-shell .row-rank,
+.site-shell .prize-tape__half span {
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 780px) {
   .site-shell .standings {
     transform: none;
@@ -233,7 +331,9 @@
     filter: none;
   }
 
-  .site-shell .board-prize-spotlight {
+  .site-shell .board-prize-spotlight,
+  .site-shell .prize-tape__track,
+  .site-shell .board-top-three .podium-card.rank-1 .prize-ribbon {
     animation: none;
   }
 }
