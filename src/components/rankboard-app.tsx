@@ -708,7 +708,7 @@ function Home({
       <RevealBlock className="home-board-showcase__inner">
         <div className="home-section-heading">
           <span>Live rankings</span>
-          <h2>Leader <em>Boards</em></h2>
+          <h2>Leader<em>board</em></h2>
           <p>Every player counts. Your move.</p>
         </div>
         <div className="home-board-showcase__arena">
