@@ -190,6 +190,33 @@
   transform: translateY(-2px) rotate(0.2deg);
 }
 
+/* 7. Prize ticket floats gently like a prize tag on a string. */
+.site-shell .board-prize-spotlight {
+  animation: ticket-bob 5s ease-in-out infinite;
+}
+
+@keyframes ticket-bob {
+  0%, 100% { transform: rotate(-1.2deg) translateY(0); }
+  50% { transform: rotate(-0.6deg) translateY(-4px); }
+}
+
+/* 8. Balanced headlines + visible keyboard focus. */
+.site-shell h1,
+.site-shell h2,
+.site-shell h3 {
+  text-wrap: balance;
+}
+
+.site-shell a:focus-visible,
+.site-shell button:focus-visible,
+.site-shell input:focus-visible,
+.site-shell select:focus-visible,
+.site-shell textarea:focus-visible {
+  outline: 3px solid var(--funk-lemon);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
 @media (max-width: 780px) {
   .site-shell .standings {
     transform: none;
@@ -204,5 +231,9 @@
 @media (prefers-reduced-motion: reduce) {
   .site-shell .home-artz-title {
     filter: none;
+  }
+
+  .site-shell .board-prize-spotlight {
+    animation: none;
   }
 }
