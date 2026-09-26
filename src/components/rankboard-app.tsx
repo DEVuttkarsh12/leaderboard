@@ -130,55 +130,65 @@ const casinoOrnamentImages: Record<CasinoOrnamentVariant, string> = {
   "slot-reels": "/artz-slot-reels.webp",
 };
 
-const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
+const pageData: Record<string, { title: string; tagline: string; kicker: string; action: [string, string] }> = {
   challenges: {
     title: "Missions",
     tagline: "Earn. Claim. Repeat.",
+    kicker: "Daily grind",
     action: ["Leaderboard", "/leaderboard"],
   },
   tournaments: {
     title: "Tournaments",
     tagline: "Enter. Compete. Climb.",
+    kicker: "Bracket wars",
     action: ["Leaderboard", "/leaderboard"],
   },
   "bonus-hunts": {
     title: "Bonus Hunts",
     tagline: "Follow the hunt. Catch the biggest hits.",
+    kicker: "Chase the hits",
     action: ["Leaderboard", "/leaderboard"],
   },
   store: {
     title: "Reward Store",
     tagline: "Points. Redemption. Done.",
+    kicker: "Spend your points",
     action: ["Help", "/support"],
   },
   "custom-bets": {
     title: "Custom Bets",
     tagline: "Predict. Bet. Cash out.",
+    kicker: "Call your shot",
     action: ["Store", "/store"],
   },
   "watch-points": {
     title: "Watch Points",
     tagline: "Watch live. Earn passive.",
+    kicker: "Earn while watching",
     action: ["Store", "/store"],
   },
   admin: {
     title: "Admin",
     tagline: "Command. Control. Ship.",
+    kicker: "Control room",
     action: ["Leaderboard", "/leaderboard"],
   },
   help: {
     title: "Help Center",
     tagline: "Answers fast.",
+    kicker: "How it works",
     action: ["Support", "/support"],
   },
   support: {
     title: "Support",
     tagline: "Report. Track. Resolve.",
+    kicker: "We got you",
     action: ["FAQ", "/help"],
   },
   login: {
     title: "Sign in",
     tagline: "Your rewards, saved.",
+    kicker: "Join the race",
     action: ["Leaderboard", "/leaderboard"],
   },
 };
@@ -1209,7 +1219,7 @@ function PlayerRow({ player }: { player: Player }) {
   return <div className={`player-row rank-row-${player.rank}`}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong></span></div><strong className="wager">{fmt(player.points)} <small>wagered</small></strong></div>;
 }
 
-function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
+function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; kicker: string; action: [string, string] } }) {
   const Icon = featurePageIcons[route] ?? Sparkles;
   const ornament = featurePageOrnaments[route] ?? "slot-reels";
   return <main>
@@ -1223,7 +1233,7 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
         transition={{ delay: 0.42, duration: 0.52, ease: [0.16, 1, 0.3, 1] }}
       >
         <span className="feature-page-hero__icon"><Icon size={28} strokeWidth={2.6} aria-hidden="true" /></span>
-        <div><p className="kicker"><span>●</span> Season 08</p><h1>{data.title}</h1></div>
+        <div><p className="kicker"><span>●</span> {data.kicker}</p><h1>{data.title}</h1></div>
         <Link className="feature-page-hero__action" href={data.action[1]} title={data.action[0]}><span>{data.action[0]}</span><ArrowUpRight size={18} strokeWidth={2.7} aria-hidden="true" /></Link>
       </motion.div>
     </section>
