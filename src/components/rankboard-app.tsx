@@ -677,7 +677,7 @@ function Home({
       </motion.div>
       <HomeKickStream account={account} setAccount={setAccount} />
     </section>
-    <PrizeTape items={["Prize pot $1,150", "Season 08 · Live now", "1st $600 · 2nd $325 · 3rd $225", "Wager · Climb · Win", "Fresh missions weekly"]} />
+    <PrizeTape items={["Prize pot $1,150", "Live rankings", "1st $600 · 2nd $325 · 3rd $225", "Wager · Climb · Win", "Fresh missions weekly"]} />
     <section className="home-action-zone" aria-label="ARTZ Rewards destinations">
       <RevealBlock className="home-action-zone__inner">
         <div className="home-section-heading">
@@ -1108,7 +1108,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="board-hero board-hero--leaderboard page-width">
       <PrizeDropField compact />
       <div className="board-hero__title">
-        <p className="board-hero__badge"><i />Season 08 · Live now</p>
+        <p className="board-hero__badge"><i />Live now</p>
         <h1><span>Monthly</span> Leaderboard</h1>
         <p className="board-hero__sub">Top wagers take the pot. No fluff, just hits.</p>
       </div>
@@ -1132,7 +1132,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         <Podium players={users.slice(0, 3)} />
       </div>
     </section>
-    <PrizeTape items={["Prize pot $1,150", "Season 08 · Live now", "1st $600 · 2nd $325 · 3rd $225", "Top wager takes the pot"]} />
+    <PrizeTape items={["Prize pot $1,150", "Live now", "1st $600 · 2nd $325 · 3rd $225", "Top wager takes the pot"]} />
     <section className="section page-width board-section">
       <LiquidGlass className="standings" tone="cyan">
         <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
