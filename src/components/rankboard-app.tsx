@@ -130,65 +130,55 @@ const casinoOrnamentImages: Record<CasinoOrnamentVariant, string> = {
   "slot-reels": "/artz-slot-reels.webp",
 };
 
-const pageData: Record<string, { title: string; tagline: string; kicker: string; action: [string, string] }> = {
+const pageData: Record<string, { title: string; tagline: string; action: [string, string] }> = {
   challenges: {
     title: "Missions",
     tagline: "Earn. Claim. Repeat.",
-    kicker: "Daily grind",
     action: ["Leaderboard", "/leaderboard"],
   },
   tournaments: {
     title: "Tournaments",
     tagline: "Enter. Compete. Climb.",
-    kicker: "Bracket wars",
     action: ["Leaderboard", "/leaderboard"],
   },
   "bonus-hunts": {
     title: "Bonus Hunts",
     tagline: "Follow the hunt. Catch the biggest hits.",
-    kicker: "Chase the hits",
     action: ["Leaderboard", "/leaderboard"],
   },
   store: {
     title: "Reward Store",
     tagline: "Points. Redemption. Done.",
-    kicker: "Spend your points",
     action: ["Help", "/support"],
   },
   "custom-bets": {
     title: "Custom Bets",
     tagline: "Predict. Bet. Cash out.",
-    kicker: "Call your shot",
     action: ["Store", "/store"],
   },
   "watch-points": {
     title: "Watch Points",
     tagline: "Watch live. Earn passive.",
-    kicker: "Earn while watching",
     action: ["Store", "/store"],
   },
   admin: {
     title: "Admin",
     tagline: "Command. Control. Ship.",
-    kicker: "Control room",
     action: ["Leaderboard", "/leaderboard"],
   },
   help: {
     title: "Help Center",
     tagline: "Answers fast.",
-    kicker: "How it works",
     action: ["Support", "/support"],
   },
   support: {
     title: "Support",
     tagline: "Report. Track. Resolve.",
-    kicker: "We got you",
     action: ["FAQ", "/help"],
   },
   login: {
     title: "Sign in",
     tagline: "Your rewards, saved.",
-    kicker: "Join the race",
     action: ["Leaderboard", "/leaderboard"],
   },
 };
@@ -686,7 +676,6 @@ function Home({
     <section className="home-action-zone" aria-label="ARTZ Rewards destinations">
       <RevealBlock className="home-action-zone__inner">
         <div className="home-section-heading">
-          <span>Rewards hub</span>
           <h2>Rewards <em>&amp;</em> Perks</h2>
           <p>Everything you need. Nothing you don&apos;t.</p>
         </div>
@@ -712,7 +701,6 @@ function Home({
     <section className="home-board-showcase" aria-label="ARTZ leaderboard preview">
       <RevealBlock className="home-board-showcase__inner">
         <div className="home-section-heading">
-          <span>Live rankings</span>
           <h2>Leader<em>board</em></h2>
           <p>Every player counts. Your move.</p>
         </div>
@@ -1113,7 +1101,6 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="board-hero board-hero--leaderboard page-width">
       <PrizeDropField compact />
       <div className="board-hero__title">
-        <p className="board-hero__badge"><i />Live now</p>
         <h1><span>Monthly</span> Leaderboard</h1>
         <p className="board-hero__sub">Top wagers take the pot. No fluff, just hits.</p>
       </div>
@@ -1224,7 +1211,7 @@ function PlayerRow({ player }: { player: Player }) {
   return <div className={`player-row rank-row-${player.rank}`}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong></span></div><strong className="wager">{fmt(player.points)} <small>wagered</small></strong></div>;
 }
 
-function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; kicker: string; action: [string, string] } }) {
+function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
   const Icon = featurePageIcons[route] ?? Sparkles;
   const ornament = featurePageOrnaments[route] ?? "slot-reels";
   return <main>
@@ -1238,7 +1225,7 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
         transition={{ delay: 0.42, duration: 0.52, ease: [0.16, 1, 0.3, 1] }}
       >
         <span className="feature-page-hero__icon"><Icon size={28} strokeWidth={2.6} aria-hidden="true" /></span>
-        <div><p className="kicker"><span>●</span> {data.kicker}</p><h1>{data.title}</h1></div>
+        <div><h1>{data.title}</h1></div>
         <Link className="feature-page-hero__action" href={data.action[1]} title={data.action[0]}><span>{data.action[0]}</span><ArrowUpRight size={18} strokeWidth={2.7} aria-hidden="true" /></Link>
       </motion.div>
     </section>
@@ -1255,7 +1242,6 @@ function Legal({ type }: { type: string }) {
   return (
     <main className="legal page-width">
       <CasinoOrnament className="legal-vault" variant="vault" delay={0.3} />
-      <p className="kicker"><span>●</span> ARTZ Rewards legal</p>
       <h1>{privacy ? "Privacy" : "Terms"}<em>.</em></h1>
       <p className="legal-lead">{privacy ? "How ARTZ Rewards handles your data." : "The rules for playing fair."}</p>
       <div className="legal-layout">
@@ -1586,7 +1572,6 @@ function Profile({ account }: { account: HeaderAccount }) {
         <section className="board-hero page-width">
           <CasinoOrnament className="profile-vault" variant="vault" delay={0.28} />
           <div>
-            <p className="kicker"><span>●</span> Player hub</p>
             <h1>Profile</h1>
             <p className="hero-desc">Sign in to see points, links & history.</p>
             <div className="button-row">
@@ -1604,7 +1589,6 @@ function Profile({ account }: { account: HeaderAccount }) {
         <section className="board-hero page-width">
           <CasinoOrnament className="profile-vault" variant="vault" delay={0.18} />
           <div>
-            <p className="kicker"><span>●</span> Admin lane</p>
             <h1>Opening Admin</h1>
             <p className="hero-desc">Redirecting to control room.</p>
           </div>
@@ -1622,7 +1606,6 @@ function Profile({ account }: { account: HeaderAccount }) {
       <section className="board-hero page-width">
         <CasinoOrnament className="profile-vault" variant="vault" delay={0.28} />
         <div>
-          <p className="kicker"><span>●</span> Player hub</p>
           <h1>Profile</h1>
         </div>
         <div className="round-ticket"><strong>{fmt(account.points)} PTS</strong><span>{account.profileProvider.toUpperCase()}</span></div>

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import {
   Fredoka,
   Instrument_Sans,
+  Luckiest_Guy,
 } from "next/font/google";
 import "./globals.css";
 import "./artz-polish.css";
@@ -22,9 +23,9 @@ const artzDisplay = Fredoka({
   display: "swap",
 });
 
-const artzLogo = Fredoka({
+const artzLogo = Luckiest_Guy({
   variable: "--font-artz-logo",
-  weight: ["500", "600", "700"],
+  weight: "400",
   subsets: ["latin"],
   display: "swap",
 });

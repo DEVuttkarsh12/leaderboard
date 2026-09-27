@@ -127,6 +127,57 @@
   transform: rotate(-0.3deg);
 }
 
+/* 4b. Proper gloss: bright top streak, inner light, ambient glow. */
+.site-shell .standings,
+.site-shell .season-clock,
+.site-shell .action-card,
+.site-shell .auth-card,
+.site-shell .auth-session-card,
+.site-shell .bracket-panel,
+.site-shell .inventory-panel,
+.site-shell .connection-card,
+.site-shell .casino-link-card,
+.site-shell .workspace-list article,
+.site-shell .tool-panel,
+.site-shell .admin-panel,
+.site-shell .watch-console,
+.site-shell .profile-card,
+.site-shell .profile-panel,
+.site-shell .board-section .player-row {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.22), transparent 32%),
+    radial-gradient(circle at 85% -10%, rgba(255, 176, 46, 0.26), transparent 46%),
+    radial-gradient(circle at 8% 115%, rgba(255, 77, 109, 0.13), transparent 42%),
+    linear-gradient(160deg, #2c1a0e, #130b07 58%, #1e0e06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -16px 30px rgba(0, 0, 0, 0.38),
+    5px 5px 0 var(--funk-pine),
+    0 24px 60px rgba(0, 0, 0, 0.5),
+    0 0 32px rgba(255, 122, 26, 0.13);
+}
+
+/* 4c. Rotating aura behind the hero title. */
+.site-shell .home-center-stage {
+  position: relative;
+}
+
+.site-shell .home-center-stage::before {
+  content: "";
+  position: absolute;
+  inset: -14% -20%;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(255, 122, 26, 0.16), rgba(255, 228, 94, 0.1),
+    rgba(255, 77, 109, 0.13), rgba(255, 176, 46, 0.12), rgba(255, 122, 26, 0.16));
+  filter: blur(60px);
+  pointer-events: none;
+  animation: hero-glow-spin 26s linear infinite;
+}
+
+@keyframes hero-glow-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Leaderboard rows shimmy: alternating playful tilt. */
 .site-shell .board-section .player-row:nth-child(odd) {
   transform: rotate(-0.35deg);
@@ -412,14 +463,14 @@
   background: radial-gradient(circle at 32% 28%, #ffe9b0, var(--funk-amber) 42%, #b25a12 78%, #5e2f08);
   color: #2b1404;
   font-family: var(--font-artz-logo);
-  font-weight: 700;
+  font-weight: 400;
   transform: rotate(-8deg) scale(1.06);
   box-shadow: inset 0 0 0 3px rgba(255, 243, 208, 0.55), 2px 2px 0 var(--funk-pine),
     0 0 20px rgba(255, 176, 46, 0.5);
 }
 
 .site-shell .desktop-nav__word {
-  font-weight: 600;
+  font-weight: 400;
   -webkit-text-stroke: 0.6px var(--funk-amber);
   paint-order: stroke fill;
 }
@@ -486,6 +537,14 @@
   transform: rotate(0deg) translateY(-1px);
 }
 
+.site-shell .desktop-nav__brand:hover .desktop-nav__mark {
+  transform: rotate(6deg) scale(1.12);
+}
+
+.site-shell .desktop-nav__mark {
+  transition: transform 0.25s ease;
+}
+
 /* Mobile menu header gets the sticker treatment too. */
 .site-shell .staggered-menu-header {
   border: 2px solid rgba(255, 246, 229, 0.9);
@@ -507,6 +566,10 @@
 @media (prefers-reduced-motion: reduce) {
   .site-shell .home-artz-title {
     filter: none;
+  }
+
+  .site-shell .home-center-stage::before {
+    animation: none;
   }
 
   .site-shell .board-prize-spotlight,
