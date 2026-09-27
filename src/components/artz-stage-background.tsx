@@ -81,10 +81,10 @@ function createEmbers(width: number, height: number) {
     x: ((index * 83 + 41) % 997) / 997 * width,
     y: ((index * 137 + 79) % 991) / 991 * height,
     radius: 0.8 + ((index * 17) % 18) / 10,
-    speed: 4 + ((index * 31) % 15),
+    speed: 7 + ((index * 31) % 18),
     sway: 5 + ((index * 29) % 18),
     phase: ((index * 47) % 360) * (Math.PI / 180),
-    opacity: 0.18 + ((index * 13) % 35) / 100,
+    opacity: 0.22 + ((index * 13) % 35) / 100,
     tone: index % 7 === 0 ? "coral" : index % 5 === 0 ? "ruby" : "gold",
   }));
 }
@@ -310,7 +310,7 @@ function drawGlint(
   glint: Glint,
   time: number
 ) {
-  const twinkle = Math.pow(Math.max(0, Math.sin(time * 0.72 + glint.phase)), 5);
+  const twinkle = Math.pow(Math.max(0, Math.sin(time * 1.05 + glint.phase)), 5);
   const alpha = glint.opacity * (0.42 + twinkle * 1.08);
   const size = glint.size * (0.88 + twinkle * 0.52);
   const color = glint.tone === "gold"
@@ -511,7 +511,7 @@ export default function ArtzStageBackground() {
       context.fillStyle = sky ?? "#160b07";
       context.fillRect(0, 0, width, height);
 
-      const centerGlowPulse = 0.96 + Math.sin(time * 0.28) * 0.055;
+      const centerGlowPulse = 0.96 + Math.sin(time * 0.4) * 0.07;
       const centerGlow = context.createRadialGradient(
         width * (0.5 + pointer.x * 0.018),
         height * (0.43 + pointer.y * 0.012),
@@ -533,14 +533,14 @@ export default function ArtzStageBackground() {
       drawAuroraVeil(context, width, height, time, pointer.x, {
         y: 0.26,
         phase: 0.7,
-        speed: 0.09,
+        speed: 0.13,
         color: "rgba(255, 200, 100, 0.12)",
         highlight: "rgba(255, 90, 110, 0.12)",
       });
       drawAuroraVeil(context, width, height, time, pointer.x, {
         y: 0.62,
         phase: 3.2,
-        speed: 0.075,
+        speed: 0.11,
         color: "rgba(255, 150, 50, 0.075)",
         highlight: "rgba(255, 110, 60, 0.11)",
         reverse: true,

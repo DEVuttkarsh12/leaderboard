@@ -439,6 +439,51 @@
   transform: rotate(-2deg);
 }
 
+/* 17. Living background: drifting glow orbs above the canvas. */
+.site-shell::after {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 30% at 22% 28%, rgba(255, 122, 26, 0.15), transparent 70%),
+    radial-gradient(30% 26% at 78% 60%, rgba(255, 77, 109, 0.12), transparent 70%),
+    radial-gradient(26% 22% at 55% 86%, rgba(255, 228, 94, 0.1), transparent 70%);
+  animation: orb-drift 24s ease-in-out infinite alternate;
+}
+
+@keyframes orb-drift {
+  0% { transform: translate3d(-3%, -2%, 0) scale(1); }
+  50% { transform: translate3d(3%, 2%, 0) scale(1.08); }
+  100% { transform: translate3d(-2%, 3%, 0) scale(1.04); }
+}
+
+/* 18. Periodic meteor streak across the night sky. */
+.site-shell::before {
+  content: "";
+  position: fixed;
+  top: -8%;
+  left: 108%;
+  z-index: 1;
+  width: 190px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #ffe9b0 60%, #ffffff);
+  filter: drop-shadow(0 0 8px rgba(255, 200, 100, 0.8));
+  pointer-events: none;
+  transform: rotate(-28deg);
+  opacity: 0;
+  animation: meteor-fall 12s linear infinite;
+}
+
+@keyframes meteor-fall {
+  0% { top: -8%; left: 108%; opacity: 0; }
+  2% { opacity: 1; }
+  11% { top: 44%; left: 6%; opacity: 0; }
+  100% { top: 44%; left: 6%; opacity: 0; }
+}
+
 /* 13. Sticker navbar with the same funky vibe as the boards. */
 .site-shell .desktop-nav {
   border: 2px solid var(--funk-cream);
@@ -568,8 +613,14 @@
     filter: none;
   }
 
-  .site-shell .home-center-stage::before {
+  .site-shell .home-center-stage::before,
+  .site-shell::after,
+  .site-shell::before {
     animation: none;
+  }
+
+  .site-shell::before {
+    opacity: 0;
   }
 
   .site-shell .board-prize-spotlight,

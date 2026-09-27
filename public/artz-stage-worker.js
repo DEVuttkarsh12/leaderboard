@@ -28,10 +28,10 @@ function rebuildScene() {
     x: seeded(index, 83, 997) * width,
     y: seeded(index, 137, 991) * height,
     radius: 0.8 + ((index * 17) % 17) / 11,
-    speed: 4 + ((index * 31) % 13),
+    speed: 7 + ((index * 31) % 16),
     sway: 5 + ((index * 29) % 16),
     phase: ((index * 47) % 360) * Math.PI / 180,
-    alpha: 0.16 + ((index * 13) % 28) / 100,
+    alpha: 0.2 + ((index * 13) % 28) / 100,
     tone: index % 7 === 0 ? "coral" : index % 5 === 0 ? "ruby" : "gold",
   }));
 
@@ -150,7 +150,7 @@ function draw(now) {
     glint.y -= glint.speed * delta;
     glint.x += Math.sin(time * 0.18 + glint.phase) * delta * 0.22;
     if (glint.y < -12) glint.y = height + 12;
-    const pulse = Math.pow(Math.max(0, Math.sin(time * 0.72 + glint.phase)), 5);
+    const pulse = Math.pow(Math.max(0, Math.sin(time * 1.05 + glint.phase)), 5);
     const size = glint.size * (0.9 + pulse * 0.45);
     const color = glint.tone === "gold" ? "#ffc763" : glint.tone === "coral" ? "#ff6e78" : "#ff5e6e";
     context.globalAlpha = 0.28 + pulse * 0.58;
