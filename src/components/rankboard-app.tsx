@@ -674,6 +674,11 @@ function Home({
             <ArrowUpRight size={15} strokeWidth={2.7} aria-hidden="true" />
           </MagneticLink>
         </div>
+        <div className="home-hero-stats" aria-label="Reward highlights">
+          <span><small>Prize pot</small><strong>$1,150</strong></span>
+          <span><small>Live players</small><strong>{users.length}</strong></span>
+          <span><small>Top prize</small><strong>$600</strong></span>
+        </div>
       </motion.div>
       <HomeKickStream account={account} setAccount={setAccount} />
     </section>
@@ -1749,7 +1754,7 @@ function Footer() {
       <div className="footer-top page-width">
         <div>
           <Link className="brand" href="/"><span className="brand-mark">A</span><span>ARTZ<span>REWARDS</span></span></Link>
-          <p>Live rewards by ARTZ. Play responsibly · 18+</p>
+          <p>Live rewards by ARTZ. Play responsibly · <b className="age-chip">18+</b></p>
         </div>
         <div className="footer-links">
           {links.map(([name, href]) => (
