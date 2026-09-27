@@ -367,6 +367,52 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 19. Nothing edgy anywhere: every container rounded with glowing golden borders. */
+.site-shell .action-card,
+.site-shell .auth-card,
+.site-shell .auth-session-card,
+.site-shell .auth-panel,
+.site-shell .auth-form,
+.site-shell .auth-modal-shell,
+.site-shell .bracket-panel,
+.site-shell .inventory-panel,
+.site-shell .connection-card,
+.site-shell .casino-link-card,
+.site-shell .casino-card,
+.site-shell .workspace-list article,
+.site-shell .workspace-notice,
+.site-shell .tool-panel,
+.site-shell .admin-panel,
+.site-shell .watch-console,
+.site-shell .profile-card,
+.site-shell .profile-panel,
+.site-shell .season-clock,
+.site-shell .player-row,
+.site-shell .table-head,
+.site-shell .market-card,
+.site-shell .market-admin-info,
+.site-shell .bet-amount-control,
+.site-shell .odds-grid,
+.site-shell .tournament-match,
+.site-shell .hunt-feature,
+.site-shell .hunt-list__card,
+.site-shell .hunt-clips article,
+.site-shell .hunt-empty,
+.site-shell .you-position-card,
+.site-shell .board-pulse-card,
+.site-shell .legal-layout aside,
+.site-shell .legal-layout article {
+  border-radius: 20px;
+  border: 1.5px solid rgba(255, 196, 80, 0.45);
+  filter: drop-shadow(0 0 14px rgba(255, 180, 70, 0.2));
+}
+
+.site-shell input,
+.site-shell select,
+.site-shell textarea {
+  border-radius: 14px;
+}
+
 /* 14. Hero jackpot stat chips. */
 .site-shell .home-hero-stats {
   display: flex;
