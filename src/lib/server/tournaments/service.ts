@@ -213,6 +213,14 @@ export async function updateTournament(
   input: Partial<{ title: string; starts: string; prize: string; seats: number; status: TournamentStatus; active: boolean }>
 ) {
   await requireAdminUser(sessionToken);
+  const existing = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { id: true, _count: { select: { entries: true } } },
+  });
+  if (!existing) throw new Error("Tournament not found.");
+  if (input.seats !== undefined && input.seats < existing._count.entries) {
+    throw new Error(`Seat limit cannot be lower than the ${existing._count.entries} registered players.`);
+  }
   await prisma.tournament.update({ where: { id: tournamentId }, data: input });
   return getAdminTournament(sessionToken, tournamentId);
 }

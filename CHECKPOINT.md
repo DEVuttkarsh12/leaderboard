@@ -1,5 +1,7 @@
 # 🏁 RankBoard Project Checkpoint
 
+> **Historical implementation log:** this file records the original August 2026 backend/product checkpoint. For the current repo state, latest design direction, and resume instructions, read the workspace handoff at [`../CHECKPOINT.md`](../CHECKPOINT.md) first. The latest visual work is newer than the entries in this file.
+
 **Timestamp**: 2026-08-22 22:54:00 (IST)  
 **Location**: `/home/uttkarsh/Documents/leaderboard/leaderboard-app`  
 **Git Branch**: `main`

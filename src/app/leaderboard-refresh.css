@@ -353,6 +353,33 @@
 .hunt-clips article { display: grid; align-content: start; gap: 14px; min-height: 170px; padding: 20px; border: 1px solid rgba(255, 77, 109, 0.26); border-radius: 18px; background: rgba(33, 20, 12, 0.82); }
 .hunt-clips article > span { display: inline-flex; align-items: center; gap: 7px; color: #ffbc84; font-weight: 900; }
 .hunt-clips h3 { margin: 0; color: #fff6fa; font-size: 20px; }
+
+/* Admin controls for publishing tournaments and operating bonus hunts. */
+.tournament-edit-form,
+.bonus-hunt-admin-form { margin-block: 18px; }
+.admin-tournament-entrants { margin-top: 18px; padding: 16px; border: 1px solid rgba(255, 177, 100, 0.22); border-radius: 16px; background: rgba(12, 4, 20, 0.44); }
+.admin-tournament-entrants > div { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: #ffd293; }
+.admin-tournament-entrants > div small { color: rgba(255, 235, 248, 0.55); font-size: 10px; font-weight: 900; letter-spacing: 0.12em; }
+.admin-tournament-entrants ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+.admin-tournament-entrants li { padding: 7px 10px; border: 1px solid rgba(255, 177, 100, 0.22); border-radius: 999px; color: rgba(255, 246, 229, 0.85); font-size: 12px; }
+.admin-tournament-entrants p { margin: 12px 0 0; color: rgba(255, 235, 248, 0.58); }
+.admin-hunt-list article.selected { border-color: rgba(255, 193, 95, 0.68); background: linear-gradient(135deg, rgba(255, 171, 61, 0.13), rgba(38, 22, 14, 0.76)); }
+.admin-hunt-manager { display: grid; gap: 18px; margin-top: 22px; padding: clamp(18px, 2.4vw, 30px); overflow: hidden; }
+.admin-hunt-manager .admin-tournament-manager__head { margin-bottom: 2px; }
+.admin-hunt-manager .admin-section-title { margin: 8px 0 0; }
+.admin-hunt-clip-create { margin: 0; }
+.admin-hunt-clips { margin-top: 0; }
+.admin-hunt-clips > form { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(120px, 0.35fr) auto auto auto; align-items: end; gap: 12px; }
+.admin-hunt-clips > form label { display: grid; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.08em; }
+.admin-hunt-clips > form input { width: 100%; min-width: 0; }
+.admin-hunt-clips > form > span { padding: 11px 4px; color: #ffd293; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.admin-hunt-clips > form > button { min-height: 42px; }
+
+@media (max-width: 780px) {
+  .admin-hunt-clips > form { grid-template-columns: 1fr 1fr; }
+  .admin-hunt-clips > form > span { grid-column: 1 / -1; }
+  .admin-tournament-entrants > div { align-items: flex-start; flex-direction: column; gap: 5px; }
+}
 .hunt-clips article > div { display: flex; gap: 9px; flex-wrap: wrap; }
 .hunt-clips button { min-height: 35px; font-size: 12px; }
 .hunt-empty { padding: 36px; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 18px; color: rgba(255, 235, 248, 0.72); text-align: center; }

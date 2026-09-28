@@ -1,10 +1,14 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
+import { requireAdminUser } from "@/lib/server/admin/users";
+
+type HuntStatus = "SCHEDULED" | "LIVE" | "COMPLETED";
 
 export type HuntPayload = {
   id: string;
   title: string;
   time: string;
+  startsAt: string | null;
   host: string;
   status: "Live" | "Upcoming" | "Completed";
   heat: number;
@@ -15,6 +19,8 @@ export type HuntPayload = {
   openedCount: number;
   totalPayout: number;
   bestMultiplier: number;
+  active: boolean;
+  sortOrder: number;
 };
 
 export type HuntClipPayload = {
@@ -81,8 +87,6 @@ const DEFAULT_HUNTS = [
   },
 ];
 
-type HuntStatus = "SCHEDULED" | "LIVE" | "COMPLETED";
-
 function statusLabel(status: HuntStatus): HuntPayload["status"] {
   switch (status) {
     case "LIVE":
@@ -96,10 +100,12 @@ function statusLabel(status: HuntStatus): HuntPayload["status"] {
 
 function timeLabel(date: Date | null) {
   if (!date) return "TBA";
-  return date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
+  return date.toLocaleString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
     minute: "2-digit",
-    hour12: false,
   });
 }
 
@@ -120,7 +126,8 @@ function heatFor(hunt: {
 }
 
 async function seedHuntsIfEmpty() {
-  const count = await prisma.bonusHuntSession.count({ where: { active: true } });
+  // Seed only a truly empty table. Hiding every hunt must not resurrect demo hunts.
+  const count = await prisma.bonusHuntSession.count();
   if (count > 0) return;
 
   const now = Date.now();
@@ -176,6 +183,7 @@ export async function listHunts(
       id: hunt.id,
       title: hunt.title,
       time: timeLabel(hunt.startsAt),
+      startsAt: hunt.startsAt?.toISOString() ?? null,
       host: hunt.host,
       status: statusLabel(hunt.status),
       heat: heatFor(hunt),
@@ -186,6 +194,8 @@ export async function listHunts(
       openedCount: hunt.openedCount,
       totalPayout: hunt.totalPayout,
       bestMultiplier: hunt.bestMultiplier,
+      active: hunt.active,
+      sortOrder: hunt.sortOrder,
     })),
     clips: hunts.flatMap((hunt) =>
       hunt.clips.map((clip) => ({
@@ -200,6 +210,125 @@ export async function listHunts(
       }))
     ),
   };
+}
+
+export async function listAdminHunts(sessionToken: string | undefined): Promise<HuntsPayload> {
+  await requireAdminUser(sessionToken);
+  const hunts = await prisma.bonusHuntSession.findMany({
+    include: { clips: { orderBy: { createdAt: "asc" } } },
+    orderBy: [{ active: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+  });
+
+  return {
+    hunts: hunts.map((hunt) => ({
+      id: hunt.id,
+      title: hunt.title,
+      time: timeLabel(hunt.startsAt),
+      startsAt: hunt.startsAt?.toISOString() ?? null,
+      host: hunt.host,
+      status: statusLabel(hunt.status),
+      heat: heatFor(hunt),
+      followed: false,
+      startBankroll: hunt.startBankroll,
+      currentBankroll: hunt.currentBankroll,
+      bonusCount: hunt.bonusCount,
+      openedCount: hunt.openedCount,
+      totalPayout: hunt.totalPayout,
+      bestMultiplier: hunt.bestMultiplier,
+      active: hunt.active,
+      sortOrder: hunt.sortOrder,
+    })),
+    clips: hunts.flatMap((hunt) => hunt.clips.map((clip) => ({
+      id: clip.id,
+      huntId: hunt.id,
+      title: clip.title,
+      stat: `${clip.multiplier.toLocaleString()}x`,
+      votes: clip.votes,
+      saved: false,
+      voted: false,
+      multiplier: clip.multiplier,
+    }))),
+  };
+}
+
+export async function createAdminHunt(
+  sessionToken: string | undefined,
+  input: {
+    title: string;
+    host: string;
+    status: HuntStatus;
+    startsAt: Date | null;
+    startBankroll: number;
+    currentBankroll: number;
+    bonusCount: number;
+    openedCount: number;
+    totalPayout: number;
+    bestMultiplier: number;
+    sortOrder: number;
+    active: boolean;
+  }
+) {
+  await requireAdminUser(sessionToken);
+  const hunt = await prisma.bonusHuntSession.create({ data: input });
+  return hunt;
+}
+
+export async function updateAdminHunt(
+  sessionToken: string | undefined,
+  huntId: string,
+  input: Partial<{
+    title: string;
+    host: string;
+    status: HuntStatus;
+    startsAt: Date | null;
+    startBankroll: number;
+    currentBankroll: number;
+    bonusCount: number;
+    openedCount: number;
+    totalPayout: number;
+    bestMultiplier: number;
+    sortOrder: number;
+    active: boolean;
+  }>
+) {
+  await requireAdminUser(sessionToken);
+  const exists = await prisma.bonusHuntSession.findUnique({ where: { id: huntId }, select: { id: true } });
+  if (!exists) throw new Error("Hunt not found.");
+  return prisma.bonusHuntSession.update({ where: { id: huntId }, data: input });
+}
+
+export async function createAdminHuntClip(
+  sessionToken: string | undefined,
+  huntId: string,
+  input: { title: string; multiplier: number }
+) {
+  await requireAdminUser(sessionToken);
+  const hunt = await prisma.bonusHuntSession.findUnique({ where: { id: huntId }, select: { id: true } });
+  if (!hunt) throw new Error("Hunt not found.");
+  return prisma.huntClip.create({ data: { ...input, huntId } });
+}
+
+export async function updateAdminHuntClip(
+  sessionToken: string | undefined,
+  huntId: string,
+  clipId: string,
+  input: Partial<{ title: string; multiplier: number }>
+) {
+  await requireAdminUser(sessionToken);
+  const clip = await prisma.huntClip.findFirst({ where: { id: clipId, huntId }, select: { id: true } });
+  if (!clip) throw new Error("Hunt highlight not found.");
+  return prisma.huntClip.update({ where: { id: clipId }, data: input });
+}
+
+export async function deleteAdminHuntClip(
+  sessionToken: string | undefined,
+  huntId: string,
+  clipId: string
+) {
+  await requireAdminUser(sessionToken);
+  const clip = await prisma.huntClip.findFirst({ where: { id: clipId, huntId }, select: { id: true } });
+  if (!clip) throw new Error("Hunt highlight not found.");
+  await prisma.huntClip.delete({ where: { id: clipId } });
 }
 
 export async function toggleHuntFollow(

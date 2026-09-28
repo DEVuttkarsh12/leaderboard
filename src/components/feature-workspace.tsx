@@ -163,6 +163,92 @@ type ApiTournamentMatch = {
   status: "Pending" | "Live" | "Completed";
 };
 
+type BonusHunt = {
+  id: string;
+  title: string;
+  time: string;
+  startsAt: string | null;
+  host: string;
+  status: "Live" | "Upcoming" | "Completed";
+  heat: number;
+  followed: boolean;
+  startBankroll: number;
+  currentBankroll: number;
+  bonusCount: number;
+  openedCount: number;
+  totalPayout: number;
+  bestMultiplier: number;
+  active: boolean;
+  sortOrder: number;
+};
+
+type BonusHuntClip = {
+  id: string;
+  huntId: string;
+  title: string;
+  stat: string;
+  votes: number;
+  saved: boolean;
+  voted: boolean;
+  multiplier: number;
+};
+
+type BonusHuntsPayload = { hunts: BonusHunt[]; clips: BonusHuntClip[] };
+type AdminHuntStatus = "SCHEDULED" | "LIVE" | "COMPLETED";
+
+type AdminHuntDraft = {
+  title: string;
+  host: string;
+  startsAt: string;
+  status: AdminHuntStatus;
+  startBankroll: string;
+  currentBankroll: string;
+  bonusCount: string;
+  openedCount: string;
+  totalPayout: string;
+  bestMultiplier: string;
+  sortOrder: string;
+};
+
+function huntStatusValue(status: BonusHunt["status"]): AdminHuntStatus {
+  return status === "Live" ? "LIVE" : status === "Completed" ? "COMPLETED" : "SCHEDULED";
+}
+
+function localDateTimeValue(value: string | null) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return localDate.toISOString().slice(0, 16);
+}
+
+function adminHuntDraft(hunt: BonusHunt): AdminHuntDraft {
+  return {
+    title: hunt.title,
+    host: hunt.host,
+    startsAt: localDateTimeValue(hunt.startsAt),
+    status: huntStatusValue(hunt.status),
+    startBankroll: String(hunt.startBankroll),
+    currentBankroll: String(hunt.currentBankroll),
+    bonusCount: String(hunt.bonusCount),
+    openedCount: String(hunt.openedCount),
+    totalPayout: String(hunt.totalPayout),
+    bestMultiplier: String(hunt.bestMultiplier),
+    sortOrder: String(hunt.sortOrder),
+  };
+}
+
+function formatHuntTime(hunt: Pick<BonusHunt, "startsAt" | "time">) {
+  if (!hunt.startsAt) return hunt.time;
+  return new Date(hunt.startsAt).toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 type Purchase = {
   id: string;
   item: string;
@@ -821,34 +907,6 @@ function TournamentBracket({
   );
 }
 
-type BonusHunt = {
-  id: string;
-  title: string;
-  time: string;
-  host: string;
-  status: "Live" | "Upcoming" | "Completed";
-  heat: number;
-  followed: boolean;
-  startBankroll: number;
-  currentBankroll: number;
-  bonusCount: number;
-  openedCount: number;
-  totalPayout: number;
-  bestMultiplier: number;
-};
-
-type BonusHuntClip = {
-  id: string;
-  huntId: string;
-  title: string;
-  stat: string;
-  votes: number;
-  saved: boolean;
-  voted: boolean;
-};
-
-type BonusHuntsPayload = { hunts: BonusHunt[]; clips: BonusHuntClip[] };
-
 function BonusHuntsWorkspace() {
   const [data, setData] = useState<BonusHuntsPayload>({ hunts: [], clips: [] });
   const [message, setMessage] = useState("Loading hunts...");
@@ -907,7 +965,7 @@ function BonusHuntsWorkspace() {
           <div className="hunt-feature__intro">
             <span className={`hunt-status hunt-status--${featured.status.toLowerCase()}`}>{featured.status === "Live" ? <Radio size={15} aria-hidden="true" /> : <Clock3 size={15} aria-hidden="true" />}{featured.status} hunt</span>
             <h2>{featured.title}</h2>
-            <p>Hosted by {featured.host} · {featured.time}</p>
+            <p>Hosted by {featured.host} · {formatHuntTime(featured)}</p>
             <button type="button" disabled={Boolean(busy)} onClick={() => void act("/api/hunts/follow", `hunt-${featured.id}`, { huntId: featured.id })}>{featured.followed ? "Following" : "Follow hunt"} <ArrowUpRight size={15} aria-hidden="true" /></button>
           </div>
           <div className="hunt-feature__stats">
@@ -923,7 +981,7 @@ function BonusHuntsWorkspace() {
         <LiquidGlass as="article" className="hunt-list__card" key={hunt.id} tone="cyan">
           <span className={`hunt-status hunt-status--${hunt.status.toLowerCase()}`}>{hunt.status}</span>
           <h3>{hunt.title}</h3>
-          <p>{hunt.host} · {hunt.time}</p>
+          <p>{hunt.host} · {formatHuntTime(hunt)}</p>
           <div><span>{hunt.openedCount} / {hunt.bonusCount} bonuses</span><strong>{hunt.bestMultiplier.toLocaleString()}x best</strong></div>
           <button type="button" disabled={Boolean(busy)} onClick={() => void act("/api/hunts/follow", `hunt-${hunt.id}`, { huntId: hunt.id })}>{hunt.followed ? "Following" : "Follow hunt"}</button>
         </LiquidGlass>
@@ -1690,6 +1748,28 @@ function AdminWorkspace({
     seats: "8",
     participants: "",
   });
+  const [tournamentDraft, setTournamentDraft] = useState({ title: "", starts: "", prize: "", seats: "8" });
+  const [adminHunts, setAdminHunts] = useState<BonusHunt[]>([]);
+  const [adminHuntClips, setAdminHuntClips] = useState<BonusHuntClip[]>([]);
+  const [selectedHuntId, setSelectedHuntId] = useState("");
+  const [adminHuntStatus, setAdminHuntStatus] = useState("Loading bonus hunts");
+  const [huntBusy, setHuntBusy] = useState(false);
+  const [newHunt, setNewHunt] = useState<AdminHuntDraft>({
+    title: "",
+    host: "",
+    startsAt: "",
+    status: "SCHEDULED",
+    startBankroll: "0",
+    currentBankroll: "0",
+    bonusCount: "10",
+    openedCount: "0",
+    totalPayout: "0",
+    bestMultiplier: "0",
+    sortOrder: "0",
+  });
+  const [huntEditor, setHuntEditor] = useState<AdminHuntDraft | null>(null);
+  const [newHuntClipTitle, setNewHuntClipTitle] = useState("");
+  const [newHuntClipMultiplier, setNewHuntClipMultiplier] = useState("1");
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [adminQuery, setAdminQuery] = useState("");
   const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
@@ -1719,6 +1799,21 @@ function AdminWorkspace({
     adminTournaments.find((tournament) => tournament.id === selectedTournamentId) ??
     adminTournaments[0] ??
     null;
+  const selectedHunt = adminHunts.find((hunt) => hunt.id === selectedHuntId) ?? adminHunts[0] ?? null;
+  const selectedHuntClips = selectedHunt ? adminHuntClips.filter((clip) => clip.huntId === selectedHunt.id) : [];
+
+  const reloadAdminHunts = useCallback(async (preferredId?: string) => {
+    const response = await fetch("/api/admin/hunts", { cache: "no-store" });
+    const payload = (await response.json()) as BonusHuntsPayload & { error?: string };
+    if (!response.ok || !payload.hunts) throw new Error(payload.error ?? "Could not load bonus hunts.");
+    setAdminHunts(payload.hunts);
+    setAdminHuntClips(payload.clips ?? []);
+    const nextHunt = payload.hunts.find((hunt) => hunt.id === preferredId) ?? payload.hunts[0] ?? null;
+    setSelectedHuntId(nextHunt?.id ?? "");
+    setHuntEditor(nextHunt ? adminHuntDraft(nextHunt) : null);
+    setAdminHuntStatus(`${payload.hunts.length} hunts loaded · ${payload.hunts.filter((hunt) => hunt.active).length} published`);
+    return payload;
+  }, []);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -1742,6 +1837,25 @@ function AdminWorkspace({
 
     return () => { active = false; };
   }, [isAdmin]);
+
+  useEffect(() => {
+    if (!selectedTournament) return;
+    setTournamentDraft({
+      title: selectedTournament.title,
+      starts: selectedTournament.starts,
+      prize: selectedTournament.prize,
+      seats: String(selectedTournament.seats),
+    });
+  }, [selectedTournament]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    let active = true;
+    reloadAdminHunts().catch((error) => {
+      if (active) setAdminHuntStatus(error instanceof Error ? error.message : "Could not load bonus hunts.");
+    });
+    return () => { active = false; };
+  }, [isAdmin, reloadAdminHunts]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -2117,6 +2231,29 @@ function AdminWorkspace({
     }
   }
 
+  async function saveTournamentDetails() {
+    if (!selectedTournament) return;
+    setAdminTournamentStatus(`Saving ${selectedTournament.title}...`);
+    try {
+      const response = await fetch(`/api/admin/tournaments/${selectedTournament.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: tournamentDraft.title.trim(),
+          starts: tournamentDraft.starts.trim(),
+          prize: tournamentDraft.prize.trim(),
+          seats: Math.max(2, Math.min(64, Number(tournamentDraft.seats) || 2)),
+        }),
+      });
+      const payload = (await response.json()) as { tournament?: ApiTournament; error?: string };
+      if (!response.ok || !payload.tournament) throw new Error(payload.error ?? "Tournament details could not be saved.");
+      replaceAdminTournament(payload.tournament);
+      setAdminTournamentStatus(`${payload.tournament.title} saved and published to players`);
+    } catch (error) {
+      setAdminTournamentStatus(error instanceof Error ? error.message : "Tournament details could not be saved.");
+    }
+  }
+
   async function generateAdminBracket() {
     if (!selectedTournament) return;
     setAdminTournamentStatus("Generating bracket...");
@@ -2181,6 +2318,157 @@ function AdminWorkspace({
       setChallongeStatus(error instanceof Error ? error.message : "Challonge update failed");
     } finally {
       setChallongeBusy(false);
+    }
+  }
+
+  function selectAdminHunt(hunt: BonusHunt) {
+    setSelectedHuntId(hunt.id);
+    setHuntEditor(adminHuntDraft(hunt));
+  }
+
+  function huntDraftPayload(draft: AdminHuntDraft) {
+    return {
+      title: draft.title.trim(),
+      host: draft.host.trim(),
+      startsAt: draft.startsAt ? new Date(draft.startsAt).toISOString() : null,
+      status: draft.status,
+      startBankroll: Math.max(0, Number(draft.startBankroll) || 0),
+      currentBankroll: Math.max(0, Number(draft.currentBankroll) || 0),
+      bonusCount: Math.max(0, Number(draft.bonusCount) || 0),
+      openedCount: Math.max(0, Number(draft.openedCount) || 0),
+      totalPayout: Math.max(0, Number(draft.totalPayout) || 0),
+      bestMultiplier: Math.max(0, Number(draft.bestMultiplier) || 0),
+      sortOrder: Math.trunc(Number(draft.sortOrder) || 0),
+    };
+  }
+
+  async function publishBonusHunt(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!newHunt.title.trim() || !newHunt.host.trim()) {
+      setAdminHuntStatus("Add a hunt title and host.");
+      return;
+    }
+    setHuntBusy(true);
+    setAdminHuntStatus("Publishing bonus hunt...");
+    try {
+      const response = await fetch("/api/admin/hunts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...huntDraftPayload(newHunt), active: true }),
+      });
+      const payload = (await response.json()) as { hunt?: { id: string }; error?: string };
+      if (!response.ok || !payload.hunt) throw new Error(payload.error ?? "Bonus hunt could not be created.");
+      await reloadAdminHunts(payload.hunt.id);
+      setNewHunt({ title: "", host: "", startsAt: "", status: "SCHEDULED", startBankroll: "0", currentBankroll: "0", bonusCount: "10", openedCount: "0", totalPayout: "0", bestMultiplier: "0", sortOrder: "0" });
+      setAdminHuntStatus("Bonus hunt published. Players can see it now.");
+    } catch (error) {
+      setAdminHuntStatus(error instanceof Error ? error.message : "Bonus hunt could not be created.");
+    } finally {
+      setHuntBusy(false);
+    }
+  }
+
+  async function saveBonusHunt() {
+    if (!selectedHunt || !huntEditor) return;
+    setHuntBusy(true);
+    setAdminHuntStatus(`Saving ${selectedHunt.title}...`);
+    try {
+      const response = await fetch(`/api/admin/hunts/${selectedHunt.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(huntDraftPayload(huntEditor)),
+      });
+      const payload = (await response.json()) as { hunt?: BonusHunt; error?: string };
+      if (!response.ok || !payload.hunt) throw new Error(payload.error ?? "Bonus hunt could not be updated.");
+      await reloadAdminHunts(selectedHunt.id);
+      setAdminHuntStatus(`${payload.hunt.title} saved. Player page will refresh automatically.`);
+    } catch (error) {
+      setAdminHuntStatus(error instanceof Error ? error.message : "Bonus hunt could not be updated.");
+    } finally {
+      setHuntBusy(false);
+    }
+  }
+
+  async function patchBonusHunt(hunt: BonusHunt, patch: { active?: boolean; status?: AdminHuntStatus }) {
+    setHuntBusy(true);
+    setAdminHuntStatus(`Updating ${hunt.title}...`);
+    try {
+      const response = await fetch(`/api/admin/hunts/${hunt.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+      const payload = (await response.json()) as { hunt?: BonusHunt; error?: string };
+      if (!response.ok || !payload.hunt) throw new Error(payload.error ?? "Bonus hunt could not be updated.");
+      await reloadAdminHunts(hunt.id);
+      setAdminHuntStatus(`${payload.hunt.title} updated and synced to the player page.`);
+    } catch (error) {
+      setAdminHuntStatus(error instanceof Error ? error.message : "Bonus hunt could not be updated.");
+    } finally {
+      setHuntBusy(false);
+    }
+  }
+
+  async function addBonusHuntClip(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedHunt || !newHuntClipTitle.trim()) return;
+    setHuntBusy(true);
+    try {
+      const response = await fetch(`/api/admin/hunts/${selectedHunt.id}/clips`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newHuntClipTitle.trim(), multiplier: Math.max(0, Number(newHuntClipMultiplier) || 0) }),
+      });
+      const payload = (await response.json()) as { clip?: BonusHuntClip; error?: string };
+      if (!response.ok || !payload.clip) throw new Error(payload.error ?? "Highlight could not be added.");
+      await reloadAdminHunts(selectedHunt.id);
+      setNewHuntClipTitle("");
+      setNewHuntClipMultiplier("1");
+      setAdminHuntStatus("Highlight added and visible to players.");
+    } catch (error) {
+      setAdminHuntStatus(error instanceof Error ? error.message : "Highlight could not be added.");
+    } finally {
+      setHuntBusy(false);
+    }
+  }
+
+  async function saveBonusHuntClip(event: FormEvent<HTMLFormElement>, clip: BonusHuntClip) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const title = String(form.get("title") ?? "").trim();
+    const multiplier = Number(form.get("multiplier"));
+    if (!selectedHunt || !title || !Number.isFinite(multiplier) || multiplier < 0) return;
+    setHuntBusy(true);
+    try {
+      const response = await fetch(`/api/admin/hunts/${selectedHunt.id}/clips/${clip.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, multiplier }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Highlight could not be updated.");
+      await reloadAdminHunts(selectedHunt.id);
+      setAdminHuntStatus("Highlight saved and synced to players.");
+    } catch (error) {
+      setAdminHuntStatus(error instanceof Error ? error.message : "Highlight could not be updated.");
+    } finally {
+      setHuntBusy(false);
+    }
+  }
+
+  async function removeBonusHuntClip(clip: BonusHuntClip) {
+    if (!selectedHunt || !window.confirm(`Remove “${clip.title}”? Its votes and saves will also be removed.`)) return;
+    setHuntBusy(true);
+    try {
+      const response = await fetch(`/api/admin/hunts/${selectedHunt.id}/clips/${clip.id}`, { method: "DELETE" });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Highlight could not be removed.");
+      await reloadAdminHunts(selectedHunt.id);
+      setAdminHuntStatus("Highlight removed.");
+    } catch (error) {
+      setAdminHuntStatus(error instanceof Error ? error.message : "Highlight could not be removed.");
+    } finally {
+      setHuntBusy(false);
     }
   }
 
@@ -2732,6 +3020,17 @@ function AdminWorkspace({
               <button className="button primary" type="button" onClick={() => patchAdminTournament(selectedTournament, { status: "COMPLETED" })}>Finish</button>
             </div>
           </div>
+          <form className="support-form account-form tournament-edit-form" onSubmit={(event) => { event.preventDefault(); void saveTournamentDetails(); }}>
+            <label>TITLE<input required maxLength={100} value={tournamentDraft.title} onChange={(event) => setTournamentDraft((current) => ({ ...current, title: event.target.value }))} /></label>
+            <label>START<input required maxLength={100} value={tournamentDraft.starts} onChange={(event) => setTournamentDraft((current) => ({ ...current, starts: event.target.value }))} /></label>
+            <label>PRIZE<input required maxLength={80} value={tournamentDraft.prize} onChange={(event) => setTournamentDraft((current) => ({ ...current, prize: event.target.value }))} /></label>
+            <label>SEAT LIMIT<input type="number" min="2" max="64" step="1" value={tournamentDraft.seats} onChange={(event) => setTournamentDraft((current) => ({ ...current, seats: event.target.value }))} /></label>
+            <button className="button primary" type="submit">Save tournament details <span>↗</span></button>
+          </form>
+          <div className="admin-tournament-entrants">
+            <div><small>REGISTRATION</small><strong>{selectedTournament.taken} / {selectedTournament.seats} players</strong></div>
+            {selectedTournament.entrants.length ? <ul>{selectedTournament.entrants.map((entrant, index) => <li key={`${entrant}-${index}`}>{entrant}</li>)}</ul> : <p>No players registered yet.</p>}
+          </div>
           <div className="admin-bracket-seeds">
             <label>BRACKET SEEDS<textarea value={bracketParticipants} onChange={(event) => setBracketParticipants(event.target.value)} placeholder="Leave blank to use registered players" /></label>
             <button className="button primary" type="button" onClick={generateAdminBracket}>Generate bracket <span>↗</span></button>
@@ -2758,6 +3057,80 @@ function AdminWorkspace({
             <p className="admin-helper-text">{challongeStatus || "Embedded live via iframe"}</p>
           </div>
           {selectedTournament.matches.length ? <TournamentBracket tournament={selectedTournament} onUpdate={updateAdminMatch} /> : <p className="admin-note">Add seed names or use registered players, then generate the bracket.</p>}
+        </LiquidGlass>
+      ) : null}
+      <div className="admin-section-title">
+        <div>
+          <p>Bonus hunts</p>
+          <h2>Create & run hunts</h2>
+        </div>
+      </div>
+      <p className="admin-note">{adminHuntStatus}. Published hunts and highlights appear on the player page.</p>
+      <form className="support-form account-form bonus-hunt-admin-form" onSubmit={publishBonusHunt}>
+        <label>HUNT TITLE<input required maxLength={100} value={newHunt.title} onChange={(event) => setNewHunt((current) => ({ ...current, title: event.target.value }))} placeholder="ARTZ Friday Bonus Hunt" /></label>
+        <label>HOST<input required maxLength={80} value={newHunt.host} onChange={(event) => setNewHunt((current) => ({ ...current, host: event.target.value }))} placeholder="Streamer name" /></label>
+        <label>START TIME<input type="datetime-local" value={newHunt.startsAt} onChange={(event) => setNewHunt((current) => ({ ...current, startsAt: event.target.value }))} /></label>
+        <label>STATUS<select value={newHunt.status} onChange={(event) => setNewHunt((current) => ({ ...current, status: event.target.value as AdminHuntStatus }))}><option value="SCHEDULED">Upcoming</option><option value="LIVE">Live</option><option value="COMPLETED">Completed</option></select></label>
+        <label>START BANKROLL<input type="number" min="0" max="2000000000" step="1" value={newHunt.startBankroll} onChange={(event) => setNewHunt((current) => ({ ...current, startBankroll: event.target.value }))} /></label>
+        <label>CURRENT BANKROLL<input type="number" min="0" max="2000000000" step="1" value={newHunt.currentBankroll} onChange={(event) => setNewHunt((current) => ({ ...current, currentBankroll: event.target.value }))} /></label>
+        <label>BONUSES PLANNED<input type="number" min="0" max="100000" step="1" value={newHunt.bonusCount} onChange={(event) => setNewHunt((current) => ({ ...current, bonusCount: event.target.value }))} /></label>
+        <label>BONUSES OPENED<input type="number" min="0" max="100000" step="1" value={newHunt.openedCount} onChange={(event) => setNewHunt((current) => ({ ...current, openedCount: event.target.value }))} /></label>
+        <label>TOTAL PAYOUT<input type="number" min="0" max="2000000000" step="1" value={newHunt.totalPayout} onChange={(event) => setNewHunt((current) => ({ ...current, totalPayout: event.target.value }))} /></label>
+        <label>BEST MULTIPLIER<input type="number" min="0" max="1000000000" step="any" value={newHunt.bestMultiplier} onChange={(event) => setNewHunt((current) => ({ ...current, bestMultiplier: event.target.value }))} /></label>
+        <label>SORT ORDER<input type="number" min="-1000000" max="1000000" step="1" value={newHunt.sortOrder} onChange={(event) => setNewHunt((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
+        <button className="button primary" type="submit" disabled={huntBusy}>{huntBusy ? "Saving" : "Create & publish hunt"} <span>↗</span></button>
+      </form>
+      <div className="workspace-list admin-hunt-list">
+        {adminHunts.length ? adminHunts.map((hunt) => (
+          <article className={selectedHunt?.id === hunt.id ? "selected" : ""} key={hunt.id}>
+            <span>{hunt.active ? hunt.status : "Hidden"}</span>
+            <div><h3>{hunt.title}</h3><p>{hunt.host} · {formatHuntTime(hunt)} · {hunt.openedCount}/{hunt.bonusCount} bonuses · {adminHuntClips.filter((clip) => clip.huntId === hunt.id).length} highlights</p></div>
+            <button type="button" onClick={() => selectAdminHunt(hunt)}>Manage</button>
+            <button type="button" disabled={huntBusy} onClick={() => void patchBonusHunt(hunt, { active: !hunt.active })}>{hunt.active ? "Hide" : "Publish"}</button>
+          </article>
+        )) : <article><span>EMPTY</span><div><h3>No bonus hunts yet</h3><p>Create a hunt above to publish it to players.</p></div></article>}
+      </div>
+      {selectedHunt && huntEditor ? (
+        <LiquidGlass className="admin-hunt-manager" tone="violet">
+          <div className="admin-tournament-manager__head">
+            <div><small>HUNT CONTROL ROOM</small><h3>{selectedHunt.title}</h3><p>{selectedHunt.active ? "Visible to players" : "Hidden from players"} · {selectedHuntClips.length} highlights · {selectedHuntClips.reduce((total, clip) => total + clip.votes, 0)} votes</p></div>
+            <div className="button-row">
+              <button className="button ghost" type="button" disabled={huntBusy} onClick={() => void patchBonusHunt(selectedHunt, { status: "SCHEDULED" })}>Set upcoming</button>
+              <button className="button ghost" type="button" disabled={huntBusy} onClick={() => void patchBonusHunt(selectedHunt, { status: "LIVE" })}>Go live</button>
+              <button className="button primary" type="button" disabled={huntBusy} onClick={() => void patchBonusHunt(selectedHunt, { status: "COMPLETED" })}>Complete</button>
+            </div>
+          </div>
+          <form className="support-form account-form bonus-hunt-admin-form bonus-hunt-edit-form" onSubmit={(event) => { event.preventDefault(); void saveBonusHunt(); }}>
+            <label>TITLE<input required maxLength={100} value={huntEditor.title} onChange={(event) => setHuntEditor((current) => current ? { ...current, title: event.target.value } : current)} /></label>
+            <label>HOST<input required maxLength={80} value={huntEditor.host} onChange={(event) => setHuntEditor((current) => current ? { ...current, host: event.target.value } : current)} /></label>
+            <label>START TIME<input type="datetime-local" value={huntEditor.startsAt} onChange={(event) => setHuntEditor((current) => current ? { ...current, startsAt: event.target.value } : current)} /></label>
+            <label>STATUS<select value={huntEditor.status} onChange={(event) => setHuntEditor((current) => current ? { ...current, status: event.target.value as AdminHuntStatus } : current)}><option value="SCHEDULED">Upcoming</option><option value="LIVE">Live</option><option value="COMPLETED">Completed</option></select></label>
+            <label>START BANKROLL<input type="number" min="0" max="2000000000" step="1" value={huntEditor.startBankroll} onChange={(event) => setHuntEditor((current) => current ? { ...current, startBankroll: event.target.value } : current)} /></label>
+            <label>CURRENT BANKROLL<input type="number" min="0" max="2000000000" step="1" value={huntEditor.currentBankroll} onChange={(event) => setHuntEditor((current) => current ? { ...current, currentBankroll: event.target.value } : current)} /></label>
+            <label>BONUSES PLANNED<input type="number" min="0" max="100000" step="1" value={huntEditor.bonusCount} onChange={(event) => setHuntEditor((current) => current ? { ...current, bonusCount: event.target.value } : current)} /></label>
+            <label>BONUSES OPENED<input type="number" min="0" max="100000" step="1" value={huntEditor.openedCount} onChange={(event) => setHuntEditor((current) => current ? { ...current, openedCount: event.target.value } : current)} /></label>
+            <label>TOTAL PAYOUT<input type="number" min="0" max="2000000000" step="1" value={huntEditor.totalPayout} onChange={(event) => setHuntEditor((current) => current ? { ...current, totalPayout: event.target.value } : current)} /></label>
+            <label>BEST MULTIPLIER<input type="number" min="0" max="1000000000" step="any" value={huntEditor.bestMultiplier} onChange={(event) => setHuntEditor((current) => current ? { ...current, bestMultiplier: event.target.value } : current)} /></label>
+            <label>SORT ORDER<input type="number" min="-1000000" max="1000000" step="1" value={huntEditor.sortOrder} onChange={(event) => setHuntEditor((current) => current ? { ...current, sortOrder: event.target.value } : current)} /></label>
+            <button className="button primary" type="submit" disabled={huntBusy}>{huntBusy ? "Saving" : "Save hunt details"} <span>↗</span></button>
+          </form>
+          <div className="admin-section-title"><div><p>Player highlights</p><h2>Manage clips</h2></div></div>
+          <form className="support-form account-form admin-hunt-clip-create" onSubmit={addBonusHuntClip}>
+            <label>HIGHLIGHT TITLE<input required maxLength={100} value={newHuntClipTitle} onChange={(event) => setNewHuntClipTitle(event.target.value)} placeholder="The 500x reveal" /></label>
+            <label>MULTIPLIER<input type="number" min="0" max="1000000000" step="any" value={newHuntClipMultiplier} onChange={(event) => setNewHuntClipMultiplier(event.target.value)} /></label>
+            <button className="button primary" type="submit" disabled={huntBusy}>Add highlight <span>↗</span></button>
+          </form>
+          <div className="workspace-list admin-hunt-clips">
+            {selectedHuntClips.length ? selectedHuntClips.map((clip) => (
+              <form key={`${clip.id}-${clip.title}-${clip.multiplier}`} onSubmit={(event) => void saveBonusHuntClip(event, clip)}>
+                <label>TITLE<input name="title" required maxLength={100} defaultValue={clip.title} /></label>
+                <label>MULTIPLIER<input name="multiplier" type="number" min="0" max="1000000000" step="any" defaultValue={clip.multiplier} /></label>
+                <span>{clip.votes} votes</span>
+                <button type="submit" disabled={huntBusy}>Save</button>
+                <button type="button" disabled={huntBusy} onClick={() => void removeBonusHuntClip(clip)}>Remove</button>
+              </form>
+            )) : <article><span>EMPTY</span><div><h3>No highlights yet</h3><p>Add a highlight to feature it on the player page.</p></div></article>}
+          </div>
         </LiquidGlass>
       ) : null}
       <div className="admin-section-title">
