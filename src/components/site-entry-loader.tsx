@@ -83,7 +83,6 @@ export default function SiteEntryLoader({
 
         <div className="site-loader__lock-copy">
           <strong>ARTZ <span>REWARDS</span></strong>
-          <small><Sparkles size={13} /> Shuffling rewards</small>
         </div>
 
         <div className="site-loader__lock-track" aria-hidden="true">

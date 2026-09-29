@@ -44,7 +44,7 @@
   background: rgba(19, 11, 7, 0.82);
   color: #ffe45e;
   font-family: var(--font-artz-body), sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -157,7 +157,7 @@
   gap: 7px;
   color: #2b1404;
   font-family: var(--font-artz-body), sans-serif;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -194,7 +194,7 @@
   border: 1.5px solid #130b07;
   border-radius: 999px;
   font-family: var(--font-artz-body), sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.04em;
   box-shadow: 2px 2px 0 rgba(19, 11, 7, 0.85);
@@ -217,7 +217,7 @@
 }
 
 .board-hero--leaderboard .season-clock__head > span {
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .board-hero--leaderboard .season-clock__digits {
@@ -233,7 +233,7 @@
 }
 
 .board-hero--leaderboard .season-clock__digits small {
-  font-size: 9px;
+  font-size: 14px;
 }
 
 .board-top-three {
@@ -283,7 +283,7 @@
   display: block;
   margin-top: 14px;
   color: rgba(255, 246, 229, 0.72);
-  font-size: 13px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -317,7 +317,7 @@
 
 .board-section .player-row .wager small {
   color: rgba(255, 246, 229, 0.55);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -327,7 +327,7 @@
 .bonus-hunts-workspace { gap: 24px; }
 .hunt-feature { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1fr); gap: 32px; padding: clamp(24px, 4vw, 44px); border-color: rgba(255, 150, 106, 0.35); background: radial-gradient(circle at 12% 8%, rgba(255, 77, 109, 0.21), transparent 46%), linear-gradient(145deg, rgba(44, 26, 16, 0.94), rgba(13, 2, 24, 0.96)); }
 .hunt-feature__intro { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-.hunt-status { display: inline-flex; align-items: center; gap: 6px; width: max-content; padding: 7px 11px; border: 1px solid rgba(255, 177, 100, 0.45); border-radius: 999px; color: #ffd18c; font-size: 11px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; }
+.hunt-status { display: inline-flex; align-items: center; gap: 6px; width: max-content; padding: 7px 11px; border: 1px solid rgba(255, 177, 100, 0.45); border-radius: 999px; color: #ffd18c; font-size: 14px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; }
 .hunt-status--live { color: #ffba72; box-shadow: 0 0 18px rgba(255, 132, 82, 0.21); }
 .hunt-status--upcoming { color: #ffedbe; border-color: rgba(255, 176, 46, 0.43); }
 .hunt-feature h2 { margin: 0; color: #fff4fc; font-family: var(--font-artz-display), sans-serif; font-size: clamp(35px, 4.5vw, 60px); line-height: 0.98; }
@@ -337,15 +337,15 @@
 .hunt-feature button:disabled, .hunt-list__card button:disabled, .hunt-clips button:disabled { opacity: 0.55; cursor: default; }
 .hunt-feature__stats { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .hunt-feature__stats > div { display: grid; align-content: center; gap: 7px; min-height: 91px; padding: 16px; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 16px; background: rgba(10, 1, 22, 0.45); }
-.hunt-feature__stats small { color: rgba(255, 236, 247, 0.56); font-size: 11px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
+.hunt-feature__stats small { color: rgba(255, 236, 247, 0.56); font-size: 14px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
 .hunt-feature__stats strong { color: #ffedbe; font-size: clamp(21px, 2.5vw, 32px); line-height: 1; }
-.hunt-feature__stats strong span { color: rgba(255, 240, 249, 0.5); font-size: 0.63em; }
+.hunt-feature__stats strong span { color: rgba(255, 240, 249, 0.5); font-size: max(14px, 0.63em); }
 .hunt-feature__progress { grid-column: 1 / -1; height: 8px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.1); }
 .hunt-feature__progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffb02e, #ff4d6d, #ffc66e); box-shadow: 0 0 18px rgba(255, 169, 104, 0.62); }
 .hunt-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
 .hunt-list__card { display: grid; align-content: start; gap: 12px; min-height: 205px; padding: 22px; }
 .hunt-list__card h3 { margin: 0; color: #fff7fb; font-size: 24px; }
-.hunt-list__card > div { display: flex; justify-content: space-between; gap: 10px; color: rgba(255, 235, 248, 0.65); font-size: 12px; }
+.hunt-list__card > div { display: flex; justify-content: space-between; gap: 10px; color: rgba(255, 235, 248, 0.65); font-size: 14px; }
 .hunt-list__card > div strong { color: #ffd293; }
 .hunt-list__card button { justify-self: start; margin-top: 4px; }
 .hunt-clips h2 { color: #fff5fa; font-size: clamp(27px, 3vw, 38px); }
@@ -359,9 +359,9 @@
 .bonus-hunt-admin-form { margin-block: 18px; }
 .admin-tournament-entrants { margin-top: 18px; padding: 16px; border: 1px solid rgba(255, 177, 100, 0.22); border-radius: 16px; background: rgba(12, 4, 20, 0.44); }
 .admin-tournament-entrants > div { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: #ffd293; }
-.admin-tournament-entrants > div small { color: rgba(255, 235, 248, 0.55); font-size: 10px; font-weight: 900; letter-spacing: 0.12em; }
+.admin-tournament-entrants > div small { color: rgba(255, 235, 248, 0.55); font-size: 14px; font-weight: 900; letter-spacing: 0.12em; }
 .admin-tournament-entrants ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
-.admin-tournament-entrants li { padding: 7px 10px; border: 1px solid rgba(255, 177, 100, 0.22); border-radius: 999px; color: rgba(255, 246, 229, 0.85); font-size: 12px; }
+.admin-tournament-entrants li { padding: 7px 10px; border: 1px solid rgba(255, 177, 100, 0.22); border-radius: 999px; color: rgba(255, 246, 229, 0.85); font-size: 14px; }
 .admin-tournament-entrants p { margin: 12px 0 0; color: rgba(255, 235, 248, 0.58); }
 .admin-hunt-list article.selected { border-color: rgba(255, 193, 95, 0.68); background: linear-gradient(135deg, rgba(255, 171, 61, 0.13), rgba(38, 22, 14, 0.76)); }
 .admin-hunt-manager { display: grid; gap: 18px; margin-top: 22px; padding: clamp(18px, 2.4vw, 30px); overflow: hidden; }
@@ -370,9 +370,9 @@
 .admin-hunt-clip-create { margin: 0; }
 .admin-hunt-clips { margin-top: 0; }
 .admin-hunt-clips > form { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(120px, 0.35fr) auto auto auto; align-items: end; gap: 12px; }
-.admin-hunt-clips > form label { display: grid; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.08em; }
+.admin-hunt-clips > form label { display: grid; gap: 7px; color: var(--muted); font-size: 14px; font-weight: 900; letter-spacing: 0.08em; }
 .admin-hunt-clips > form input { width: 100%; min-width: 0; }
-.admin-hunt-clips > form > span { padding: 11px 4px; color: #ffd293; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.admin-hunt-clips > form > span { padding: 11px 4px; color: #ffd293; font-size: 14px; font-weight: 800; white-space: nowrap; }
 .admin-hunt-clips > form > button { min-height: 42px; }
 
 @media (max-width: 780px) {
@@ -381,7 +381,7 @@
   .admin-tournament-entrants > div { align-items: flex-start; flex-direction: column; gap: 5px; }
 }
 .hunt-clips article > div { display: flex; gap: 9px; flex-wrap: wrap; }
-.hunt-clips button { min-height: 35px; font-size: 12px; }
+.hunt-clips button { min-height: 35px; font-size: 14px; }
 .hunt-empty { padding: 36px; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 18px; color: rgba(255, 235, 248, 0.72); text-align: center; }
 
 @media (max-width: 700px) {
@@ -397,11 +397,11 @@
 
 @media (max-width: 520px) {
   .board-hero--leaderboard .board-hero__title h1 { max-width: 350px; font-size: clamp(38px, 11vw, 52px); }
-  .board-hero__badge { font-size: 11px; }
+  .board-hero__badge { font-size: 14px; }
   .board-prize-spotlight { width: min(420px, calc(100% - 16px)); padding: 14px; gap: 12px; }
   .board-section .player-row { grid-template-columns: minmax(0, 1fr) auto; }
   .board-section .player-row .wager { grid-column: 2; grid-row: 1; padding-left: 4px; font-size: 14px; }
-  .board-section .player-row .wager small { display: block; font-size: 9px; }
+  .board-section .player-row .wager small { display: block; font-size: 14px; }
   .board-section .player-cell { min-width: 0; gap: 8px; }
   .board-section .mini-avatar { display: none; }
   .hunt-feature__stats { gap: 8px; }

@@ -95,65 +95,118 @@
   color: #2b1404;
 }
 
-/* 4. No straight containers: curvy, tilted, sticker-framed. */
-.site-shell .standings,
-.site-shell .season-clock,
-.site-shell .action-card,
-.site-shell .auth-card,
-.site-shell .auth-session-card,
-.site-shell .bracket-panel,
-.site-shell .inventory-panel,
-.site-shell .connection-card,
-.site-shell .casino-link-card,
-.site-shell .workspace-list article,
-.site-shell .tool-panel,
-.site-shell .admin-panel,
-.site-shell .watch-console,
-.site-shell .profile-card,
-.site-shell .profile-panel {
-  border-radius: 22px;
+/* Shared arcade surfaces: reflection, colored rim, and a soft raised edge. */
+.site-shell {
+  --surface-rgb: 255 176 46;
+  --muted: #d7c6b9;
+  --card-radius: 28px;
+  --panel-round: 28px;
 }
 
-.site-shell .player-row,
-.site-shell .table-head {
-  border-radius: 18px;
+.site-shell .workspace--missions { --surface-rgb: 255 77 109; }
+.site-shell .workspace--bets { --surface-rgb: 45 225 167; }
+.site-shell .workspace--watch { --surface-rgb: 45 225 167; }
+.site-shell .bonus-hunts-workspace { --surface-rgb: 255 122 26; }
+
+.site-shell :is(
+  .standings, .season-clock, .action-card, .auth-modal-shell,
+  .auth-card, .auth-session-card, .auth-panel, .bracket-panel,
+  .inventory-panel, .connection-card, .casino-link-card,
+  .casino-link-panel, .casino-card, .workspace-list article,
+  .workspace-notice, .tool-panel, .support-form, .admin-panel,
+  .admin-user-manager, .admin-user-detail, .admin-tournament-manager,
+  .admin-hunt-manager, .watch-console, .profile-card, .profile-panel,
+  .market-admin-row, .hunt-feature, .hunt-list__card, .hunt-clips article,
+  .hunt-empty, .you-position-card, .board-pulse-card,
+  .legal-layout aside, .legal-layout article, .home-kick-stream
+) {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgb(var(--surface-rgb) / 0.48);
+  border-radius: var(--card-radius);
+  clip-path: none;
+  filter: none;
+  background:
+    linear-gradient(116deg, rgba(255, 255, 255, 0.18), transparent 29%),
+    radial-gradient(ellipse at 88% 0%, rgb(var(--surface-rgb) / 0.23), transparent 58%),
+    linear-gradient(165deg, rgba(46, 28, 23, 0.94), rgba(18, 10, 12, 0.97) 68%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.26),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.24),
+    0 8px 0 rgba(8, 4, 5, 0.65),
+    0 20px 42px rgba(0, 0, 0, 0.3),
+    0 0 26px rgb(var(--surface-rgb) / 0.12);
+  backdrop-filter: blur(18px) saturate(1.35);
 }
 
-/* Arcade-cabinet frame for the main standings board. */
+/* The light strip sits above the reflection; it never intercepts a click. */
+.site-shell :is(
+  .standings, .season-clock, .action-card, .bracket-panel,
+  .connection-card, .casino-card, .support-form, .tool-panel,
+  .admin-panel, .admin-user-manager, .admin-tournament-manager,
+  .admin-hunt-manager, .watch-console, .hunt-feature, .hunt-list__card,
+  .hunt-clips article, .legal-layout article, .auth-modal-shell, .home-kick-stream
+)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgb(var(--surface-rgb) / 0.9), #fff2d5, rgb(var(--surface-rgb) / 0.9), transparent) center top / 62% 3px no-repeat;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.site-shell .liquid-glass[data-liquid-tone="cyan"] { --liquid-tint: 45 225 167; }
+.site-shell .liquid-glass[data-liquid-tone="success"] { --liquid-tint: 45 225 167; }
+.site-shell .workspace-grid > :nth-child(3n + 2) { --surface-rgb: 45 225 167; }
+.site-shell .workspace-grid > :nth-child(3n) { --surface-rgb: 255 77 109; }
+
+.site-shell :is(.player-row, .table-head, .tournament-match,
+  .market-admin-info, .admin-tournament-entrants, .admin-user-list button,
+  .hunt-feature__stats > div, .status-grid > div, .account-strip > div,
+  .stat-strip > div, .home-hero-stats > span, .admin-bracket-seeds,
+  .bet-amount-control, .odds-grid button, .auth-tabs, .search, .wide-search,
+  .admin-point-control, .admin-moderation-control, .admin-casino-strip > span) {
+  border: 1px solid rgb(var(--surface-rgb) / 0.3);
+  border-radius: 20px;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.13), transparent 40%),
+    linear-gradient(165deg, rgb(var(--surface-rgb) / 0.11), rgba(18, 10, 12, 0.88));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 6px 18px rgba(0, 0, 0, 0.2);
+  filter: none;
+}
+
 .site-shell .standings {
-  border: 2px solid var(--funk-cream);
-  box-shadow: 6px 6px 0 var(--funk-pine), 0 26px 60px rgba(0, 0, 0, 0.5),
-    0 0 36px rgba(255, 122, 26, 0.22);
+  padding: clamp(16px, 2.4vw, 28px);
   transform: rotate(-0.3deg);
 }
 
-/* 4b. Proper gloss: bright top streak, inner light, ambient glow. */
-.site-shell .standings,
-.site-shell .season-clock,
-.site-shell .action-card,
-.site-shell .auth-card,
-.site-shell .auth-session-card,
-.site-shell .bracket-panel,
-.site-shell .inventory-panel,
-.site-shell .connection-card,
-.site-shell .casino-link-card,
-.site-shell .workspace-list article,
-.site-shell .tool-panel,
-.site-shell .admin-panel,
-.site-shell .watch-console,
-.site-shell .profile-card,
-.site-shell .profile-panel,
-.site-shell .board-section .player-row {
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.22), transparent 32%),
-    radial-gradient(circle at 85% -10%, rgba(255, 176, 46, 0.26), transparent 46%),
-    radial-gradient(circle at 8% 115%, rgba(255, 77, 109, 0.13), transparent 42%),
-    linear-gradient(160deg, #2c1a0e, #130b07 58%, #1e0e06);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -16px 30px rgba(0, 0, 0, 0.38),
-    5px 5px 0 var(--funk-pine),
-    0 24px 60px rgba(0, 0, 0, 0.5),
-    0 0 32px rgba(255, 122, 26, 0.13);
+.site-shell .workspace-list {
+  display: grid;
+  gap: 18px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.site-shell .workspace-list article {
+  padding: 22px;
+  transform: none;
+}
+
+.site-shell .workspace-list article:last-child {
+  border-bottom: 1px solid rgb(var(--surface-rgb) / 0.48);
+}
+
+.site-shell :is(.action-card, .connection-card, .workspace-list article):hover {
+  border-color: rgb(var(--surface-rgb) / 0.8);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 8px 0 rgba(8, 4, 5, 0.65), 0 24px 44px rgba(0, 0, 0, 0.35), 0 0 32px rgb(var(--surface-rgb) / 0.22);
 }
 
 /* 4c. Rotating aura behind the hero title. */
@@ -301,7 +354,7 @@
   align-items: center;
   gap: 8px;
   color: #2b1404;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -320,7 +373,7 @@
   place-items: center;
   flex: 0 0 auto;
   border-radius: 50%;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .site-shell .board-section .rank-row-1 .row-rank {
@@ -367,52 +420,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 19. Nothing edgy anywhere: every container rounded with glowing golden borders. */
-.site-shell .action-card,
-.site-shell .auth-card,
-.site-shell .auth-session-card,
-.site-shell .auth-panel,
-.site-shell .auth-form,
-.site-shell .auth-modal-shell,
-.site-shell .bracket-panel,
-.site-shell .inventory-panel,
-.site-shell .connection-card,
-.site-shell .casino-link-card,
-.site-shell .casino-card,
-.site-shell .workspace-list article,
-.site-shell .workspace-notice,
-.site-shell .tool-panel,
-.site-shell .admin-panel,
-.site-shell .watch-console,
-.site-shell .profile-card,
-.site-shell .profile-panel,
-.site-shell .season-clock,
-.site-shell .player-row,
-.site-shell .table-head,
-.site-shell .market-card,
-.site-shell .market-admin-info,
-.site-shell .bet-amount-control,
-.site-shell .odds-grid,
-.site-shell .tournament-match,
-.site-shell .hunt-feature,
-.site-shell .hunt-list__card,
-.site-shell .hunt-clips article,
-.site-shell .hunt-empty,
-.site-shell .you-position-card,
-.site-shell .board-pulse-card,
-.site-shell .legal-layout aside,
-.site-shell .legal-layout article {
-  border-radius: 20px;
-  border: 1.5px solid rgba(255, 196, 80, 0.45);
-  filter: drop-shadow(0 0 14px rgba(255, 180, 70, 0.2));
-}
-
-.site-shell input,
-.site-shell select,
-.site-shell textarea {
-  border-radius: 14px;
-}
-
 /* 14. Hero jackpot stat chips. */
 .site-shell .home-hero-stats {
   display: flex;
@@ -440,7 +447,7 @@
 
 .site-shell .home-hero-stats small {
   color: rgba(255, 246, 229, 0.6);
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -478,7 +485,7 @@
   border-radius: 999px;
   background: linear-gradient(145deg, var(--funk-coral), #b31e38);
   color: #fff6e5;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.08em;
   box-shadow: 2px 2px 0 var(--funk-pine);
@@ -579,7 +586,7 @@
   position: absolute;
   left: 9px;
   top: 50%;
-  font-size: 8px;
+  font-size: 14px;
   transform: translateY(-50%) rotate(-2deg);
   color: rgba(255, 246, 229, 0.35);
 }
@@ -641,6 +648,207 @@
   border: 2px solid rgba(255, 246, 229, 0.9);
   border-radius: 18px;
   box-shadow: 3px 3px 0 var(--funk-pine);
+}
+
+/* Readable labels and calm copy give the prize artwork room to breathe. */
+.site-shell :is(button, input, select, textarea) {
+  font-family: var(--font-artz-body), sans-serif;
+}
+
+.site-shell :is(input, select, textarea) {
+  min-height: 48px;
+  border-radius: 16px;
+  font-size: 16px;
+}
+
+.site-shell :is(p, label, small, .signal-chip, .workspace-heading__status,
+  .card-topline, .hunt-status, .table-head, .prize-ticket__splits .split) {
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+.site-shell :is(.workspace-list p, .reward-card__copy p, .hunt-feature p,
+  .hunt-list__card p, .admin-panel p, .admin-note, .admin-helper-text,
+  .hunt-feature__stats small, .account-strip__copy small, .home-hero-stats small) {
+  color: #d7c6b9;
+}
+
+.site-shell :is(.reward-card__copy p, .workspace-list p, .legal-layout p) {
+  font-size: 16px;
+}
+
+.site-shell :is(.signal-chip, .workspace-heading__status) {
+  max-width: 100%;
+  height: auto;
+  min-height: 36px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.site-shell .signal-chip--icon-only {
+  padding: 9px;
+  min-width: 36px;
+}
+
+.site-shell .workspace-heading__status {
+  color: #ffe0a1;
+  font-size: 14px;
+  flex-shrink: 1;
+}
+
+.site-shell .workspace-heading {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.site-shell .account-strip,
+.site-shell .stat-strip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.site-shell .help-answers article {
+  display: block;
+}
+
+.site-shell .workspace-list .workspace-empty-card {
+  grid-template-columns: 1fr;
+}
+
+.site-shell .help-answers h3 {
+  margin-bottom: 8px;
+  font-size: 21px;
+}
+
+.site-shell .desktop-nav__links a {
+  padding-inline: 10px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.site-shell .desktop-nav__links a::before {
+  content: none;
+}
+
+.site-shell .desktop-nav__links {
+  gap: 2px;
+}
+
+.site-shell .home-action-zone .home-route-card {
+  border-radius: 28px;
+}
+
+.site-shell :is(.button, .refresh, .load-more, .route-link) {
+  border-radius: 999px;
+}
+
+.site-shell :is(.action-card__footer button, .workspace-list button,
+  .bracket-panel button, .tool-panel button, .admin-panel button,
+  .connection-card button, .auth-tabs button) {
+  border-radius: 999px;
+}
+
+.site-shell button:disabled {
+  opacity: 0.78;
+}
+
+.site-shell .reward-art {
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.18), transparent 40%),
+    radial-gradient(ellipse at 50% 0%, rgb(var(--surface-rgb) / 0.2), transparent 72%),
+    rgba(15, 8, 10, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 0 22px rgb(var(--surface-rgb) / 0.08);
+}
+
+.site-shell .reward-art--image {
+  background-size: cover;
+  background-position: center;
+}
+
+.site-shell .home-kick-stream {
+  overflow: hidden;
+}
+
+.site-shell .home-kick-stream__bar {
+  gap: 12px;
+}
+
+.site-shell .home-kick-stream__footer a {
+  margin-left: auto;
+}
+
+.site-shell .auth-modal-shell :is(.auth-panel, .auth-card, .auth-copy, .auth-form) {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  filter: none;
+}
+
+.site-shell .home-route-card__mark {
+  margin-top: 10px;
+}
+
+.site-shell .home-hero-podium .podium-card { --podium-glow: rgba(255, 178, 46, 0.4); }
+.site-shell .home-hero-podium .rank-2 { --podium-glow: rgba(45, 225, 167, 0.4); }
+.site-shell .home-hero-podium .rank-3 { --podium-glow: rgba(255, 77, 109, 0.4); }
+
+.site-shell .board-top-three .winner-arena .podium-card,
+.site-shell .home-board-showcase .podium.compact .podium-card {
+  border-radius: 28px;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.22), transparent 35%),
+    radial-gradient(ellipse at 70% 0%, var(--podium-glow), transparent 65%),
+    linear-gradient(160deg, #38221a, #130b0c 70%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 8px 0 #130b07,
+    0 24px 45px rgba(0, 0, 0, 0.4), 0 0 32px var(--podium-glow);
+}
+
+.site-shell .board-hero--leaderboard .season-clock {
+  width: min(300px, 28vw);
+  padding: 18px;
+}
+
+.site-shell .season-clock__meta,
+.site-shell .season-clock__digits small {
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+.site-shell .age-chip {
+  font-size: 14px;
+}
+
+@media (max-width: 1180px) {
+  .site-shell .desktop-nav { display: none; }
+  .site-shell .mobile-menu-only { display: block; }
+}
+
+@media (min-width: 1181px) {
+  .site-shell .mobile-menu-only { display: none; }
+}
+
+@media (max-width: 700px) {
+  .site-shell { --card-radius: 24px; }
+  .site-shell .board-hero--leaderboard .season-clock {
+    width: min(350px, 100%);
+  }
+  .site-shell .home-hero-stats {
+    gap: 10px;
+    margin-inline: 14px;
+  }
+  .site-shell .home-hero-stats > span {
+    min-width: 0;
+    flex: 1;
+    padding: 12px 8px;
+  }
+  .site-shell .home-hero-stats small { font-size: 14px; }
+  .site-shell .home-hero-stats strong { font-size: 24px; }
+  .site-shell .workspace-list article { padding: 18px; }
 }
 
 @media (max-width: 780px) {

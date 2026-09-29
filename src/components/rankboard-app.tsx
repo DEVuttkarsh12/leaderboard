@@ -515,7 +515,6 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
   const cleanHandle = account.handle.replace(/^@/, "") || "guest";
   const initials = getInitials(cleanHandle);
   const isAdmin = isAdminHeaderAccount(account);
-  const accountStatus = !account.authenticated ? "Guest" : isAdmin ? "Admin" : account.profileProvider === "kick" ? "Kick" : account.profileProvider === "discord" ? "Discord" : "Signed in";
   const accountHref = headerAccountDestination(account);
   const menuLinks = account.authenticated
     ? isAdmin
@@ -535,7 +534,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
         <span className="menu-logo-word">
           ARTZ<span>REWARDS</span>
         </span>
-        <small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small>
+        {account.authenticated && <small>{formatNumberCompact(account.points)} PTS</small>}
       </span>
     </div>
   );
@@ -568,7 +567,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
             <span className="desktop-nav__avatar">{account.image ? <Image src={account.image} alt="" width={36} height={36} unoptimized /> : initials}</span>
             <span>
               <strong>{account.authenticated ? cleanHandle : "Guest"}</strong>
-              <small>{accountStatus} · {formatNumberCompact(account.points)} PTS</small>
+              {account.authenticated && <small>{formatNumberCompact(account.points)} PTS</small>}
             </span>
           </Link>
           {account.authenticated ? (
@@ -646,7 +645,6 @@ function Home({
         transition={{ delay: 0.38, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
       >
         <span className="home-hero-emblem" aria-hidden="true"><Crown size={22} strokeWidth={2.5} /><b>A</b></span>
-        <span className="home-welcome">ARTZ presents</span>
         <h1 className="home-artz-title" aria-label="ARTZ Rewards">
           <PlayfulWord text="ARTZ" />
           <PlayfulWord accent text="Rewards" />
@@ -672,12 +670,11 @@ function Home({
       </motion.div>
       <HomeKickStream account={account} setAccount={setAccount} />
     </section>
-    <PrizeTape items={["Prize pot $1,150", "Live rankings", "1st $600 · 2nd $325 · 3rd $225", "Wager · Climb · Win", "Fresh missions weekly"]} />
+    <PrizeTape items={["1st $600 · 2nd $325 · 3rd $225", "Weekly missions"]} />
     <section className="home-action-zone" aria-label="ARTZ Rewards destinations">
       <RevealBlock className="home-action-zone__inner">
         <div className="home-section-heading">
           <h2>Rewards <em>&amp;</em> Perks</h2>
-          <p>Everything you need. Nothing you don&apos;t.</p>
         </div>
         <motion.figure
           className="home-lucky-slot"
@@ -692,8 +689,8 @@ function Home({
         </motion.figure>
         <CasinoOrnament className="home-gold-bars" variant="gold-bars" reveal delay={0.12} />
         <div className="home-route-strip">
-          {launchpad.map(([title, href, badge, color, Icon]) => (
-            <SpotlightRouteCard badge={badge} color={color} href={href} icon={Icon} key={href} title={title} />
+          {launchpad.map(([title, href, , color, Icon]) => (
+            <SpotlightRouteCard color={color} href={href} icon={Icon} key={href} title={title} />
           ))}
         </div>
       </RevealBlock>
@@ -702,7 +699,6 @@ function Home({
       <RevealBlock className="home-board-showcase__inner">
         <div className="home-section-heading">
           <h2>Leader<em>board</em></h2>
-          <p>Every player counts. Your move.</p>
         </div>
         <div className="home-board-showcase__arena">
           <motion.figure
@@ -878,7 +874,9 @@ function HomeKickStream({
       <div className="home-kick-stream__bar">
         <span className="home-kick-stream__status"><i />{isLive ? "Live now" : "Channel offline"}</span>
         <strong>{stream?.channelSlug ? `@${stream.channelSlug}` : "Kick stream"}</strong>
-        <span className="home-kick-stream__earning"><Radio size={15} strokeWidth={2.6} aria-hidden="true" />{earningMessage}</span>
+        {!account.authenticated || !kickConnected ? (
+          <a className="home-kick-stream__earning" href="/api/auth/kick"><Radio size={15} strokeWidth={2.6} aria-hidden="true" />Connect Kick to earn</a>
+        ) : <span className="home-kick-stream__earning"><Radio size={15} strokeWidth={2.6} aria-hidden="true" />{earningMessage}</span>}
       </div>
       <div className="home-kick-stream__player">
         {playerUrl ? (
@@ -894,8 +892,10 @@ function HomeKickStream({
         )}
       </div>
       <div className="home-kick-stream__footer">
-        <span><small>Earned today</small><strong>{fmt(summary?.earnedPointsToday)} PTS</strong></span>
-        <span><small>Total balance</small><strong>{fmt(summary?.points ?? account.points)} PTS</strong></span>
+        {account.authenticated && <>
+          <span><small>Earned today</small><strong>{fmt(summary?.earnedPointsToday)} PTS</strong></span>
+          <span><small>Total balance</small><strong>{fmt(summary?.points ?? account.points)} PTS</strong></span>
+        </>}
         <a href={stream?.channelSlug ? `https://kick.com/${stream.channelSlug}` : "https://kick.com"} target="_blank" rel="noreferrer">
           Open Kick <ArrowUpRight size={14} strokeWidth={2.7} aria-hidden="true" />
         </a>
@@ -1000,13 +1000,11 @@ function MagneticLink({ className, href, children }: { className: string; href: 
 }
 
 function SpotlightRouteCard({
-  badge,
   color,
   href,
   icon: Icon,
   title,
 }: {
-  badge: string;
   color: string;
   href: string;
   icon: ZoneIcon;
@@ -1026,7 +1024,6 @@ function SpotlightRouteCard({
       onPointerLeave={(event) => event.currentTarget.style.setProperty("--spotlight-opacity", "0")}
       onPointerMove={handlePointerMove}
     >
-      <span className="home-route-card__badge">{badge}</span>
       <Icon className="home-route-card__mark" size={62} strokeWidth={1.8} aria-hidden="true" />
       <strong>{title}</strong>
       <ArrowUpRight className="home-route-card__arrow" size={19} strokeWidth={2.7} aria-hidden="true" />
@@ -1102,7 +1099,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       <PrizeDropField compact />
       <div className="board-hero__title">
         <h1><span>Monthly</span> Leaderboard</h1>
-        <p className="board-hero__sub">Top wagers take the pot. No fluff, just hits.</p>
+        <p className="board-hero__sub">Top wagers win cash.</p>
       </div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
     </section>
@@ -1110,7 +1107,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
       <div className="board-prize-spotlight" aria-label="Total prize pool: $1,150">
         <span className="prize-ticket__coin" aria-hidden="true"><Trophy size={26} strokeWidth={2.4} /></span>
         <span className="prize-ticket__main">
-          <small><i />Prize pot · paid in cash</small>
+          <small><i />Cash prize pot</small>
           <strong>$1,150</strong>
         </span>
         <span className="prize-ticket__splits">
@@ -1124,7 +1121,6 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
         <Podium players={users.slice(0, 3)} />
       </div>
     </section>
-    <PrizeTape items={["Prize pot $1,150", "Live now", "1st $600 · 2nd $325 · 3rd $225", "Top wager takes the pot"]} />
     <section className="section page-width board-section">
       <LiquidGlass className="standings" tone="cyan">
         <div className="board-controls"><label className="search"><Search size={16} strokeWidth={2.4} aria-hidden="true" /><input value={query} onChange={e=>{setQuery(e.target.value);setVisible(10)}} placeholder="Find a player…" aria-label="Search players"/></label><button type="button" className={`refresh ${refreshing?"spin":""}`} onClick={refresh} aria-label="Refresh leaderboard"><RefreshCw size={16} strokeWidth={2.4} aria-hidden="true" /></button></div>
@@ -1208,7 +1204,7 @@ function SeasonClock({
 }
 
 function PlayerRow({ player }: { player: Player }) {
-  return <div className={`player-row rank-row-${player.rank}`}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong></span></div><strong className="wager">{fmt(player.points)} <small>wagered</small></strong></div>;
+  return <div className={`player-row rank-row-${player.rank}`}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong></span></div><strong className="wager">{fmt(player.points)}</strong></div>;
 }
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {
@@ -1613,18 +1609,14 @@ function Profile({ account }: { account: HeaderAccount }) {
 
       <section className="stat-strip page-width">
         <div><span>Points</span><strong>{fmt(account.points)}</strong></div>
-        <div><span>Account</span><strong>{account.profileProvider.toUpperCase()}</strong></div>
         <div><span>Handle</span><strong>{account.handle}</strong></div>
-        <div className="round-block"><span>Via</span><strong>{account.profileProvider.toUpperCase()}</strong></div>
       </section>
 
       <section className="section page-width app-workspace">
         <div className="workspace-heading">
           <div>
-            <p>Casino Links</p>
-            <h2>Verified Accounts</h2>
+            <h2>Casino accounts</h2>
           </div>
-          <span>Verified only. No impersonation.</span>
         </div>
 
         <div className="casino-link-grid">
@@ -1652,7 +1644,6 @@ function Profile({ account }: { account: HeaderAccount }) {
       <section className="section page-width section-tight">
         <div className="workspace-heading">
           <div>
-            <p>Ledger</p>
             <h2>Point history</h2>
           </div>
           <Link className="route-link" href="/store">Spend <span>↗</span></Link>
@@ -1680,7 +1671,6 @@ function Profile({ account }: { account: HeaderAccount }) {
       <section className="section page-width section-tight">
         <div className="workspace-heading">
           <div>
-            <p>Logins</p>
             <h2>Connections</h2>
           </div>
         </div>
@@ -1737,7 +1727,7 @@ function Footer() {
       <div className="footer-top page-width">
         <div>
           <Link className="brand" href="/"><span className="brand-mark">A</span><span>ARTZ<span>REWARDS</span></span></Link>
-          <p>Live rewards by ARTZ. Play responsibly · <b className="age-chip">18+</b></p>
+          <p>Play responsibly · <b className="age-chip">18+</b></p>
         </div>
         <div className="footer-links">
           {links.map(([name, href]) => (
@@ -1745,7 +1735,7 @@ function Footer() {
           ))}
         </div>
       </div>
-      <div className="footer-bottom"><span>© 2026 ARTZ REWARDS</span><span>LIVE <b>●</b></span></div>
+      <div className="footer-bottom"><span>© 2026 ARTZ REWARDS</span></div>
     </footer>
   );
 }

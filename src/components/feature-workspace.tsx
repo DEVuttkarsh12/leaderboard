@@ -335,11 +335,11 @@ const defaultAccount: Account = {
 };
 
 const faq = [
-  { q: "Wager score", a: "Live API. Read-only." },
-  { q: "Kick points", a: "Watch. Earn. Spend." },
-  { q: "Store rewards", a: "Order → delivered by admin." },
-  { q: "Custom bets", a: "Admin picks the winner." },
-  { q: "Casino names", a: "Link in profile." },
+  { q: "Wager score", a: "Your eligible casino wagers set your leaderboard score." },
+  { q: "Kick points", a: "Connect Kick and watch live to earn points." },
+  { q: "Store rewards", a: "Redeem points and track delivery in your orders." },
+  { q: "Custom bets", a: "Pick a side. Winning bets pay the listed odds." },
+  { q: "Casino names", a: "Link and verify casino usernames in your profile." },
 ];
 
 const workspaceIcons: Record<string, WorkspaceIcon> = {
@@ -752,7 +752,7 @@ function TournamentsWorkspace() {
       }
       setTournamentList(payload.tournaments);
       setSelected((current) => payload.tournaments?.some((item) => item.id === current) ? current : (payload.tournaments?.[0]?.id ?? ""));
-      if (announce) setMessage("Bracket synced.");
+      if (announce) setMessage("");
     } catch (error) {
       if (announce) setMessage(error instanceof Error ? error.message : "Could not load tournaments.");
     }
@@ -795,7 +795,7 @@ function TournamentsWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Tournaments" title="Brackets & prizes" meta={`${registrations} entries · ${message}`} />
+      <WorkspaceHeader overline="Tournaments" title="Brackets & prizes" meta={message || `${registrations} entries`} />
       <div className="workspace-grid three">
         {tournamentList.map((item) => (
           <LiquidGlass as="article" className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id} tone="cyan">
@@ -813,7 +813,7 @@ function TournamentsWorkspace() {
       {tournament ? (
         <LiquidGlass className="bracket-panel bracket-panel--live" tone="violet">
           <div className="bracket-panel__head">
-            <div><small>LIVE BRACKET</small><h3>{tournament.title}</h3><p>{tournament.prize} · Updated {new Date(tournament.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p></div>
+            <div><h3>{tournament.title}</h3><p>{tournament.prize}</p></div>
             <button type="button" onClick={toggleEntry} disabled={tournament.status !== "Open"}>
               {tournament.joined ? "Withdraw" : tournament.status === "Open" ? "Enter" : tournament.status}
             </button>
@@ -840,7 +840,7 @@ function TournamentsWorkspace() {
           ) : tournament.matches.length ? (
             <TournamentBracket tournament={tournament} />
           ) : (
-            <div className="tournament-empty"><Trophy size={24} aria-hidden="true" /><strong>Bracket preparing</strong><span>Admin seeds will appear here live.</span></div>
+            <div className="tournament-empty"><Trophy size={24} aria-hidden="true" /><strong>Bracket coming soon</strong></div>
           )}
         </LiquidGlass>
       ) : null}
@@ -959,7 +959,7 @@ function BonusHuntsWorkspace() {
 
   return (
     <section className="section page-width app-workspace bonus-hunts-workspace">
-      <WorkspaceHeader overline="Bonus Hunts" title="Every bonus has a moment" meta={message || `${data.hunts.length} hunts · ${live ? "Live hunt in progress" : "Next hunt on deck"}`} />
+      <WorkspaceHeader overline="Bonus Hunts" title="Hunt lineup" meta={message || (live ? "Live now" : "")} />
       {featured ? (
         <LiquidGlass as="article" className="hunt-feature" tone="violet">
           <div className="hunt-feature__intro">
@@ -1089,7 +1089,7 @@ function StoreWorkspace({
         if (!active) return;
         if (data.items) {
           setItems(data.items);
-          setMessage(isGuest ? "Sign in to redeem" : `${data.items.length} rewards`);
+          setMessage("");
         } else {
           setMessage(data.error ?? "Could not load items.");
         }
@@ -1243,7 +1243,7 @@ function StoreWorkspace({
           );
         })}
       </div>
-      <ApiPurchaseList purchases={purchases} />
+      {!isGuest && <ApiPurchaseList purchases={purchases} />}
     </section>
   );
 }
@@ -1408,7 +1408,7 @@ function CustomBetsWorkspace({
       <WorkspaceHeader
         overline="Custom Bets"
         title="Live markets"
-        meta={message || `${bets.filter((bet) => bet.status === "Open").length} open bets`}
+        meta={message}
       />
       <AccountStrip account={account} />
       {isGuest && (
@@ -1468,7 +1468,7 @@ function CustomBetsWorkspace({
           </LiquidGlass>
         ))}
       </div>
-      <BetList bets={bets} />
+      {!isGuest && <BetList bets={bets} />}
     </section>
   );
 }
@@ -1840,21 +1840,29 @@ function AdminWorkspace({
 
   useEffect(() => {
     if (!selectedTournament) return;
-    setTournamentDraft({
-      title: selectedTournament.title,
-      starts: selectedTournament.starts,
-      prize: selectedTournament.prize,
-      seats: String(selectedTournament.seats),
-    });
+    const syncDraft = window.setTimeout(() => {
+      setTournamentDraft({
+        title: selectedTournament.title,
+        starts: selectedTournament.starts,
+        prize: selectedTournament.prize,
+        seats: String(selectedTournament.seats),
+      });
+    }, 0);
+    return () => window.clearTimeout(syncDraft);
   }, [selectedTournament]);
 
   useEffect(() => {
     if (!isAdmin) return;
     let active = true;
-    reloadAdminHunts().catch((error) => {
-      if (active) setAdminHuntStatus(error instanceof Error ? error.message : "Could not load bonus hunts.");
-    });
-    return () => { active = false; };
+    const initialLoad = window.setTimeout(() => {
+      void reloadAdminHunts().catch((error) => {
+        if (active) setAdminHuntStatus(error instanceof Error ? error.message : "Could not load bonus hunts.");
+      });
+    }, 0);
+    return () => {
+      active = false;
+      window.clearTimeout(initialLoad);
+    };
   }, [isAdmin, reloadAdminHunts]);
 
   useEffect(() => {
@@ -2948,7 +2956,6 @@ function AdminWorkspace({
       </LiquidGlass>
       <div className="admin-grid">
         <LiquidGlass as="article" className="admin-panel admin-panel--wide" tone="violet">
-          <small>WEBSITE</small>
           <h3>Site banners</h3>
           <label>Announcement<input maxLength={200} value={siteBannerInputs.announcement} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, announcement: event.target.value }))} /></label>
           <label>Banner<input maxLength={200} value={siteBannerInputs.banner} onChange={(event) => setSiteBannerInputs((current) => ({ ...current, banner: event.target.value }))} /></label>
@@ -3065,7 +3072,7 @@ function AdminWorkspace({
           <h2>Create & run hunts</h2>
         </div>
       </div>
-      <p className="admin-note">{adminHuntStatus}. Published hunts and highlights appear on the player page.</p>
+      <p className="admin-note">{adminHuntStatus}</p>
       <form className="support-form account-form bonus-hunt-admin-form" onSubmit={publishBonusHunt}>
         <label>HUNT TITLE<input required maxLength={100} value={newHunt.title} onChange={(event) => setNewHunt((current) => ({ ...current, title: event.target.value }))} placeholder="ARTZ Friday Bonus Hunt" /></label>
         <label>HOST<input required maxLength={80} value={newHunt.host} onChange={(event) => setNewHunt((current) => ({ ...current, host: event.target.value }))} placeholder="Streamer name" /></label>
@@ -3093,7 +3100,7 @@ function AdminWorkspace({
       {selectedHunt && huntEditor ? (
         <LiquidGlass className="admin-hunt-manager" tone="violet">
           <div className="admin-tournament-manager__head">
-            <div><small>HUNT CONTROL ROOM</small><h3>{selectedHunt.title}</h3><p>{selectedHunt.active ? "Visible to players" : "Hidden from players"} · {selectedHuntClips.length} highlights · {selectedHuntClips.reduce((total, clip) => total + clip.votes, 0)} votes</p></div>
+            <div><h3>{selectedHunt.title}</h3><p>{selectedHunt.active ? "Published" : "Hidden"} · {selectedHuntClips.length} highlights</p></div>
             <div className="button-row">
               <button className="button ghost" type="button" disabled={huntBusy} onClick={() => void patchBonusHunt(selectedHunt, { status: "SCHEDULED" })}>Set upcoming</button>
               <button className="button ghost" type="button" disabled={huntBusy} onClick={() => void patchBonusHunt(selectedHunt, { status: "LIVE" })}>Go live</button>
@@ -3114,7 +3121,7 @@ function AdminWorkspace({
             <label>SORT ORDER<input type="number" min="-1000000" max="1000000" step="1" value={huntEditor.sortOrder} onChange={(event) => setHuntEditor((current) => current ? { ...current, sortOrder: event.target.value } : current)} /></label>
             <button className="button primary" type="submit" disabled={huntBusy}>{huntBusy ? "Saving" : "Save hunt details"} <span>↗</span></button>
           </form>
-          <div className="admin-section-title"><div><p>Player highlights</p><h2>Manage clips</h2></div></div>
+          <div className="admin-section-title"><div><h2>Highlights</h2></div></div>
           <form className="support-form account-form admin-hunt-clip-create" onSubmit={addBonusHuntClip}>
             <label>HIGHLIGHT TITLE<input required maxLength={100} value={newHuntClipTitle} onChange={(event) => setNewHuntClipTitle(event.target.value)} placeholder="The 500x reveal" /></label>
             <label>MULTIPLIER<input type="number" min="0" max="1000000000" step="any" value={newHuntClipMultiplier} onChange={(event) => setNewHuntClipMultiplier(event.target.value)} /></label>
@@ -3320,23 +3327,23 @@ function HelpWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Help Center" title="Find answers fast" meta={`${results.length} answers`} />
+      <WorkspaceHeader overline="Help Center" title="Find answers" meta="" />
       <label className="wide-search">
         <span>SEARCH HELP</span>
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Points, rewards, bets" />
       </label>
-      <div className="workspace-list">
+      <div className="workspace-list help-answers">
+        {!results.length && <article><div><h3>No answers found</h3><p>Try another search or contact support.</p></div></article>}
         {results.map((item) => (
           <article key={item.q}>
-            <span>FAQ</span>
             <div>
               <h3>{item.q}</h3>
               <p>{item.a}</p>
             </div>
-            <Link href="/support">Support</Link>
           </article>
         ))}
       </div>
+      <Link className="button ghost" href="/support">Contact support <ArrowUpRight size={16} aria-hidden="true" /></Link>
     </section>
   );
 }
@@ -3358,7 +3365,7 @@ function SupportWorkspace() {
         if (!active) return;
         if (payload.tickets) {
           setTickets(payload.tickets);
-          setStatus(payload.tickets.length ? "Tickets synced." : "No tickets yet.");
+          setStatus("");
         } else {
           setStatus(payload.error ?? "Could not load tickets.");
         }
@@ -3410,7 +3417,7 @@ function SupportWorkspace() {
 
   return (
     <section className="section page-width app-workspace">
-      <WorkspaceHeader overline="Support" title="Open a ticket" meta={`${tickets.length} tickets · ${status}`} />
+      <WorkspaceHeader overline="Support" title="Open a ticket" meta={status} />
       <form className="support-form" onSubmit={submit}>
         <label>CATEGORY<select value={category} onChange={(event) => setCategory(event.target.value)}><option>Reward</option><option>Account</option><option>Leaderboard</option><option>Claim</option></select></label>
         <label>SUBJECT<input required value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="What broke?" /></label>
@@ -3426,7 +3433,7 @@ function SupportWorkspace() {
               <p>{ticket.category} / {new Date(ticket.createdAt).toLocaleString()}</p>
             </div>
           </article>
-        )) : <article><span>EMPTY</span><div><h3>No tickets</h3><p>Open one above.</p></div></article>}
+        )) : <article className="workspace-empty-card"><h3>No tickets yet</h3></article>}
       </div>
     </section>
   );
@@ -3581,13 +3588,12 @@ function LoginWorkspace({
 
   return (
     <section className="section page-width app-workspace auth-workspace">
-      <WorkspaceHeader overline="Account" title="Sign in to ARTZ Rewards" meta={status} />
+      <WorkspaceHeader overline="Account" title={signedIn ? "Your account" : "Choose your login"} meta={status === "Signed out" || status === "Session active" ? "" : status} />
       <div className="auth-modal-shell" role="dialog" aria-modal="true" aria-labelledby="auth-title">
         <div className="auth-panel">
           <div className="auth-copy">
-            <p>ACCOUNT ACCESS</p>
-            <h3 id="auth-title">{signedIn ? "Account active" : "Login to ARTZ Rewards"}</h3>
-            <span>{account.handle}</span>
+            <h3 id="auth-title">{signedIn ? "Account active" : "Let’s play."}</h3>
+            {signedIn && <span>{account.handle}</span>}
           </div>
           <div className="auth-card">
             {signedIn ? (
@@ -3627,9 +3633,8 @@ function LoginWorkspace({
           </div>
         </div>
       </div>
-      <ConnectionPanel account={account} setAccount={setAccount} onStatus={setStatus} />
-      <AccountStrip account={account} />
-      <Inventory items={account.inventory} />
+      {signedIn && <ConnectionPanel account={account} setAccount={setAccount} onStatus={setStatus} />}
+      {signedIn && <Inventory items={account.inventory} />}
     </section>
   );
 }
@@ -3698,7 +3703,6 @@ function ConnectionPanel({
           >
             <small>{provider.toUpperCase()}</small>
             <h3>{state.connected ? state.username : "Not linked"}</h3>
-            <p>{state.connected ? "Connected" : "OAuth ready"}</p>
             <button type="button" onClick={() => toggle(provider)} disabled={busyProvider === provider}>{busyProvider === provider ? "Working" : state.connected ? "Disconnect" : `Login ${provider}`}</button>
           </LiquidGlass>
         );
@@ -3715,9 +3719,9 @@ function WorkspaceHeader({ overline, title, meta }: { overline: string; title: s
         <span className="workspace-heading__icon" title={overline}><Icon size={19} strokeWidth={2.8} aria-hidden="true" /><span className="sr-only">{overline}</span></span>
         <h2>{title}</h2>
       </div>
-      <LiquidGlass as="span" className="workspace-heading__status" depth="clear" interactive={false} tone="cyan" title={meta}>
-        <Activity size={14} strokeWidth={3} aria-hidden="true" />{meta}
-      </LiquidGlass>
+      {meta.trim() && <LiquidGlass as="span" className="workspace-heading__status" depth="clear" interactive={false} tone="cyan" role="status">
+        <Activity size={16} strokeWidth={3} aria-hidden="true" />{meta}
+      </LiquidGlass>}
     </div>
   );
 }
@@ -3727,11 +3731,10 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 function AccountStrip({ account }: { account: Account }) {
+  if (account.handle === "@guest") return null;
   const stats: { label: string; value: string; icon: WorkspaceIcon }[] = [
     { label: "Player", value: account.handle, icon: CircleUserRound },
     { label: "Points", value: account.points.toLocaleString(), icon: Coins },
-    { label: "Via", value: accountProviderLabel(account), icon: BadgeCheck },
-    { label: "Streak", value: `${account.streak} ${account.streak === 1 ? "day" : "days"}`, icon: Flame },
   ];
 
   return (

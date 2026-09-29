@@ -116,7 +116,7 @@ body {
   border-radius: 0;
   color: rgba(246, 237, 249, 0.68);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: none;
 }
@@ -166,13 +166,13 @@ body {
 
 .desktop-nav__account strong {
   color: #fff9fd;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .desktop-nav__account small {
   color: rgba(255, 237, 190, 0.6);
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 0;
 }
 
@@ -263,7 +263,7 @@ body {
   gap: 0;
   color: rgba(249, 238, 251, 0.76);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   text-shadow: none;
 }
@@ -449,7 +449,7 @@ body {
 
   .desktop-nav__links a {
     padding-inline: 7px;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .desktop-nav__account {
@@ -503,7 +503,7 @@ body {
   }
 
   .mobile-menu-only .menu-logo-lockup small {
-    font-size: 8px;
+    font-size: 14px;
     letter-spacing: 0;
   }
 }
@@ -535,7 +535,7 @@ body {
   }
 
   .home-welcome {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .home-artz-subtitle {

@@ -344,7 +344,7 @@ h4,
 .home-welcome {
   color: rgba(255, 247, 237, 0.72);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -503,7 +503,7 @@ h4,
   grid-column: 1 / -1;
   justify-self: center;
   color: var(--gold);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -517,7 +517,7 @@ h4,
 
 .home-live-stat small {
   color: rgba(255, 247, 237, 0.5);
-  font-size: 9px;
+  font-size: 14px;
 }
 
 /* Independent reward signals */
@@ -606,7 +606,7 @@ h4,
 .home-section-heading > span {
   color: var(--gold);
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0;
 }
 
@@ -1416,7 +1416,7 @@ textarea:focus {
 
   .desktop-nav__links a {
     padding-inline: 7px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .hero-casino-prop {
@@ -1740,7 +1740,7 @@ textarea:focus {
   }
 
   .home-section-heading p {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .home-board-slots {
@@ -2008,7 +2008,7 @@ textarea:focus {
 
 .desktop-nav__links a {
   padding-inline: 7px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 /* Keep the leaderboard ornament inside the stage instead of clipping at right. */
@@ -2073,7 +2073,7 @@ textarea:focus {
   gap: 8px;
   color: rgba(255, 245, 238, 0.76);
   font-family: var(--font-label);
-  font-size: 12px;
+  font-size: 14px;
   text-transform: uppercase;
 }
 
@@ -2134,21 +2134,21 @@ textarea:focus {
   border-radius: 50%;
   background: rgba(255, 77, 109, 0.12);
   color: #ff4d6d;
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 900;
 }
 
 .tournament-match > div > strong {
   min-width: 0;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .tournament-match > div > b {
   color: var(--gold-bright);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .tournament-match input {
@@ -2173,7 +2173,7 @@ textarea:focus {
   justify-content: space-between;
   padding: 4px 9px;
   color: rgba(255, 245, 238, 0.48);
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -2184,7 +2184,7 @@ textarea:focus {
   border: 0;
   background: transparent;
   color: #ffc46b;
-  font-size: 9px;
+  font-size: 14px;
 }
 
 .tournament-empty {
@@ -2199,7 +2199,7 @@ textarea:focus {
 
 .tournament-empty span {
   color: rgba(255, 245, 238, 0.55);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .tournament-create-form .tournament-participant-field {
@@ -2230,14 +2230,14 @@ textarea:focus {
   display: grid;
   gap: 7px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 900;
 }
 
 @media (max-width: 1180px) and (min-width: 981px) {
   .desktop-nav__links a {
     padding-inline: 5px;
-    font-size: 10px;
+    font-size: 14px;
   }
 }
 
@@ -2328,7 +2328,7 @@ textarea:focus {
   align-items: center;
   gap: 8px;
   color: rgba(255, 247, 237, 0.68);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -2396,7 +2396,7 @@ textarea:focus {
 
 .home-kick-stream__footer small {
   color: rgba(255, 247, 237, 0.46);
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -2413,7 +2413,7 @@ textarea:focus {
   align-items: center;
   gap: 6px;
   color: #ffad42;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -2450,7 +2450,7 @@ textarea:focus {
 .admin-kick-monitor small {
   display: block;
   color: rgba(255, 247, 237, 0.5);
-  font-size: 9px;
+  font-size: 14px;
 }
 
 .admin-kick-monitor strong {
@@ -2460,7 +2460,7 @@ textarea:focus {
 
 .admin-kick-monitor time {
   color: rgba(255, 247, 237, 0.48);
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -2565,7 +2565,7 @@ textarea:focus {
   display: grid;
   gap: 6px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -2629,7 +2629,7 @@ textarea:focus {
   gap: 8px;
   color: rgba(255, 247, 237, 0.86);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.01em;
   white-space: nowrap;
@@ -2670,7 +2670,7 @@ textarea:focus {
   }
 
   .site-banner-strip__item {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .site-shell:has(.site-banner-strip) main {
@@ -2698,7 +2698,7 @@ textarea:focus {
   align-self: flex-end;
   color: var(--gold-bright);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -2729,7 +2729,7 @@ textarea:focus {
 .admin-challonge__head small {
   color: var(--faint);
   font-family: var(--font-label);
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 0.16em;
 }
 
@@ -2813,7 +2813,7 @@ textarea:focus {
 }
 
 .season-clock__digits small {
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.09em;
 }
 
@@ -2955,7 +2955,7 @@ textarea:focus {
 
 .live-pool .live-pool__copy small {
   color: rgba(255, 246, 234, 0.74);
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.16em;
 }
 
@@ -2970,7 +2970,7 @@ textarea:focus {
 .live-pool .live-pool__copy strong > span {
   margin-right: 2px;
   color: #ffb43f;
-  font-size: 0.68em;
+  font-size: max(14px, 0.68em);
   vertical-align: 0.14em;
 }
 

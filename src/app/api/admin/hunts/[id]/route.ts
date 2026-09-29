@@ -36,10 +36,11 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
 
   try {
     const { id } = await context.params;
+    const { startsAt, ...fields } = parsed.data;
     const patch = {
-      ...parsed.data,
-      ...(parsed.data.startsAt !== undefined
-        ? { startsAt: parsed.data.startsAt ? new Date(parsed.data.startsAt) : null }
+      ...fields,
+      ...(startsAt !== undefined
+        ? { startsAt: startsAt ? new Date(startsAt) : null }
         : {}),
     };
     const hunt = await updateAdminHunt(request.cookies.get(SESSION_COOKIE)?.value, id, patch);
