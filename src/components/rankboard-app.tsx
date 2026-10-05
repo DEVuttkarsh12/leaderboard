@@ -32,6 +32,7 @@ import {
   type ReactNode,
   type SetStateAction,
 } from "react";
+import AvatarContent from "./avatar-content";
 import CustomCursor from "./custom-cursor";
 import FeatureWorkspace from "./feature-workspace";
 import LiquidGlass from "./liquid-glass";
@@ -44,7 +45,6 @@ import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatLastUpdated, formatNumberCompact, formatShortDate } from "@/lib/formatters";
 import { getSearchableNames } from "@/lib/normalize-leaderboard";
 import {
-  getInitials,
   maskPlayerHandle,
   maskPlayerName,
 } from "@/lib/player-presentation";
@@ -513,7 +513,6 @@ function SiteBanner() {
 function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccount; accountOpen: boolean; setAccountOpen: (v: boolean) => void }) {
   const pathname = usePathname();
   const cleanHandle = account.handle.replace(/^@/, "") || "guest";
-  const initials = getInitials(cleanHandle);
   const isAdmin = isAdminHeaderAccount(account);
   const accountHref = headerAccountDestination(account);
   const menuLinks = account.authenticated
@@ -564,7 +563,7 @@ function Header({ account, accountOpen, setAccountOpen }: { account: HeaderAccou
         </div>
         <div className="desktop-nav__account-group">
           <Link className="desktop-nav__account" href={accountHref} aria-label={`Open ${headerAccountDestinationLabel(account)}`}>
-            <span className="desktop-nav__avatar">{account.image ? <Image src={account.image} alt="" width={36} height={36} unoptimized /> : initials}</span>
+            <span className="desktop-nav__avatar"><AvatarContent src={account.image} size={36} /></span>
             <span>
               <strong>{account.authenticated ? cleanHandle : "Guest"}</strong>
               {account.authenticated && <small>{formatNumberCompact(account.points)} PTS</small>}
@@ -1066,11 +1065,11 @@ function Podium({ players, compact = false }: { players: Player[]; compact?: boo
   const prizes: Record<number, string> = { 1: "$600", 2: "$325", 3: "$225" };
 
   if (players.length === 0) {
-    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><span>AR</span></div><div className="podium-copy"><strong>Syncing</strong>{compact ? <b>0 <em>SCORE</em></b> : <span><b>0</b> wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+    return <div className={`podium ${compact ? "compact" : ""}`}>{[2, 1, 3].map((rank, idx) => <article className={`podium-card rank-${rank}`} key={rank}><div className="rank-badge">#{rank}</div><div className="prize-ribbon">{prizes[rank]}</div><div className="avatar"><AvatarContent size={72} /></div><div className="podium-copy"><strong>Syncing</strong>{compact ? <b>0 <em>SCORE</em></b> : <span><b>0</b> wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
   }
 
   const order = players.length === 3 ? [players[1], players[0], players[2]] : players;
-  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><span>{getInitials(p.name)}</span>{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{compact ? playerHandle(p) : playerName(p)}</strong>{compact ? <b>{fmt(playerScore(p))} <em>SCORE</em></b> : <span><b>{fmt(p.points)}</b> wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
+  return <div className={`podium ${compact ? "compact" : ""}`}>{order.map((p, idx) => <article className={`podium-card rank-${p.rank}`} key={p.id}><div className="rank-badge">#{p.rank}</div><div className="prize-ribbon">{prizes[p.rank] ?? "PRIZE"}</div><div className="avatar"><AvatarContent src={p.avatarUrl} size={86} />{p.verified && <i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</div><div className="podium-copy"><strong>{compact ? playerHandle(p) : playerName(p)}</strong>{compact ? <b>{fmt(playerScore(p))} <em>SCORE</em></b> : <span><b>{fmt(p.points)}</b> wagered</span>}</div>{idx === 1 && <div className="crown"><Crown size={22} fill="currentColor" aria-hidden="true" /></div>}</article>)}</div>;
 }
 
 function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | null }) {
@@ -1216,7 +1215,7 @@ function SeasonClock({
 }
 
 function PlayerRow({ player }: { player: Player }) {
-  return <div className={`player-row rank-row-${player.rank}`}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar">{getInitials(player.name)}</div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong></span></div><strong className="wager">{fmt(player.points)}</strong></div>;
+  return <div className={`player-row rank-row-${player.rank}`}><div className="player-cell"><b className="row-rank">{String(player.rank).padStart(2,"0")}</b><div className="mini-avatar"><AvatarContent src={player.avatarUrl} size={40} /></div><span><strong>{playerName(player)}{player.verified&&<i><Check size={10} strokeWidth={3} aria-hidden="true" /></i>}</strong></span></div><strong className="wager">{fmt(player.points)}</strong></div>;
 }
 
 function FeaturePage({ route, data }: { route: string; data: { title: string; tagline: string; action: [string, string] } }) {

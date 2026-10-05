@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import AvatarContent from "./avatar-content";
 import {
   Activity,
   ArrowUpRight,
@@ -427,11 +427,9 @@ function AccountImage({
   account: Account;
   className: string;
 }) {
-  const initials = account.handle.slice(1, 3).toUpperCase() || "AR";
-
   return (
     <span className={className}>
-      {account.image ? <Image src={account.image} alt="" width={42} height={42} unoptimized /> : initials}
+      <AvatarContent src={account.image} size={72} />
     </span>
   );
 }
@@ -2875,7 +2873,7 @@ function AdminWorkspace({
           <div className="admin-user-list">
             {adminUsers.length ? adminUsers.map((user) => (
               <button className={selectedAdminUser?.id === user.id ? "selected" : ""} key={user.id} type="button" onClick={() => setSelectedAdminUserId(user.id)}>
-                <span>{user.image ? <Image src={user.image} alt="" width={42} height={42} unoptimized /> : user.handle.slice(1, 3).toUpperCase()}</span>
+                <span><AvatarContent src={user.image} size={42} /></span>
                 <strong>{user.handle}</strong>
                 <small>{user.role} / {user.banned ? "BANNED" : user.timeoutUntil ? "TIMEOUT" : "ACTIVE"}</small>
               </button>
@@ -2885,7 +2883,7 @@ function AdminWorkspace({
             {selectedAdminUser ? (
               <>
                 <div className="admin-user-detail__head">
-                  <span>{selectedAdminUser.image ? <Image src={selectedAdminUser.image} alt="" width={42} height={42} unoptimized /> : selectedAdminUser.handle.slice(1, 3).toUpperCase()}</span>
+                  <span><AvatarContent src={selectedAdminUser.image} size={56} /></span>
                   <div>
                     <small>{selectedAdminUser.email || "No email"}</small>
                     <h3>{selectedAdminUser.handle}</h3>
