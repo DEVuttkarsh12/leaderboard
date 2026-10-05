@@ -46,7 +46,8 @@ import {
   useSyncExternalStore,
 } from "react";
 import type { AuthAccountPayload } from "@/lib/auth/account";
-import { challongeEmbedUrl } from "@/lib/challonge";
+import TournamentBracket from "./tournament-bracket";
+import type { MatchUpdate } from "@/lib/tournament-bracket";
 import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { formatNumberCompact } from "@/lib/formatters";
 import LiquidGlass from "./liquid-glass";
@@ -146,8 +147,6 @@ type ApiTournament = {
   active: boolean;
   entrants: string[];
   matches: ApiTournamentMatch[];
-  challongeId: string | null;
-  challongeUrl: string | null;
   updatedAt: string;
 };
 
@@ -741,20 +740,25 @@ function TournamentsWorkspace() {
   const [message, setMessage] = useState("Loading tournaments...");
   const tournament = tournamentList.find((item) => item.id === selected) ?? tournamentList[0] ?? null;
   const registrations = tournamentList.filter((item) => item.joined).length;
-  const bracketEmbedUrl = tournament ? challongeEmbedUrl(tournament.challongeUrl) : null;
+  const [entryBusy, setEntryBusy] = useState(false);
+  const requestId = useRef(0);
+  const mutationPending = useRef(false);
 
   const loadTournaments = useCallback(async (announce = false) => {
+    if (mutationPending.current) return;
+    const request = ++requestId.current;
     try {
       const response = await fetch("/api/tournaments", { cache: "no-store" });
       const payload = (await response.json()) as { tournaments?: ApiTournament[]; error?: string };
       if (!response.ok || !payload.tournaments) {
         throw new Error(payload.error ?? "Could not load tournaments.");
       }
+      if (request !== requestId.current || mutationPending.current) return;
       setTournamentList(payload.tournaments);
       setSelected((current) => payload.tournaments?.some((item) => item.id === current) ? current : (payload.tournaments?.[0]?.id ?? ""));
       if (announce) setMessage("");
     } catch (error) {
-      if (announce) setMessage(error instanceof Error ? error.message : "Could not load tournaments.");
+      if (announce && request === requestId.current) setMessage(error instanceof Error ? error.message : "Could not load tournaments.");
     }
   }, []);
 
@@ -773,7 +777,10 @@ function TournamentsWorkspace() {
   }, [loadTournaments]);
 
   async function toggleEntry() {
-    if (!tournament) return;
+    if (!tournament || entryBusy) return;
+    mutationPending.current = true;
+    requestId.current += 1;
+    setEntryBusy(true);
     setMessage(tournament.joined ? "Withdrawing entry..." : "Entering tournament...");
 
     try {
@@ -790,12 +797,16 @@ function TournamentsWorkspace() {
       setMessage("Tournament state saved.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Tournament entry failed.");
+    } finally {
+      mutationPending.current = false;
+      setEntryBusy(false);
     }
   }
 
   return (
     <section className="section page-width app-workspace">
       <WorkspaceHeader overline="Tournaments" title="Brackets & prizes" meta={message || `${registrations} entries`} />
+      {!tournamentList.length && <p className="tournament-empty">{message || "No tournaments scheduled yet."}</p>}
       <div className="workspace-grid three">
         {tournamentList.map((item) => (
           <LiquidGlass as="article" className={`action-card ${selected === item.id ? "selected" : ""}`} key={item.id} tone="cyan">
@@ -814,30 +825,11 @@ function TournamentsWorkspace() {
         <LiquidGlass className="bracket-panel bracket-panel--live" tone="violet">
           <div className="bracket-panel__head">
             <div><h3>{tournament.title}</h3><p>{tournament.prize}</p></div>
-            <button type="button" onClick={toggleEntry} disabled={tournament.status !== "Open"}>
-              {tournament.joined ? "Withdraw" : tournament.status === "Open" ? "Enter" : tournament.status}
+            <button type="button" onClick={toggleEntry} disabled={entryBusy || tournament.status !== "Open" || (!tournament.joined && tournament.taken >= tournament.seats)}>
+              {entryBusy ? "Saving…" : tournament.joined ? "Withdraw" : tournament.status !== "Open" ? tournament.status : tournament.taken >= tournament.seats ? "Full" : "Enter"}
             </button>
           </div>
-          {tournament.challongeUrl && !bracketEmbedUrl ? (
-            <div className="tournament-embed">
-              <a className="tournament-embed__link" href={tournament.challongeUrl} target="_blank" rel="noreferrer">
-                Open live bracket on Challonge <span>↗</span>
-              </a>
-            </div>
-          ) : null}
-          {bracketEmbedUrl ? (
-            <div className="tournament-embed">
-              <iframe
-                src={bracketEmbedUrl}
-                title={`${tournament.title} bracket`}
-                loading="lazy"
-                referrerPolicy="no-referrer"
-              />
-              <a className="tournament-embed__link" href={tournament.challongeUrl ?? "#"} target="_blank" rel="noreferrer">
-                Open on Challonge <span>↗</span>
-              </a>
-            </div>
-          ) : tournament.matches.length ? (
+          {tournament.matches.length ? (
             <TournamentBracket tournament={tournament} />
           ) : (
             <div className="tournament-empty"><Trophy size={24} aria-hidden="true" /><strong>Bracket coming soon</strong></div>
@@ -848,83 +840,29 @@ function TournamentsWorkspace() {
   );
 }
 
-type MatchUpdate = Partial<Pick<ApiTournamentMatch, "participantA" | "participantB" | "scoreA" | "scoreB" | "winner">> & {
-  status?: "PENDING" | "LIVE" | "COMPLETED";
-};
-
-function tournamentRoundLabel(round: number, totalRounds: number) {
-  const remaining = totalRounds - round;
-  if (remaining === 1) return "Final";
-  if (remaining === 2) return "Semifinal";
-  if (remaining === 3) return "Quarterfinal";
-  return round === 0 ? "Qualifiers" : `Round ${round + 1}`;
-}
-
-function TournamentBracket({
-  onUpdate,
-  tournament,
-}: {
-  onUpdate?: (match: ApiTournamentMatch, update: MatchUpdate) => void;
-  tournament: ApiTournament;
-}) {
-  const rounds = useMemo(() => {
-    const grouped = new Map<number, ApiTournamentMatch[]>();
-    tournament.matches.forEach((match) => grouped.set(match.round, [...(grouped.get(match.round) ?? []), match]));
-    return [...grouped.entries()].sort(([a], [b]) => a - b);
-  }, [tournament.matches]);
-
-  return (
-    <div className={`tournament-bracket${onUpdate ? " tournament-bracket--admin" : ""}`}>
-      {rounds.map(([round, matches]) => (
-        <section className="tournament-round" key={round}>
-          <header><span>0{round + 1}</span><strong>{tournamentRoundLabel(round, rounds.length)}</strong></header>
-          <div className="tournament-round__matches">
-            {matches.map((match) => (
-              <article className={`tournament-match tournament-match--${match.status.toLowerCase()}`} key={match.id}>
-                {(["A", "B"] as const).map((side) => {
-                  const participant = side === "A" ? match.participantA : match.participantB;
-                  const score = side === "A" ? match.scoreA : match.scoreB;
-                  return (
-                    <div className={participant && participant === match.winner ? "winner" : ""} key={side}>
-                      <span>{participant?.slice(0, 2).toUpperCase() ?? "--"}</span>
-                      <strong>{participant ?? "TBD"}</strong>
-                      {onUpdate ? (
-                        <>
-                          <input aria-label={`${participant ?? side} score`} defaultValue={score ?? ""} inputMode="numeric" onBlur={(event) => onUpdate(match, { [side === "A" ? "scoreA" : "scoreB"]: event.currentTarget.value ? Number(event.currentTarget.value) : null })} />
-                          <button type="button" disabled={!participant} onClick={() => participant && onUpdate(match, { winner: participant, status: "COMPLETED" })} title={`Advance ${participant ?? side}`}><Crown size={13} aria-hidden="true" /></button>
-                        </>
-                      ) : <b>{score ?? "-"}</b>}
-                    </div>
-                  );
-                })}
-                <footer><span>Match {match.position + 1}</span><button type="button" disabled={!onUpdate || match.status === "Completed"} onClick={() => onUpdate?.(match, { status: match.status === "Live" ? "PENDING" : "LIVE" })}>{match.status}</button></footer>
-              </article>
-            ))}
-          </div>
-        </section>
-      ))}
-    </div>
-  );
-}
-
 function BonusHuntsWorkspace() {
   const [data, setData] = useState<BonusHuntsPayload>({ hunts: [], clips: [] });
   const [message, setMessage] = useState("Loading hunts...");
   const [busy, setBusy] = useState("");
+  const [selectedHuntId, setSelectedHuntId] = useState("");
+  const requestId = useRef(0);
+  const mutationPending = useRef(false);
 
   useEffect(() => {
     let active = true;
     async function loadHunts() {
+      if (mutationPending.current) return;
+      const request = ++requestId.current;
       try {
         const response = await fetch("/api/hunts", { cache: "no-store" });
         const payload = (await response.json()) as BonusHuntsPayload & { error?: string };
         if (!response.ok || !payload.hunts) throw new Error(payload.error ?? "Could not load hunts.");
-        if (active) {
+        if (active && request === requestId.current) {
           setData({ hunts: payload.hunts, clips: payload.clips ?? [] });
           setMessage("");
         }
       } catch (error) {
-        if (active) setMessage(error instanceof Error ? error.message : "Could not load hunts.");
+        if (active && request === requestId.current) setMessage(error instanceof Error ? error.message : "Could not load hunts.");
       }
     }
     void loadHunts();
@@ -939,6 +877,9 @@ function BonusHuntsWorkspace() {
   }, []);
 
   async function act(path: string, key: string, body: Record<string, string>) {
+    if (mutationPending.current) return;
+    mutationPending.current = true;
+    requestId.current += 1;
     setBusy(key);
     try {
       const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -949,12 +890,14 @@ function BonusHuntsWorkspace() {
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Action failed.");
     } finally {
+      mutationPending.current = false;
       setBusy("");
     }
   }
 
   const live = data.hunts.find((hunt) => hunt.status === "Live");
-  const featured = live ?? data.hunts[0];
+  const featured = data.hunts.find((hunt) => hunt.id === selectedHuntId) ?? live ?? data.hunts[0];
+  const highlights = data.clips.filter((clip) => clip.huntId === featured?.id);
   const money = (value: number) => `$${value.toLocaleString("en-US")}`;
 
   return (
@@ -983,10 +926,11 @@ function BonusHuntsWorkspace() {
           <h3>{hunt.title}</h3>
           <p>{hunt.host} · {formatHuntTime(hunt)}</p>
           <div><span>{hunt.openedCount} / {hunt.bonusCount} bonuses</span><strong>{hunt.bestMultiplier.toLocaleString()}x best</strong></div>
+          <button type="button" onClick={() => setSelectedHuntId(hunt.id)}>View hunt</button>
           <button type="button" disabled={Boolean(busy)} onClick={() => void act("/api/hunts/follow", `hunt-${hunt.id}`, { huntId: hunt.id })}>{hunt.followed ? "Following" : "Follow hunt"}</button>
         </LiquidGlass>
       ))}</div>}
-      {data.clips.length > 0 && <section className="hunt-clips" aria-label="Hunt highlights"><h2>Big hit highlights</h2><div>{data.clips.map((clip) => (
+      {highlights.length > 0 && <section className="hunt-clips" aria-label="Hunt highlights"><h2>Big hit highlights</h2><div>{highlights.map((clip) => (
         <article key={clip.id}><span><Flame size={18} aria-hidden="true" /> {clip.stat}</span><h3>{clip.title}</h3><div><button type="button" disabled={Boolean(busy) || clip.voted} onClick={() => void act("/api/hunts/clips/vote", `vote-${clip.id}`, { clipId: clip.id })}>{clip.voted ? "Voted" : "Vote"} · {clip.votes}</button><button type="button" disabled={Boolean(busy)} onClick={() => void act("/api/hunts/clips/save", `save-${clip.id}`, { clipId: clip.id })}>{clip.saved ? "Saved" : "Save"}</button></div></article>
       ))}</div></section>}
     </section>
@@ -1737,10 +1681,9 @@ function AdminWorkspace({
   const [selectedTournamentId, setSelectedTournamentId] = useState("");
   const [adminTournamentStatus, setAdminTournamentStatus] = useState("Loading tournaments");
   const [bracketParticipants, setBracketParticipants] = useState("");
-  const [challongeLinkInput, setChallongeLinkInput] = useState("");
-  const [challongeCreateName, setChallongeCreateName] = useState("");
-  const [challongeStatus, setChallongeStatus] = useState("");
-  const [challongeBusy, setChallongeBusy] = useState(false);
+  const [tournamentBusy, setTournamentBusy] = useState(false);
+  const tournamentMutationPending = useRef(false);
+  const tournamentMutationVersion = useRef(0);
   const [newTournament, setNewTournament] = useState({
     title: "",
     starts: "",
@@ -1838,18 +1781,18 @@ function AdminWorkspace({
     return () => { active = false; };
   }, [isAdmin]);
 
+  const selectedTournamentTitle = selectedTournament?.title ?? "";
+  const selectedTournamentStarts = selectedTournament?.starts ?? "";
+  const selectedTournamentPrize = selectedTournament?.prize ?? "";
+  const selectedTournamentSeats = selectedTournament?.seats ?? 8;
+  const currentTournamentId = selectedTournament?.id ?? "";
+
   useEffect(() => {
-    if (!selectedTournament) return;
     const syncDraft = window.setTimeout(() => {
-      setTournamentDraft({
-        title: selectedTournament.title,
-        starts: selectedTournament.starts,
-        prize: selectedTournament.prize,
-        seats: String(selectedTournament.seats),
-      });
+      setTournamentDraft({ title: selectedTournamentTitle, starts: selectedTournamentStarts, prize: selectedTournamentPrize, seats: String(selectedTournamentSeats) });
     }, 0);
     return () => window.clearTimeout(syncDraft);
-  }, [selectedTournament]);
+  }, [currentTournamentId, selectedTournamentTitle, selectedTournamentStarts, selectedTournamentPrize, selectedTournamentSeats]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -1869,20 +1812,26 @@ function AdminWorkspace({
     if (!isAdmin) return;
     let active = true;
 
-    fetch("/api/admin/tournaments", { cache: "no-store" })
-      .then((response) => response.json().then((payload) => ({ response, payload })))
-      .then(({ response, payload }: { response: Response; payload: { tournaments?: ApiTournament[]; error?: string } }) => {
-        if (!active) return;
+    async function refresh() {
+      if (tournamentMutationPending.current) return;
+      const version = tournamentMutationVersion.current;
+      try {
+        const response = await fetch("/api/admin/tournaments", { cache: "no-store" });
+        const payload = (await response.json()) as { tournaments?: ApiTournament[]; error?: string };
         if (!response.ok || !payload.tournaments) throw new Error(payload.error ?? "Could not load tournaments");
+        if (!active || tournamentMutationPending.current || version !== tournamentMutationVersion.current) return;
         setAdminTournaments(payload.tournaments);
         setSelectedTournamentId((current) => payload.tournaments?.some((item) => item.id === current) ? current : (payload.tournaments?.[0]?.id ?? ""));
-        setAdminTournamentStatus(`${payload.tournaments.length} tournaments loaded`);
-      })
-      .catch((error) => {
+        setAdminTournamentStatus((current) => current === "Loading tournaments" ? `${payload.tournaments!.length} tournaments loaded` : current);
+      } catch (error) {
         if (active) setAdminTournamentStatus(error instanceof Error ? error.message : "Could not load tournaments");
-      });
-
-    return () => { active = false; };
+      }
+    }
+    void refresh();
+    const visibleRefresh = () => { if (document.visibilityState === "visible") void refresh(); };
+    const interval = window.setInterval(visibleRefresh, 10_000);
+    window.addEventListener("focus", visibleRefresh);
+    return () => { active = false; window.clearInterval(interval); window.removeEventListener("focus", visibleRefresh); };
   }, [isAdmin]);
 
   useEffect(() => {
@@ -2178,7 +2127,7 @@ function AdminWorkspace({
   }
 
   function parseParticipants(value: string) {
-    return [...new Set(value.split(/[\n,]+/).map((name) => name.trim()).filter(Boolean))].slice(0, 64);
+    return value.split(/[\n,]+/).map((name) => name.trim()).filter(Boolean);
   }
 
   function replaceAdminTournament(tournament: ApiTournament) {
@@ -2193,12 +2142,16 @@ function AdminWorkspace({
 
   async function publishTournament(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (tournamentBusy) return;
     if (!newTournament.title.trim() || !newTournament.starts.trim() || !newTournament.prize.trim()) {
       setAdminTournamentStatus("Add a title, start time, and prize");
       return;
     }
     setAdminTournamentStatus("Publishing tournament...");
 
+    tournamentMutationVersion.current += 1;
+    tournamentMutationPending.current = true;
+    setTournamentBusy(true);
     try {
       const response = await fetch("/api/admin/tournaments", {
         method: "POST",
@@ -2207,23 +2160,30 @@ function AdminWorkspace({
           title: newTournament.title.trim(),
           starts: newTournament.starts.trim(),
           prize: newTournament.prize.trim(),
-          seats: Math.max(2, Math.min(64, Number(newTournament.seats) || 8)),
+          seats: Number(newTournament.seats),
           participants: parseParticipants(newTournament.participants),
         }),
       });
       const payload = (await response.json()) as { tournament?: ApiTournament; error?: string };
       if (!response.ok || !payload.tournament) throw new Error(payload.error ?? "Tournament creation failed");
       replaceAdminTournament(payload.tournament);
-      setBracketParticipants(newTournament.participants);
+      setBracketParticipants("");
       setNewTournament({ title: "", starts: "", prize: "", seats: "8", participants: "" });
       setAdminTournamentStatus(`Published ${payload.tournament.title}`);
     } catch (error) {
       setAdminTournamentStatus(error instanceof Error ? error.message : "Tournament creation failed");
+    } finally {
+      tournamentMutationPending.current = false;
+      setTournamentBusy(false);
     }
   }
 
   async function patchAdminTournament(tournament: ApiTournament, patch: Record<string, string | number | boolean>) {
+    if (tournamentBusy) return;
     setAdminTournamentStatus(`Updating ${tournament.title}`);
+    tournamentMutationVersion.current += 1;
+    tournamentMutationPending.current = true;
+    setTournamentBusy(true);
     try {
       const response = await fetch(`/api/admin/tournaments/${tournament.id}`, {
         method: "PATCH",
@@ -2236,12 +2196,18 @@ function AdminWorkspace({
       setAdminTournamentStatus(`${payload.tournament.title} updated`);
     } catch (error) {
       setAdminTournamentStatus(error instanceof Error ? error.message : "Tournament update failed");
+    } finally {
+      tournamentMutationPending.current = false;
+      setTournamentBusy(false);
     }
   }
 
   async function saveTournamentDetails() {
-    if (!selectedTournament) return;
+    if (!selectedTournament || tournamentBusy) return;
     setAdminTournamentStatus(`Saving ${selectedTournament.title}...`);
+    tournamentMutationVersion.current += 1;
+    tournamentMutationPending.current = true;
+    setTournamentBusy(true);
     try {
       const response = await fetch(`/api/admin/tournaments/${selectedTournament.id}`, {
         method: "PATCH",
@@ -2250,7 +2216,7 @@ function AdminWorkspace({
           title: tournamentDraft.title.trim(),
           starts: tournamentDraft.starts.trim(),
           prize: tournamentDraft.prize.trim(),
-          seats: Math.max(2, Math.min(64, Number(tournamentDraft.seats) || 2)),
+          seats: Number(tournamentDraft.seats),
         }),
       });
       const payload = (await response.json()) as { tournament?: ApiTournament; error?: string };
@@ -2259,12 +2225,18 @@ function AdminWorkspace({
       setAdminTournamentStatus(`${payload.tournament.title} saved and published to players`);
     } catch (error) {
       setAdminTournamentStatus(error instanceof Error ? error.message : "Tournament details could not be saved.");
+    } finally {
+      tournamentMutationPending.current = false;
+      setTournamentBusy(false);
     }
   }
 
   async function generateAdminBracket() {
-    if (!selectedTournament) return;
+    if (!selectedTournament || tournamentBusy) return;
     setAdminTournamentStatus("Generating bracket...");
+    tournamentMutationVersion.current += 1;
+    tournamentMutationPending.current = true;
+    setTournamentBusy(true);
     try {
       const response = await fetch(`/api/admin/tournaments/${selectedTournament.id}/bracket`, {
         method: "POST",
@@ -2277,12 +2249,18 @@ function AdminWorkspace({
       setAdminTournamentStatus(`${payload.tournament.matches.length} bracket matches ready`);
     } catch (error) {
       setAdminTournamentStatus(error instanceof Error ? error.message : "Bracket generation failed");
+    } finally {
+      tournamentMutationPending.current = false;
+      setTournamentBusy(false);
     }
   }
 
   async function updateAdminMatch(match: ApiTournamentMatch, update: MatchUpdate) {
-    if (!selectedTournament) return;
+    if (!selectedTournament || tournamentBusy) return;
     setAdminTournamentStatus("Updating bracket...");
+    tournamentMutationVersion.current += 1;
+    tournamentMutationPending.current = true;
+    setTournamentBusy(true);
     try {
       const response = await fetch(`/api/admin/tournaments/${selectedTournament.id}/matches/${match.id}`, {
         method: "PATCH",
@@ -2295,37 +2273,29 @@ function AdminWorkspace({
       setAdminTournamentStatus("Bracket published live");
     } catch (error) {
       setAdminTournamentStatus(error instanceof Error ? error.message : "Match update failed");
+    } finally {
+      tournamentMutationPending.current = false;
+      setTournamentBusy(false);
     }
   }
 
-  async function updateTournamentChallonge(action: "link" | "create" | "unlink") {
-    if (!selectedTournament) return;
-    setChallongeBusy(true);
-    setChallongeStatus(action === "link" ? "Linking bracket..." : action === "create" ? "Creating bracket..." : "Unlinking bracket...");
+  async function resetAdminBracket() {
+    if (!selectedTournament || tournamentBusy || !window.confirm("Reset this bracket and all match results? Registered players are kept and registration reopens.")) return;
+    tournamentMutationVersion.current += 1;
+    tournamentMutationPending.current = true;
+    setTournamentBusy(true);
     try {
-      const body =
-        action === "link"
-          ? { action, url: challongeLinkInput }
-          : action === "create"
-            ? { action, name: challongeCreateName }
-            : { action };
-      const response = await fetch(`/api/admin/tournaments/${selectedTournament.id}/challonge`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(`/api/admin/tournaments/${selectedTournament.id}/bracket`, { method: "DELETE" });
       const payload = (await response.json()) as { tournament?: ApiTournament; error?: string };
-      if (!response.ok || !payload.tournament) throw new Error(payload.error ?? "Challonge update failed");
+      if (!response.ok || !payload.tournament) throw new Error(payload.error ?? "Bracket reset failed.");
       replaceAdminTournament(payload.tournament);
-      setChallongeStatus(payload.tournament.challongeUrl ? `Linked ${payload.tournament.challongeUrl}` : "Challonge bracket detached");
-      if (action !== "unlink") {
-        setChallongeLinkInput("");
-        setChallongeCreateName("");
-      }
+      setBracketParticipants("");
+      setAdminTournamentStatus("Bracket reset. Registration is open.");
     } catch (error) {
-      setChallongeStatus(error instanceof Error ? error.message : "Challonge update failed");
+      setAdminTournamentStatus(error instanceof Error ? error.message : "Bracket reset failed.");
     } finally {
-      setChallongeBusy(false);
+      tournamentMutationPending.current = false;
+      setTournamentBusy(false);
     }
   }
 
@@ -2994,26 +2964,25 @@ function AdminWorkspace({
           <h2>Create & manage</h2>
         </div>
       </div>
-      <p className="admin-note">{adminTournamentStatus}</p>
+      <p className="admin-note" role="status">{adminTournamentStatus}</p>
       <form className="support-form account-form tournament-create-form" onSubmit={publishTournament}>
-        <label>TITLE<input value={newTournament.title} onChange={(event) => setNewTournament((current) => ({ ...current, title: event.target.value }))} placeholder="ARTZ Friday Clash" /></label>
-        <label>START<input value={newTournament.starts} onChange={(event) => setNewTournament((current) => ({ ...current, starts: event.target.value }))} placeholder="Friday 21:00" /></label>
-        <label>PRIZE<input value={newTournament.prize} onChange={(event) => setNewTournament((current) => ({ ...current, prize: event.target.value }))} placeholder="50K pts" /></label>
-        <label>SEATS<input value={newTournament.seats} inputMode="numeric" onChange={(event) => setNewTournament((current) => ({ ...current, seats: event.target.value.replace(/\D/g, "") }))} /></label>
-        <label className="tournament-participant-field">SEEDS<textarea value={newTournament.participants} onChange={(event) => setNewTournament((current) => ({ ...current, participants: event.target.value }))} placeholder={"One player per line\n@player_one\n@player_two"} /></label>
-        <button className="button primary" type="submit">Create tournament <span>↗</span></button>
+        <label>TITLE<input required maxLength={100} value={newTournament.title} onChange={(event) => setNewTournament((current) => ({ ...current, title: event.target.value }))} placeholder="ARTZ Friday Clash" /></label>
+        <label>START<input required maxLength={100} value={newTournament.starts} onChange={(event) => setNewTournament((current) => ({ ...current, starts: event.target.value }))} placeholder="Friday 21:00" /></label>
+        <label>PRIZE<input required maxLength={80} value={newTournament.prize} onChange={(event) => setNewTournament((current) => ({ ...current, prize: event.target.value }))} placeholder="50K pts" /></label>
+        <label>SEATS<input type="number" min="2" max="64" step="1" required value={newTournament.seats} inputMode="numeric" onChange={(event) => setNewTournament((current) => ({ ...current, seats: event.target.value.replace(/\D/g, "") }))} /></label>
+        <label className="tournament-participant-field">SEEDS (OPTIONAL)<textarea value={newTournament.participants} onChange={(event) => setNewTournament((current) => ({ ...current, participants: event.target.value }))} placeholder={"One player per line\n@player_one\n@player_two"} /></label>
+        <button className="button primary" type="submit" disabled={tournamentBusy}>{tournamentBusy ? "Saving…" : "Create tournament"} <span>↗</span></button>
       </form>
       <div className="workspace-list admin-tournament-list">
         {adminTournaments.map((tournament) => (
           <article className={selectedTournament?.id === tournament.id ? "selected" : ""} key={tournament.id}>
             <span>{tournament.active ? tournament.status : "Hidden"}</span>
             <div><h3>{tournament.title}</h3><p>{tournament.starts} · {tournament.prize} · {tournament.matches.length} matches</p></div>
-            <button type="button" onClick={() => {
+            <button type="button" disabled={tournamentBusy} onClick={() => {
               setSelectedTournamentId(tournament.id);
-              const seeds = tournament.matches.filter((match) => match.round === 0).flatMap((match) => [match.participantA, match.participantB]).filter((name): name is string => Boolean(name));
-              setBracketParticipants((seeds.length ? seeds : tournament.entrants).join("\n"));
+              setBracketParticipants("");
             }}>Edit</button>
-            <button type="button" onClick={() => patchAdminTournament(tournament, { active: !tournament.active })}>{tournament.active ? "Hide" : "Publish"}</button>
+            <button type="button" disabled={tournamentBusy} onClick={() => patchAdminTournament(tournament, { active: !tournament.active })}>{tournament.active ? "Hide" : "Publish"}</button>
           </article>
         ))}
       </div>
@@ -3022,9 +2991,9 @@ function AdminWorkspace({
           <div className="admin-tournament-manager__head">
             <div><small>BRACKET EDITOR</small><h3>{selectedTournament.title}</h3><p>{selectedTournament.taken} registered · {selectedTournament.matches.length} matches</p></div>
             <div className="button-row">
-              <button className="button ghost" type="button" onClick={() => patchAdminTournament(selectedTournament, { status: "OPEN" })}>Open</button>
-              <button className="button ghost" type="button" onClick={() => patchAdminTournament(selectedTournament, { status: "LOCKED" })}>Lock</button>
-              <button className="button primary" type="button" onClick={() => patchAdminTournament(selectedTournament, { status: "COMPLETED" })}>Finish</button>
+              <button className="button ghost" type="button" onClick={() => patchAdminTournament(selectedTournament, { status: "OPEN" })} disabled={tournamentBusy || Boolean(selectedTournament.matches.length)}>Open registration</button>
+              <button className="button ghost" type="button" onClick={() => patchAdminTournament(selectedTournament, { status: "LOCKED" })} disabled={tournamentBusy || selectedTournament.status === "Completed"}>Lock registration</button>
+              {selectedTournament.matches.length > 0 && <button className="button ghost" type="button" disabled={tournamentBusy} onClick={() => void resetAdminBracket()}>Reset bracket</button>}
             </div>
           </div>
           <form className="support-form account-form tournament-edit-form" onSubmit={(event) => { event.preventDefault(); void saveTournamentDetails(); }}>
@@ -3032,38 +3001,17 @@ function AdminWorkspace({
             <label>START<input required maxLength={100} value={tournamentDraft.starts} onChange={(event) => setTournamentDraft((current) => ({ ...current, starts: event.target.value }))} /></label>
             <label>PRIZE<input required maxLength={80} value={tournamentDraft.prize} onChange={(event) => setTournamentDraft((current) => ({ ...current, prize: event.target.value }))} /></label>
             <label>SEAT LIMIT<input type="number" min="2" max="64" step="1" value={tournamentDraft.seats} onChange={(event) => setTournamentDraft((current) => ({ ...current, seats: event.target.value }))} /></label>
-            <button className="button primary" type="submit">Save tournament details <span>↗</span></button>
+            <button className="button primary" type="submit" disabled={tournamentBusy}>Save tournament details <span>↗</span></button>
           </form>
           <div className="admin-tournament-entrants">
             <div><small>REGISTRATION</small><strong>{selectedTournament.taken} / {selectedTournament.seats} players</strong></div>
             {selectedTournament.entrants.length ? <ul>{selectedTournament.entrants.map((entrant, index) => <li key={`${entrant}-${index}`}>{entrant}</li>)}</ul> : <p>No players registered yet.</p>}
           </div>
-          <div className="admin-bracket-seeds">
+          <div className="admin-bracket-seeds" hidden={Boolean(selectedTournament.matches.length)}>
             <label>BRACKET SEEDS<textarea value={bracketParticipants} onChange={(event) => setBracketParticipants(event.target.value)} placeholder="Leave blank to use registered players" /></label>
-            <button className="button primary" type="button" onClick={generateAdminBracket}>Generate bracket <span>↗</span></button>
+            <button className="button primary" type="button" onClick={generateAdminBracket} disabled={tournamentBusy}>Generate bracket <span>↗</span></button>
           </div>
-          <div className="admin-challonge">
-            <div className="admin-challonge__head">
-              <small>CHALLONGE</small>
-              <strong>{selectedTournament.challongeUrl ? "Bracket linked" : "Not linked"}</strong>
-            </div>
-            {selectedTournament.challongeUrl ? (
-              <p className="admin-note"><a href={selectedTournament.challongeUrl} target="_blank" rel="noreferrer">{selectedTournament.challongeUrl}</a></p>
-            ) : null}
-            <div className="admin-challonge__row">
-              <input value={challongeLinkInput} onChange={(event) => setChallongeLinkInput(event.target.value)} placeholder="challonge.com/your-bracket" />
-              <button className="button ghost" type="button" onClick={() => updateTournamentChallonge("link")} disabled={challongeBusy || !challongeLinkInput.trim()}>Link existing</button>
-            </div>
-            <div className="admin-challonge__row">
-              <input value={challongeCreateName} onChange={(event) => setChallongeCreateName(event.target.value)} placeholder={selectedTournament.title} />
-              <button className="button primary" type="button" onClick={() => updateTournamentChallonge("create")} disabled={challongeBusy}>Create on Challonge <span>↗</span></button>
-            </div>
-            {selectedTournament.challongeUrl ? (
-              <button className="button ghost" type="button" onClick={() => updateTournamentChallonge("unlink")} disabled={challongeBusy}>Detach bracket</button>
-            ) : null}
-            <p className="admin-helper-text">{challongeStatus || "Embedded live via iframe"}</p>
-          </div>
-          {selectedTournament.matches.length ? <TournamentBracket tournament={selectedTournament} onUpdate={updateAdminMatch} /> : <p className="admin-note">Add seed names or use registered players, then generate the bracket.</p>}
+          {selectedTournament.matches.length ? <TournamentBracket tournament={selectedTournament} busy={tournamentBusy} onUpdate={updateAdminMatch} /> : <p className="admin-note">Add seed names or use registered players, then generate the bracket.</p>}
         </LiquidGlass>
       ) : null}
       <div className="admin-section-title">
@@ -3072,7 +3020,7 @@ function AdminWorkspace({
           <h2>Create & run hunts</h2>
         </div>
       </div>
-      <p className="admin-note">{adminHuntStatus}</p>
+      <p className="admin-note" role="status">{adminHuntStatus}</p>
       <form className="support-form account-form bonus-hunt-admin-form" onSubmit={publishBonusHunt}>
         <label>HUNT TITLE<input required maxLength={100} value={newHunt.title} onChange={(event) => setNewHunt((current) => ({ ...current, title: event.target.value }))} placeholder="ARTZ Friday Bonus Hunt" /></label>
         <label>HOST<input required maxLength={80} value={newHunt.host} onChange={(event) => setNewHunt((current) => ({ ...current, host: event.target.value }))} placeholder="Streamer name" /></label>

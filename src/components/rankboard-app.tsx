@@ -914,6 +914,18 @@ function PlayfulWord({ accent = false, text }: { accent?: boolean; text: string 
   );
 }
 
+function ArcadePageTitle({ title }: { title: string }) {
+  const words = title.trim().split(/\s+/);
+
+  return (
+    <h1 className="arcade-page-title" aria-label={title}>
+      {words.map((word, index) => (
+        <PlayfulWord key={`${word}-${index}`} text={word} accent={index === words.length - 1 && index > 0} />
+      ))}
+    </h1>
+  );
+}
+
 function CasinoOrnament({
   className,
   delay = 0,
@@ -1098,7 +1110,7 @@ function Leaderboard({ countdownTarget = null }: { countdownTarget?: string | nu
     <section className="board-hero board-hero--leaderboard page-width">
       <PrizeDropField compact />
       <div className="board-hero__title">
-        <h1><span>Monthly</span> Leaderboard</h1>
+        <ArcadePageTitle title="Monthly Leaderboard" />
         <p className="board-hero__sub">Top wagers win cash.</p>
       </div>
       <SeasonClock error={Boolean(error)} lastUpdated={lastUpdated} targetDate={targetDate} />
@@ -1221,7 +1233,7 @@ function FeaturePage({ route, data }: { route: string; data: { title: string; ta
         transition={{ delay: 0.42, duration: 0.52, ease: [0.16, 1, 0.3, 1] }}
       >
         <span className="feature-page-hero__icon"><Icon size={28} strokeWidth={2.6} aria-hidden="true" /></span>
-        <div><h1>{data.title}</h1></div>
+        <div><ArcadePageTitle title={data.title} /></div>
         <Link className="feature-page-hero__action" href={data.action[1]} title={data.action[0]}><span>{data.action[0]}</span><ArrowUpRight size={18} strokeWidth={2.7} aria-hidden="true" /></Link>
       </motion.div>
     </section>
@@ -1238,7 +1250,7 @@ function Legal({ type }: { type: string }) {
   return (
     <main className="legal page-width">
       <CasinoOrnament className="legal-vault" variant="vault" delay={0.3} />
-      <h1>{privacy ? "Privacy" : "Terms"}<em>.</em></h1>
+      <ArcadePageTitle title={privacy ? "Privacy" : "Terms"} />
       <p className="legal-lead">{privacy ? "How ARTZ Rewards handles your data." : "The rules for playing fair."}</p>
       <div className="legal-layout">
         <aside><span>Last updated</span><strong>Aug 13, 2026</strong><Link href={privacy ? "/terms" : "/privacy"}>{privacy ? "Read terms" : "Read privacy"} ↗</Link></aside>
@@ -1568,7 +1580,7 @@ function Profile({ account }: { account: HeaderAccount }) {
         <section className="board-hero page-width">
           <CasinoOrnament className="profile-vault" variant="vault" delay={0.28} />
           <div>
-            <h1>Profile</h1>
+            <ArcadePageTitle title="Profile" />
             <p className="hero-desc">Sign in to see points, links & history.</p>
             <div className="button-row">
               <Link className="button primary" href="/login">Sign in</Link>
@@ -1585,7 +1597,7 @@ function Profile({ account }: { account: HeaderAccount }) {
         <section className="board-hero page-width">
           <CasinoOrnament className="profile-vault" variant="vault" delay={0.18} />
           <div>
-            <h1>Opening Admin</h1>
+            <ArcadePageTitle title="Opening Admin" />
             <p className="hero-desc">Redirecting to control room.</p>
           </div>
         </section>
@@ -1602,7 +1614,7 @@ function Profile({ account }: { account: HeaderAccount }) {
       <section className="board-hero page-width">
         <CasinoOrnament className="profile-vault" variant="vault" delay={0.28} />
         <div>
-          <h1>Profile</h1>
+          <ArcadePageTitle title="Profile" />
         </div>
         <div className="round-ticket"><strong>{fmt(account.points)} PTS</strong><span>{account.profileProvider.toUpperCase()}</span></div>
       </section>

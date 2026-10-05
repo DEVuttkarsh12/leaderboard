@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const message = error instanceof Error ? error.message : "Clip vote failed.";
     const status =
       message === "Sign in to vote on clips." ? 401 :
-      message === "Clip not found." ? 404 :
+      message === "Clip not found." || message === "Hunt not found." ? 404 :
       500;
     return NextResponse.json({ error: message }, { status });
   }

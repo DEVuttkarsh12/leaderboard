@@ -118,3 +118,13 @@ src/
 - Empty state display
 - Reduced-motion support
 - Keyboard accessible
+
+## Tournaments and bonus hunts
+
+Tournament brackets run entirely on this site; no Challonge API key or embed is needed. In `/admin`, create an open tournament with a title, start label, prize, and 2–64 seats. Players can enter or withdraw while registration is open. Generate the single-elimination bracket from registered players, or supply unique seed names in order (strongest seed first). Supplying seeds during creation starts the bracket immediately and locks registration.
+
+The bracket editor saves scores, marks matches live, and advances winners. Byes advance automatically. Completing the final publishes the champion and finishes the tournament. Resetting or correcting a result clears affected later results; resetting the whole bracket preserves registrations and reopens entry. Publish/hide and event details are managed in the same panel. Admin rosters refresh every 10 seconds; player brackets refresh every 5 seconds.
+
+The bonus hunt panel creates and edits hunts, controls upcoming/live/completed status and visibility, updates bankroll/progress/payout figures, and manages highlights. Players can select a hunt, follow it, vote once on each highlight, and save highlights. Player hunt data refreshes every 15 seconds. Opened bonuses cannot exceed the planned count; hidden hunts and their highlights reject player actions. Empty event tables remain empty until an admin creates an event.
+
+Run the event regression tests with `npm run test:events`.

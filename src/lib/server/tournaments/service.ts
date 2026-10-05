@@ -1,12 +1,9 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
 import { requireAdminUser } from "@/lib/server/admin/users";
-import { challongeSlug } from "@/lib/challonge";
-import {
-  createChallongeTournament,
-  getChallongeTournament,
-} from "@/lib/server/challonge/client";
-
+import type { Prisma } from "@/generated/prisma/client";
+import { applyMatchUpdate, bracketChampion, createBracket, type MatchUpdate } from "@/lib/tournament-bracket";
+import { randomUUID } from "node:crypto";
 export type TournamentMatchPayload = {
   id: string;
   round: number;
@@ -32,16 +29,8 @@ export type TournamentPayload = {
   active: boolean;
   entrants: string[];
   matches: TournamentMatchPayload[];
-  challongeId: string | null;
-  challongeUrl: string | null;
   updatedAt: string;
 };
-
-const DEFAULT_TOURNAMENTS = [
-  { code: "friday-rush", title: "Friday Rush", starts: "Tonight 21:00", prize: "40K pts", seats: 64, taken: 0, sortOrder: 10 },
-  { code: "duel-ladder", title: "Duel Ladder", starts: "Tomorrow 18:30", prize: "25K pts", seats: 32, taken: 0, sortOrder: 20 },
-  { code: "season-finals", title: "Season Finals", starts: "Sunday 20:00", prize: "120K pts", seats: 16, taken: 0, sortOrder: 30 },
-];
 
 type TournamentStatus = "OPEN" | "LOCKED" | "COMPLETED";
 
@@ -55,8 +44,6 @@ type TournamentRecord = {
   taken: number;
   status: TournamentStatus;
   active: boolean;
-  challongeId: string | null;
-  challongeUrl: string | null;
   updatedAt: Date;
   entries: Array<{
     userId: string;
@@ -143,27 +130,11 @@ function toPayload(tournament: TournamentRecord, userId?: string | null): Tourna
       winner: match.winner,
       status: matchStatusLabel(match.status),
     })),
-    challongeId: tournament.challongeId,
-    challongeUrl: tournament.challongeUrl,
     updatedAt: tournament.updatedAt.toISOString(),
   };
 }
 
-async function seedTournamentsIfEmpty() {
-  const count = await prisma.tournament.count();
-  if (count > 0) return;
-
-  await prisma.tournament.createMany({
-    data: DEFAULT_TOURNAMENTS.map((tournament) => ({
-      ...tournament,
-      status: "OPEN" as const,
-      active: true,
-    })),
-  });
-}
-
 export async function listTournaments(sessionToken: string | undefined): Promise<TournamentPayload[]> {
-  await seedTournamentsIfEmpty();
   const userId = await getSessionUserId(sessionToken);
   const tournaments = await prisma.tournament.findMany({
     where: { active: true },
@@ -175,7 +146,6 @@ export async function listTournaments(sessionToken: string | undefined): Promise
 
 export async function listAdminTournaments(sessionToken: string | undefined): Promise<TournamentPayload[]> {
   await requireAdminUser(sessionToken);
-  await seedTournamentsIfEmpty();
   const tournaments = await prisma.tournament.findMany({
     include: tournamentInclude,
     orderBy: [{ active: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
@@ -183,28 +153,34 @@ export async function listAdminTournaments(sessionToken: string | undefined): Pr
   return (tournaments as TournamentRecord[]).map((tournament) => toPayload(tournament));
 }
 
+// Every mutation takes the same tournament row lock, including registration.
+// This serializes seat checks, bracket generation, scoring, and admin edits.
+async function lockTournament(tx: Prisma.TransactionClient, id: string) {
+  const rows = await tx.$queryRaw<Array<{ id: string }>>`SELECT "id" FROM "Tournament" WHERE "id" = ${id} FOR UPDATE`;
+  if (!rows.length) throw new Error("Tournament not found.");
+}
+
+async function readTournament(tx: Prisma.TransactionClient, id: string) {
+  const record = await tx.tournament.findUniqueOrThrow({ where: { id }, include: tournamentInclude });
+  return toPayload(record as TournamentRecord);
+}
+
 export async function createTournament(
   sessionToken: string | undefined,
   input: { title: string; starts: string; prize: string; seats: number; participants: string[] }
 ) {
   await requireAdminUser(sessionToken);
+  const matches = input.participants.length ? createBracket(input.participants, input.seats) : [];
   const slug = input.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "tournament";
-  const tournament = await prisma.tournament.create({
-    data: {
-      code: `${slug}-${Date.now().toString(36)}`,
-      title: input.title,
-      starts: input.starts,
-      prize: input.prize,
-      seats: input.seats,
-      status: "OPEN",
-      active: true,
-    },
+  return prisma.$transaction(async (tx) => {
+    const tournament = await tx.tournament.create({ data: {
+      code: `${slug}-${randomUUID()}`,
+      title: input.title, starts: input.starts, prize: input.prize, seats: input.seats,
+      status: matches.length ? "LOCKED" : "OPEN", active: true,
+      matches: { create: matches },
+    } });
+    return readTournament(tx, tournament.id);
   });
-
-  if (input.participants.length >= 2) {
-    await buildTournamentBracket(sessionToken, tournament.id, input.participants);
-  }
-  return getAdminTournament(sessionToken, tournament.id);
 }
 
 export async function updateTournament(
@@ -213,22 +189,26 @@ export async function updateTournament(
   input: Partial<{ title: string; starts: string; prize: string; seats: number; status: TournamentStatus; active: boolean }>
 ) {
   await requireAdminUser(sessionToken);
-  const existing = await prisma.tournament.findUnique({
-    where: { id: tournamentId },
-    select: { id: true, _count: { select: { entries: true } } },
+  return prisma.$transaction(async (tx) => {
+    await lockTournament(tx, tournamentId);
+    const existing = await tx.tournament.findUniqueOrThrow({ where: { id: tournamentId }, include: tournamentInclude });
+    const participants = existing.matches.filter((match) => match.round === 0).flatMap((match) => [match.participantA, match.participantB]).filter(Boolean).length;
+    const minimum = Math.max(existing.entries.length, participants);
+    if (input.seats !== undefined && input.seats < minimum) {
+      throw new Error(`Seat limit cannot be lower than the ${minimum} registered or seeded players.`);
+    }
+    if (input.status === "OPEN" && existing.matches.length) {
+      throw new Error("Reset the bracket before reopening registration.");
+    }
+    if (input.status === "COMPLETED" && !bracketChampion(existing.matches)) {
+      throw new Error("Complete the final match to finish the tournament.");
+    }
+    if (input.status === "LOCKED" && bracketChampion(existing.matches)) {
+      throw new Error("Reset the final result to resume this tournament.");
+    }
+    await tx.tournament.update({ where: { id: tournamentId }, data: input });
+    return readTournament(tx, tournamentId);
   });
-  if (!existing) throw new Error("Tournament not found.");
-  if (input.seats !== undefined && input.seats < existing._count.entries) {
-    throw new Error(`Seat limit cannot be lower than the ${existing._count.entries} registered players.`);
-  }
-  await prisma.tournament.update({ where: { id: tournamentId }, data: input });
-  return getAdminTournament(sessionToken, tournamentId);
-}
-
-function nextBracketSize(count: number) {
-  let size = 2;
-  while (size < count) size *= 2;
-  return Math.min(size, 64);
 }
 
 export async function buildTournamentBracket(
@@ -237,174 +217,71 @@ export async function buildTournamentBracket(
   requestedParticipants: string[] = []
 ) {
   await requireAdminUser(sessionToken);
-  const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, include: tournamentInclude });
-  if (!tournament) throw new Error("Tournament not found.");
-
-  const supplied = requestedParticipants.map((name) => name.trim()).filter(Boolean);
-  const registered = (tournament as TournamentRecord).entries.map(entrantName);
-  const participants = [...new Set((supplied.length ? supplied : registered).slice(0, 64))];
-  if (participants.length < 2) throw new Error("Add at least two bracket participants.");
-
-  const size = nextBracketSize(participants.length);
-  const roundCount = Math.log2(size);
-  const matches: Array<{
-    tournamentId: string;
-    round: number;
-    position: number;
-    participantA: string | null;
-    participantB: string | null;
-    winner: string | null;
-    status: string;
-  }> = [];
-
-  for (let round = 0; round < roundCount; round += 1) {
-    const matchCount = size / 2 ** (round + 1);
-    for (let position = 0; position < matchCount; position += 1) {
-      const participantA = round === 0 ? participants[position * 2] ?? null : null;
-      const participantB = round === 0 ? participants[position * 2 + 1] ?? null : null;
-      const winner = participantA && !participantB ? participantA : participantB && !participantA ? participantB : null;
-      matches.push({ tournamentId, round, position, participantA, participantB, winner, status: winner ? "COMPLETED" : "PENDING" });
-    }
-  }
-
-  for (let round = 0; round < roundCount - 1; round += 1) {
-    for (const match of matches.filter((item) => item.round === round && item.winner)) {
-      const next = matches.find((item) => item.round === round + 1 && item.position === Math.floor(match.position / 2));
-      if (!next) continue;
-      if (match.position % 2 === 0) next.participantA = match.winner;
-      else next.participantB = match.winner;
-    }
-  }
-
-  await prisma.$transaction([
-    prisma.tournamentMatch.deleteMany({ where: { tournamentId } }),
-    prisma.tournamentMatch.createMany({ data: matches }),
-    prisma.tournament.update({ where: { id: tournamentId }, data: { status: "LOCKED" } }),
-  ]);
-  return getAdminTournament(sessionToken, tournamentId);
+  return prisma.$transaction(async (tx) => {
+    await lockTournament(tx, tournamentId);
+    const tournament = await tx.tournament.findUniqueOrThrow({ where: { id: tournamentId }, include: tournamentInclude });
+    if (tournament.matches.length) throw new Error("Reset the existing bracket before generating a new one.");
+    const registered = (tournament as TournamentRecord).entries.map(entrantName);
+    const matches = createBracket(requestedParticipants.length ? requestedParticipants : registered, tournament.seats);
+    await tx.tournamentMatch.createMany({ data: matches.map((match) => ({ ...match, tournamentId })) });
+    await tx.tournament.update({ where: { id: tournamentId }, data: { status: "LOCKED" } });
+    return readTournament(tx, tournamentId);
+  });
 }
 
-export async function linkTournamentToChallonge(
-  sessionToken: string | undefined,
-  tournamentId: string,
-  url: string
-) {
+export async function resetTournamentBracket(sessionToken: string | undefined, tournamentId: string) {
   await requireAdminUser(sessionToken);
-  const slug = challongeSlug(url);
-  if (!slug) throw new Error("Provide a valid Challonge tournament URL.");
-
-  const challonge = await getChallongeTournament(slug);
-  await prisma.tournament.update({
-    where: { id: tournamentId },
-    data: { challongeId: challonge.id, challongeUrl: challonge.url },
+  return prisma.$transaction(async (tx) => {
+    await lockTournament(tx, tournamentId);
+    await tx.tournamentMatch.deleteMany({ where: { tournamentId } });
+    await tx.tournament.update({ where: { id: tournamentId }, data: { status: "OPEN" } });
+    return readTournament(tx, tournamentId);
   });
-  return getAdminTournament(sessionToken, tournamentId);
-}
-
-export async function createTournamentOnChallonge(
-  sessionToken: string | undefined,
-  tournamentId: string,
-  input: { name?: string; url?: string }
-) {
-  await requireAdminUser(sessionToken);
-  const tournament = await prisma.tournament.findUnique({
-    where: { id: tournamentId },
-    select: { title: true },
-  });
-  if (!tournament) throw new Error("Tournament not found.");
-
-  const challonge = await createChallongeTournament({
-    name: input.name?.trim() || tournament.title,
-    url: input.url?.trim() || undefined,
-  });
-  await prisma.tournament.update({
-    where: { id: tournamentId },
-    data: { challongeId: challonge.id, challongeUrl: challonge.url },
-  });
-  return getAdminTournament(sessionToken, tournamentId);
-}
-
-export async function unlinkTournamentChallonge(
-  sessionToken: string | undefined,
-  tournamentId: string
-) {
-  await requireAdminUser(sessionToken);
-  await prisma.tournament.update({
-    where: { id: tournamentId },
-    data: { challongeId: null, challongeUrl: null },
-  });
-  return getAdminTournament(sessionToken, tournamentId);
 }
 
 export async function updateTournamentMatch(
   sessionToken: string | undefined,
   tournamentId: string,
   matchId: string,
-  input: Partial<{
-    participantA: string | null;
-    participantB: string | null;
-    scoreA: number | null;
-    scoreB: number | null;
-    winner: string | null;
-    status: "PENDING" | "LIVE" | "COMPLETED";
-  }>
+  input: MatchUpdate
 ) {
   await requireAdminUser(sessionToken);
-  const current = await prisma.tournamentMatch.findFirst({ where: { id: matchId, tournamentId } });
-  if (!current) throw new Error("Tournament match not found.");
-
-  const participantA = input.participantA === undefined ? current.participantA : input.participantA;
-  const participantB = input.participantB === undefined ? current.participantB : input.participantB;
-  if (input.winner && input.winner !== participantA && input.winner !== participantB) {
-    throw new Error("Winner must be one of the match participants.");
-  }
-
-  const winner = input.winner === undefined ? current.winner : input.winner;
-  const updated = await prisma.tournamentMatch.update({
-    where: { id: matchId },
-    data: { ...input, status: winner ? "COMPLETED" : input.status },
-  });
-  const nextMatch = await prisma.tournamentMatch.findUnique({
-    where: { tournamentId_round_position: { tournamentId, round: current.round + 1, position: Math.floor(current.position / 2) } },
-  });
-  if (nextMatch) {
-    await prisma.tournamentMatch.update({
-      where: { id: nextMatch.id },
-      data: current.position % 2 === 0 ? { participantA: winner } : { participantB: winner },
-    });
-  }
-
-  return { updated, tournament: await getAdminTournament(sessionToken, tournamentId) };
-}
-
-async function getAdminTournament(sessionToken: string | undefined, tournamentId: string) {
-  await requireAdminUser(sessionToken);
-  const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, include: tournamentInclude });
-  if (!tournament) throw new Error("Tournament not found.");
-  return toPayload(tournament as TournamentRecord);
+  return prisma.$transaction(async (tx) => {
+    await lockTournament(tx, tournamentId);
+    const matches = await tx.tournamentMatch.findMany({ where: { tournamentId }, orderBy: [{ round: "asc" }, { position: "asc" }] });
+    const current = matches.find((match) => match.id === matchId);
+    if (!current) throw new Error("Tournament match not found.");
+    const next = applyMatchUpdate(matches, current.round, current.position, input);
+    for (const match of next) {
+      const previous = matches.find((item) => item.id === match.id)!;
+      const data = { participantA: match.participantA, participantB: match.participantB, scoreA: match.scoreA, scoreB: match.scoreB, winner: match.winner, status: match.status };
+      if (Object.entries(data).some(([key, value]) => previous[key as keyof typeof data] !== value)) {
+        await tx.tournamentMatch.update({ where: { id: match.id }, data });
+      }
+    }
+    await tx.tournament.update({ where: { id: tournamentId }, data: { status: bracketChampion(next) ? "COMPLETED" : "LOCKED" } });
+    return { tournament: await readTournament(tx, tournamentId) };
+  }, { timeout: 15_000 });
 }
 
 export async function toggleTournamentEntry(sessionToken: string | undefined, tournamentId: string): Promise<TournamentPayload[]> {
   const userId = await getSessionUserId(sessionToken);
   if (!userId) throw new Error("Sign in to enter tournaments.");
-  await seedTournamentsIfEmpty();
-
   await prisma.$transaction(async (tx) => {
-    const tournament = await tx.tournament.findFirst({ where: { id: tournamentId, active: true } });
-    if (!tournament) throw new Error("Tournament not found.");
+    await lockTournament(tx, tournamentId);
+    const tournament = await tx.tournament.findUniqueOrThrow({ where: { id: tournamentId } });
+    if (!tournament.active) throw new Error("Tournament not found.");
     if (tournament.status !== "OPEN") throw new Error("Tournament is not open.");
     const existing = await tx.tournamentEntry.findUnique({ where: { userId_tournamentId: { userId, tournamentId } } });
-    const actualTaken = await tx.tournamentEntry.count({ where: { tournamentId } });
-
+    const taken = await tx.tournamentEntry.count({ where: { tournamentId } });
     if (existing) {
       await tx.tournamentEntry.delete({ where: { id: existing.id } });
-      await tx.tournament.update({ where: { id: tournamentId }, data: { taken: Math.max(0, actualTaken - 1) } });
-      return;
+      await tx.tournament.update({ where: { id: tournamentId }, data: { taken: taken - 1 } });
+    } else {
+      if (taken >= tournament.seats) throw new Error("Tournament is full.");
+      await tx.tournamentEntry.create({ data: { userId, tournamentId } });
+      await tx.tournament.update({ where: { id: tournamentId }, data: { taken: taken + 1 } });
     }
-    if (actualTaken >= tournament.seats) throw new Error("Tournament is full.");
-    await tx.tournamentEntry.create({ data: { userId, tournamentId } });
-    await tx.tournament.update({ where: { id: tournamentId }, data: { taken: actualTaken + 1 } });
   });
-
   return listTournaments(sessionToken);
 }

@@ -885,3 +885,150 @@
     animation: none;
   }
 }
+
+/* The interior page titles use the same lively, hand-placed letters as ARTZ Rewards. */
+.site-shell h1.arcade-page-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  column-gap: 0.18em;
+  row-gap: 0.08em;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--font-artz-logo), sans-serif;
+  font-size: clamp(42px, 5.6vw, 76px);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.08;
+  text-align: center;
+  text-shadow: none;
+  text-transform: uppercase;
+  transform: none;
+  -webkit-text-stroke: 0;
+}
+
+.site-shell h1.arcade-page-title::after {
+  content: none;
+}
+
+.site-shell h1.arcade-page-title .playful-word {
+  flex: 0 0 auto;
+}
+
+.site-shell h1.arcade-page-title .playful-word:nth-child(even) {
+  transform: rotate(1.5deg) translateY(5px);
+}
+
+.site-shell h1.arcade-page-title .playful-word i {
+  -webkit-text-stroke-width: 1.5px;
+  filter: drop-shadow(2px 3px 0 #a54911) drop-shadow(4px 5px 0 #130b07);
+}
+
+.site-shell h1.arcade-page-title .playful-word--accent i {
+  filter: drop-shadow(2px 3px 0 #8a3141) drop-shadow(4px 5px 0 #130b07);
+}
+
+.site-shell .board-hero--leaderboard h1.arcade-page-title {
+  font-size: clamp(42px, 5.2vw, 70px);
+}
+
+.site-shell .feature-page-hero h1.arcade-page-title {
+  font-size: clamp(40px, 5vw, 64px);
+}
+
+.site-shell .legal > h1.arcade-page-title,
+.site-shell .board-hero:not(.board-hero--leaderboard):not(.feature-page-hero) h1.arcade-page-title {
+  justify-content: flex-start;
+}
+
+/* Solid prize stickers keep the rank and cash amounts readable on every podium. */
+.site-shell .board-top-three .winner-arena .podium-card.rank-1 {
+  --podium-chip: #ffe45e;
+  --podium-chip-ink: #261604;
+}
+
+.site-shell .board-top-three .winner-arena .podium-card.rank-2 {
+  --podium-chip: #72f4cb;
+  --podium-chip-ink: #07382d;
+}
+
+.site-shell .board-top-three .winner-arena .podium-card.rank-3 {
+  --podium-chip: #ffb2c0;
+  --podium-chip-ink: #4d1424;
+}
+
+.site-shell .board-top-three .winner-arena .podium-card .rank-badge,
+.site-shell .board-top-three .winner-arena .podium-card .prize-ribbon {
+  border: 2px solid #130b07;
+  background: linear-gradient(145deg, #fff9e9 -40%, var(--podium-chip) 48%, var(--podium-chip));
+  color: var(--podium-chip-ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  text-shadow: none;
+  box-shadow: 3px 4px 0 #130b07, 0 0 20px var(--podium-glow);
+}
+
+.site-shell .board-top-three .winner-arena .podium-card .rank-badge {
+  min-height: 32px;
+  padding-inline: 11px;
+  font-size: 16px;
+}
+
+.site-shell .board-top-three .winner-arena .podium-card .prize-ribbon {
+  min-height: 42px;
+  padding-inline: 17px;
+  font-size: 19px;
+}
+
+@media (max-width: 700px) {
+  .site-shell h1.arcade-page-title,
+  .site-shell .board-hero--leaderboard h1.arcade-page-title,
+  .site-shell .feature-page-hero h1.arcade-page-title {
+    font-size: clamp(33px, 8.5vw, 53px);
+  }
+
+  .site-shell h1.arcade-page-title .playful-word i {
+    -webkit-text-stroke-width: 1px;
+    filter: drop-shadow(1px 2px 0 #a54911) drop-shadow(3px 3px 0 #130b07);
+  }
+
+  .site-shell h1.arcade-page-title .playful-word--accent i {
+    filter: drop-shadow(1px 2px 0 #8a3141) drop-shadow(3px 3px 0 #130b07);
+  }
+}
+
+/* Site-owned tournament tree: fixed match slots keep connector paths aligned. */
+.native-bracket { min-width: 0; margin-top: 24px; }
+.native-bracket__summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.native-bracket__summary > strong { display: flex; align-items: center; gap: 9px; padding: 10px 16px; border: 1px solid #ffe45e; border-radius: 16px; background: #382711; color: #ffe45e; }
+.native-bracket__viewport { max-width: 100%; max-height: 760px; overflow: auto; padding: 8px; border-radius: 20px; background: rgba(0, 0, 0, .15); scrollbar-color: #b48342 #170f0a; }
+.native-bracket__viewport:focus-visible { outline: 2px solid #72f4cb; outline-offset: 3px; }
+.native-bracket__canvas { position: relative; }
+.native-bracket__connectors { position: absolute; inset: 0; pointer-events: none; }
+.native-bracket__connectors path { fill: none; stroke: #735337; stroke-width: 2; }
+.native-bracket__connectors path.is-decided { stroke: #72f4cb; }
+.native-bracket__round { position: absolute; top: 0; margin: 0; color: #ffe3a8; font-size: 17px; }
+.native-bracket__slot { position: absolute; width: var(--match-width); height: var(--match-height); }
+.site-shell .native-match { height: 100%; margin: 0; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 5px; border: 1px solid #977341; border-radius: 18px; background: linear-gradient(145deg, #39271e, #17100c); box-shadow: inset 0 1px 0 #ffffff24, 0 3px 8px #0005; }
+.site-shell .native-match--live { border-color: #ffe45e; box-shadow: 0 0 14px #ffb54130; }
+.site-shell .native-match--completed { border-color: #72f4cb80; }
+.native-match > header, .native-match > footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; }
+.native-match > header > span { color: #d3bda7; }
+.native-match > header > strong { color: #ffdc95; font-size: 14px; }
+.native-match__player { display: grid; grid-template-columns: minmax(0, 1fr) 48px 34px; align-items: center; gap: 6px; min-height: 32px; }
+.native-match__player > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+.native-match__player.is-winner { color: #72f4cb; }
+.site-shell .native-match__player > input { width: 48px; min-height: 32px; padding: 3px; border-radius: 8px; text-align: center; font-size: 16px; appearance: textfield; }
+.native-match__player > input::-webkit-inner-spin-button { appearance: none; }
+.site-shell .native-match__player > button { display: grid; place-items: center; min-width: 32px; min-height: 32px; padding: 0; border-radius: 10px; }
+.site-shell .native-match footer button { display: flex; align-items: center; gap: 4px; min-height: 28px; padding: 3px 7px; font-size: 14px; }
+.site-shell .native-match button:disabled { opacity: .5; cursor: default; }
+.site-shell .admin-bracket-seeds[hidden] { display: none; }
+@media (max-width: 700px) {
+  .native-bracket__viewport { max-height: 580px; }
+  .native-bracket__summary { font-size: 14px; }
+}

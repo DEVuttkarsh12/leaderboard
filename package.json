@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:events": "node tests/tournament-bracket.test.mjs",
     "postinstall": "prisma generate",
     "admin:list": "node scripts/set-admin.cjs list",
     "admin:promote": "node scripts/set-admin.cjs promote",

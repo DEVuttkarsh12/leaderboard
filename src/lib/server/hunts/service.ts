@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/server/db/prisma";
 import { getSessionUserId } from "@/lib/server/auth/session";
 import { requireAdminUser } from "@/lib/server/admin/users";
+import type { Prisma } from "@/generated/prisma/client";
+import { validateHuntProgress } from "@/lib/bonus-hunt";
 
 type HuntStatus = "SCHEDULED" | "LIVE" | "COMPLETED";
 
@@ -38,54 +40,6 @@ export type HuntsPayload = {
   hunts: HuntPayload[];
   clips: HuntClipPayload[];
 };
-
-const DEFAULT_HUNTS = [
-  {
-    title: "Midnight Multiplier",
-    host: "Vanta",
-    status: "LIVE" as const,
-    startBankroll: 250000,
-    currentBankroll: 215000,
-    bonusCount: 25,
-    openedCount: 18,
-    totalPayout: 186000,
-    bestMultiplier: 860,
-    sortOrder: 10,
-    startsInMinutes: -30,
-    clips: [
-      { title: "860x reveal", multiplier: 860, votes: 124 },
-      { title: "Last-spin save", multiplier: 190, votes: 81 },
-    ],
-  },
-  {
-    title: "Neon Chase",
-    host: "Luxe",
-    status: "SCHEDULED" as const,
-    startBankroll: 180000,
-    currentBankroll: 180000,
-    bonusCount: 20,
-    openedCount: 0,
-    totalPayout: 0,
-    bestMultiplier: 0,
-    sortOrder: 20,
-    startsInMinutes: 90,
-    clips: [{ title: "Vault streak", multiplier: 240, votes: 57 }],
-  },
-  {
-    title: "Vault Break",
-    host: "Midas",
-    status: "SCHEDULED" as const,
-    startBankroll: 320000,
-    currentBankroll: 320000,
-    bonusCount: 30,
-    openedCount: 0,
-    totalPayout: 0,
-    bestMultiplier: 0,
-    sortOrder: 30,
-    startsInMinutes: 180,
-    clips: [],
-  },
-];
 
 function statusLabel(status: HuntStatus): HuntPayload["status"] {
   switch (status) {
@@ -125,43 +79,14 @@ function heatFor(hunt: {
   return Math.max(0, Math.min(100, Math.round(progress * 0.7 + bankrollPressure * 0.3)));
 }
 
-async function seedHuntsIfEmpty() {
-  // Seed only a truly empty table. Hiding every hunt must not resurrect demo hunts.
-  const count = await prisma.bonusHuntSession.count();
-  if (count > 0) return;
-
-  const now = Date.now();
-  for (const hunt of DEFAULT_HUNTS) {
-    await prisma.bonusHuntSession.create({
-      data: {
-        title: hunt.title,
-        host: hunt.host,
-        status: hunt.status,
-        startBankroll: hunt.startBankroll,
-        currentBankroll: hunt.currentBankroll,
-        bonusCount: hunt.bonusCount,
-        openedCount: hunt.openedCount,
-        totalPayout: hunt.totalPayout,
-        bestMultiplier: hunt.bestMultiplier,
-        sortOrder: hunt.sortOrder,
-        startsAt: new Date(now + hunt.startsInMinutes * 60 * 1000),
-        clips: {
-          create: hunt.clips.map((clip) => ({
-            title: clip.title,
-            multiplier: clip.multiplier,
-            votes: clip.votes,
-          })),
-        },
-      },
-    });
-  }
+async function lockHunt(tx: Prisma.TransactionClient, huntId: string, published = false) {
+  const rows = await tx.$queryRaw<Array<{ id: string; active: boolean }>>`SELECT "id", "active" FROM "BonusHuntSession" WHERE "id" = ${huntId} FOR UPDATE`;
+  if (!rows.length || (published && !rows[0].active)) throw new Error("Hunt not found.");
 }
 
 export async function listHunts(
   sessionToken: string | undefined
 ): Promise<HuntsPayload> {
-  await seedHuntsIfEmpty();
-
   const userId = await getSessionUserId(sessionToken);
   const [hunts, follows, votes, saves] = await Promise.all([
     prisma.bonusHuntSession.findMany({
@@ -269,6 +194,7 @@ export async function createAdminHunt(
   }
 ) {
   await requireAdminUser(sessionToken);
+  validateHuntProgress(input);
   const hunt = await prisma.bonusHuntSession.create({ data: input });
   return hunt;
 }
@@ -292,9 +218,12 @@ export async function updateAdminHunt(
   }>
 ) {
   await requireAdminUser(sessionToken);
-  const exists = await prisma.bonusHuntSession.findUnique({ where: { id: huntId }, select: { id: true } });
-  if (!exists) throw new Error("Hunt not found.");
-  return prisma.bonusHuntSession.update({ where: { id: huntId }, data: input });
+  return prisma.$transaction(async (tx) => {
+    await lockHunt(tx, huntId);
+    const existing = await tx.bonusHuntSession.findUniqueOrThrow({ where: { id: huntId } });
+    validateHuntProgress({ ...existing, ...input });
+    return tx.bonusHuntSession.update({ where: { id: huntId }, data: input });
+  });
 }
 
 export async function createAdminHuntClip(
@@ -303,9 +232,10 @@ export async function createAdminHuntClip(
   input: { title: string; multiplier: number }
 ) {
   await requireAdminUser(sessionToken);
-  const hunt = await prisma.bonusHuntSession.findUnique({ where: { id: huntId }, select: { id: true } });
-  if (!hunt) throw new Error("Hunt not found.");
-  return prisma.huntClip.create({ data: { ...input, huntId } });
+  return prisma.$transaction(async (tx) => {
+    await lockHunt(tx, huntId);
+    return tx.huntClip.create({ data: { ...input, huntId } });
+  });
 }
 
 export async function updateAdminHuntClip(
@@ -315,9 +245,12 @@ export async function updateAdminHuntClip(
   input: Partial<{ title: string; multiplier: number }>
 ) {
   await requireAdminUser(sessionToken);
-  const clip = await prisma.huntClip.findFirst({ where: { id: clipId, huntId }, select: { id: true } });
-  if (!clip) throw new Error("Hunt highlight not found.");
-  return prisma.huntClip.update({ where: { id: clipId }, data: input });
+  return prisma.$transaction(async (tx) => {
+    await lockHunt(tx, huntId);
+    const clip = await tx.huntClip.findFirst({ where: { id: clipId, huntId }, select: { id: true } });
+    if (!clip) throw new Error("Hunt highlight not found.");
+    return tx.huntClip.update({ where: { id: clipId }, data: input });
+  });
 }
 
 export async function deleteAdminHuntClip(
@@ -326,9 +259,12 @@ export async function deleteAdminHuntClip(
   clipId: string
 ) {
   await requireAdminUser(sessionToken);
-  const clip = await prisma.huntClip.findFirst({ where: { id: clipId, huntId }, select: { id: true } });
-  if (!clip) throw new Error("Hunt highlight not found.");
-  await prisma.huntClip.delete({ where: { id: clipId } });
+  await prisma.$transaction(async (tx) => {
+    await lockHunt(tx, huntId);
+    const clip = await tx.huntClip.findFirst({ where: { id: clipId, huntId }, select: { id: true } });
+    if (!clip) throw new Error("Hunt highlight not found.");
+    await tx.huntClip.delete({ where: { id: clipId } });
+  });
 }
 
 export async function toggleHuntFollow(
@@ -338,21 +274,12 @@ export async function toggleHuntFollow(
   const userId = await getSessionUserId(sessionToken);
   if (!userId) throw new Error("Sign in to follow hunts.");
 
-  const hunt = await prisma.bonusHuntSession.findFirst({
-    where: { id: huntId, active: true },
-    select: { id: true },
+  await prisma.$transaction(async (tx) => {
+    await lockHunt(tx, huntId, true);
+    const existing = await tx.huntFollow.findUnique({ where: { userId_huntId: { userId, huntId } } });
+    if (existing) await tx.huntFollow.delete({ where: { id: existing.id } });
+    else await tx.huntFollow.create({ data: { userId, huntId } });
   });
-  if (!hunt) throw new Error("Hunt not found.");
-
-  const existing = await prisma.huntFollow.findUnique({
-    where: { userId_huntId: { userId, huntId } },
-  });
-
-  if (existing) {
-    await prisma.huntFollow.delete({ where: { id: existing.id } });
-  } else {
-    await prisma.huntFollow.create({ data: { userId, huntId } });
-  }
 
   return listHunts(sessionToken);
 }
@@ -367,6 +294,7 @@ export async function voteHuntClip(
   await prisma.$transaction(async (tx) => {
     const clip = await tx.huntClip.findUnique({ where: { id: clipId } });
     if (!clip) throw new Error("Clip not found.");
+    await lockHunt(tx, clip.huntId, true);
 
     const existing = await tx.huntClipVote.findUnique({
       where: { userId_clipId: { userId, clipId } },
@@ -390,18 +318,14 @@ export async function toggleHuntClipSave(
   const userId = await getSessionUserId(sessionToken);
   if (!userId) throw new Error("Sign in to save clips.");
 
-  const clip = await prisma.huntClip.findUnique({ where: { id: clipId } });
-  if (!clip) throw new Error("Clip not found.");
-
-  const existing = await prisma.huntClipSave.findUnique({
-    where: { userId_clipId: { userId, clipId } },
+  await prisma.$transaction(async (tx) => {
+    const clip = await tx.huntClip.findUnique({ where: { id: clipId } });
+    if (!clip) throw new Error("Clip not found.");
+    await lockHunt(tx, clip.huntId, true);
+    const existing = await tx.huntClipSave.findUnique({ where: { userId_clipId: { userId, clipId } } });
+    if (existing) await tx.huntClipSave.delete({ where: { id: existing.id } });
+    else await tx.huntClipSave.create({ data: { userId, clipId } });
   });
-
-  if (existing) {
-    await prisma.huntClipSave.delete({ where: { id: existing.id } });
-  } else {
-    await prisma.huntClipSave.create({ data: { userId, clipId } });
-  }
 
   return listHunts(sessionToken);
 }

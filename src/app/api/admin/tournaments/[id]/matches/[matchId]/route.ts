@@ -6,16 +6,14 @@ import { updateTournamentMatch } from "@/lib/server/tournaments/service";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const nullableName = z.string().trim().max(80).nullable();
+const nullableName = z.string().trim().min(1).max(80).nullable();
 const nullableScore = z.number().int().min(0).max(1_000_000).nullable();
 const matchSchema = z.object({
-  participantA: nullableName.optional(),
-  participantB: nullableName.optional(),
   scoreA: nullableScore.optional(),
   scoreB: nullableScore.optional(),
   winner: nullableName.optional(),
   status: z.enum(["PENDING", "LIVE", "COMPLETED"]).optional(),
-});
+}).strict().refine((value) => Object.keys(value).length > 0);
 
 export async function PATCH(
   request: NextRequest,

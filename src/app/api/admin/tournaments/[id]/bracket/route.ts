@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { SESSION_COOKIE } from "@/lib/server/auth/session";
-import { buildTournamentBracket } from "@/lib/server/tournaments/service";
+import { buildTournamentBracket, resetTournamentBracket } from "@/lib/server/tournaments/service";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,6 +22,17 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     return NextResponse.json({ tournament });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Bracket creation failed.";
+    return NextResponse.json({ error: message }, { status: message.includes("Admin") ? 403 : 400 });
+  }
+}
+
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await context.params;
+    const tournament = await resetTournamentBracket(request.cookies.get(SESSION_COOKIE)?.value, id);
+    return NextResponse.json({ tournament });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Bracket reset failed.";
     return NextResponse.json({ error: message }, { status: message.includes("Admin") ? 403 : 400 });
   }
 }
